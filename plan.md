@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 8.1 — Template cache and TDC utilities
+Current task: 8.2 — Parameterized collect token generator
 
 ---
 
@@ -72,8 +72,8 @@ Current task: 8.1 — Template cache and TDC utilities
 
 | ID | Task | Status |
 |----|------|--------|
-| 8.1 | Template cache and TDC utilities (tdc-utils.js, template-cache.js) | in-progress |
-| 8.2 | Parameterized collect token generator (collect-generator.js) | pending |
+| 8.1 | Template cache and TDC utilities (tdc-utils.js, template-cache.js) | done |
+| 8.2 | Parameterized collect token generator (collect-generator.js) | in-progress |
 | 8.3 | Tests for foundation modules | pending |
 
 ### Phase 9: vData Generation
@@ -105,43 +105,41 @@ Current task: 8.1 — Template cache and TDC utilities
 
 ## Current Task
 
-**ID**: 8.1
-**Title**: Template cache and TDC utilities
+**ID**: 8.2
+**Title**: Parameterized collect token generator
 **Phase**: Scraper Foundation Modules
 **Status**: in-progress
 
 ### Goal
-Create two utility modules: `scraper/tdc-utils.js` (extract TDC_NAME and eks from tdc.js source) and `scraper/template-cache.js` (map TDC_NAME → XTEA params, pre-seeded from existing pipeline output). These are prerequisites for all downstream scraper modules.
+Create `scraper/collect-generator.js` — a parameterized XTEA encryption module that generates collect tokens using any template's key (not just Template A's hardcoded key). Reuses `token/outer-pipeline.js` and `token/collector-schema.js` for the key-independent parts; only re-implements the XTEA cipher with dynamic key/delta/keyModConstants parameters.
 
 ### Context
-- **TDC_NAME extraction**: Line 1 of every tdc.js contains `var TDC_NAME="<32-char-string>"`. Extract via regex.
-- **eks extraction**: Line 123 (approximately) contains `window[TDC_NAME] = '<base64>'` — the eks token. 312 chars base64. Extract via regex matching `window[...] = '...'` pattern on the source string.
-- **Template cache**: Simple JSON file at `scraper/cache/templates.json`. Pre-seed from the 5 existing `output/*/pipeline-config.json` files. Each entry maps TDC_NAME → `{template, key, delta, rounds, keyModConstants, caseCount, lastSeen}`.
-- **Existing pipeline configs** at `output/tdc/pipeline-config.json` etc. contain `xteaParams: {key, delta, rounds, keyModConstants}` and `template` field.
-- The cache module should support: `lookup(tdcName)` → params or null, `store(tdcName, params)`, `seed()` to populate from output files.
-- **Protected paths**: Do NOT modify anything in `token/`, `pipeline/`, `puppeteer/`, `targets/`. Only create new files in `scraper/`.
-- **Style**: CommonJS, 2-space indent, single quotes, semicolons, `const`/`let`.
+- **`token/crypto-core.js`** has hardcoded `STATE_A = [0x6257584F, ...]`, `DELTA`, `KEY_MOD_1`, `KEY_MOD_3`. These are Template A only. We need a version that accepts these as parameters.
+- **`token/outer-pipeline.js`** exports `buildCdString`, `buildSdString`, `assembleToken`, `urlEncode`, `buildToken` — all key-independent, safe to `require()`.
+- **`token/collector-schema.js`** exports `buildDefaultCdArray` — also key-independent, safe to `require()`.
+- **`token/generate-token.js`** exports `generateToken(profile, options)` and `buildInputChunks(cdString, sdString)` — these call the hardcoded `encryptSegments`. Our module should replicate the chunk-building + encryption pipeline with a parameterized encrypt function.
+- **Template XTEA params** come from `scraper/template-cache.js` (task 8.1) as `{key: [4 ints], delta: int, rounds: int, keyModConstants: [2 ints]}`.
+- The `buildToken` function in `outer-pipeline.js` takes an `encryptFn(chunks) → base64segments[]` — this is the pluggable interface. We create our own `encryptFn` parameterized by key/delta/keyModConstants.
+- **XTEA cipher algorithm** (from `token/crypto-core.js` lines 94-122):
+  - `cipherRound(r9, r92)` — Feistel with sum accumulation, key mod on indices 1 and 3
+  - `encrypt(inputBytes)` — 8-byte block ECB
+  - `encryptSegments(chunks)` — encrypt + btoa each chunk
+- **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
 
 ### Implementation Steps
-1. Create `scraper/` directory and `scraper/cache/` subdirectory.
-2. Create `scraper/tdc-utils.js` with:
-   - `extractTdcName(source)` — regex on first line: `/var\s+TDC_NAME\s*=\s*"([^"]+)"/`
-   - `extractEks(source)` — regex: `/window\[TDC_NAME\]\s*=\s*'([^']+)'/` (or match the variable pattern)
-3. Create `scraper/template-cache.js` with:
-   - Constructor takes optional path to `templates.json` (default: `scraper/cache/templates.json`)
-   - `load()` — read JSON file, return cache object
-   - `save()` — write cache to disk
-   - `lookup(tdcName)` — return XTEA params or null
-   - `store(tdcName, params)` — add/update entry with `lastSeen` timestamp
-   - `seed()` — scan `output/*/pipeline-config.json` files and populate cache
-4. Create `scraper/cache/templates.json` pre-seeded with all 3 known templates (A, B, C).
+1. Create `scraper/collect-generator.js` with:
+   - `createEncryptFn({key, delta, rounds, keyModConstants})` → returns an `encryptFn(chunks)` compatible with `outer-pipeline.buildToken()`.
+   - Internal helpers: `convertBytesToWord`, `convertWordToBytes`, `cipherRound`, `encrypt` — copied from `token/crypto-core.js` but parameterized (key/delta/keyModConstants as closure variables instead of module constants).
+   - `generateCollect(profile, xteaParams, options)` — main entry point. Builds cdArray from profile via `collector-schema.buildDefaultCdArray`, builds cdString/sdString via `outer-pipeline`, builds input chunks (same logic as `generate-token.buildInputChunks`), encrypts with parameterized XTEA, assembles + URL-encodes.
+2. The function signature of `generateCollect` should match what the scraper orchestrator needs:
+   - `profile`: fingerprint profile object (from `profiles/*.json`)
+   - `xteaParams`: `{key, delta, rounds, keyModConstants}` from template cache
+   - `options`: `{appid, nonce}` for sdString
 
 ### Verification
-- [ ] `node -e "const u = require('./scraper/tdc-utils'); const fs = require('fs'); const src = fs.readFileSync('targets/tdc.js','utf8'); console.log(u.extractTdcName(src)); console.log(u.extractEks(src).length)"` → prints `FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk` and `312`
-- [ ] Same test with `targets/tdc-v2.js` → prints `SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD` and `312`
-- [ ] Same test with `targets/tdc-v5.js` → prints `WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE` and `312`
-- [ ] `node -e "const c = require('./scraper/template-cache'); const cache = new c(); cache.load(); const p = cache.lookup('FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk'); console.log(p.key, p.delta, p.rounds)"` → prints the correct key array, delta 2654435769, rounds 32
-- [ ] `scraper/cache/templates.json` exists and contains 3 entries with correct XTEA keys matching `output/*/pipeline-config.json`
+- [ ] Generate a collect token with Template A params and compare output length to `token/generate-token.js` output (both should produce ~4460 char URL-encoded strings from the same profile).
+- [ ] Verify the parameterized encrypt produces byte-identical output to `token/crypto-core.encryptFn` for Template A params: `node -e` test that encrypts the same input with both and compares.
+- [ ] Generate a collect token with Template B params (different key) — should succeed and produce a different token than Template A.
 
 ### Suggested Agent
-general-purpose — straightforward file creation with known patterns and data
+general-purpose — reimplementation of known algorithm with parameterization

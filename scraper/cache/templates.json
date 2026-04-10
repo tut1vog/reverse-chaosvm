@@ -1,0 +1,29 @@
+{
+  "FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk": {
+    "template": "A",
+    "key": [1649891407, 1177175396, 1667911778, 1835286848],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [2368517, 592130],
+    "caseCount": 95,
+    "lastSeen": "2026-04-10T06:46:26.597Z"
+  },
+  "SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD": {
+    "template": "B",
+    "key": [1800497218, 1297435497, 1768248406, 1160520510],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [0, 2236974],
+    "caseCount": 94,
+    "lastSeen": "2026-04-10T06:48:07.539Z"
+  },
+  "WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE": {
+    "template": "C",
+    "key": [1497973082, 1162699365, 1835557720, 1818645087],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [0, 263180],
+    "caseCount": 100,
+    "lastSeen": "2026-04-10T06:53:28.698Z"
+  }
+}
