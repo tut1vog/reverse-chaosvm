@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 2 — Claude Code Tooling
-Current task: 2.1 — Create agent files (opcode-mapper, key-extractor, token-verifier)
+Current task: 2.2 — Create commands (port-version, fetch-latest) and skill (port-opcodes)
 
 ---
 
@@ -21,8 +21,8 @@ Current task: 2.1 — Create agent files (opcode-mapper, key-extractor, token-ve
 
 | ID | Task | Status |
 |----|------|--------|
-| 2.1 | Create agent files (opcode-mapper, key-extractor, token-verifier) | in-progress |
-| 2.2 | Create commands (port-version, fetch-latest) and skill (port-opcodes) | pending |
+| 2.1 | Create agent files (opcode-mapper, key-extractor, token-verifier) | done |
+| 2.2 | Create commands (port-version, fetch-latest) and skill (port-opcodes) | in-progress |
 
 ### Phase 3: VM Parser & Opcode Auto-Mapper
 > Build modules to parse any tdc build's VM function, identify variables by structural role, and auto-map opcodes to known semantic operations.
@@ -64,37 +64,38 @@ Current task: 2.1 — Create agent files (opcode-mapper, key-extractor, token-ve
 
 ## Current Task
 
-**ID**: 2.1
-**Title**: Create agent files (opcode-mapper, key-extractor, token-verifier)
+**ID**: 2.2
+**Title**: Create commands (port-version, fetch-latest) and skill (port-opcodes)
 **Phase**: Claude Code Tooling
 **Status**: in-progress
 
 ### Goal
-Create 3 specialized agent markdown files that define the behavior of the pipeline's core agents. These agents will be dispatched by the director to perform specific pipeline stages.
+Create the 2 command files and 1 skill file specified in the project brief. These provide user-facing entry points for the automated pipeline and manual opcode porting workflow.
 
 ### Context
-- Agent files go in `.claude/agents/` alongside the existing cc-project-* agents
-- Format: YAML frontmatter (`name`, `description`) + system prompt body
-- The system prompts must be project-agnostic enough to be reusable but specific enough to be effective
-- Key reference files for writing these agents:
-  - `docs/OPCODE_REFERENCE.md` — 95 known semantic operations (opcode-mapper needs this)
-  - `docs/CRYPTO_ANALYSIS.md` — XTEA analysis (key-extractor needs this)
-  - `docs/TOKEN_FORMAT.md` — token structure (token-verifier needs this)
-  - `dynamic/crypto-tracer-v3.js` — reference tracer implementation (key-extractor adapts this pattern)
-  - `decompiler/disassembler.js` — reference opcode table format (opcode-mapper outputs this format)
-  - `token/generate-token.js` — token generation entry point (token-verifier uses this)
+- Commands go in `.claude/commands/` (currently empty directory)
+- Skills go in `.claude/skills/` (currently empty directory)
+- Commands are invoked as slash commands (e.g., `/port-version targets/tdc-v4.js`)
+- The skill provides detailed step-by-step instructions for manual opcode mapping
+- Key references:
+  - `project-brief.md` sections on Commands and Skills — specifies what each should do
+  - `.claude/agents/opcode-mapper.md` — the agent that port-version will dispatch for opcode mapping
+  - `.claude/agents/key-extractor.md` — the agent port-version dispatches for key extraction
+  - `.claude/agents/token-verifier.md` — the agent port-version dispatches for verification
+  - `docs/OPCODE_REFERENCE.md` — the pattern-matching reference table that port-opcodes skill needs
+  - `decompiler/disassembler.js` lines 27-123 — reference opcode table format
 
 ### Implementation Steps
-1. Create `.claude/agents/opcode-mapper.md` — agent that parses `__TENCENT_CHAOS_VM` switch/case handlers, identifies VM variables by structural role, normalizes handlers, and pattern-matches to known semantic operations. Outputs opcode table as JSON.
-2. Create `.claude/agents/key-extractor.md` — agent that uses Puppeteer to dynamically trace the XTEA key schedule. Extracts STATE_A (4×uint32), delta, round count, and key modification constants.
-3. Create `.claude/agents/token-verifier.md` — agent that captures a live token via Puppeteer, generates a standalone token using extracted config, and performs byte-by-byte comparison with detailed diagnostics.
+1. Create `.claude/commands/port-version.md` — primary command that takes a tdc file path as argument, runs full automated pipeline: decode → opcode auto-map → XTEA key extract → token verify. Reports progress at each stage, halts with diagnostics on failure.
+2. Create `.claude/commands/fetch-latest.md` — fetches fresh tdc.js builds from Tencent's CAPTCHA endpoint, saves to `targets/` with appropriate naming, reports which template each build matches.
+3. Create `.claude/skills/port-opcodes.md` — detailed step-by-step instructions for manual opcode mapping process, including the pattern-matching reference table and handling for ambiguous/compound opcodes.
 
 ### Verification
-- [ ] `.claude/agents/opcode-mapper.md` exists with valid YAML frontmatter and mentions structural role identification, pattern matching, JSON output
-- [ ] `.claude/agents/key-extractor.md` exists with valid YAML frontmatter and mentions Puppeteer, XTEA, STATE_A, dynamic tracing
-- [ ] `.claude/agents/token-verifier.md` exists with valid YAML frontmatter and mentions byte comparison, live capture, diagnostics
-- [ ] All 3 files have `name` and `description` in frontmatter
-- [ ] No agent overwrites the existing cc-project-* files
+- [ ] `.claude/commands/port-version.md` exists and describes the full pipeline stages (decode, opcode map, key extract, verify)
+- [ ] `.claude/commands/fetch-latest.md` exists and describes fetching from Tencent endpoint
+- [ ] `.claude/skills/port-opcodes.md` exists and contains pattern-matching reference table for opcode identification
+- [ ] All files are valid markdown
+- [ ] No existing files modified
 
 ### Suggested Agent
-general-purpose — writing agent definition markdown files
+general-purpose — writing command and skill definition markdown files
