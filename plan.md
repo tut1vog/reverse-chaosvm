@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 15
-Current task: 15.3 — Modify hybrid solver: Chrome vData generation
+Current task: 15.4 — Live test with Chrome-generated vData
 
 ---
 
@@ -137,50 +137,36 @@ Current task: 15.3 — Modify hybrid solver: Chrome vData generation
 |----|------|--------|
 | 15.1 | Build POST body comparison script | done |
 | 15.2 | vData and jQuery serialization comparison | done |
-| 15.3 | Modify hybrid solver: Chrome vData generation | pending |
-| 15.4 | Live test with Chrome-generated vData | pending |
+| 15.3 | Modify hybrid solver: Chrome vData generation | done |
+| 15.4 | Live test with Chrome-generated vData | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 15.3
-**Title**: Modify hybrid solver: Chrome vData generation
+**ID**: 15.4
+**Title**: Live test with Chrome-generated vData
 **Phase**: Byte-Level POST Body Comparison
 **Status**: in-progress
 
 ### Goal
-Modify `scripts/hybrid-solver.js` to generate vData inside Chrome (via page.evaluate) instead of jsdom. Task 15.2 proved that jsdom's vm-slide produces different vData than a real browser (likely environment detection). The Phase 14 hybrid solver used jsdom for vData — that's why it still got errorCode 9 even with Chrome TLS. This task fixes that by moving vData generation into Chrome's context.
+Run the modified hybrid solver (Chrome vData instead of jsdom) against the live endpoint. This is the critical experiment: if errorCode 9 disappears, vData was the cause. If it persists, there's something else.
 
 ### Context
-- `scripts/hybrid-solver.js` — existing hybrid solver, currently uses jsdom vData (line 386-441)
-- `scraper/vdata-generator.js` — jsdom-based vData generator (to be replaced for Chrome path)
-- `sample/vm_slide.js` (43688 bytes) — vm-slide source, needs to execute in Chrome context
-- `sample/slide-jy.js` (96410 bytes) — jQuery source, needs to execute in Chrome context
-- The hybrid solver already has Puppeteer's `page` object available and intercepts responses
-
-**Approach**: Instead of calling `generateVData()` (jsdom), inject jQuery + vm-slide into the Puppeteer page, build the postFields object in Chrome's context, fire jQuery.ajax, intercept the vData from the XHR hook, and return it to Node.js.
-
-Specifically, modify the hybrid solver's Step 8 to:
-1. Read slide-jy.js and vm_slide.js sources in Node.js
-2. Use `page.evaluate()` to:
-   a. Inject jQuery and vm-slide into the page's JS context
-   b. Hook XHR.send to capture the body
-   c. Build the postFields object (pass from Node.js via evaluate args)
-   d. Fire `$.ajax({type:'POST', data: postFields})` — vm-slide hooks and appends vData
-   e. Return the captured body (with vData) back to Node.js
-3. Parse the returned body to extract vData and the serialized POST body
-4. Use these for the verify POST (via page.evaluate(fetch()))
+- `scripts/hybrid-solver.js` — modified to use Chrome page.evaluate for vData generation
+- Phase 14 hybrid test: Chrome TLS + jsdom vData → errorCode 9
+- Phase 15.2 finding: jsdom vData differs completely from browser vData
 
 ### Implementation Steps
-1. In `scripts/hybrid-solver.js`, replace the jsdom vData generation (lines ~386-441) with Chrome-based generation
-2. Keep the jsdom path as a fallback (in case Chrome page context is unavailable), behind a flag
-3. Ensure the verify POST still uses the jQuery-serialized body + vData from Chrome
+1. Run `node scripts/hybrid-solver.js` 2-3 times
+2. Document results in `output/hybrid-test-chrome-vdata.json`
+3. Compare errorCode with Phase 14 results
 
 ### Verification
-- [ ] `scripts/hybrid-solver.js` modified — Chrome vData path is the default
-- [ ] The script still runs: `node scripts/hybrid-solver.js --headful` (manual check — no crash)
-- [ ] vData is generated via page.evaluate, not jsdom (check log output: should say "Chrome" not "jsdom")
+- [ ] Script completes without crashes
+- [ ] Chrome vData generation succeeds (log shows "Step 8: Generate vData via Chrome")
+- [ ] Results documented with errorCode
+- [ ] Comparison with Phase 14 (jsdom vData) results documented
 
 ### Suggested Agent
 general-purpose
