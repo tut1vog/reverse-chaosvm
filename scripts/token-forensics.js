@@ -37,6 +37,9 @@ puppeteer.use(StealthPlugin());
 const { CaptchaClient } = require('../puppeteer/captcha-client');
 const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const TemplateCache = require('../scraper/template-cache');
+const { parseVmFunction } = require('../pipeline/vm-parser');
+const { mapOpcodes } = require('../pipeline/opcode-mapper');
+const { extractKey } = require('../pipeline/key-extractor');
 const {
   buildCdString,
   buildSdString,
@@ -564,6 +567,36 @@ function comparisonC(chromeCollect, parsed, xteaParams, hashContent) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Pipeline XTEA extraction
+// ═══════════════════════════════════════════════════════════════════════
+
+async function extractXteaFromSource(tdcSource) {
+  const os = require('os');
+  const tmpFile = path.join(os.tmpdir(), `tdc-forensics-${Date.now()}.js`);
+  try {
+    // Write source to temp file (extractKey reads from disk)
+    fs.writeFileSync(tmpFile, tdcSource, 'utf8');
+
+    // Run pipeline: parse → map → extract
+    const parsed = parseVmFunction(tdcSource);
+    const mapped = mapOpcodes(parsed, tdcSource);
+    const keyResult = await extractKey(tmpFile, mapped.opcodeTable, parsed.variables);
+
+    return {
+      key: keyResult.key,         // array of 4 ints
+      delta: keyResult.delta,     // 0x9E3779B9
+      rounds: keyResult.rounds,   // 32
+      keyMods: keyResult.keyMods || [0, 0, 0, 0],
+      keyModConstants: keyResult.keyModConstants || null,
+      source: 'pipeline',
+    };
+  } finally {
+    // Clean up temp file
+    try { fs.unlinkSync(tmpFile); } catch (_) {}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Main
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -703,40 +736,59 @@ async function run(opts) {
     const chromeCollect = chromeGetData.collect;
     log(`  Chrome collect token captured: ${chromeCollect.length} chars`);
 
-    // ── Step 5: Extract TDC_NAME + template cache lookup ──
-    log('Step 5: Extract TDC_NAME + template lookup...');
+    // ── Step 5: Extract TDC_NAME + XTEA params ──
+    log('Step 5: Extract TDC_NAME + XTEA params...');
     const tdcName = extractTdcName(capturedTdcSource);
     if (!tdcName) throw new Error('Could not extract TDC_NAME');
     log(`  TDC_NAME: ${tdcName}`);
     results.tdcName = tdcName;
 
-    let cached = cache.lookup(tdcName);
-    if (!cached) {
-      log('  TDC_NAME not in cache, trying structural lookup...');
-      try {
-        const { parseVmFunction } = require('../pipeline/vm-parser');
-        const vmInfo = parseVmFunction(capturedTdcSource);
-        cached = cache.lookupByStructure(vmInfo.caseCount);
-        if (cached) {
-          cache.store(tdcName, cached);
-          log(`  Matched template ${cached.template} by structure (${vmInfo.caseCount} opcodes)`);
+    // Try pipeline extraction first (gets current key for live build)
+    let xteaParams = null;
+    let xteaSource = 'unknown';
+    try {
+      log('  Attempting pipeline XTEA extraction from live tdc.js...');
+      xteaParams = await extractXteaFromSource(capturedTdcSource);
+      xteaSource = 'pipeline';
+      log(`  Pipeline extraction succeeded: key=[${xteaParams.key.map(k => '0x' + (k >>> 0).toString(16)).join(', ')}]`);
+      log(`  keyMods=[${xteaParams.keyMods.join(', ')}], delta=0x${(xteaParams.delta >>> 0).toString(16)}, rounds=${xteaParams.rounds}`);
+      results.template = 'pipeline-extracted';
+    } catch (pipelineErr) {
+      log(`  Pipeline extraction failed: ${pipelineErr.message}`);
+      log('  Falling back to template cache...');
+
+      // Existing template cache lookup as fallback
+      let cached = cache.lookup(tdcName);
+      if (!cached) {
+        log('  TDC_NAME not in cache, trying structural lookup...');
+        try {
+          const vmInfo = parseVmFunction(capturedTdcSource);
+          cached = cache.lookupByStructure(vmInfo.caseCount);
+          if (cached) {
+            cache.store(tdcName, cached);
+            log(`  Matched template ${cached.template} by structure (${vmInfo.caseCount} opcodes)`);
+          }
+        } catch (parseErr) {
+          log(`  VM parse failed: ${parseErr.message}`);
         }
-      } catch (parseErr) {
-        log(`  VM parse failed: ${parseErr.message}`);
       }
+      if (!cached) throw new Error(`Unknown template ${tdcName} (pipeline failed, cache miss)`);
+
+      results.template = cached.template;
+      log(`  Template: ${cached.template}, opcodes: ${cached.caseCount}`);
+
+      xteaParams = {
+        key: cached.key,
+        delta: cached.delta,
+        rounds: cached.rounds,
+        keyModConstants: cached.keyModConstants,
+        keyMods: cached.keyMods || null,
+      };
+      xteaSource = 'cache';
     }
-    if (!cached) throw new Error(`Unknown template ${tdcName}`);
 
-    results.template = cached.template;
-    log(`  Template: ${cached.template}, opcodes: ${cached.caseCount}`);
-
-    const xteaParams = {
-      key: cached.key,
-      delta: cached.delta,
-      rounds: cached.rounds,
-      keyModConstants: cached.keyModConstants,
-      keyMods: cached.keyMods || null,
-    };
+    results.xteaSource = xteaSource;
+    log(`  XTEA params source: ${xteaSource}`);
 
     // ── Step 6: Decrypt Chrome's collect token ──
     log('Step 6: Decrypt Chrome collect token...');
