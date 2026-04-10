@@ -273,9 +273,16 @@ class CaptchaPuppeteer {
             log(`  [pptr] Verify request: POST body ${postData.length} chars`);
             log(`  [pptr] Verify request: collect field length = ${collect.length}`);
             // Capture full POST body as plain object
+            // IMPORTANT: URLSearchParams converts '+' to spaces, corrupting
+            // base64 fields (collect, eks). Parse raw postData to preserve them.
             capturedVerifyPost = {};
-            for (const [key, value] of params.entries()) {
-              capturedVerifyPost[key] = value;
+            for (const pair of postData.split('&')) {
+              const eqIdx = pair.indexOf('=');
+              if (eqIdx === -1) continue;
+              const k = decodeURIComponent(pair.slice(0, eqIdx));
+              // Preserve '+' as literal (it's base64, not space)
+              const v = decodeURIComponent(pair.slice(eqIdx + 1).replace(/\+/g, '%2B'));
+              capturedVerifyPost[k] = v;
             }
             log(`  [pptr] Verify request: captured ${Object.keys(capturedVerifyPost).length} fields`);
           } catch (err) {
