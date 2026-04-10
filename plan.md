@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 5 — Token Verifier & Pipeline Orchestrator
-Current task: 5.2 — Implement pipeline orchestrator
+Current phase: Phase 6 — Multi-Version Validation
+Current task: 6.1 — Port tdc-v3 (Template A — same as tdc.js, sanity check)
 
 ---
 
@@ -47,7 +47,7 @@ Current task: 5.2 — Implement pipeline orchestrator
 | ID | Task | Status |
 |----|------|--------|
 | 5.1 | Implement token verifier module (capture live, generate standalone, byte-compare) | done |
-| 5.2 | Implement pipeline orchestrator (decode → map → extract → verify) | in-progress |
+| 5.2 | Implement pipeline orchestrator (decode → map → extract → verify) | done |
 | 5.3 | Tests for verifier and orchestrator | pending |
 
 ### Phase 6: Multi-Version Validation
@@ -55,7 +55,7 @@ Current task: 5.2 — Implement pipeline orchestrator
 
 | ID | Task | Status |
 |----|------|--------|
-| 6.1 | Port tdc-v3 (Template A — same as tdc.js, sanity check) | pending |
+| 6.1 | Port tdc-v3 (Template A — same as tdc.js, sanity check) | in-progress |
 | 6.2 | Port tdc-v2 (Template B — different opcodes and XTEA key) | pending |
 | 6.3 | Port tdc-v4 and tdc-v5 (unknown templates) | pending |
 | 6.4 | Update documentation with all findings | pending |
@@ -64,45 +64,17 @@ Current task: 5.2 — Implement pipeline orchestrator
 
 ## Current Task
 
-**ID**: 5.2
-**Title**: Implement pipeline orchestrator
-**Phase**: Token Verifier & Pipeline Orchestrator
+**ID**: 6.1
+**Title**: Port tdc-v3 (Template A — same as tdc.js, sanity check)
+**Phase**: Multi-Version Validation
 **Status**: in-progress
 
 ### Goal
-Build the single-command entry point that chains all pipeline stages: parse → map opcodes → extract key → verify token. This is the `pipeline/run.js` that the `/port-version` command will invoke.
-
-### Context
-All pipeline modules are now built and tested:
-- `pipeline/vm-parser.js` — `parseVmFunction(src)` → variables, switchNode, caseCount
-- `pipeline/opcode-mapper.js` — `mapOpcodes(parseResult)` → opcodeTable, unmapped, notes
-- `pipeline/key-extractor.js` — `extractKey(tdcPath, opcodeTable, variables)` → key params (async, Puppeteer)
-- `pipeline/token-verifier.js` — `verifyToken(tdcPath, keyParams)` → match result (async, Puppeteer)
-- `decompiler/decoder.js` — bytecode decoder (already works on all builds)
-
-The orchestrator chains these, reports progress, saves per-version config, and handles errors.
-
-**Output location**: `pipeline/run.js` (both importable and CLI-runnable)
-
-### Implementation Steps
-1. Create `pipeline/run.js` exporting `portVersion(tdcPath, options)` (async)
-2. CLI support: `node pipeline/run.js targets/tdc-v4.js`
-3. Pipeline stages:
-   - Stage 1: Read and parse source → vm-parser → report variables and case count
-   - Stage 2: Map opcodes → opcode-mapper → report mapped/unmapped counts, save opcode-table.json
-   - Stage 3: Extract XTEA key → key-extractor → report key params, save xtea-params.json
-   - Stage 4: Verify token → token-verifier → report match result, save verification-report.json
-4. Output directory: `output/<target-stem>/` (create if needed)
-5. Save a combined `output/<target-stem>/pipeline-config.json` with all extracted params
-6. Progress reporting: console.log at each stage with timing
-7. Error handling: if any stage fails, report which stage, save partial results, exit
+Run the automated pipeline on tdc-v3.js as a sanity check. This is the same template as tdc.js (Template A, 95 opcodes) so it should pass with byte-identical token match.
 
 ### Verification
-- [ ] `pipeline/run.js` exists and exports `portVersion`
-- [ ] `node pipeline/run.js targets/tdc.js` completes all 4 stages successfully
-- [ ] Output files created: `output/tdc/opcode-table.json`, `output/tdc/xtea-params.json`, `output/tdc/verification-report.json`, `output/tdc/pipeline-config.json`
-- [ ] Verification shows byte-identical match for tdc.js
-- [ ] No modifications to existing files
-
-### Suggested Agent
-general-purpose — orchestration script, straightforward
+- [ ] `node pipeline/run.js targets/tdc-v3.js` completes all 4 stages
+- [ ] Template classified as A (95 opcodes)
+- [ ] XTEA key matches tdc.js key (same template)
+- [ ] Token verification: byte-identical match
+- [ ] Output files saved to `output/tdc-v3/`
