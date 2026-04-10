@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 17.2 — Tests for Chrome cd injection script
+Current task: 17.3 — Full Chrome cd injection — live test
 
 ---
 
@@ -161,7 +161,7 @@ Current task: 17.2 — Tests for Chrome cd injection script
 | ID | Task | Status |
 |----|------|--------|
 | 17.1 | Chrome cd injection script | done |
-| 17.2 | Tests for Chrome cd injection script | pending |
+| 17.2 | Tests for Chrome cd injection script | done |
 | 17.3 | Full Chrome cd injection — live test | pending |
 | 17.4 | Binary search: identify which cd fields the server validates | pending |
 | 17.5 | Fix identified fields in standalone generator | pending |
@@ -171,31 +171,32 @@ Current task: 17.2 — Tests for Chrome cd injection script
 
 ## Current Task
 
-**ID**: 17.2
-**Title**: Tests for Chrome cd injection script
-**Phase**: Chrome cd Injection — Identify Which Fields the Server Validated
+**ID**: 17.3
+**Title**: Full Chrome cd injection — live test
+**Phase**: Chrome cd Injection — Identify Which Fields the Server Validates
 **Status**: in-progress
 
 ### Goal
-Write unit tests for the `cdArrayOverride` feature added to `scraper/collect-generator.js`. Verify that passing `cdArrayOverride` skips `buildDefaultCdArray` and `reorderCdArray`, and that the resulting token contains the overridden cd values.
+Run `scripts/chrome-cd-inject.js` live against Tencent's CAPTCHA endpoint. Determine whether a standalone-encrypted token with Chrome's real cd values resolves errorCode 9. This is the critical experiment.
 
 ### Context
-- `scraper/collect-generator.js` lines 347-355: the `cdArrayOverride` logic
-- Existing tests: `tests/test-collect-generator.js` — extend with new test cases
-- The override should: (a) skip buildDefaultCdArray, (b) skip reorderCdArray, (c) produce a valid encrypted token containing the override cd array
-- The `generateCollect()` function returns a URL-encoded string
+- Script: `scripts/chrome-cd-inject.js` (829 lines) — ready to run
+- Requires: Chrome/Chromium with Puppeteer, Python OpenCV for slide solving
+- Output: `output/chrome-cd-inject.json`
+- Previous results: hybrid-solver.js (standalone token + Chrome TLS) always gets errorCode 9
+- If this script gets errorCode != 9, it proves cd field values are the root cause
+- If still errorCode 9, it means the issue is in encryption, token structure, or sd fields
 
 ### Implementation Steps
-1. Read `tests/test-collect-generator.js` to understand existing test patterns
-2. Add test cases:
-   - `cdArrayOverride` bypasses `buildDefaultCdArray` (verify different token output)
-   - `cdArrayOverride` with a known array produces a token that, when decrypted, contains that array
-   - `cdArrayOverride` is ignored when not an array (falls back to normal path)
-3. Ensure all existing tests still pass
+1. Run `node scripts/chrome-cd-inject.js` with up to 3 attempts
+2. Examine output for: cd array capture success, cd diff count, verify response errorCode
+3. Save results to `output/chrome-cd-inject.json`
 
 ### Verification
-- [ ] `npm test` passes (163/165 + new tests)
-- [ ] New tests in `tests/test-collect-generator.js` cover cdArrayOverride
+- [ ] Script runs to completion without crashes
+- [ ] cd array captured from Chrome (length 55-65)
+- [ ] Verify response received (any errorCode — we're recording the outcome)
+- [ ] Results saved to `output/chrome-cd-inject.json`
 
 ### Suggested Agent
 general-purpose
