@@ -1,0 +1,1669 @@
+{
+  "timestamp": "2026-04-10T14:04:08.394Z",
+  "description": "Same-session comparison: Chrome tdc.js collect vs standalone collect",
+  "session": {
+    "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+    "templateCaseCount": 98,
+    "xteaKey": "4f4d6852 61426747 45535c40 6c3b4158",
+    "nonce": "eda1152f11f1daf0",
+    "ans": "459,30;"
+  },
+  "chromeCollect": {
+    "length": 4908,
+    "decryptedLength": 3675,
+    "cdFieldCount": 60,
+    "sdFields": [
+      "od",
+      "clientType",
+      "coordinate",
+      "trycnt",
+      "refreshcnt",
+      "slideValue",
+      "dragobj",
+      "ft"
+    ]
+  },
+  "standaloneCollect": {
+    "length": 5966,
+    "decryptedLength": 4204,
+    "cdFieldCount": 60,
+    "sdFields": [
+      "od",
+      "clientType",
+      "coordinate",
+      "trycnt",
+      "refreshcnt",
+      "slideValue",
+      "dragobj",
+      "ft"
+    ]
+  },
+  "cdDiff": [
+    {
+      "index": 0,
+      "fieldName": "connectionInfo",
+      "chrome": null,
+      "standalone": null,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 1,
+      "fieldName": "timezoneOffset",
+      "chrome": "+08",
+      "standalone": "+08",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 2,
+      "fieldName": "plugins",
+      "chrome": [
+        {
+          "name": "PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Chrome PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Chromium PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Microsoft Edge PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "WebKit built-in PDF",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        }
+      ],
+      "standalone": [
+        {
+          "name": "PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Chrome PDF Viewer",
+          "[[4,-1,-1,1775829848388,0,0,0,0]]               description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Chromium PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Microsoft Edge PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "WebKit built-in PDF",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        }
+      ],
+      "match": false,
+      "severity": "low"
+    },
+    {
+      "index": 3,
+      "fieldName": "indexedDbAvail",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 4,
+      "fieldName": "flashFonts",
+      "chrome": "",
+      "standalone": "",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 5,
+      "fieldName": "audioFingerprint",
+      "chrome": {
+        "nt_vc_output": {
+          "ac-baseLatency": 0.01,
+          "ac-outputLatency": 0,
+          "ac-sampleRate": 44100,
+          "ac-maxChannelCount": 2,
+          "ac-numberOfInputs": 1,
+          "ac-numberOfOutputs": 0,
+          "ac-channelCount": 2,
+          "ac-channelCountMode": "explicit",
+          "ac-channelInterpretation": "speakers",
+          "an-fftSize": 2048,
+          "an-frequencyBinCount": 1024,
+          "an-minDecibels": -100,
+          "an-maxDecibels": -30,
+          "an-smoothingTimeConstant": 0.8,
+          "an-numberOfInputs": 1,
+          "an-numberOfOutputs": 1,
+          "an-channelCount": 2,
+          "an-channelCountMode": "max",
+          "an-channelInterpretation": "speakers"
+        },
+        "pxi_output": 10240
+      },
+      "standalone": {
+        "nt_vc_output": {
+          "ac-baseLatency": 0.01,
+          "ac-outputLatency": 0,
+          "ac-sampleRate": 44100,
+          "ac-maxChannelCount": 2,
+          "ac-numberOfInputs": 1,
+          "ac-numberOfOutputs": 0,
+          "ac-channelCount": 2,
+          "ac-channelCountMode": "explicit",
+          "ac-channelInterpretation": "speakers",
+          "an-fftSize": 2048,
+          "an-frequencyBinCount": 1024,
+          "an-minDecibels": -100,
+          "an-maxDecibels": -30,
+          "an-smoothingTimeConstant": 0.8,
+          "an-numberOfInputs": 1,
+          "an-numberOfOutputs": 1,
+          "an-channelCount": 2,
+          "an-channelCountMode": "max",
+          "an-channelInterpretation": "speakers"
+        },
+        "pxi_output": 10240
+      },
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 6,
+      "fieldName": "audioCodecs",
+      "chrome": [
+        {
+          "codec": "AAC",
+          "support": "probably"
+        },
+        {
+          "codec": "MP3",
+          "support": "probably"
+        },
+        {
+          "codec": "Ogg Vorbis",
+          "support": "probably"
+        },
+        {
+          "codec": "Ogg Opus",
+          "support": "probably"
+        },
+        {
+          "codec": "WAV",
+          "support": "probably"
+        },
+        {
+          "codec": "FLAC",
+          "support": "probably"
+        },
+        {
+          "codec": "WebM Vorbis",
+          "support": "probably"
+        },
+        {
+          "codec": "WebM Opus",
+          "support": "probably"
+        },
+        {
+          "codec": "M4A",
+          "support": "maybe"
+        }
+      ],
+      "standalone": [
+        {
+          "codec": "AAC",
+          "support": "probably"
+        },
+        {
+          "codec": "MP3",
+          "support": "probably"
+        },
+        {
+          "codec": "Ogg Vorbis",
+          "support": "probably"
+        },
+        {
+          "codec": "Ogg Opus",
+          "support": "probably"
+        },
+        {
+          "codec": "WAV",
+          "support": "probably"
+        },
+        {
+          "codec": "FLAC",
+          "support": "probably"
+        },
+        {
+          "codec": "WebM Vorbis",
+          "support": "probably"
+        },
+        {
+          "codec": "WebM Opus",
+          "support": "probably"
+        },
+        {
+          "codec": "M4A",
+          "support": "maybe"
+        }
+      ],
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 7,
+      "fieldName": "touchSupport",
+      "chrome": 2,
+      "standalone": 2,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 8,
+      "fieldName": "webglRenderer",
+      "chrome": "Intel Iris OpenGL Engine",
+      "standalone": "Intel Iris OpenGL Engine",
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 9,
+      "fieldName": "availHeight",
+      "chrome": 600,
+      "standalone": 600,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 10,
+      "fieldName": "frameStatus",
+      "chrome": "top",
+      "standalone": "top",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 11,
+      "fieldName": "headlessFlag",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 12,
+      "fieldName": "cssOverflowResult",
+      "chrome": "",
+      "standalone": "",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 13,
+      "fieldName": "colorGamut",
+      "chrome": "srgb",
+      "standalone": "srgb",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 14,
+      "fieldName": "timestampInit",
+      "chrome": 1775829843,
+      "standalone": 1775829848,
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 15,
+      "fieldName": "userAgentData",
+      "chrome": {
+        "brands": [],
+        "mobile": false,
+        "platform": ""
+      },
+      "standalone": {
+        "brands": [],
+        "mobile": false,
+        "platform": ""
+      },
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 16,
+      "fieldName": "webglImage",
+      "chrome": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+      "standalone": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
+      "match": false,
+      "severity": "high"
+    },
+    {
+      "index": 17,
+      "fieldName": "hardwareConcurrency",
+      "chrome": 8,
+      "standalone": 8,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 18,
+      "fieldName": "videoCodecs",
+      "chrome": [
+        {
+          "codec": "H.264",
+          "support": "probably"
+        },
+        {
+          "codec": "H.264 High",
+          "support": "probably"
+        },
+        {
+          "codec": "H.265/HEVC",
+          "support": ""
+        },
+        {
+          "codec": "VP8",
+          "support": "probably"
+        },
+        {
+          "codec": "VP9",
+          "support": "probably"
+        },
+        {
+          "codec": "AV1",
+          "support": "probably"
+        },
+        {
+          "codec": "Theora",
+          "support": ""
+        },
+        {
+          "codec": "MPEG-4",
+          "support": ""
+        }
+      ],
+      "standalone": [
+        {
+          "codec": "H.264",
+          "support": "probably"
+        },
+        {
+          "codec": "H.264 High",
+          "support": "probably"
+        },
+        {
+          "codec": "H.265/HEVC",
+          "support": ""
+        },
+        {
+          "codec": "VP8",
+          "support": "probably"
+        },
+        {
+          "codec": "VP9",
+          "support": "probably"
+        },
+        {
+          "codec": "AV1",
+          "support": "probably"
+        },
+        {
+          "codec": "Theora",
+          "support": ""
+        },
+        {
+          "codec": "MPEG-4",
+          "support": ""
+        }
+      ],
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 19,
+      "fieldName": "errorLog",
+      "chrome": "",
+      "standalone": "",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 20,
+      "fieldName": "screenComposite",
+      "chrome": "800-600-600-24-*-*-|-*",
+      "standalone": "800-600-600-24-*-*-|-*",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 21,
+      "fieldName": "maxTouchPoints",
+      "chrome": 4,
+      "standalone": 0,
+      "match": false,
+      "severity": "high"
+    },
+    {
+      "index": 22,
+      "fieldName": "userAgent",
+      "chrome": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      "standalone": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 23,
+      "fieldName": "highEntropyValues",
+      "chrome": {
+        "_state": 0,
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "model": "",
+        "platform": "",
+        "platformVersion": "",
+        "uaFullVersion": "",
+        "wow64": false
+      },
+      "standalone": {
+        "_state": 0,
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "model": "",
+        "platform": "",
+        "platformVersion": "",
+        "uaFullVersion": "",
+        "wow64": false
+      },
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 24,
+      "fieldName": "adBlockDetected",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 25,
+      "fieldName": "storageEstimate",
+      "chrome": {
+        "_state": 0,
+        "quota": 10737418240,
+        "usage": null,
+        "usageDetails": {}
+      },
+      "standalone": {
+        "_state": 0,
+        "quota": 10737418240,
+        "usage": null,
+        "usageDetails": {}
+      },
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 26,
+      "fieldName": "viewportWidth",
+      "chrome": 800,
+      "standalone": 800,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 27,
+      "fieldName": "doNotTrack",
+      "chrome": "",
+      "standalone": "",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 28,
+      "fieldName": "featureBitmask",
+      "chrome": 1023,
+      "standalone": 1023,
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 29,
+      "fieldName": "vendor",
+      "chrome": "Intel Inc.",
+      "standalone": "Google Inc. (Google)",
+      "match": false,
+      "severity": "high"
+    },
+    {
+      "index": 30,
+      "fieldName": "canvasHash",
+      "chrome": 797242128,
+      "standalone": 1443396012,
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 31,
+      "fieldName": "timestampCollectionEnd",
+      "chrome": 1775829840,
+      "standalone": 1775829851,
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 32,
+      "fieldName": "performanceHash",
+      "chrome": 681731712,
+      "standalone": 3196862795,
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 33,
+      "fieldName": "screenResolution",
+      "chrome": [
+        1280,
+        1400
+      ],
+      "standalone": [
+        1280,
+        1400
+      ],
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 34,
+      "fieldName": "screenPosition",
+      "chrome": "1;0",
+      "standalone": "0;0",
+      "match": false,
+      "severity": "low"
+    },
+    {
+      "index": 35,
+      "fieldName": "canvasBlocked",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 36,
+      "fieldName": "sessionStorageAvail",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 37,
+      "fieldName": "localStorageAvail",
+      "chrome": 1,
+      "standalone": 1,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 38,
+      "fieldName": "webdriverFlag",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 39,
+      "fieldName": "cookiesEnabled",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 40,
+      "fieldName": "detectedFonts",
+      "chrome": "7448370201960312832",
+      "standalone": "7448307515255877632",
+      "match": false,
+      "severity": "high"
+    },
+    {
+      "index": 41,
+      "fieldName": "pageUrl",
+      "chrome": "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+      "standalone": "https://t.captcha.qq.com/cap_union_new_show?rand=4059232799",
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 42,
+      "fieldName": "internalToken",
+      "chrome": "98k",
+      "standalone": "98k",
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 43,
+      "fieldName": "callCounter",
+      "chrome": 1,
+      "standalone": 1,
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 44,
+      "fieldName": "languages",
+      "chrome": [
+        "en-US",
+        "en"
+      ],
+      "standalone": [
+        "en-US",
+        "en"
+      ],
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 45,
+      "fieldName": "characterSet",
+      "chrome": "UTF-8",
+      "standalone": "UTF-8",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 46,
+      "fieldName": "maxTouchPointsDup",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true,
+      "severity": "high"
+    },
+    {
+      "index": 47,
+      "fieldName": "colorGamutLegacy",
+      "chrome": "",
+      "standalone": "",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 48,
+      "fieldName": "mathFingerprint",
+      "chrome": 0.7060000896453857,
+      "standalone": 0.3068026897534055,
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 49,
+      "fieldName": "intlOptions",
+      "chrome": {
+        "timeZone": "Asia/Shanghai",
+        "calendar": "gregory",
+        "numberingSystem": "latn",
+        "locale": "en-US"
+      },
+      "standalone": {
+        "timeZone": "Asia/Shanghai",
+        "calendar": "gregory",
+        "numberingSystem": "latn",
+        "locale": "en-US"
+      },
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 50,
+      "fieldName": "mimeTypes",
+      "chrome": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf"
+        }
+      ],
+      "standalone": [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf"
+        }
+      ],
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 51,
+      "fieldName": "connectionType",
+      "chrome": "unknown",
+      "standalone": "unknown",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 52,
+      "fieldName": "timestampCollectionStart",
+      "chrome": 1775829840,
+      "standalone": 1775829848,
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 53,
+      "fieldName": "devicePixelRatio",
+      "chrome": 1,
+      "standalone": 1,
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 54,
+      "fieldName": "osPlatform",
+      "chrome": "windows",
+      "standalone": "windows",
+      "match": true,
+      "severity": "critical"
+    },
+    {
+      "index": 55,
+      "fieldName": "behavioralEvents",
+      "chrome": [
+        [
+          4,
+          -1,
+          -1,
+          1775829840601,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          159,
+          812,
+          1213,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          193,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          -1,
+          2,
+          90,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          85,
+          0,
+          41,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          149,
+          -1,
+          45,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          66,
+          -1,
+          38,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          117,
+          -1,
+          36,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          51,
+          1,
+          47,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          90,
+          0,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          73,
+          -1,
+          66,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          30,
+          0,
+          50,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          54,
+          0,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          40,
+          0,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          29,
+          0,
+          66,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          22,
+          -1,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          13,
+          0,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          4,
+          0,
+          42,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          3,
+          2,
+          40,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          4,
+          -1,
+          47,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          -2,
+          -1,
+          165,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "standalone": [
+        [
+          4,
+          -1,
+          -1,
+          1775829848388,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          32,
+          0,
+          1775829848529,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          32,
+          1,
+          1775829848627,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          28,
+          0,
+          1775829848712,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          26,
+          -1,
+          1775829848800,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          25,
+          -1,
+          1775829848893,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          24,
+          1,
+          1775829848997,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          22,
+          0,
+          1775829849085,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          21,
+          1,
+          1775829849167,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          21,
+          1,
+          1775829849253,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          18,
+          1,
+          1775829849337,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          19,
+          0,
+          1775829849422,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          16,
+          0,
+          1775829849506,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          15,
+          0,
+          1775829849611,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          16,
+          0,
+          1775829849697,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          15,
+          0,
+          1775829849784,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          14,
+          0,
+          1775829849875,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          13,
+          0,
+          1775829849973,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          13,
+          -1,
+          1775829850067,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          14,
+          -1,
+          1775829850158,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          16,
+          0,
+          1775829850251,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          59,
+          -1,
+          1775829850355,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          1775829850403,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          1775829850426,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          0,
+          0,
+          1775829850467,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "match": false,
+      "severity": "dynamic"
+    },
+    {
+      "index": 56,
+      "fieldName": "permissionStatus",
+      "chrome": {
+        "_state": -2
+      },
+      "standalone": {
+        "_state": -2
+      },
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 57,
+      "fieldName": "platform",
+      "chrome": "Linux x86_64",
+      "standalone": "Win32",
+      "match": false,
+      "severity": "critical"
+    },
+    {
+      "index": 58,
+      "fieldName": "webrtcIp",
+      "chrome": "",
+      "standalone": "",
+      "match": true,
+      "severity": "low"
+    },
+    {
+      "index": 59,
+      "fieldName": "colorDepth",
+      "chrome": 24,
+      "standalone": 24,
+      "match": true,
+      "severity": "low"
+    }
+  ],
+  "sdDiff": [
+    {
+      "key": "od",
+      "chrome": "C",
+      "standalone": "C",
+      "match": true
+    },
+    {
+      "key": "clientType",
+      "chrome": "",
+      "standalone": "",
+      "match": true
+    },
+    {
+      "key": "coordinate",
+      "chrome": [
+        10,
+        60,
+        1.8559
+      ],
+      "standalone": [
+        459,
+        30,
+        1775829848529
+      ],
+      "match": false
+    },
+    {
+      "key": "trycnt",
+      "chrome": 1,
+      "standalone": 1,
+      "match": true
+    },
+    {
+      "key": "refreshcnt",
+      "chrome": 0,
+      "standalone": 0,
+      "match": true
+    },
+    {
+      "key": "slideValue",
+      "chrome": [
+        [
+          158,
+          814,
+          90
+        ],
+        [
+          85,
+          0,
+          41
+        ],
+        [
+          76,
+          -3,
+          24
+        ],
+        [
+          73,
+          2,
+          20
+        ],
+        [
+          66,
+          -1,
+          38
+        ],
+        [
+          59,
+          0,
+          18
+        ],
+        [
+          58,
+          -1,
+          18
+        ],
+        [
+          51,
+          1,
+          47
+        ],
+        [
+          45,
+          -1,
+          24
+        ],
+        [
+          45,
+          1,
+          43
+        ],
+        [
+          37,
+          0,
+          26
+        ],
+        [
+          36,
+          -1,
+          40
+        ],
+        [
+          30,
+          0,
+          50
+        ],
+        [
+          28,
+          -1,
+          25
+        ],
+        [
+          26,
+          1,
+          41
+        ],
+        [
+          22,
+          1,
+          26
+        ],
+        [
+          18,
+          -1,
+          40
+        ],
+        [
+          15,
+          0,
+          25
+        ],
+        [
+          14,
+          0,
+          41
+        ],
+        [
+          10,
+          1,
+          29
+        ],
+        [
+          12,
+          -2,
+          37
+        ],
+        [
+          7,
+          1,
+          29
+        ],
+        [
+          6,
+          -1,
+          38
+        ],
+        [
+          4,
+          0,
+          23
+        ],
+        [
+          2,
+          0,
+          20
+        ],
+        [
+          1,
+          2,
+          20
+        ],
+        [
+          1,
+          -2,
+          24
+        ],
+        [
+          3,
+          1,
+          23
+        ],
+        [
+          -2,
+          -1,
+          12
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "standalone": [
+        [
+          32,
+          0,
+          1775829848529
+        ],
+        [
+          32,
+          1,
+          1775829848627
+        ],
+        [
+          28,
+          0,
+          1775829848712
+        ],
+        [
+          26,
+          -1,
+          1775829848800
+        ],
+        [
+          25,
+          -1,
+          1775829848893
+        ],
+        [
+          24,
+          1,
+          1775829848997
+        ],
+        [
+          22,
+          0,
+          1775829849085
+        ],
+        [
+          21,
+          1,
+          1775829849167
+        ],
+        [
+          21,
+          1,
+          1775829849253
+        ],
+        [
+          18,
+          1,
+          1775829849337
+        ],
+        [
+          19,
+          0,
+          1775829849422
+        ],
+        [
+          16,
+          0,
+          1775829849506
+        ],
+        [
+          15,
+          0,
+          1775829849611
+        ],
+        [
+          16,
+          0,
+          1775829849697
+        ],
+        [
+          15,
+          0,
+          1775829849784
+        ],
+        [
+          14,
+          0,
+          1775829849875
+        ],
+        [
+          13,
+          0,
+          1775829849973
+        ],
+        [
+          13,
+          -1,
+          1775829850067
+        ],
+        [
+          14,
+          -1,
+          1775829850158
+        ],
+        [
+          16,
+          0,
+          1775829850251
+        ],
+        [
+          59,
+          -1,
+          1775829850355
+        ],
+        [
+          0,
+          1,
+          1775829850426
+        ]
+      ],
+      "match": false
+    },
+    {
+      "key": "dragobj",
+      "chrome": 1,
+      "standalone": 1,
+      "match": true
+    },
+    {
+      "key": "ft",
+      "chrome": "6f_7Pfn_H",
+      "standalone": "U7isUy3vf",
+      "match": false
+    }
+  ],
+  "summary": {
+    "cdTotal": 60,
+    "cdMatch": 45,
+    "cdMismatch": 7,
+    "cdDynamic": 8,
+    "criticalDiffs": [
+      {
+        "index": 57,
+        "fieldName": "platform",
+        "chrome": "Linux x86_64",
+        "standalone": "Win32"
+      }
+    ],
+    "highDiffs": [
+      {
+        "index": 16,
+        "fieldName": "webglImage",
+        "chrome": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+        "standalone": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg=="
+      },
+      {
+        "index": 21,
+        "fieldName": "maxTouchPoints",
+        "chrome": 4,
+        "standalone": 0
+      },
+      {
+        "index": 29,
+        "fieldName": "vendor",
+        "chrome": "Intel Inc.",
+        "standalone": "Google Inc. (Google)"
+      },
+      {
+        "index": 40,
+        "fieldName": "detectedFonts",
+        "chrome": "7448370201960312832",
+        "standalone": "7448307515255877632"
+      }
+    ]
+  }
+}
