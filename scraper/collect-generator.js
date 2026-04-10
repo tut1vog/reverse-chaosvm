@@ -335,18 +335,24 @@ function reorderCdArray(cdArray, cdFieldOrder, behavioralEvents) {
  * @param {Object} [options.sdOverride] - Complete sd object to use instead of default
  * @param {number[]} [options.cdFieldOrder] - Field reordering array (schema indices, -1 = behavioralEvents)
  * @param {*} [options.behavioralEvents] - Behavioral events value to insert at -1 position in cdFieldOrder
+ * @param {Array} [options.cdArrayOverride] - Pre-built cd array to use instead of building from profile
  * @returns {string} URL-encoded collect token string
  */
 function generateCollect(profile, xteaParams, options) {
   const opts = options || {};
   const p = profile || {};
 
-  // Step 1: Build cdArray from profile
-  let cdArray = buildDefaultCdArray(p);
+  // Step 1: Build cdArray from profile (or use override)
+  let cdArray;
+  if (opts.cdArrayOverride && Array.isArray(opts.cdArrayOverride)) {
+    cdArray = opts.cdArrayOverride;
+  } else {
+    cdArray = buildDefaultCdArray(p);
 
-  // Step 1b: Reorder cd fields if cdFieldOrder is provided
-  if (opts.cdFieldOrder && Array.isArray(opts.cdFieldOrder)) {
-    cdArray = reorderCdArray(cdArray, opts.cdFieldOrder, opts.behavioralEvents);
+    // Step 1b: Reorder cd fields if cdFieldOrder is provided
+    if (opts.cdFieldOrder && Array.isArray(opts.cdFieldOrder)) {
+      cdArray = reorderCdArray(cdArray, opts.cdFieldOrder, opts.behavioralEvents);
+    }
   }
 
   // Step 2: Build cdString (hand-rolled JSON)
@@ -399,7 +405,8 @@ module.exports = {
   reorderCdArray,
   generateFt,
 
-  // Internals (for testing)
+  // Internals (for testing/injection)
+  buildDefaultCdArray,
   convertBytesToWord,
   convertWordToBytes,
   cipherRound,
