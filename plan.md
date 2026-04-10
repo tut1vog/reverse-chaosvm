@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 18.5 — Live forensics with in-page key
+Current task: none — blocked, awaiting direction
 
 ---
 
@@ -179,7 +179,7 @@ Current task: 18.5 — Live forensics with in-page key
 | 18.3.1 | Extract XTEA key from live tdc.js at runtime | done |
 | 18.3.2 | Fix keyMods derivation from keyModConstants | done |
 | 18.4 | In-page key instrumentation for live tdc.js | done |
-| 18.5 | Live forensics with in-page key | in-progress |
+| 18.5 | Live forensics with in-page key | blocked |
 | 18.6 | Fix identified divergence | pending |
 | 18.7 | Live re-test with fix | pending |
 
@@ -192,10 +192,10 @@ Current task: 18.5 — Live forensics with in-page key
 **Phase**: Token Forensics — Decrypt-Reencrypt Round-Trip
 **Status**: in-progress
 
-**ID**: 18.4
-**Title**: In-page key instrumentation for live tdc.js
+**ID**: 18.5
+**Title**: Live forensics — blocked
 **Phase**: Token Forensics — Decrypt-Reencrypt Round-Trip
-**Status**: in-progress
+**Status**: blocked
 
 ### Goal
 Modify `scripts/token-forensics.js` to instrument the live tdc.js on the actual CAPTCHA page (not an isolated page) to capture the real XTEA key used at runtime. The key-extractor's `patchTdcSource` + `buildInstrumentCode` + `analyzeTrace` provide the instrumentation and analysis logic — we need to apply them in-page via request interception.
