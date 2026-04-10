@@ -11,6 +11,7 @@
   "dependencies": {
     "acorn": "^8.16.0",
     "canvas": "^3.2.3",
+    "jsdom": "^29.0.2",
     "puppeteer": "^24.40.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
