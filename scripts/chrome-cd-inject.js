@@ -3,10 +3,11 @@
 /**
  * chrome-cd-inject.js — Chrome cd Array Injection Test
  *
- * Uses Puppeteer (real Chrome) to execute tdc.js and intercepts the raw cd array
- * BEFORE encryption via JSON.stringify interception. Then feeds those exact cd
- * values into the standalone generateCollect() via cdArrayOverride, and submits
- * via Chrome TLS.
+ * Uses Puppeteer (real Chrome) to execute tdc.js, captures Chrome's encrypted
+ * collect token from TDC.getData(true), then decrypts it using XTEA params from
+ * the template cache to extract the raw cd array. Feeds those exact cd values
+ * into the standalone generateCollect() via cdArrayOverride, and submits via
+ * Chrome TLS.
  *
  * This isolates whether the cd (collector data) array is causing errorCode 9:
  *   - If Chrome cd + standalone encrypt = success → standalone cd values are wrong
@@ -15,16 +16,16 @@
  * Flow:
  *   1. Launch Puppeteer with stealth plugin
  *   2. Prehandle via Node.js HTTP
- *   3. Navigate to show page in Chrome + inject JSON.stringify interceptor
- *   4. Intercept tdc.js + images + config (Chrome executes tdc.js natively)
- *   5. Capture the raw cd array via the JSON.stringify hook
- *   6. Solve slider via OpenCV
- *   7. Extract TDC_NAME + eks from captured tdc.js
- *   8. Look up template cache for XTEA params
- *   9. Generate collect token standalone with Chrome's cd array (cdArrayOverride)
- *  10. Generate vData via Chrome page.evaluate
- *  11. Submit verify POST via Chrome fetch() (Chrome TLS)
- *  12. Log result + comparison
+ *   3. Navigate to show page in Chrome + intercept tdc.js/images/config
+ *   4. Call TDC.getData(true) in Chrome — capture encrypted collect token
+ *   5. Solve slider via OpenCV
+ *   6. Extract TDC_NAME + eks from captured tdc.js
+ *   7. Look up template cache for XTEA params
+ *  7b. Decrypt Chrome's collect token → extract raw cd array
+ *   8. Generate collect token standalone with Chrome's cd array (cdArrayOverride)
+ *   9. Generate vData via Chrome page.evaluate
+ *  10. Submit verify POST via Chrome fetch() (Chrome TLS)
+ *  11. Log result + comparison
  *
  * Usage:
  *   node scripts/chrome-cd-inject.js
@@ -109,6 +110,74 @@ function compareCdArrays(chromeCd, standaloneCd) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// XTEA Decryption (for decrypting Chrome's collect token)
+// ═══════════════════════════════════════════════════════════════════════
+
+function convertBytesToWord(fourByteString) {
+  const b0 = fourByteString.charCodeAt(0) || 0;
+  const b1 = fourByteString.charCodeAt(1) || 0;
+  const b2 = fourByteString.charCodeAt(2) || 0;
+  const b3 = fourByteString.charCodeAt(3) || 0;
+  return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+}
+
+function convertWordToBytes(word) {
+  return String.fromCharCode(
+    word & 0xFF,
+    (word >> 8) & 0xFF,
+    (word >> 16) & 0xFF,
+    (word >> 24) & 0xFF
+  );
+}
+
+function decryptXtea(inputBytes, params) {
+  const { key, delta, rounds, keyMods } = params;
+  let output = '';
+  const targetSum = rounds * delta;
+
+  for (let pos = 0; pos < inputBytes.length; pos += 8) {
+    const slice1 = inputBytes.slice(pos, pos + 4);
+    const slice2 = inputBytes.slice(pos + 4, pos + 8);
+
+    let v0 = convertBytesToWord(slice1);
+    let v1 = convertBytesToWord(slice2);
+    let sum = targetSum;
+
+    while (sum !== 0) {
+      const idx1 = (sum >>> 11) & 3;
+      v1 -= (((v0 << 4) ^ (v0 >>> 5)) + v0) ^ (sum + key[idx1] + keyMods[idx1]);
+      sum -= delta;
+      const idx0 = sum & 3;
+      v0 -= (((v1 << 4) ^ (v1 >>> 5)) + v1) ^ (sum + key[idx0] + keyMods[idx0]);
+    }
+
+    output += convertWordToBytes(v0) + convertWordToBytes(v1);
+  }
+
+  return output;
+}
+
+function decryptCollect(collectStr, params) {
+  const b64 = collectStr
+    .replace(/%2B/g, '+')
+    .replace(/%2F/g, '/')
+    .replace(/%3D/g, '=');
+
+  const encrypted = Buffer.from(b64, 'base64').toString('binary');
+  const decrypted = decryptXtea(encrypted, params);
+  const plaintext = decrypted.replace(/[\0\s]+$/, '');
+
+  let parsed = null;
+  try {
+    parsed = JSON.parse(plaintext);
+  } catch (e) {
+    // Fall through
+  }
+
+  return { plaintext, parsed };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Main Solver
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -176,22 +245,7 @@ async function solve(opts) {
       log(`  sess=${session.sess.slice(0, 20)}... sid=${session.sid}`);
 
       // ── Step 3: Navigate to show page + intercept ──
-      log('Step 3: Navigate to show page + inject JSON.stringify interceptor...');
-
-      // Inject JSON.stringify interceptor BEFORE any page loads
-      // This captures the cd array when tdc.js calls JSON.stringify on it
-      await page.evaluateOnNewDocument(() => {
-        const origStringify = JSON.stringify;
-        window.__capturedCdArray = null;
-        window.__cdCaptureLog = [];
-        JSON.stringify = function(obj) {
-          if (Array.isArray(obj) && obj.length >= 55 && obj.length <= 65) {
-            window.__capturedCdArray = origStringify(obj); // store as JSON string to avoid ref issues
-            window.__cdCaptureLog.push('Captured cd array, length=' + obj.length);
-          }
-          return origStringify.apply(this, arguments);
-        };
-      });
+      log('Step 3: Navigate to show page + intercept tdc.js...');
 
       // Build show URL
       const showParams = new URLSearchParams({
@@ -311,11 +365,12 @@ async function solve(opts) {
         log(`  Config: nonce=${nonce}, vsig=${vsig.slice(0, 10)}..., subcapclass=${subcapclass}`);
       }
 
-      // ── Step 4: Wait for Chrome to execute tdc.js and capture cd array ──
-      log('Step 4: Wait for TDC.getData() and cd array capture...');
+      // ── Step 4: Wait for Chrome to execute tdc.js and capture collect token ──
+      log('Step 4: Wait for TDC.getData() to get Chrome collect token...');
 
       // Wait for TDC object to be available (tdc.js creates it)
       let tdcAvailable = false;
+      let chromeCollect = null;
       const tdcWaitStart = Date.now();
       while (!tdcAvailable && Date.now() - tdcWaitStart < 15000) {
         tdcAvailable = await page.evaluate(() => typeof window.TDC !== 'undefined');
@@ -325,7 +380,7 @@ async function solve(opts) {
       if (tdcAvailable) {
         log('  TDC object available in Chrome');
 
-        // Trigger TDC.getData() in Chrome to cause the cd array to be JSON.stringified
+        // Call TDC.getData(true) to get Chrome's encrypted collect token
         const chromeGetData = await page.evaluate(() => {
           try {
             if (window.TDC && typeof window.TDC.getData === 'function') {
@@ -338,34 +393,14 @@ async function solve(opts) {
           }
         });
 
-        if (chromeGetData.ok) {
-          log(`  Chrome TDC.getData() returned collect of length ${chromeGetData.collect ? chromeGetData.collect.length : 0}`);
+        if (chromeGetData.ok && chromeGetData.collect) {
+          chromeCollect = chromeGetData.collect;
+          log(`  Chrome collect token captured: ${chromeCollect.length} chars`);
         } else {
-          log(`  Chrome TDC.getData() failed: ${chromeGetData.reason}`);
+          log(`  Chrome TDC.getData() failed: ${chromeGetData.reason || 'empty result'}`);
         }
       } else {
         log('  WARNING: TDC object not available in Chrome after 15s');
-      }
-
-      // Extract captured cd array
-      const cdCaptureResult = await page.evaluate(() => {
-        return {
-          cdArrayJson: window.__capturedCdArray || null,
-          captureLog: window.__cdCaptureLog || [],
-        };
-      });
-
-      log(`  cd capture log: ${JSON.stringify(cdCaptureResult.captureLog)}`);
-
-      let capturedCd = null;
-      if (cdCaptureResult.cdArrayJson) {
-        capturedCd = JSON.parse(cdCaptureResult.cdArrayJson);
-        log(`  Captured cd array: length=${capturedCd.length}`);
-        log(`  First 5 values: ${JSON.stringify(capturedCd.slice(0, 5))}`);
-        log(`  Last 5 values: ${JSON.stringify(capturedCd.slice(-5))}`);
-      } else {
-        log('  WARNING: No cd array captured via JSON.stringify hook');
-        log('  Will proceed with standalone cd generation only');
       }
 
       // ── Step 5: Solve slider via OpenCV ──
@@ -415,6 +450,31 @@ async function solve(opts) {
         keyModConstants: cached.keyModConstants,
         keyMods: cached.keyMods || null,
       };
+
+      // ── Step 7b: Decrypt Chrome's collect token to extract cd array ──
+      log('Step 7b: Decrypt Chrome collect token...');
+      let capturedCd = null;
+      if (chromeCollect) {
+        try {
+          const decryptResult = decryptCollect(chromeCollect, xteaParams);
+          if (decryptResult.parsed && decryptResult.parsed.cd) {
+            capturedCd = decryptResult.parsed.cd;
+            log(`  Decrypted Chrome cd: ${capturedCd.length} fields`);
+            log(`  First 5: ${JSON.stringify(capturedCd.slice(0, 5))}`);
+            log(`  Last 5: ${JSON.stringify(capturedCd.slice(-5))}`);
+          } else {
+            log('  WARNING: Decryption succeeded but no cd field in parsed result');
+            if (decryptResult.plaintext) {
+              log(`  Plaintext (first 200): ${decryptResult.plaintext.slice(0, 200)}`);
+            }
+          }
+        } catch (decryptErr) {
+          log(`  WARNING: Chrome collect decryption failed: ${decryptErr.message}`);
+          log('  Will proceed with standalone cd generation');
+        }
+      } else {
+        log('  No Chrome collect token available to decrypt');
+      }
 
       // ── Step 8: Generate collect token with Chrome's cd array ──
       log('Step 8: Generate collect token (standalone encrypt, Chrome cd)...');
