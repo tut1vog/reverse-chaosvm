@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 16
-Current task: 16.4 — Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition)
+Current task: 16.5 — Live re-test after fixes
 
 ---
 
@@ -152,50 +152,40 @@ Current task: 16.4 — Fix cd field mismatches (platform, maxTouchPoints, vendor
 | 16.1 | Run full Puppeteer solver as control test | done |
 | 16.2 | Capture Chrome collect + generate standalone, diff both for same session | done |
 | 16.3 | Fix sd.coordinate format and slideValue timestamp format | done |
-| 16.4 | Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition) | pending |
-| 16.5 | Live re-test after fixes | pending |
+| 16.4 | Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition) | done |
+| 16.5 | Live re-test after fixes | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 16.4
-**Title**: Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition)
+**ID**: 16.5
+**Title**: Live re-test after fixes
 **Phase**: Definitive Test — Chrome tdc.js vs Standalone Collect
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
-Fix the 4 non-dynamic cd field mismatches identified in the Chrome vs standalone diff: platform, maxTouchPoints, vendor, and screenPosition. These are profile values that don't match what the headless Chrome environment reports.
+Run the hybrid solver with the fixed sd format and updated profile to see if errorCode 9 is resolved.
 
 ### Context
-From `output/chrome-vs-standalone-diff.json`:
+Fixes applied:
+- sd.coordinate: now `[10, 60, ratio]` instead of `[xAnswer, slideY, timestamp]`
+- sd.slideValue: first entry `[firstDx, cursorY, firstDt]` instead of `[totalX, totalY, totalElapsed]`; relative dt for all entries
+- cd fields: platform="Linux x86_64", maxTouchPoints=4, vendor="Intel Inc.", screenPosition="1;0"
 
-| Index | Field | Chrome | Standalone | Severity |
-|-------|-------|--------|-----------|----------|
-| 57 | platform | "Linux x86_64" | "Win32" | critical |
-| 21 | maxTouchPoints | 4 | 0 | high |
-| 29 | vendor | "Intel Inc." | "Google Inc. (Google)" | high |
-| 34 | screenPosition | "1;0" | "0;0" | low |
-
-**Root cause**: `profiles/default.json` has values for a Windows desktop Chrome, but the headless Chrome runs on Linux. The profile needs updating to match the Linux server environment.
-
-- `profiles/default.json` — the browser fingerprint profile
-- `token/collector-schema.js` — `buildDefaultCdArray(profile)` maps profile fields to cd array positions
-
-Note: `webglImage` (index 16) and `detectedFonts` (index 40) also differ but these are environment-dependent hashes that can't be fixed via profile — they'll always differ. The `plugins` diff (index 2) may be minor.
+Remaining known cd differences (unfixable, environment-dependent):
+- webglImage: different canvas fingerprint per environment
+- detectedFonts: different hash per environment
+- plugins: minor difference
 
 ### Implementation Steps
-1. Update `profiles/default.json`:
-   - `platform`: "Linux x86_64" (to match headless Chrome on Linux)
-   - `maxTouchPoints`: 4 (to match headless Chrome)
-   - `vendor`: "Intel Inc." (to match headless Chrome's WebGL vendor)
-   - `screenPosition`: "1;0" (to match Chrome)
-   
-2. Verify `collector-schema.js` correctly maps these profile fields to the right cd indices.
+1. Run `node scripts/hybrid-solver.js` 3 times
+2. Record errorCode for each run
+3. If still errorCode 9, the remaining differences (or a new issue) are the cause
 
 ### Verification
-- [ ] `node -e "..."` — buildDefaultCdArray with updated profile has correct values at indices 21, 29, 34, 57
-- [ ] `npm test` passes (163/165)
+- [ ] 3 runs completed
+- [ ] Results documented
 
 ### Suggested Agent
 general-purpose
