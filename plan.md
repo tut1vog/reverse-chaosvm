@@ -108,7 +108,7 @@ Current task: 12.3 — Analyze decrypted collect — compare field-by-field with
 |----|------|--------|
 | 12.1 | Puppeteer capture: intercept collect token, tdc.js, and verify POST | done |
 | 12.2 | Extract XTEA key from captured tdc.js and decrypt the collect token | done |
-| 12.3 | Analyze decrypted collect — compare field-by-field with our profile | in-progress |
+| 12.3 | Analyze decrypted collect — compare field-by-field with our profile | done |
 | 12.4 | Update default profile and fix scraper to produce valid collect tokens | pending |
 | 12.5 | Live end-to-end verification of headless scraper | pending |
 
@@ -116,40 +116,44 @@ Current task: 12.3 — Analyze decrypted collect — compare field-by-field with
 
 ## Current Task
 
-**ID**: 12.3
-**Title**: Analyze decrypted collect — build field mapping and identify scraper fixes
+**ID**: 12.4
+**Title**: Update default profile and fix scraper to produce valid collect tokens
 **Phase**: Scraper Debugging — Collect Token Analysis
-**Status**: in-progress
+**Status**: pending
 
 ### Goal
-Analyze the decrypted browser vs scraper collect tokens to produce an actionable field mapping and identify what the scraper needs to fix to produce valid tokens.
+Apply the findings from the field mapping analysis to fix the scraper's collect token generation so it produces tokens the server will accept.
 
 ### Context
-From task 12.2 we have `output/puppeteer-capture/collect-decrypted.json` with both browser (60 entries) and scraper (59 entries) cd arrays, plus sd comparison. Key findings so far:
-- The 98-opcode template uses completely different cd field ordering than Template A
-- Browser sd has slideValue/coordinate/dragobj/ft; scraper sd has appid/nonce/token
-- XTEA key mods are on indices 2 and 3 (not 1 and 3)
-- Browser fingerprint: Chrome/146, Intel Iris GPU, Windows, [1280,1400], audio 44100Hz
-- The collect token is a SINGLE base64 blob (not 4 segments) that decrypts to `{"cd":[...],"sd":{...}}`
-- 98-opcode template key: [0x4F4D6852, 0x61426747, 0x45535C40, 0x6C3B4158], keyMods=[0, 0, 986887, 1513228]
+From task 12.3, we have `output/puppeteer-capture/scraper-fixes.md` with 14 prioritized fixes and `output/puppeteer-capture/field-mapping.json` with the complete 60-field reordering map. Key issues:
 
-Browser cd fields identified by value:
-- [1] timezone "+08", [2] plugins, [5] audio fingerprint, [6] audio codecs
-- [8] GPU renderer, [9] screen height, [13] color gamut, [16] WebGL canvas
-- [18] video codecs, [22] user agent, [26] screen width, [28] feature bitmask
-- [29] GPU vendor, [33] viewport, [44] languages, [45] charset
-- [49] Intl options, [54] platform, [55] behavioral events + hash array
+**P0 (blocking)**:
+1. sd structure wrong — has appid/nonce/token instead of slideValue/coordinate/dragobj/ft/trycnt/refreshcnt
+2. cd array must be reordered from 59-field to 60-field layout for the 98-opcode template
+3. New behavioralEvents field at browser index 55 must be added
+4. videoCodecs corruption bug — event data concatenated to H.264 codec string
+
+**P1 (detection)**:
+5. HeadlessChrome in UA string
+6. pageUrl exposes localhost
+7. SwiftShader webglRenderer
+8. userAgentData/highEntropyValues inconsistency
+9. detectedFonts must be hash format (not font name list)
+
+**P2 (scoring)**:
+10-14. Languages, maxTouchPoints, osPlatform, audio fingerprint, screenResolution
+
+Key files to modify:
+- `scraper/collect-generator.js` — must support template-specific cd reordering
+- `scraper/scraper.js` — must fix sd structure, pass slide interaction data
+- `profiles/default.json` — must update fingerprint values
+- `token/collector-schema.js` — may need 60-field variant
 
 ### Implementation Steps
-1. Map each browser cd index to its semantic meaning
-2. Cross-reference with `docs/COLLECTOR_SCHEMA.md` (scraper's 59-field ordering)
-3. Produce `output/puppeteer-capture/field-mapping.json`
-4. List critical scraper changes needed
+TBD — will be detailed when this task is dispatched.
 
 ### Verification
-- [ ] field-mapping.json has mappings for all 60 browser cd entries
-- [ ] Each mapping identifies collector schema field and corresponding scraper index
-- [ ] Critical scraper fix list is actionable
+TBD
 
 ### Suggested Agent
-general-purpose — cross-referencing decrypted data with collector schema docs
+general-purpose
