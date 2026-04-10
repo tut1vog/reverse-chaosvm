@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 16
-Current task: 16.3 — Fix sd.coordinate format and slideValue timestamp format
+Current task: 16.4 — Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition)
 
 ---
 
@@ -151,7 +151,7 @@ Current task: 16.3 — Fix sd.coordinate format and slideValue timestamp format
 |----|------|--------|
 | 16.1 | Run full Puppeteer solver as control test | done |
 | 16.2 | Capture Chrome collect + generate standalone, diff both for same session | done |
-| 16.3 | Fix sd.coordinate format and slideValue timestamp format | pending |
+| 16.3 | Fix sd.coordinate format and slideValue timestamp format | done |
 | 16.4 | Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition) | pending |
 | 16.5 | Live re-test after fixes | pending |
 
@@ -159,50 +159,43 @@ Current task: 16.3 — Fix sd.coordinate format and slideValue timestamp format
 
 ## Current Task
 
-**ID**: 16.3
-**Title**: Fix sd.coordinate format and slideValue timestamp format
+**ID**: 16.4
+**Title**: Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition)
 **Phase**: Definitive Test — Chrome tdc.js vs Standalone Collect
 **Status**: pending
 
 ### Goal
-Fix the two most critical structural differences in the standalone collect token that almost certainly cause errorCode 9: (1) `sd.coordinate` sends wrong values — standalone sends `[xAnswer, slideY, timestamp]` but Chrome sends `[leftOffset, topOffset, dragRatio]`; (2) `sd.slideValue` uses absolute timestamps for the dt field, but Chrome uses relative time deltas from the previous event.
+Fix the 4 non-dynamic cd field mismatches identified in the Chrome vs standalone diff: platform, maxTouchPoints, vendor, and screenPosition. These are profile values that don't match what the headless Chrome environment reports.
 
 ### Context
-**Diff results** (`output/chrome-vs-standalone-diff.json`):
+From `output/chrome-vs-standalone-diff.json`:
 
-**sd.coordinate** (WRONG FORMAT):
-- Chrome: `[10, 60, 1.8559]` — [left CSS offset to slider start, top offset, display ratio]
-- Standalone: `[459, 30, 1775829848529]` — [xAnswer, slideY, timestamp_ms]
-- The coordinate needs to be [slider_left_px, slider_top_px, captcha_ratio] — these are CSS layout values, NOT the answer coordinates.
+| Index | Field | Chrome | Standalone | Severity |
+|-------|-------|--------|-----------|----------|
+| 57 | platform | "Linux x86_64" | "Win32" | critical |
+| 21 | maxTouchPoints | 4 | 0 | high |
+| 29 | vendor | "Intel Inc." | "Google Inc. (Google)" | high |
+| 34 | screenPosition | "1;0" | "0;0" | low |
 
-**sd.slideValue** (WRONG TIMESTAMP FORMAT):
-- Chrome: `[[158, 814, 90], [85, 0, 41], [76, -3, 24], ...]` — [dx, dy, dt_relative_ms]
-- Standalone: `[[32, 0, 1775829848529], [32, 1, 1775829848627], ...]` — [dx, dy, absolute_timestamp_ms]
-- The dt field should be milliseconds since the previous event, NOT absolute timestamp.
+**Root cause**: `profiles/default.json` has values for a Windows desktop Chrome, but the headless Chrome runs on Linux. The profile needs updating to match the Linux server environment.
 
-**Files to modify**:
-- `scraper/collect-generator.js` — `buildSlideSd()` builds the sd object including `coordinate` and `slideValue`
-- `scraper/collect-generator.js` — `generateBehavioralEvents()` produces the raw event data that gets turned into slideValue
+- `profiles/default.json` — the browser fingerprint profile
+- `token/collector-schema.js` — `buildDefaultCdArray(profile)` maps profile fields to cd array positions
+
+Note: `webglImage` (index 16) and `detectedFonts` (index 40) also differ but these are environment-dependent hashes that can't be fixed via profile — they'll always differ. The `plugins` diff (index 2) may be minor.
 
 ### Implementation Steps
-1. Fix `buildSlideSd()` in `scraper/collect-generator.js`:
-   - Change `coordinate` to accept `[leftOffset, topOffset, ratio]` instead of `[xAnswer, slideY, timestamp]`
-   - The caller must pass the correct coordinate values (left offset from slider start, top offset, display ratio from the page)
+1. Update `profiles/default.json`:
+   - `platform`: "Linux x86_64" (to match headless Chrome on Linux)
+   - `maxTouchPoints`: 4 (to match headless Chrome)
+   - `vendor`: "Intel Inc." (to match headless Chrome's WebGL vendor)
+   - `screenPosition`: "1;0" (to match Chrome)
    
-2. Fix `generateBehavioralEvents()` or the slideValue construction:
-   - Convert absolute timestamps to relative deltas: `dt[i] = timestamp[i] - timestamp[i-1]`
-   - First event uses time since drag start
-   
-3. Update all callers of `buildSlideSd()`:
-   - `scraper/collect-generator.js` itself (if it calls buildSlideSd internally)
-   - `scripts/hybrid-solver.js`
-   - `scripts/collect-diff.js`
-   - Any other callers
+2. Verify `collector-schema.js` correctly maps these profile fields to the right cd indices.
 
 ### Verification
-- [ ] `node -e "const cg = require('./scraper/collect-generator'); ..."` — buildSlideSd produces relative dt in slideValue
-- [ ] Run `node scripts/collect-diff.js` — sd.coordinate and sd.slideValue formats now match Chrome
-- [ ] No existing tests broken: `npm test` passes (163/165)
+- [ ] `node -e "..."` — buildDefaultCdArray with updated profile has correct values at indices 21, 29, 34, 57
+- [ ] `npm test` passes (163/165)
 
 ### Suggested Agent
 general-purpose
