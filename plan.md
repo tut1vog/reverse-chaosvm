@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 18.3.1 — Extract XTEA key from live tdc.js at runtime
+Current task: 18.3 — Live forensics test
 
 ---
 
@@ -175,8 +175,8 @@ Current task: 18.3.1 — Extract XTEA key from live tdc.js at runtime
 |----|------|--------|
 | 18.1 | Create token forensics script | done |
 | 18.2 | Tests for token forensics helpers | pending |
-| 18.3 | Live forensics test | blocked |
-| 18.3.1 | Extract XTEA key from live tdc.js at runtime | in-progress |
+| 18.3 | Live forensics test | in-progress |
+| 18.3.1 | Extract XTEA key from live tdc.js at runtime | done |
 | 18.4 | Fix identified divergence | pending |
 | 18.5 | Live re-test with fix | pending |
 
