@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 12
-Current task: 12.3 — Analyze decrypted collect — compare field-by-field with our profile
+Current task: 12.4 — Update default profile and fix scraper to produce valid collect tokens
 
 ---
 
@@ -109,51 +109,34 @@ Current task: 12.3 — Analyze decrypted collect — compare field-by-field with
 | 12.1 | Puppeteer capture: intercept collect token, tdc.js, and verify POST | done |
 | 12.2 | Extract XTEA key from captured tdc.js and decrypt the collect token | done |
 | 12.3 | Analyze decrypted collect — compare field-by-field with our profile | done |
-| 12.4 | Update default profile and fix scraper to produce valid collect tokens | pending |
+| 12.4 | Update default profile and fix scraper to produce valid collect tokens | done |
 | 12.5 | Live end-to-end verification of headless scraper | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 12.4
-**Title**: Update default profile and fix scraper to produce valid collect tokens
+**ID**: 12.5
+**Title**: Live end-to-end verification of headless scraper
 **Phase**: Scraper Debugging — Collect Token Analysis
 **Status**: pending
 
 ### Goal
-Apply the findings from the field mapping analysis to fix the scraper's collect token generation so it produces tokens the server will accept.
+Run the scraper against the live Tencent CAPTCHA endpoint and verify whether the updated collect token (with template-specific cd ordering, proper sd structure, and realistic profile) gets accepted.
 
 ### Context
-From task 12.3, we have `output/puppeteer-capture/scraper-fixes.md` with 14 prioritized fixes and `output/puppeteer-capture/field-mapping.json` with the complete 60-field reordering map. Key issues:
-
-**P0 (blocking)**:
-1. sd structure wrong — has appid/nonce/token instead of slideValue/coordinate/dragobj/ft/trycnt/refreshcnt
-2. cd array must be reordered from 59-field to 60-field layout for the 98-opcode template
-3. New behavioralEvents field at browser index 55 must be added
-4. videoCodecs corruption bug — event data concatenated to H.264 codec string
-
-**P1 (detection)**:
-5. HeadlessChrome in UA string
-6. pageUrl exposes localhost
-7. SwiftShader webglRenderer
-8. userAgentData/highEntropyValues inconsistency
-9. detectedFonts must be hash format (not font name list)
-
-**P2 (scoring)**:
-10-14. Languages, maxTouchPoints, osPlatform, audio fingerprint, screenResolution
-
-Key files to modify:
-- `scraper/collect-generator.js` — must support template-specific cd reordering
-- `scraper/scraper.js` — must fix sd structure, pass slide interaction data
-- `profiles/default.json` — must update fingerprint values
-- `token/collector-schema.js` — may need 60-field variant
+Task 12.4 implemented: 4-element keyMods XTEA, cd field reordering, behavioralEvents generation, slide sd structure, realistic Windows Chrome profile. The 98-opcode template cache entries have cdFieldOrder and keyMods. The scraper should now produce tokens structurally identical to what a real browser sends.
 
 ### Implementation Steps
-TBD — will be detailed when this task is dispatched.
+1. Run `node scraper/cli.js --captcha-only --verbose` against the live endpoint
+2. Analyze the verify response — check errorCode
+3. If errorCode != 0, capture the generated token, decrypt it, compare with the browser capture
+4. Identify remaining issues and fix
 
 ### Verification
-TBD
+- [ ] Scraper completes without crashes
+- [ ] Verify POST returns a response (even if errorCode != 0)
+- [ ] Document the errorCode and any remaining issues
 
 ### Suggested Agent
 general-purpose
