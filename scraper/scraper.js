@@ -193,9 +193,8 @@ class Scraper {
    * @returns {Promise<string>} vm-slide source code
    */
   async _getVmSlideSource(sig) {
-    // Try to find vm-slide URL in sig._raw
+    // Strategy 1: Try to find vm-slide URL in sig._raw config fields
     if (sig._raw) {
-      // Check for dcFileName-like fields for vm-slide
       const candidates = ['vmSlide', 'vm_slide', 'vmSlideFileName'];
       for (const field of candidates) {
         if (sig._raw[field]) {
@@ -203,21 +202,68 @@ class Scraper {
             const url = sig._raw[field].startsWith('http')
               ? sig._raw[field]
               : `https://t.captcha.qq.com/${sig._raw[field].replace(/^\//, '')}`;
-            this._log(`Fetching vm-slide from ${url}`);
+            this._log(`Fetching vm-slide from config field '${field}': ${url}`);
             const resp = await httpRequest(url, { timeout: 10000 });
             if (resp.statusCode === 200 && resp.body.length > 100) {
+              this._log(`  Got live vm-slide (${resp.body.length} chars)`);
               return resp.body;
             }
           } catch (err) {
-            this._log(`Failed to fetch vm-slide from ${field}: ${err.message}`);
+            this._log(`  Failed to fetch vm-slide from ${field}: ${err.message}`);
           }
         }
       }
     }
 
-    // Fallback to cached source
+    // Strategy 2: Parse vm-slide URL from show page HTML (if available)
+    if (sig._html) {
+      const vmSlideUrl = parseVmSlideUrl(sig._html);
+      if (vmSlideUrl) {
+        try {
+          const fullUrl = vmSlideUrl.startsWith('http')
+            ? vmSlideUrl
+            : `https://t.captcha.qq.com/${vmSlideUrl.replace(/^\//, '')}`;
+          this._log(`Fetching vm-slide from show page HTML: ${fullUrl}`);
+          const resp = await httpRequest(fullUrl, { timeout: 10000 });
+          if (resp.statusCode === 200 && resp.body.length > 100) {
+            this._log(`  Got live vm-slide (${resp.body.length} chars)`);
+            return resp.body;
+          }
+        } catch (err) {
+          this._log(`  Failed to fetch vm-slide from HTML: ${err.message}`);
+        }
+      }
+    }
+
+    // Strategy 3: Fetch the show page directly and parse vm-slide URL from it
+    if (sig.showUrl) {
+      try {
+        this._log(`Fetching show page to find vm-slide URL: ${sig.showUrl.slice(0, 80)}...`);
+        const showResp = await httpRequest(sig.showUrl, { timeout: 10000 });
+        if (showResp.statusCode === 200 && showResp.body.length > 100) {
+          const vmSlideUrl = parseVmSlideUrl(showResp.body);
+          if (vmSlideUrl) {
+            const fullUrl = vmSlideUrl.startsWith('http')
+              ? vmSlideUrl
+              : `https://t.captcha.qq.com/${vmSlideUrl.replace(/^\//, '')}`;
+            this._log(`  Found vm-slide URL in show page: ${fullUrl}`);
+            const vmResp = await httpRequest(fullUrl, { timeout: 10000 });
+            if (vmResp.statusCode === 200 && vmResp.body.length > 100) {
+              this._log(`  Got live vm-slide (${vmResp.body.length} chars)`);
+              return vmResp.body;
+            }
+          } else {
+            this._log('  No vm-slide URL found in show page HTML');
+          }
+        }
+      } catch (err) {
+        this._log(`  Failed to fetch show page for vm-slide: ${err.message}`);
+      }
+    }
+
+    // Strategy 4: Fallback to cached source
     if (this._vmSlideSource) {
-      this._log('Using cached vm-slide source');
+      this._log('Using cached vm-slide fallback (sample/vm_slide.js)');
       return this._vmSlideSource;
     }
 

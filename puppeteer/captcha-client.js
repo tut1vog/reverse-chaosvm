@@ -433,6 +433,40 @@ class CaptchaClient {
     const bgUrl = this._resolveImageUrl(data.bg_url || data.cdnPic1 || data.bgurl || '');
     const sliceUrl = this._resolveImageUrl(data.slice_url || data.cdnPic2 || data.sliceurl || '');
 
+    // Construct showUrl for the legacy path (same URL format as _getShowConfig)
+    // so that downstream code always has a valid show page URL for Referer etc.
+    const legacyShowSubsid = String(this._subsid++);
+    this._showSubsid = legacyShowSubsid;
+    const showParams = new URLSearchParams({
+      aid: this.aid,
+      protocol: 'https',
+      accver: '1',
+      showtype: 'popup',
+      ua: Buffer.from(this.userAgent).toString('base64'),
+      noheader: '1',
+      fb: '1',
+      aged: '0',
+      enableAged: '0',
+      enableDarkMode: '0',
+      grayscale: '1',
+      dyeid: '0',
+      clientype: '2',
+      sess: session.sess,
+      fwidth: '0',
+      sid: session.sid,
+      wxLang: '',
+      tcScale: '1',
+      uid: '',
+      cap_cd: '',
+      rnd: String(Math.floor(Math.random() * 1000000)),
+      prehandleLoadTime: String(Math.floor(Math.random() * 200 + 100)),
+      createIframeStart: String(Date.now()),
+      global: '0',
+      subsid: legacyShowSubsid,
+    });
+    const legacyShowUrl = `${BASE_URL}/cap_union_new_show?${showParams.toString()}`;
+    this._lastShowUrl = legacyShowUrl;
+
     return {
       bgUrl,
       sliceUrl,
@@ -444,6 +478,8 @@ class CaptchaClient {
       capclass: data.capclass || session.capclass || '',
       sess: data.sess || session.sess,
       sid: data.sid || session.sid,
+      showUrl: legacyShowUrl,
+      showSubsid: legacyShowSubsid,
       _raw: data,
     };
   }
@@ -561,6 +597,7 @@ class CaptchaClient {
       // Show page subsid — used in verify POST body (HAR: subsid=10 = show page value)
       showSubsid: showSubsid,
       _raw: config,
+      _html: resp.body,
     };
   }
 
