@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-04-10T13:28:40.570Z",
+  "description": "vData and jQuery serialization comparison: jsdom vs browser",
+  "vmSlideSource": {
+    "path": "/home/ubuntu/workspace/reverse-chaosvm/sample/vm_slide.js",
+    "sizeBytes": 43688
+  },
+  "serialization": {
+    "jsdomLength": 6276,
+    "manualLength": 6634,
+    "match": false,
+    "firstDivergenceAt": 805,
+    "jsdomContext": "bal=0&subsid=1&cdata=0&ans=500,87;&vsig=&websig=&subcapclass",
+    "manualContext": "bal=0&subsid=1&cdata=0&ans=500%2C87%3B&vsig=&websig=&subcapc",
+    "totalDiffs": 5747,
+    "jsdomHasLiteralPlus": true,
+    "jsdomHasPctEncodedPlus": false,
+    "notes": "jQuery.param in jsdom differs from manual encodeURIComponent serialization. Check encoding of special characters (+, spaces, *, !)."
+  },
+  "vData": {
+    "jsdomLength": 152,
+    "browserLength": 152,
+    "jsdomValue": "LUyRP5O30eR1763_XNfB_ezSZgacdoTD4fx2Zv*nRbElpXSDdHhF37F6ZxbLOVZz*46boEbHvuVvN4SGCv5RSdlF*9UM_i_omS9SAXPemL0CLmVG4FTINmZRuEImuNBWsljcH9upD0fmoOfG_C7WH7YY",
+    "browserValue": "SByq4Ln1Nr3Mmdk6sjMXBu8wDHoSg4WDbAPMVTo6jy5JEI2xWhyORIflxNrMvrm1vzhe3dztaQOSzP7z31z-iuahJBsWhKSB-cVRdX1PRkhJehp6yxEj-o6FEmRrnPqnhKyx7Mz5*9IjnadWhe91IGYY",
+    "match": false,
+    "firstDivergenceAt": 0,
+    "totalDiffs": 147,
+    "notes": "vData differs. Same length but different content. vm-slide may detect jsdom environment or depend on browser-specific APIs."
+  },
+  "conclusion": "Both jQuery serialization and vData differ. The serialization difference likely causes the vData difference (since vData is computed from the serialized body)."
+}
