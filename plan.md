@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 15
-Current task: 16.1 — Run full Puppeteer solver as control test
+Current task: 16.2 — Capture Chrome collect + generate standalone, diff both for same session
 
 ---
 
@@ -149,41 +149,78 @@ Current task: 16.1 — Run full Puppeteer solver as control test
 
 | ID | Task | Status |
 |----|------|--------|
-| 16.1 | Run full Puppeteer solver as control test | in-progress |
-| 16.2 | Capture and decrypt the Chrome-generated collect token | pending |
-| 16.3 | Diff Chrome collect vs standalone collect for same session | pending |
+| 16.1 | Run full Puppeteer solver as control test | done |
+| 16.2 | Capture Chrome collect + generate standalone, diff both for same session | in-progress |
+| 16.3 | Fix identified collect differences | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 16.1
-**Title**: Run full Puppeteer solver as control test
+**ID**: 16.2
+**Title**: Capture Chrome collect + generate standalone, diff both for same session
 **Phase**: Definitive Test — Chrome tdc.js vs Standalone Collect
 **Status**: in-progress
 
 ### Goal
-Run the existing full Puppeteer CAPTCHA solver (`puppeteer/captcha-solver.js` via `puppeteer/cli.js`) to confirm it still gets errorCode 0 (success) with Chrome's real tdc.js generating the collect token. This is the control: if it succeeds, the standalone collect token is confirmed as the sole remaining cause of errorCode 9.
-
-If the full Puppeteer solver ALSO gets errorCode 9 now, it means something server-side changed (e.g., switch from slide to click CAPTCHA, new validation, stale session format) and the problem is not in our code.
+Create a script that does BOTH in one session: (1) lets Chrome's tdc.js generate a real collect token (which succeeds), (2) generates a standalone collect token using the same session params and the same tdc.js XTEA params, (3) decrypts both tokens, and (4) diffs them field-by-field. This reveals exactly which fields differ between "what works" and "what doesn't."
 
 ### Context
-- `puppeteer/captcha-solver.js` — CaptchaPuppeteer class: launches Chrome stealth, navigates show page, intercepts images, solves slider via OpenCV, performs real mouse drag, waits for verify response
-- `puppeteer/cli.js` — CLI entry point: `node puppeteer/cli.js --domain example.com [--headful]`
-- CLAUDE.md note: "urlsec.qq.com has switched to click-image-selection CAPTCHAs" — the slide CAPTCHA may no longer be served, which would cause the Puppeteer solver to fail too
-- The captured verify POST (`output/puppeteer-capture/verify-post.json`) is from Phase 12.1 which got errorCode 0
+- `puppeteer/captcha-solver.js` — already captures the verify POST body including the real collect token (in `capturedVerifyPost`)
+- `output/tdc-capture/xtea-params.json` — XTEA params for the captured tdc.js (from Phase 12.1)
+- The Puppeteer solver intercepts `tdc.js` source (in `capturedTdcSource`)
+- `pipeline/run.js` — can extract XTEA params from any tdc.js build
+- `scraper/collect-generator.js` — generates standalone collect tokens
+- `token/collector-schema.js` — `buildDefaultCdArray()` for the 59-field cd array
+- `profiles/default.json` — current fingerprint profile
+
+The key insight: the Phase 12.1 comparison (`output/puppeteer-capture/collect-decrypted.json`) compared a browser capture against the OLD scraper (pre-Phase 12.4 fixes). Many issues were already fixed. We need a FRESH comparison using the CURRENT profile and code.
+
+### Approach: Modify the existing hybrid solver
+
+Instead of building from scratch, modify the hybrid solver flow:
+1. Launch Puppeteer, navigate to show page, intercept images + tdc.js
+2. Solve slider via OpenCV  
+3. Perform a REAL mouse drag (like captcha-solver.js) → Chrome generates real collect + verify POST
+4. Intercept the verify POST body → extract the Chrome-generated collect token
+5. Extract XTEA params from the intercepted tdc.js (via pipeline's vm-parser + opcode-mapper + key-extractor)
+6. Generate a standalone collect using the same session params (nonce, sess, sid, ans) + same XTEA params + current profile
+7. Decrypt BOTH tokens using the extracted XTEA params
+8. Compare cd arrays field-by-field + sd structures
+9. Output the diff to `output/chrome-vs-standalone-diff.json`
+
+Actually, this is complex. A simpler approach:
+
+**Alternative**: Run the Puppeteer solver to get a successful solve, capture the tdc.js source and the collect token. Then run the pipeline on the captured tdc.js to get XTEA params. Then decrypt the Chrome collect. Then generate + decrypt a standalone collect with the same params. Then diff.
+
+This can be a standalone script: `scripts/collect-diff.js`
 
 ### Implementation Steps
-1. Run `node puppeteer/cli.js --domain urlsec.qq.com --headful` 2-3 times
-2. If it fails because the CAPTCHA type changed (click instead of slide), note that
-3. If it gets errorCode 0, capture the verify POST body (already intercepted by captcha-solver.js)
-4. Document all results
+1. Create `scripts/collect-diff.js` that:
+   a. Runs the full Puppeteer solver (reuse CaptchaPuppeteer)
+   b. Captures the verify POST body (Chrome-generated collect) and tdc.js source
+   c. Extracts XTEA params from the captured tdc.js (run pipeline extraction)
+   d. Decrypts the Chrome collect token
+   e. Generates a standalone collect using the same session params + XTEA params + current profile
+   f. Decrypts the standalone collect
+   g. Compares cd arrays field-by-field, sd structures
+   h. Outputs `output/chrome-vs-standalone-diff.json`
+
+2. The decryption needs the full token pipeline in reverse:
+   - URL-decode the collect token
+   - Split into 4 base64 segments (the token assembly order is [1, 0, 2, 3])
+   - Decode each base64 segment to bytes
+   - Decrypt each segment with XTEA
+   - Reassemble to get the JSON string `{"cd":[...],"sd":{...}}`
+
+   OR: the pipeline already has decryption logic. Check `scripts/decrypt-collect.js` if it exists, or `token/crypto-core.js` for decrypt functions.
 
 ### Verification
-- [ ] Puppeteer solver runs without crashes
-- [ ] Result documented: errorCode and whether the CAPTCHA type is still slide
-- [ ] If errorCode 0: confirms standalone collect token is the issue
-- [ ] If errorCode 9 or CAPTCHA type changed: documents server-side changes
+- [ ] Script runs and produces a successful Puppeteer solve (errorCode 0)
+- [ ] Chrome collect token is captured and decrypted
+- [ ] Standalone collect token is generated with same session params
+- [ ] Field-by-field diff output in `output/chrome-vs-standalone-diff.json`
+- [ ] At least one concrete field difference identified
 
 ### Suggested Agent
 general-purpose
