@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 18.3 — Live forensics test
+Current task: 18.3.1 — Extract XTEA key from live tdc.js at runtime
 
 ---
 
@@ -175,7 +175,8 @@ Current task: 18.3 — Live forensics test
 |----|------|--------|
 | 18.1 | Create token forensics script | done |
 | 18.2 | Tests for token forensics helpers | pending |
-| 18.3 | Live forensics test | in-progress |
+| 18.3 | Live forensics test | blocked |
+| 18.3.1 | Extract XTEA key from live tdc.js at runtime | in-progress |
 | 18.4 | Fix identified divergence | pending |
 | 18.5 | Live re-test with fix | pending |
 
@@ -189,16 +190,32 @@ Current task: 18.3 — Live forensics test
 **Status**: in-progress
 
 ### Goal
-Run `scripts/token-forensics.js` live to identify where standalone tokens diverge from Chrome's.
+Modify `scripts/token-forensics.js` to extract the XTEA key from the captured live tdc.js source at runtime using the pipeline modules (`parseVmFunction`, `mapOpcodes`, `extractKey`), instead of relying on the template cache which has stale keys.
+
+**Why needed**: Live test showed decryption produced garbage because the cached Template A key doesn't match the live TDC build `hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig`. Tencent rotates XTEA keys while keeping the same opcode structure. Comparison B confirmed our crypto code is correct — the only issue is using the wrong key.
 
 ### Context
-- Script performs 3 comparisons: A (plaintext serialization), B (encryption round-trip), C (full reconstruction)
-- Requires Chrome + a template the cache can decrypt (Template A or the 98-opcode template that worked in Phase 17)
+- `scripts/token-forensics.js` — already captures the tdc.js source (via `capturedTdcSource`), stores it at ~line 280
+- Pipeline modules: `pipeline/vm-parser.js` exports `parseVmFunction(source)`, `pipeline/opcode-mapper.js` exports `mapOpcodes(parsed, source)`, `pipeline/key-extractor.js` exports `extractKey(filePath, opcodeTable, variables)` 
+- `extractKey` needs a FILE PATH (reads from disk), so we need to write the captured source to a temp file
+- The pipeline flow: `parseVmFunction(src)` → `mapOpcodes(parsed, src)` → `extractKey(tmpFile, opcodeTable, variables)` → returns `{ key, delta, rounds, keyMods, ... }`
+- The script should still fall back to template cache if pipeline extraction fails
+
+### Implementation Steps
+1. Add imports: `parseVmFunction` from `../pipeline/vm-parser`, `mapOpcodes` from `../pipeline/opcode-mapper`, `extractKey` from `../pipeline/key-extractor`
+2. After capturing the tdc.js source and BEFORE the template cache lookup:
+   - Write `capturedTdcSource` to a temp file (e.g., `/tmp/tdc-forensics-<timestamp>.js`)
+   - Run `parseVmFunction(capturedTdcSource)` → `mapOpcodes(parsed, capturedTdcSource)` → `extractKey(tmpFile, opcodeTable, variables)`
+   - If successful, use the extracted XTEA params instead of the template cache
+   - Clean up the temp file
+3. Fall back to template cache if pipeline extraction fails
+4. Log which method was used (pipeline vs cache)
 
 ### Verification
-- [ ] Script runs to completion, decryption succeeds
-- [ ] All three comparisons produce results
-- [ ] Results saved to `output/token-forensics.json`
+- [ ] `node -c scripts/token-forensics.js` passes
+- [ ] `npm test` still passes 173/175
+- [ ] Script imports pipeline modules and has extraction logic
+- [ ] Script falls back to template cache on extraction failure
 
 ### Suggested Agent
 general-purpose
