@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 8: Scraper Foundation Modules
-Current task: 11.2 — Update CLAUDE.md, create scrape command
+Current phase: All phases complete
+Current task: none
 
 ---
 
@@ -99,43 +99,24 @@ Current task: 11.2 — Update CLAUDE.md, create scrape command
 | ID | Task | Status |
 |----|------|--------|
 | 11.1 | End-to-end live test and debugging | done |
-| 11.2 | Update CLAUDE.md, create scrape command | in-progress |
+| 11.2 | Update CLAUDE.md, create scrape command | done |
 
 ---
 
-## Current Task
+## Summary
 
-**ID**: 11.2
-**Title**: Update CLAUDE.md, create scrape command
-**Phase**: End-to-End Integration
-**Status**: in-progress
+All 11 phases complete (Phases 1-7: porting pipeline, Phases 8-11: headless scraper).
 
-### Goal
-Update CLAUDE.md with the scraper module documentation and create `.claude/commands/scrape.md` slash command. Also document the live test findings (captcha type change, TLS blocking, new template).
+### Scraper deliverables (Phases 8-11)
+- `scraper/tdc-utils.js` — TDC_NAME and eks extraction
+- `scraper/template-cache.js` — TDC_NAME → XTEA params cache (pre-seeded with 3 templates)
+- `scraper/collect-generator.js` — Parameterized XTEA encryption for any template
+- `scraper/vdata-generator.js` — jsdom-based vData generation (XHR hook approach)
+- `scraper/scraper.js` — Main orchestrator (full CAPTCHA flow + urlsec query)
+- `scraper/cli.js` — CLI entry point
+- 73 new tests (163/165 total), `.claude/commands/scrape.md`
 
-### Context
-- **Scraper module** is complete: `scraper/` contains tdc-utils.js, template-cache.js, collect-generator.js, vdata-generator.js, scraper.js, cli.js.
-- **Live test findings** (task 11.1):
-  1. **Show page 403**: `cap_union_new_show` now returns HTTP 403 for Node.js/curl (TLS fingerprint blocking). Prehandle still works.
-  2. **Captcha type changed**: urlsec.qq.com now serves `click_image_uncheck` (6-panel AI image selection) instead of slide captchas. The scraper handles slide only.
-  3. **New template**: Live server serves TDC_NAME `XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR` (not in cache). tdc.js is still fetchable.
-  4. **CLI bugs fixed**: 4 bugs in cli.js found and fixed during live testing (import, init call, config key, method name).
-- The scraper architecture is correct and all unit tests pass. It would work against a slide CAPTCHA endpoint — the blocker is Tencent's server-side changes.
-- **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
-
-### Implementation Steps
-1. Update CLAUDE.md:
-   - Add `scraper/` to Project Structure
-   - Add scraper CLI to Commands section
-   - Add scraper architecture to Architecture section
-   - Note the live test findings and current limitations
-2. Create `.claude/commands/scrape.md` slash command for running the scraper.
-
-### Verification
-- [ ] `scraper/` appears in CLAUDE.md Project Structure
-- [ ] Scraper CLI usage appears in CLAUDE.md Commands
-- [ ] `.claude/commands/scrape.md` exists with proper format
-- [ ] Live test limitations are documented
-
-### Suggested Agent
-general-purpose — documentation updates
+### Live test findings
+- urlsec.qq.com now serves click-image CAPTCHAs (not slide)
+- `cap_union_new_show` returns 403 for non-browser TLS clients
+- New template `XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR` observed (not yet ported)
