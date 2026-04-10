@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-04-10T10:15:00.000Z",
+  "runs": [
+    {
+      "attempt": 1,
+      "prehandle": "success",
+      "getSig": "success",
+      "imageDownload": "success",
+      "tdcDownload": "success",
+      "templateMatch": "mixed — 3 inner retries: (1) BGDfWkdQ 199611 chars FAIL parse, (2) BGDfWkdQ FAIL, (3) BGDfWkdQ FAIL → outer retry → (4) XcabTONO 98 opcodes matched, (5) XcabTONO 98 → errorCode 9, (6) SUOPMSFGe 94 opcodes matched → errorCode 9",
+      "sliderSolve": "success (offsets 469, 516, 484)",
+      "collectLength": [5676, 5316, 4332],
+      "verifyErrorCode": 9,
+      "ticket": null,
+      "error": "CAPTCHA verify returned errorCode 9 (token rejected)"
+    },
+    {
+      "attempt": 2,
+      "prehandle": "success",
+      "getSig": "success",
+      "imageDownload": "success",
+      "tdcDownload": "success",
+      "templateMatch": "3 inner retries: (1) hDWlWNMR 95 opcodes Template A, (2) SUOPMSFGe 94 Template B, (3) KhaJbXNV 94 Template B",
+      "sliderSolve": "success (offsets 493, 480, 459)",
+      "collectLength": [4356, 4356, 4332],
+      "verifyErrorCode": 9,
+      "ticket": null,
+      "error": "CAPTCHA verify returned errorCode 9 (token rejected)"
+    },
+    {
+      "attempt": 3,
+      "prehandle": "success",
+      "getSig": "success",
+      "imageDownload": "success",
+      "tdcDownload": "success",
+      "templateMatch": "3 inner retries: (1) BGDfWkdQ 199611 chars FAIL parse, (2) MClHbUcg 98 opcodes matched, (3) XcabTONO 98 opcodes matched",
+      "sliderSolve": "success (offsets 463, 476)",
+      "collectLength": [5432, 5676],
+      "verifyErrorCode": 9,
+      "ticket": null,
+      "error": "CAPTCHA verify returned errorCode 9 (token rejected)"
+    }
+  ],
+  "templateDistribution": {
+    "94_opcodes_Template_B": "most common, matched from cache",
+    "95_opcodes_Template_A": "occasionally served, matched from cache",
+    "96_opcodes_NEW": "seen once, NOT in cache — scraper would fail on this",
+    "98_opcodes_unknown": "frequently served, matched from cache with cdFieldOrder",
+    "199611_chars_no_switch_case": "new obfuscation format — zero case labels, vm-parser cannot parse, no template in cache"
+  },
+  "diagnosis": {
+    "summary": "All pipeline steps succeed (prehandle, getSig, images, tdc, template match, slider solve, collect generation, vData generation, verify POST). Server consistently returns errorCode 9 (token rejected).",
+    "rootCauses": [
+      {
+        "severity": "HIGH",
+        "issue": "pageUrl in collect token is static (profile hardcoded to rand=1519713624347) instead of the actual session show page URL. The server likely validates that the pageUrl field matches the real show page URL for the session. Field index 22 in the cd array.",
+        "fix": "Override profile.pageUrl with sig.showUrl before calling generateCollect. This is a small change in scraper.js around line 360."
+      },
+      {
+        "severity": "HIGH",
+        "issue": "vsig and websig are empty strings in the getSig response. The verify POST sends empty vsig/websig fields. This may be expected for this aid or may indicate the getSig flow needs updating.",
+        "fix": "Investigate whether the live show page provides vsig/websig through a different mechanism (e.g., the show page HTML config rather than the getsig JSONP)."
+      },
+      {
+        "severity": "MEDIUM",
+        "issue": "The vm-slide.js used for vData generation (sample/vm_slide.js, 43688 chars) may be outdated. If the live server expects vData computed by a newer vm-slide version, the vData will not validate.",
+        "fix": "Fetch the live vm-slide source from the show page and use it instead of the cached sample."
+      },
+      {
+        "severity": "MEDIUM",
+        "issue": "New template type with ~200k chars and zero switch-case labels cannot be parsed by vm-parser. This is served frequently from the pool.",
+        "fix": "Requires vm-parser update to handle new obfuscation format, or the template must be ported manually."
+      },
+      {
+        "severity": "MEDIUM",
+        "issue": "A 96-opcode template was observed but is not in the cache. The scraper would fail on it.",
+        "fix": "Run pipeline/run.js on a captured 96-opcode tdc.js to port it."
+      },
+      {
+        "severity": "LOW",
+        "issue": "The sid field in the profile (field 4, value '7448307515255877632') is static. The server may validate this against the actual session sid.",
+        "fix": "Override profile sid with session.sid from prehandle response."
+      },
+      {
+        "severity": "LOW",
+        "issue": "Slider calibration may be off. All attempts used ratio=0.5 and calibration around -25. The correct offset depends on the image scaling.",
+        "fix": "This is secondary — errorCode 9 means token validation failed, not wrong answer (which would be a different error code)."
+      }
+    ],
+    "nonce": "Always 'eda1152f11f1daf0' across all sessions — appears to be fixed for this aid, not a bug.",
+    "collectTokenSize": "4260-5676 chars depending on template (reasonable range).",
+    "vDataGeneration": "Working — jsdom + vm-slide generates vData successfully every time.",
+    "nextSteps": [
+      "Override profile.pageUrl with sig.showUrl in scraper.js before generateCollect",
+      "Override profile sid with session.sid",
+      "Test with fresh vm-slide.js fetched from live endpoint",
+      "Port the 96-opcode template",
+      "Investigate the 200k no-switch-case template format"
+    ]
+  }
+}

@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 12
-Current task: 12.4 — Update default profile and fix scraper to produce valid collect tokens
+Current task: 12.5 — Live end-to-end verification of headless scraper
 
 ---
 
@@ -110,33 +110,23 @@ Current task: 12.4 — Update default profile and fix scraper to produce valid c
 | 12.2 | Extract XTEA key from captured tdc.js and decrypt the collect token | done |
 | 12.3 | Analyze decrypted collect — compare field-by-field with our profile | done |
 | 12.4 | Update default profile and fix scraper to produce valid collect tokens | done |
-| 12.5 | Live end-to-end verification of headless scraper | pending |
+| 12.5 | Live end-to-end verification of headless scraper | done |
 
 ---
 
 ## Current Task
 
-**ID**: 12.5
-**Title**: Live end-to-end verification of headless scraper
-**Phase**: Scraper Debugging — Collect Token Analysis
-**Status**: pending
+Phase 12 complete. Awaiting user direction.
 
-### Goal
-Run the scraper against the live Tencent CAPTCHA endpoint and verify whether the updated collect token (with template-specific cd ordering, proper sd structure, and realistic profile) gets accepted.
+### Phase 12 Results
 
-### Context
-Task 12.4 implemented: 4-element keyMods XTEA, cd field reordering, behavioralEvents generation, slide sd structure, realistic Windows Chrome profile. The 98-opcode template cache entries have cdFieldOrder and keyMods. The scraper should now produce tokens structurally identical to what a real browser sends.
+The scraper runs end-to-end without crashes. All pipeline steps succeed: prehandle → getSig → images → tdc → template match → slider solve → collect generation → vData → verify POST. However, the server consistently returns **errorCode 9** (token rejected).
 
-### Implementation Steps
-1. Run `node scraper/cli.js --captcha-only --verbose` against the live endpoint
-2. Analyze the verify response — check errorCode
-3. If errorCode != 0, capture the generated token, decrypt it, compare with the browser capture
-4. Identify remaining issues and fix
+**Root causes identified (priority order)**:
+1. **HIGH: Static pageUrl** — cd field 22 is hardcoded to a fixed URL from profile instead of the actual session show page URL
+2. **HIGH: Empty vsig/websig** — may indicate a flow issue with getSig
+3. **MEDIUM: Stale vm-slide.js** — cached version may not match live server expectations
+4. **MEDIUM: New template formats** — 96-opcode (unported) and 200k no-switch-case (new obfuscation) seen in rotation
+5. **LOW: Static sid** — session ID in cd array should be overridden with actual session.sid
 
-### Verification
-- [ ] Scraper completes without crashes
-- [ ] Verify POST returns a response (even if errorCode != 0)
-- [ ] Document the errorCode and any remaining issues
-
-### Suggested Agent
-general-purpose
+**Suggested Phase 13**: Fix the HIGH-priority issues (pageUrl override, vsig investigation) and re-test.
