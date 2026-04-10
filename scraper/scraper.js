@@ -357,7 +357,17 @@ class Scraper {
 
         // (j) Generate collect token
         this._log('Step 6: generateCollect');
-        const collectEncoded = generateCollect(this.profile, xteaParams, {
+        const nowSec = Math.round(Date.now() / 1000);
+        const profileOverrides = Object.assign({}, this.profile, {
+          pageUrl: sig.showUrl || this.profile.pageUrl,
+          timestamp: nowSec,
+          timestampCollectionStart: nowSec,
+          timestampCollectionEnd: nowSec + 3,
+          canvasHash: Math.floor(Math.random() * 0xFFFFFFFF) >>> 0,
+          mathFingerprint: Math.random(),
+          performanceHash: Math.floor(Math.random() * 0xFFFFFFFF) >>> 0,
+        });
+        const collectEncoded = generateCollect(profileOverrides, xteaParams, {
           appid: this.aid,
           nonce: sig.nonce,
           sdOverride: slideSd,

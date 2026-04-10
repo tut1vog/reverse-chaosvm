@@ -8,8 +8,8 @@ const Scraper = require('../scraper/scraper');
 describe('Scraper: constructor defaults', () => {
   const s = new Scraper();
 
-  it('default aid is 2090803262', () => {
-    assert.strictEqual(s.aid, '2090803262');
+  it('default aid is 2046626881', () => {
+    assert.strictEqual(s.aid, '2046626881');
   });
 
   it('default slideRatio is 0.5', () => {
