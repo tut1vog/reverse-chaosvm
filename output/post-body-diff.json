@@ -1,0 +1,675 @@
+{
+  "timestamp": "2026-04-10T13:10:01.181Z",
+  "description": "Field-by-field comparison of scraper output vs known-good browser capture",
+  "templateUsed": "MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn",
+  "cdComparison": {
+    "totalFields": 60,
+    "matching": 48,
+    "dynamic": 8,
+    "mismatched": 4,
+    "fields": [
+      {
+        "index": 0,
+        "fieldName": "connectionInfo",
+        "browserValue": "null",
+        "scraperValue": "null",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 1,
+        "fieldName": "timezoneOffset",
+        "browserValue": "\"+08\"",
+        "scraperValue": "\"+08\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 2,
+        "fieldName": "plugins",
+        "browserValue": "[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF ...",
+        "scraperValue": "[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF ...",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 3,
+        "fieldName": "indexedDbAvail",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 4,
+        "fieldName": "flashFonts",
+        "browserValue": "\"\"",
+        "scraperValue": "\"\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 5,
+        "fieldName": "audioFingerprint",
+        "browserValue": "{\"nt_vc_output\":{\"ac-baseLatency\":0.01,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOf...",
+        "scraperValue": "{\"nt_vc_output\":{\"ac-baseLatency\":0.01,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOf...",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 6,
+        "fieldName": "audioCodecs",
+        "browserValue": "[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"...",
+        "scraperValue": "[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"...",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 7,
+        "fieldName": "touchSupport",
+        "browserValue": "2",
+        "scraperValue": "2",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 8,
+        "fieldName": "webglRenderer",
+        "browserValue": "\"Intel Iris OpenGL Engine\"",
+        "scraperValue": "\"Intel Iris OpenGL Engine\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 9,
+        "fieldName": "availHeight",
+        "browserValue": "600",
+        "scraperValue": "600",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 10,
+        "fieldName": "frameStatus",
+        "browserValue": "\"top\"",
+        "scraperValue": "\"top\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 11,
+        "fieldName": "headlessFlag",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 12,
+        "fieldName": "cssOverflowResult",
+        "browserValue": "\"\"",
+        "scraperValue": "\"\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 13,
+        "fieldName": "colorGamut",
+        "browserValue": "\"srgb\"",
+        "scraperValue": "\"srgb\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 14,
+        "fieldName": "timestampInit",
+        "browserValue": "1775814897",
+        "scraperValue": "1775814897",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 15,
+        "fieldName": "userAgentData",
+        "browserValue": "{\"brands\":[],\"mobile\":false,\"platform\":\"\"}",
+        "scraperValue": "{\"brands\":[],\"mobile\":false,\"platform\":\"\"}",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 16,
+        "fieldName": "webglImage",
+        "browserValue": "\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=\"",
+        "scraperValue": "\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=\"",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 17,
+        "fieldName": "hardwareConcurrency",
+        "browserValue": "8",
+        "scraperValue": "8",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 18,
+        "fieldName": "videoCodecs",
+        "browserValue": "[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"...",
+        "scraperValue": "[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"...",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 19,
+        "fieldName": "errorLog",
+        "browserValue": "\"\"",
+        "scraperValue": "\"\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 20,
+        "fieldName": "screenComposite",
+        "browserValue": "\"800-600-600-24-*-*-|-*\"",
+        "scraperValue": "\"800-600-600-24-*-*-|-*\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 21,
+        "fieldName": "maxTouchPoints",
+        "browserValue": "4",
+        "scraperValue": "0",
+        "status": "mismatch",
+        "severity": "high"
+      },
+      {
+        "index": 22,
+        "fieldName": "userAgent",
+        "browserValue": "\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"",
+        "scraperValue": "\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 23,
+        "fieldName": "highEntropyValues",
+        "browserValue": "{\"_state\":0,\"architecture\":\"\",\"bitness\":\"\",\"brands\":[],\"fullVersionList\":[],\"mobile\":false,\"model\":\"\",\"platform\":\"\",\"...",
+        "scraperValue": "{\"_state\":0,\"architecture\":\"\",\"bitness\":\"\",\"brands\":[],\"fullVersionList\":[],\"mobile\":false,\"model\":\"\",\"platform\":\"\",\"...",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 24,
+        "fieldName": "adBlockDetected",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 25,
+        "fieldName": "storageEstimate",
+        "browserValue": "{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}}",
+        "scraperValue": "{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}}",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 26,
+        "fieldName": "viewportWidth",
+        "browserValue": "800",
+        "scraperValue": "800",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 27,
+        "fieldName": "doNotTrack",
+        "browserValue": "\"\"",
+        "scraperValue": "\"\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 28,
+        "fieldName": "featureBitmask",
+        "browserValue": "1023",
+        "scraperValue": "1023",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 29,
+        "fieldName": "vendor",
+        "browserValue": "\"Intel Inc.\"",
+        "scraperValue": "\"Google Inc. (Google)\"",
+        "status": "mismatch",
+        "severity": "high"
+      },
+      {
+        "index": 30,
+        "fieldName": "canvasHash",
+        "browserValue": "1189887932",
+        "scraperValue": "1189887932",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 31,
+        "fieldName": "timestampCollectionEnd",
+        "browserValue": "1775814894",
+        "scraperValue": "1775814894",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 32,
+        "fieldName": "performanceHash",
+        "browserValue": "681731712",
+        "scraperValue": "681731712",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 33,
+        "fieldName": "screenResolution",
+        "browserValue": "[1280,1400]",
+        "scraperValue": "[1280,1400]",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 34,
+        "fieldName": "screenPosition",
+        "browserValue": "\"1;0\"",
+        "scraperValue": "\"0;0\"",
+        "status": "mismatch",
+        "severity": "high",
+        "notes": "Browser: \"1;0\", scraper uses default \"0;0\" — screenX;screenY"
+      },
+      {
+        "index": 35,
+        "fieldName": "canvasBlocked",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 36,
+        "fieldName": "sessionStorageAvail",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 37,
+        "fieldName": "localStorageAvail",
+        "browserValue": "1",
+        "scraperValue": "1",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 38,
+        "fieldName": "webdriverFlag",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 39,
+        "fieldName": "cookiesEnabled",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 40,
+        "fieldName": "detectedFonts",
+        "browserValue": "\"7448307515255877632\"",
+        "scraperValue": "\"7448307515255877632\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 41,
+        "fieldName": "pageUrl",
+        "browserValue": "\"https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347\"",
+        "scraperValue": "\"https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 42,
+        "fieldName": "internalToken",
+        "browserValue": "\"98k\"",
+        "scraperValue": "\"98k\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 43,
+        "fieldName": "callCounter",
+        "browserValue": "1",
+        "scraperValue": "1",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 44,
+        "fieldName": "languages",
+        "browserValue": "[\"en-US\",\"en\"]",
+        "scraperValue": "[\"en-US\",\"en\"]",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 45,
+        "fieldName": "characterSet",
+        "browserValue": "\"UTF-8\"",
+        "scraperValue": "\"UTF-8\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 46,
+        "fieldName": "maxTouchPointsDup",
+        "browserValue": "0",
+        "scraperValue": "0",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 47,
+        "fieldName": "colorGamutLegacy",
+        "browserValue": "\"\"",
+        "scraperValue": "\"\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 48,
+        "fieldName": "mathFingerprint",
+        "browserValue": "1.0739998817443848",
+        "scraperValue": "1.0739998817443848",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 49,
+        "fieldName": "intlOptions",
+        "browserValue": "{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"}",
+        "scraperValue": "{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"}",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 50,
+        "fieldName": "mimeTypes",
+        "browserValue": "[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}]",
+        "scraperValue": "[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}]",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 51,
+        "fieldName": "connectionType",
+        "browserValue": "\"unknown\"",
+        "scraperValue": "\"unknown\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 52,
+        "fieldName": "timestampCollectionStart",
+        "browserValue": "1775814894",
+        "scraperValue": "1775814894",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 53,
+        "fieldName": "devicePixelRatio",
+        "browserValue": "1",
+        "scraperValue": "1",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 54,
+        "fieldName": "osPlatform",
+        "browserValue": "\"windows\"",
+        "scraperValue": "\"windows\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 55,
+        "fieldName": "behavioralEvents",
+        "browserValue": "[[4,-1,-1,1775814894970,0,0,0,0],[1,159,812,1239,0,0,0,0],[2,0,0,167,0,0,0,0],[1,0,0,99,0,0,0,0],[1,153,-1,33,0,0,0,0...",
+        "scraperValue": "[[4,-1,-1,1775814894970,0,0,0,0],[1,25,1,1775814895071,0,0,0,0],[1,24,-1,1775814895113,0,0,0,0],[1,24,-1,177581489514...",
+        "status": "dynamic",
+        "severity": "info",
+        "notes": "Session-specific — overridden to browser values for comparison"
+      },
+      {
+        "index": 56,
+        "fieldName": "permissionStatus",
+        "browserValue": "{\"_state\":-2}",
+        "scraperValue": "{\"_state\":-2}",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 57,
+        "fieldName": "platform",
+        "browserValue": "\"Linux x86_64\"",
+        "scraperValue": "\"Win32\"",
+        "status": "mismatch",
+        "severity": "critical"
+      },
+      {
+        "index": 58,
+        "fieldName": "webrtcIp",
+        "browserValue": "\"\"",
+        "scraperValue": "\"\"",
+        "status": "match",
+        "severity": "info"
+      },
+      {
+        "index": 59,
+        "fieldName": "colorDepth",
+        "browserValue": "24",
+        "scraperValue": "24",
+        "status": "match",
+        "severity": "info"
+      }
+    ]
+  },
+  "sdComparison": {
+    "browserFields": [
+      "clientType",
+      "coordinate",
+      "dragobj",
+      "ft",
+      "od",
+      "refreshcnt",
+      "slideValue",
+      "trycnt"
+    ],
+    "scraperFields": [
+      "clientType",
+      "coordinate",
+      "dragobj",
+      "ft",
+      "od",
+      "refreshcnt",
+      "slideValue",
+      "trycnt"
+    ],
+    "missingInScraper": [],
+    "extraInScraper": [],
+    "fieldDiffs": [
+      {
+        "field": "clientType",
+        "browser": "\"\"",
+        "scraper": "\"\"",
+        "status": "match"
+      },
+      {
+        "field": "coordinate",
+        "browser": "[10,60,1.8559]",
+        "scraper": "[10,60,1.8559]",
+        "status": "match"
+      },
+      {
+        "field": "dragobj",
+        "browser": "1",
+        "scraper": "1",
+        "status": "match"
+      },
+      {
+        "field": "ft",
+        "browser": "\"6f_7Pfn_H\"",
+        "scraper": "\"6f_7Pfn_H\"",
+        "status": "match"
+      },
+      {
+        "field": "od",
+        "browser": "\"C\"",
+        "scraper": "\"C\"",
+        "status": "match"
+      },
+      {
+        "field": "refreshcnt",
+        "browser": "0",
+        "scraper": "0",
+        "status": "match"
+      },
+      {
+        "field": "slideValue",
+        "browser": "35 entries",
+        "scraper": "35 entries",
+        "status": "match",
+        "notes": "Compared entry count only (values are dynamic)"
+      },
+      {
+        "field": "trycnt",
+        "browser": "1",
+        "scraper": "1",
+        "status": "match"
+      }
+    ]
+  },
+  "postFieldComparison": {
+    "browserFields": [
+      "accver",
+      "aged",
+      "aid",
+      "ans",
+      "cap_cd",
+      "cdata",
+      "clientype",
+      "collect",
+      "createIframeStart",
+      "dyeid",
+      "eks",
+      "enableAged",
+      "enableDarkMode",
+      "fb",
+      "fpinfo",
+      "fwidth",
+      "global",
+      "grayscale",
+      "noheader",
+      "nonce",
+      "pow_answer",
+      "pow_calc_time",
+      "prehandleLoadTime",
+      "protocol",
+      "rnd",
+      "sess",
+      "showtype",
+      "sid",
+      "subcapclass",
+      "subsid",
+      "tcScale",
+      "tlg",
+      "ua",
+      "uid",
+      "vData",
+      "vlg",
+      "vsig",
+      "websig",
+      "wxLang"
+    ],
+    "scraperFields": [
+      "accver",
+      "aged",
+      "aid",
+      "ans",
+      "cap_cd",
+      "cdata",
+      "clientype",
+      "collect",
+      "createIframeStart",
+      "dyeid",
+      "eks",
+      "enableAged",
+      "enableDarkMode",
+      "fb",
+      "fpinfo",
+      "fwidth",
+      "global",
+      "grayscale",
+      "noheader",
+      "nonce",
+      "pow_answer",
+      "pow_calc_time",
+      "prehandleLoadTime",
+      "protocol",
+      "rnd",
+      "sess",
+      "showtype",
+      "sid",
+      "subcapclass",
+      "subsid",
+      "tcScale",
+      "tlg",
+      "ua",
+      "uid",
+      "vlg",
+      "vsig",
+      "websig",
+      "wxLang"
+    ],
+    "missingInScraper": [
+      "vData"
+    ],
+    "extraInScraper": []
+  },
+  "summary": {
+    "criticalIssues": [
+      "[57] platform: browser=\"Linux x86_64\", scraper=\"Win32\""
+    ],
+    "highIssues": [
+      "[21] maxTouchPoints: browser=4, scraper=0",
+      "[29] vendor: browser=\"Intel Inc.\", scraper=\"Google Inc. (Google)\"",
+      "[34] screenPosition: browser=\"1;0\", scraper=\"0;0\""
+    ],
+    "mediumIssues": []
+  }
+}
