@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 15
-Current task: 16.2 — Capture Chrome collect + generate standalone, diff both for same session
+Current phase: Phase 16
+Current task: 16.3 — Fix sd.coordinate format and slideValue timestamp format
 
 ---
 
@@ -150,77 +150,59 @@ Current task: 16.2 — Capture Chrome collect + generate standalone, diff both f
 | ID | Task | Status |
 |----|------|--------|
 | 16.1 | Run full Puppeteer solver as control test | done |
-| 16.2 | Capture Chrome collect + generate standalone, diff both for same session | in-progress |
-| 16.3 | Fix identified collect differences | pending |
+| 16.2 | Capture Chrome collect + generate standalone, diff both for same session | done |
+| 16.3 | Fix sd.coordinate format and slideValue timestamp format | pending |
+| 16.4 | Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition) | pending |
+| 16.5 | Live re-test after fixes | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 16.2
-**Title**: Capture Chrome collect + generate standalone, diff both for same session
+**ID**: 16.3
+**Title**: Fix sd.coordinate format and slideValue timestamp format
 **Phase**: Definitive Test — Chrome tdc.js vs Standalone Collect
-**Status**: in-progress
+**Status**: pending
 
 ### Goal
-Create a script that does BOTH in one session: (1) lets Chrome's tdc.js generate a real collect token (which succeeds), (2) generates a standalone collect token using the same session params and the same tdc.js XTEA params, (3) decrypts both tokens, and (4) diffs them field-by-field. This reveals exactly which fields differ between "what works" and "what doesn't."
+Fix the two most critical structural differences in the standalone collect token that almost certainly cause errorCode 9: (1) `sd.coordinate` sends wrong values — standalone sends `[xAnswer, slideY, timestamp]` but Chrome sends `[leftOffset, topOffset, dragRatio]`; (2) `sd.slideValue` uses absolute timestamps for the dt field, but Chrome uses relative time deltas from the previous event.
 
 ### Context
-- `puppeteer/captcha-solver.js` — already captures the verify POST body including the real collect token (in `capturedVerifyPost`)
-- `output/tdc-capture/xtea-params.json` — XTEA params for the captured tdc.js (from Phase 12.1)
-- The Puppeteer solver intercepts `tdc.js` source (in `capturedTdcSource`)
-- `pipeline/run.js` — can extract XTEA params from any tdc.js build
-- `scraper/collect-generator.js` — generates standalone collect tokens
-- `token/collector-schema.js` — `buildDefaultCdArray()` for the 59-field cd array
-- `profiles/default.json` — current fingerprint profile
+**Diff results** (`output/chrome-vs-standalone-diff.json`):
 
-The key insight: the Phase 12.1 comparison (`output/puppeteer-capture/collect-decrypted.json`) compared a browser capture against the OLD scraper (pre-Phase 12.4 fixes). Many issues were already fixed. We need a FRESH comparison using the CURRENT profile and code.
+**sd.coordinate** (WRONG FORMAT):
+- Chrome: `[10, 60, 1.8559]` — [left CSS offset to slider start, top offset, display ratio]
+- Standalone: `[459, 30, 1775829848529]` — [xAnswer, slideY, timestamp_ms]
+- The coordinate needs to be [slider_left_px, slider_top_px, captcha_ratio] — these are CSS layout values, NOT the answer coordinates.
 
-### Approach: Modify the existing hybrid solver
+**sd.slideValue** (WRONG TIMESTAMP FORMAT):
+- Chrome: `[[158, 814, 90], [85, 0, 41], [76, -3, 24], ...]` — [dx, dy, dt_relative_ms]
+- Standalone: `[[32, 0, 1775829848529], [32, 1, 1775829848627], ...]` — [dx, dy, absolute_timestamp_ms]
+- The dt field should be milliseconds since the previous event, NOT absolute timestamp.
 
-Instead of building from scratch, modify the hybrid solver flow:
-1. Launch Puppeteer, navigate to show page, intercept images + tdc.js
-2. Solve slider via OpenCV  
-3. Perform a REAL mouse drag (like captcha-solver.js) → Chrome generates real collect + verify POST
-4. Intercept the verify POST body → extract the Chrome-generated collect token
-5. Extract XTEA params from the intercepted tdc.js (via pipeline's vm-parser + opcode-mapper + key-extractor)
-6. Generate a standalone collect using the same session params (nonce, sess, sid, ans) + same XTEA params + current profile
-7. Decrypt BOTH tokens using the extracted XTEA params
-8. Compare cd arrays field-by-field + sd structures
-9. Output the diff to `output/chrome-vs-standalone-diff.json`
-
-Actually, this is complex. A simpler approach:
-
-**Alternative**: Run the Puppeteer solver to get a successful solve, capture the tdc.js source and the collect token. Then run the pipeline on the captured tdc.js to get XTEA params. Then decrypt the Chrome collect. Then generate + decrypt a standalone collect with the same params. Then diff.
-
-This can be a standalone script: `scripts/collect-diff.js`
+**Files to modify**:
+- `scraper/collect-generator.js` — `buildSlideSd()` builds the sd object including `coordinate` and `slideValue`
+- `scraper/collect-generator.js` — `generateBehavioralEvents()` produces the raw event data that gets turned into slideValue
 
 ### Implementation Steps
-1. Create `scripts/collect-diff.js` that:
-   a. Runs the full Puppeteer solver (reuse CaptchaPuppeteer)
-   b. Captures the verify POST body (Chrome-generated collect) and tdc.js source
-   c. Extracts XTEA params from the captured tdc.js (run pipeline extraction)
-   d. Decrypts the Chrome collect token
-   e. Generates a standalone collect using the same session params + XTEA params + current profile
-   f. Decrypts the standalone collect
-   g. Compares cd arrays field-by-field, sd structures
-   h. Outputs `output/chrome-vs-standalone-diff.json`
-
-2. The decryption needs the full token pipeline in reverse:
-   - URL-decode the collect token
-   - Split into 4 base64 segments (the token assembly order is [1, 0, 2, 3])
-   - Decode each base64 segment to bytes
-   - Decrypt each segment with XTEA
-   - Reassemble to get the JSON string `{"cd":[...],"sd":{...}}`
-
-   OR: the pipeline already has decryption logic. Check `scripts/decrypt-collect.js` if it exists, or `token/crypto-core.js` for decrypt functions.
+1. Fix `buildSlideSd()` in `scraper/collect-generator.js`:
+   - Change `coordinate` to accept `[leftOffset, topOffset, ratio]` instead of `[xAnswer, slideY, timestamp]`
+   - The caller must pass the correct coordinate values (left offset from slider start, top offset, display ratio from the page)
+   
+2. Fix `generateBehavioralEvents()` or the slideValue construction:
+   - Convert absolute timestamps to relative deltas: `dt[i] = timestamp[i] - timestamp[i-1]`
+   - First event uses time since drag start
+   
+3. Update all callers of `buildSlideSd()`:
+   - `scraper/collect-generator.js` itself (if it calls buildSlideSd internally)
+   - `scripts/hybrid-solver.js`
+   - `scripts/collect-diff.js`
+   - Any other callers
 
 ### Verification
-- [ ] Script runs and produces a successful Puppeteer solve (errorCode 0)
-- [ ] Chrome collect token is captured and decrypted
-- [ ] Standalone collect token is generated with same session params
-- [ ] Field-by-field diff output in `output/chrome-vs-standalone-diff.json`
-- [ ] At least one concrete field difference identified
+- [ ] `node -e "const cg = require('./scraper/collect-generator'); ..."` — buildSlideSd produces relative dt in slideValue
+- [ ] Run `node scripts/collect-diff.js` — sd.coordinate and sd.slideValue formats now match Chrome
+- [ ] No existing tests broken: `npm test` passes (163/165)
 
 ### Suggested Agent
 general-purpose
