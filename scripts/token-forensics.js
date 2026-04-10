@@ -582,11 +582,16 @@ async function extractXteaFromSource(tdcSource) {
     const mapped = mapOpcodes(parsed, tdcSource);
     const keyResult = await extractKey(tmpFile, mapped.opcodeTable, parsed.variables);
 
+    // Derive keyMods from keyModConstants: [0, kmc[0], 0, kmc[1]]
+    // The key extractor returns keyModConstants (2-element), not keyMods (4-element)
+    const kmc = keyResult.keyModConstants || [0, 0];
+    const keyMods = [0, kmc[0] || 0, 0, kmc[1] || 0];
+
     return {
       key: keyResult.key,         // array of 4 ints
       delta: keyResult.delta,     // 0x9E3779B9
       rounds: keyResult.rounds,   // 32
-      keyMods: keyResult.keyMods || [0, 0, 0, 0],
+      keyMods,
       keyModConstants: keyResult.keyModConstants || null,
       source: 'pipeline',
     };
