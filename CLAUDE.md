@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Does
 
-Reverse engineering Tencent's ChaosVM (JSVMP) — a JavaScript bytecode virtual machine used for browser fingerprinting. Three main deliverables:
+Reverse engineering Tencent's ChaosVM (JSVMP) — a JavaScript bytecode virtual machine used for browser fingerprinting. The primary goal is building an **automated porting pipeline** that can take any new tdc.js build and produce a working opcode table, decompiled output, and token generator without manual intervention.
+
+Current deliverables:
 
 1. **Decompiler** (`decompiler/`): 12-step pipeline transforming obfuscated `tdc.js` → readable JS
 2. **Token generator** (`token/`): Standalone XTEA reimplementation producing byte-identical tokens
@@ -43,12 +45,6 @@ node token/cli.js --profile profiles/default.json --verbose
 # CAPTCHA solver (requires Python + OpenCV)
 node puppeteer/cli.js --domain example.com
 node puppeteer/cli.js --domain example.com --headful   # visible browser for debug
-
-# Port a new tdc version (slash command)
-/port-new-version targets/tdc-v4.js
-
-# Dynamic token tracing
-/trace-token targets/tdc.js eks
 ```
 
 ## Project Structure
@@ -56,7 +52,7 @@ node puppeteer/cli.js --domain example.com --headful   # visible browser for deb
 ```
 targets/              Read-only tdc builds (analysis targets)
   tdc.js              Reference build — fully analyzed
-  tdc-v2.js           Different template (94 opcodes, tdc-v4/v5 not yet ported)
+  tdc-v2.js           Different template (94 opcodes, not yet ported)
   tdc-v3.js           Same template as tdc.js (identical bytecode)
   tdc-v4.js           Not yet ported
   tdc-v5.js           Not yet ported
@@ -65,6 +61,7 @@ decompiler/           12-step decompile pipeline
 token/                Standalone collect token generator (byte-identical)
 puppeteer/            Puppeteer CAPTCHA solver
 dynamic/              Runtime tracers (crypto, payload, encoding, chunk, comparison)
+pipeline/             (future) Automated porting pipeline modules
 output/tdc/           Decompiler artifacts for reference build
 output/<version>/     Per-version artifacts (create before running pipeline)
 profiles/             Browser fingerprint profiles
@@ -129,9 +126,7 @@ Variable names differ per build — identify by structural role, not by name.
 Tencent serves from a pool of VM templates with fully reshuffled opcodes per template.
 `decoder.js` works on all builds unchanged. Everything else requires a new opcode table.
 
-To port a new build: `/port-new-version targets/tdc-vN.js`
-To investigate a token: `/trace-token targets/tdc-vN.js <type>`
-For manual opcode porting: `/port-opcodes` skill
+The automated porting pipeline is under development — see `plan.md` for current status and design.
 
 See `docs/VERSION_DIFFERENCES.md` for the full porting strategy and what changes vs what stays the same.
 
@@ -168,9 +163,11 @@ See `docs/VERSION_DIFFERENCES.md` for the full porting strategy and what changes
 | `docs/WORKFLOW.md` | Development phase log |
 | `docs/PROGRESS.md` | Task-by-task progress (51 rounds) |
 
+All documentation should be treated as **reference — verify against live behavior before trusting**. When discrepancies are found between docs and actual behavior, update the docs and note the correction.
+
 ## Project Memory
 
-### Current State (2026-04-07)
+### Current State (2026-04-10)
 
 **Solved**:
 - `collect` token: byte-identical standalone reimplementation in `token/`
@@ -181,15 +178,16 @@ See `docs/VERSION_DIFFERENCES.md` for the full porting strategy and what changes
 
 **Active investigation**:
 - Multi-version pipeline: `tdc-v2` through `tdc-v5` opcode tables not yet mapped
+- Automated porting pipeline under development (see `plan.md`)
 
 **Version status**:
 | Target | Template | Decoded | Opcode table | Pipeline | Token verified |
 |--------|----------|---------|--------------|----------|----------------|
-| tdc.js | A | ✅ | ✅ (95 opcodes) | ✅ | ✅ byte-identical |
-| tdc-v2.js | B | ✅ decoder works | ❌ not mapped | ❌ | ❌ |
-| tdc-v3.js | A (same as tdc.js) | ✅ | ✅ reuse tdc.js table | untested | untested |
-| tdc-v4.js | unknown | ✅ decoder works | ❌ | ❌ | ❌ |
-| tdc-v5.js | unknown | ✅ decoder works | ❌ | ❌ | ❌ |
+| tdc.js | A | yes | yes (95 opcodes) | yes | yes (byte-identical) |
+| tdc-v2.js | B (different) | yes | NOT mapped | no | no |
+| tdc-v3.js | A (same as tdc.js) | yes | reuse tdc.js table | untested | untested |
+| tdc-v4.js | unknown | yes | NOT mapped | no | no |
+| tdc-v5.js | unknown | yes | NOT mapped | no | no |
 
 **Open questions**:
 - Does the XTEA key (STATE_A) change between templates? Only verified for tdc.js.

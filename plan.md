@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 1 — Project Foundation
-Current task: 1.2 — Rewrite CLAUDE.md, create rules, create settings.json
+Current phase: Phase 2 — Claude Code Tooling
+Current task: 2.1 — Create agent files (opcode-mapper, key-extractor, token-verifier)
 
 ---
 
@@ -14,14 +14,14 @@ Current task: 1.2 — Rewrite CLAUDE.md, create rules, create settings.json
 | ID | Task | Status |
 |----|------|--------|
 | 1.1 | Fresh git init and initial commit | done |
-| 1.2 | Rewrite CLAUDE.md, create rules, create settings.json | in-progress |
+| 1.2 | Rewrite CLAUDE.md, create rules, create settings.json | done |
 
 ### Phase 2: Claude Code Tooling
 > Create the agent, command, and skill markdown files that define specialized behaviors for the pipeline.
 
 | ID | Task | Status |
 |----|------|--------|
-| 2.1 | Create agent files (opcode-mapper, key-extractor, token-verifier) | pending |
+| 2.1 | Create agent files (opcode-mapper, key-extractor, token-verifier) | in-progress |
 | 2.2 | Create commands (port-version, fetch-latest) and skill (port-opcodes) | pending |
 
 ### Phase 3: VM Parser & Opcode Auto-Mapper
@@ -64,44 +64,37 @@ Current task: 1.2 — Rewrite CLAUDE.md, create rules, create settings.json
 
 ## Current Task
 
-**ID**: 1.2
-**Title**: Rewrite CLAUDE.md, create rules, create settings.json
-**Phase**: Project Foundation
+**ID**: 2.1
+**Title**: Create agent files (opcode-mapper, key-extractor, token-verifier)
+**Phase**: Claude Code Tooling
 **Status**: in-progress
 
 ### Goal
-Replace the outdated CLAUDE.md with a clean version reflecting the new automated porting pipeline direction. Create the three rule files and settings.json specified in the project brief.
+Create 3 specialized agent markdown files that define the behavior of the pipeline's core agents. These agents will be dispatched by the director to perform specific pipeline stages.
 
 ### Context
-- Current `CLAUDE.md` references deleted slash commands (`/port-new-version`, `/trace-token`) and agents that don't exist. The good parts to keep: architecture sections (VM internals mapping table, pipeline descriptions, project structure), code conventions, known issues, documentation table.
-- Project brief specifies exactly 3 rules: `targets-readonly.md`, `verify-dont-assume.md`, `coding-style.md`
-- Project brief specifies settings.json with tool permissions and ESLint hook config
-- ESLint is NOT yet installed — the hook config should be written but it will only activate after ESLint is added (a future concern; don't block on it)
-- The cc-project-* agents in `.claude/agents/` should be preserved (they're the meta-project management agents)
-- Files to create/modify:
-  - `CLAUDE.md` — full rewrite
-  - `.claude/rules/targets-readonly.md`
-  - `.claude/rules/verify-dont-assume.md`
-  - `.claude/rules/coding-style.md`
-  - `.claude/settings.json`
+- Agent files go in `.claude/agents/` alongside the existing cc-project-* agents
+- Format: YAML frontmatter (`name`, `description`) + system prompt body
+- The system prompts must be project-agnostic enough to be reusable but specific enough to be effective
+- Key reference files for writing these agents:
+  - `docs/OPCODE_REFERENCE.md` — 95 known semantic operations (opcode-mapper needs this)
+  - `docs/CRYPTO_ANALYSIS.md` — XTEA analysis (key-extractor needs this)
+  - `docs/TOKEN_FORMAT.md` — token structure (token-verifier needs this)
+  - `dynamic/crypto-tracer-v3.js` — reference tracer implementation (key-extractor adapts this pattern)
+  - `decompiler/disassembler.js` — reference opcode table format (opcode-mapper outputs this format)
+  - `token/generate-token.js` — token generation entry point (token-verifier uses this)
 
 ### Implementation Steps
-1. Read current `CLAUDE.md` to identify sections to preserve vs rewrite
-2. Write new `CLAUDE.md`: remove references to deleted commands/agents, update version status, add automated pipeline as primary workflow, keep VM internals table and architecture sections, mark docs as "reference — verify before trusting"
-3. Create `.claude/rules/targets-readonly.md` — never modify `targets/*.js`
-4. Create `.claude/rules/verify-dont-assume.md` — verify crypto/token/opcode behavior against live tracing, don't trust docs
-5. Create `.claude/rules/coding-style.md` — 2-space indent, single quotes, semicolons, const/let, CommonJS
-6. Create `.claude/settings.json` — tool permissions per the Director Permissions table in project-brief.md
+1. Create `.claude/agents/opcode-mapper.md` — agent that parses `__TENCENT_CHAOS_VM` switch/case handlers, identifies VM variables by structural role, normalizes handlers, and pattern-matches to known semantic operations. Outputs opcode table as JSON.
+2. Create `.claude/agents/key-extractor.md` — agent that uses Puppeteer to dynamically trace the XTEA key schedule. Extracts STATE_A (4×uint32), delta, round count, and key modification constants.
+3. Create `.claude/agents/token-verifier.md` — agent that captures a live token via Puppeteer, generates a standalone token using extracted config, and performs byte-by-byte comparison with detailed diagnostics.
 
 ### Verification
-- [ ] `CLAUDE.md` does not reference `/port-new-version`, `/trace-token`, or any non-existent commands/agents
-- [ ] `CLAUDE.md` contains the VM internals mapping table, code conventions, and documentation table
-- [ ] `CLAUDE.md` version status table is accurate (matches project-brief.md)
-- [ ] `.claude/rules/targets-readonly.md` exists and mentions `targets/*.js`
-- [ ] `.claude/rules/verify-dont-assume.md` exists and mentions live verification
-- [ ] `.claude/rules/coding-style.md` exists and mentions 2-space indent, single quotes, semicolons
-- [ ] `.claude/settings.json` is valid JSON and contains permission entries
-- [ ] No references to deleted agents/commands anywhere in the new files
+- [ ] `.claude/agents/opcode-mapper.md` exists with valid YAML frontmatter and mentions structural role identification, pattern matching, JSON output
+- [ ] `.claude/agents/key-extractor.md` exists with valid YAML frontmatter and mentions Puppeteer, XTEA, STATE_A, dynamic tracing
+- [ ] `.claude/agents/token-verifier.md` exists with valid YAML frontmatter and mentions byte comparison, live capture, diagnostics
+- [ ] All 3 files have `name` and `description` in frontmatter
+- [ ] No agent overwrites the existing cc-project-* files
 
 ### Suggested Agent
-general-purpose — documentation and config writing, no specialized knowledge needed
+general-purpose — writing agent definition markdown files

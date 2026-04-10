@@ -1,0 +1,1 @@
+Never modify any file in the `targets/` directory. These are Tencent's obfuscated tdc.js builds and are read-only analysis targets. They must remain byte-identical to what Tencent serves. If you need to experiment with modifications, copy the file to a scratch location first.
