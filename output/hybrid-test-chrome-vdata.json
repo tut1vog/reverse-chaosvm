@@ -1,0 +1,84 @@
+{
+  "testDate": "2026-04-10",
+  "description": "Hybrid solver with Chrome-generated vData (instead of jsdom)",
+  "previousTest": "Phase 14: Chrome TLS + jsdom vData → errorCode 9",
+  "change": "vData now generated via page.evaluate in Chrome (real DOM/canvas/WebGL) instead of jsdom. Also fixed about:blank origin issue (navigated to t.captcha.qq.com so relative XHR URLs resolve correctly).",
+  "runs": [
+    {
+      "run": 1,
+      "chromeLaunched": true,
+      "vDataMethod": "chrome",
+      "vDataGenerated": true,
+      "vDataLength": 152,
+      "templateMatch": "98 opcodes, template unknown",
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sliderSolved": true,
+      "ans": "218,45;",
+      "collectGenerated": true,
+      "collectLength": 6404,
+      "nonce": "eda1152f11f1daf0",
+      "verifyErrorCode": 9,
+      "ticket": null,
+      "notes": "errorCode 9 — Chrome vData did not help"
+    },
+    {
+      "run": 2,
+      "chromeLaunched": true,
+      "vDataMethod": "chrome",
+      "vDataGenerated": true,
+      "vDataLength": 152,
+      "templateMatch": "94 opcodes, template B",
+      "tdcName": "XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR",
+      "sliderSolved": true,
+      "ans": "220,45;",
+      "collectGenerated": true,
+      "collectLength": 5316,
+      "nonce": "eda1152f11f1daf0",
+      "verifyErrorCode": 9,
+      "ticket": null,
+      "notes": "errorCode 9 — Chrome vData did not help"
+    },
+    {
+      "run": 3,
+      "chromeLaunched": true,
+      "vDataMethod": "chrome",
+      "vDataGenerated": true,
+      "vDataLength": 152,
+      "templateMatch": "98 opcodes, template unknown",
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sliderSolved": true,
+      "ans": "219,45;",
+      "collectGenerated": true,
+      "collectLength": 6712,
+      "nonce": "eda1152f11f1daf0",
+      "verifyErrorCode": 9,
+      "ticket": null,
+      "notes": "errorCode 9 — Chrome vData did not help"
+    }
+  ],
+  "comparison": {
+    "phase14ErrorCode": 9,
+    "phase14VDataMethod": "jsdom",
+    "phase15ErrorCode": 9,
+    "phase15VDataMethod": "chrome",
+    "vDataMethodChanged": true,
+    "errorCodeChanged": false,
+    "conclusion": "Chrome-generated vData (real DOM, canvas, WebGL) does NOT fix errorCode 9. The issue is not in vData generation. Combined with Phase 14 (TLS not the cause), the root cause is in the collect token content itself — the XTEA-encrypted fingerprint payload that the server decrypts and validates."
+  },
+  "bugsFixes": [
+    {
+      "bug": "about:blank has no origin — XHR.open fails with 'Invalid URL' for relative URLs like /cap_union_new_verify",
+      "fix": "Navigate vData page to https://t.captcha.qq.com/favicon.ico first to establish the origin"
+    }
+  ],
+  "eliminatedHypotheses": {
+    "TLS_fingerprinting": "Eliminated in Phase 14 — Chrome TLS still gets errorCode 9",
+    "vData_generation": "Eliminated in Phase 15.3 — Chrome vData (real DOM/canvas/WebGL) still gets errorCode 9",
+    "remaining": "The collect token content is the likely cause. The server decrypts the XTEA payload and validates the fingerprint fields. Possible issues: (1) XTEA key/params wrong for the live template, (2) collector schema field order/count mismatch, (3) timestamp/nonce validation, (4) behavioral events (sd field) validation"
+  },
+  "observations": {
+    "nonce_static": "All runs show the same nonce eda1152f11f1daf0 — this appears to be a static/session-level value, not per-request",
+    "new_templates": "Live server now serves templates with 96 and 98 opcodes (not previously seen). Template rotation is active.",
+    "vdata_consistent": "Chrome-generated vData is consistently 152 chars across all runs"
+  }
+}

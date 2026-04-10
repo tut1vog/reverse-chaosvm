@@ -439,46 +439,85 @@ async function solve(opts) {
       const vdataPage = await browser.newPage();
       await vdataPage.setUserAgent(userAgent);
       try {
-        // Navigate to a page on the captcha domain so vm-slide sees a realistic
-        // origin.  We use about:blank (fastest) — vm-slide hooks XHR.send and
-        // computes vData from the POST body; it never makes a real network request.
-        await vdataPage.goto('about:blank');
+        // Navigate to the captcha domain so relative URLs (/cap_union_new_verify)
+        // resolve correctly.  about:blank has no origin, causing XHR.open to fail.
+        // We use setContent on a data URL with the captcha origin set via
+        // page.goto to a lightweight endpoint, then use the page for evaluate.
+        await vdataPage.goto('https://t.captcha.qq.com/favicon.ico', {
+          waitUntil: 'domcontentloaded',
+          timeout: 10000,
+        }).catch(() => {
+          // favicon may 404 — that's fine, we just need the origin set
+        });
 
         const chromeResult = await vdataPage.evaluate(
           (postFieldsJson, jqSrc, vmSlideSrc) => {
             return new Promise((resolve, reject) => {
               try {
+                const debugLog = [];
+
                 // Hook XHR.send BEFORE loading vm-slide
                 let capturedBody = null;
+                const origOpen = XMLHttpRequest.prototype.open;
                 const origSend = XMLHttpRequest.prototype.send;
+
+                XMLHttpRequest.prototype.open = function() {
+                  debugLog.push('XHR.open called: ' + Array.from(arguments).join(', '));
+                  return origOpen.apply(this, arguments);
+                };
+
                 XMLHttpRequest.prototype.send = function(body) {
+                  debugLog.push('XHR.send called, body length: ' + (body ? body.length : 'null'));
                   capturedBody = body;
+                  // Don't actually send — just capture
                 };
 
                 // Load jQuery if not already present
                 if (!window.jQuery) {
-                  (new Function(jqSrc))();
+                  try {
+                    (new Function(jqSrc))();
+                    debugLog.push('jQuery loaded: ' + (typeof window.jQuery));
+                  } catch (jqErr) {
+                    debugLog.push('jQuery load error: ' + jqErr.message);
+                  }
+                } else {
+                  debugLog.push('jQuery already present');
                 }
 
                 // Load vm-slide — hooks XHR.prototype.send with the vData injector
-                (new Function(vmSlideSrc))();
+                try {
+                  (new Function(vmSlideSrc))();
+                  debugLog.push('vm-slide loaded OK');
+                } catch (vmErr) {
+                  debugLog.push('vm-slide load error: ' + vmErr.message);
+                }
 
                 // Parse the post fields
                 const postFields = JSON.parse(postFieldsJson);
+                debugLog.push('postFields parsed, keys: ' + Object.keys(postFields).length);
 
                 // Fire jQuery.ajax — vm-slide intercepts, computes vData, appends it
-                jQuery.ajax({
-                  type: 'POST',
-                  url: '/cap_union_new_verify',
-                  data: postFields,
-                  timeout: 15000,
-                });
+                try {
+                  jQuery.ajax({
+                    type: 'POST',
+                    url: '/cap_union_new_verify',
+                    data: postFields,
+                    timeout: 15000,
+                    error: function(xhr, status, err) {
+                      debugLog.push('jQuery.ajax error callback: ' + status + ' ' + (err || ''));
+                    },
+                  });
+                  debugLog.push('jQuery.ajax called');
+                } catch (ajaxErr) {
+                  debugLog.push('jQuery.ajax exception: ' + ajaxErr.message);
+                }
 
-                // Restore original XHR.send
+                // Restore original XHR methods
+                XMLHttpRequest.prototype.open = origOpen;
                 XMLHttpRequest.prototype.send = origSend;
 
                 if (!capturedBody) {
-                  reject(new Error('XHR.send was never called — vm-slide did not fire'));
+                  reject(new Error('XHR.send was never called — debug: ' + debugLog.join(' | ')));
                   return;
                 }
 
@@ -495,6 +534,7 @@ async function solve(opts) {
                   vData: vData,
                   serializedBody: serializedBody,
                   fullBodyLength: capturedBody.length,
+                  debug: debugLog.join(' | '),
                 });
               } catch (err) {
                 reject(new Error(err.message || String(err)));
@@ -512,14 +552,19 @@ async function solve(opts) {
 
         vData = chromeResult.vData;
         serializedBody = chromeResult.serializedBody;
-        log(`  vData: ${vData.slice(0, 30)}...`);
+        log(`  vData (first 60): ${vData.slice(0, 60)}...`);
+        log(`  vData length: ${vData.length}`);
         log(`  Full body length from Chrome: ${chromeResult.fullBodyLength}`);
+        if (chromeResult.debug) log(`  Debug: ${chromeResult.debug}`);
       } finally {
         await vdataPage.close().catch(() => {});
       }
 
-      // Build the final POST body: jQuery-serialized fields + vData appended
-      const finalBody = serializedBody + '&vData=' + encodeURIComponent(vData);
+      // Use the captured body directly — vm-slide already appended vData with
+      // proper encoding. The capturedBody IS the final POST body.
+      // Note: vData extracted above is already URL-encoded by jQuery/vm-slide,
+      // so we must NOT re-encode it.
+      const finalBody = serializedBody + '&vData=' + vData;
       log(`  Final body length: ${finalBody.length}`);
 
       // ── Step 9: Submit verify via page.evaluate(fetch()) -- Chrome TLS ──
