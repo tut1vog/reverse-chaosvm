@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: All phases complete
-Current task: none — project goal achieved
+Current phase: Phase 7: Documentation
+Current task: 7.1 — Update README.md for automated pipeline
 
 ---
 
@@ -60,17 +60,53 @@ Current task: none — project goal achieved
 | 6.3 | Port tdc-v4 and tdc-v5 (unknown templates) | done |
 | 6.4 | Update documentation with all findings | done |
 
+### Phase 7: Documentation
+> Update README.md and other external-facing docs to reflect the automated pipeline.
+
+| ID | Task | Status |
+|----|------|--------|
+| 7.1 | Update README.md for automated pipeline | in-progress |
+
 ---
 
-## Summary
+## Current Task
 
-All 6 phases complete. The automated porting pipeline is fully operational:
-- **5/5 targets** produce byte-identical tokens
-- **3 distinct templates** identified (A=95 ops, B=94 ops, C=100 ops)
-- **Single command** ports any new tdc.js build: `node pipeline/run.js targets/tdc-vN.js`
+**ID**: 7.1
+**Title**: Update README.md for automated pipeline
+**Phase**: Documentation
+**Status**: in-progress
 
-Remaining work (future):
-- Task 5.3: Tests for token verifier and orchestrator
-- Investigate unmapped compound opcodes in Templates B (2) and C (9)
-- Extract and compare key modification constants across templates
-- Build the fetch-latest functionality to pull new builds from Tencent
+### Goal
+Bring README.md up to date with the automated porting pipeline, multi-version results, and current test counts.
+
+### Context
+- `README.md` — current file, last updated before pipeline work. Missing: pipeline/ section, tdc-v5.js, multi-template results, updated test counts, pipeline Quick Start command.
+- `CLAUDE.md` — already updated (task 6.4), use as reference for correct information.
+- `pipeline/` contains: vm-parser.js, opcode-mapper.js, key-extractor.js, token-verifier.js, run.js
+- `targets/` contains: tdc.js, tdc-v2.js, tdc-v3.js, tdc-v4.js, tdc-v5.js
+- Tests: 92 total, 90 pass, 2 known failures (same as before: test-cfg.js, test-emit.js)
+- Multi-version results: 3 templates (A=95, B=94, C=100), all 5 targets produce byte-identical tokens
+- Pipeline command: `node pipeline/run.js targets/tdc-vN.js`
+
+### Implementation Steps
+1. Read current README.md and CLAUDE.md for reference
+2. Add the automated porting pipeline to the overview diagram and "What This Project Does" (item 4)
+3. Add `node pipeline/run.js targets/tdc.js` to Quick Start
+4. Add `pipeline/` directory to Project Structure with all 5 files
+5. Fix `targets/` listing: show all 5 files, move them into `targets/` subdirectory
+6. Add a new "Automated Porting Pipeline" section (between Token Generator and CAPTCHA Solver) explaining the 4-stage pipeline and multi-template results table
+7. Update test count from "11 of 13" to "90 of 92"
+8. Update test file examples to include pipeline tests
+9. Do NOT add emojis. Keep the existing tone/style.
+
+### Verification
+- [ ] `grep -c 'pipeline' README.md` shows multiple hits (pipeline section exists)
+- [ ] README.md mentions all 5 targets (tdc.js through tdc-v5.js)
+- [ ] README.md contains the 3-template results table
+- [ ] README.md shows `node pipeline/run.js` in Quick Start
+- [ ] README.md says "90 of 92 tests pass"
+- [ ] `pipeline/` directory listed in Project Structure with all 5 files
+- [ ] No broken markdown (visual inspection)
+
+### Suggested Agent
+general-purpose — straightforward documentation rewrite with clear reference material
