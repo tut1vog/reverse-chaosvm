@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 3 — VM Parser & Opcode Auto-Mapper
-Current task: 3.1 — Implement VM variable identifier module
+Current task: 3.2 — Implement opcode auto-mapper module
 
 ---
 
@@ -29,8 +29,8 @@ Current task: 3.1 — Implement VM variable identifier module
 
 | ID | Task | Status |
 |----|------|--------|
-| 3.1 | Implement VM variable identifier module | in-progress |
-| 3.2 | Implement opcode auto-mapper module | pending |
+| 3.1 | Implement VM variable identifier module | done |
+| 3.2 | Implement opcode auto-mapper module | in-progress |
 | 3.3 | Tests for VM parser and opcode mapper (validate against tdc.js reference table) | pending |
 
 ### Phase 4: XTEA Key Extractor
@@ -64,55 +64,64 @@ Current task: 3.1 — Implement VM variable identifier module
 
 ## Current Task
 
-**ID**: 3.1
-**Title**: Implement VM variable identifier module
+**ID**: 3.2
+**Title**: Implement opcode auto-mapper module
 **Phase**: VM Parser & Opcode Auto-Mapper
 **Status**: in-progress
 
 ### Goal
-Build a Node.js module that parses any tdc.js build's `__TENCENT_CHAOS_VM` function, locates the dispatch loop, and identifies all VM variables by their structural role. This is the prerequisite for task 3.2 (opcode auto-mapper) — you can't normalize case handlers without knowing which minified variable name maps to which canonical role.
+Build a Node.js module that takes the output of `pipeline/vm-parser.js` (variable roles + switch AST node) and automatically maps each case handler to a known semantic operation by pattern matching. This is the core of the automated porting pipeline.
 
 ### Context
-The `__TENCENT_CHAOS_VM` function in each tdc.js build has a consistent structure:
-1. Helper functions (base64 decoder, zigzag, varint) — outer scope
-2. A returned factory function that calls the bytecode decoder
-3. An inner function that contains the VM dispatch loop: `while(true) { switch(bytecodeArray[++pc]) { case N: ... } }`
-4. The register file `regs` is initialized as an array literal: `[closureVar1, closureVar2, closureVar3, this, arguments, selfRef, bytecodeArray, 0]`
+Task 3.1 produced `pipeline/vm-parser.js` which returns `{ variables, switchNode, caseCount, dispatchFunction }` for any tdc build. The opcode mapper will iterate over `switchNode.cases`, normalize each handler using the variable roles, and match against known patterns.
 
-**tdc.js (Template A) variable names**: `Y`=bytecode, `C`=pc, `i`=regs, `Q`=thisCtx, `F`=catchStack, `G`=excVal
-**tdc-v2.js (Template B)** will have completely different names.
+**How case handlers look (normalized)**:
+- `regs[bytecode[++pc]] = regs[bytecode[++pc]] + regs[bytecode[++pc]]` → ADD
+- `regs[bytecode[++pc]] = regs[bytecode[++pc]] >> bytecode[++pc]` → SHR_K
+- `catchStack.pop(); regs[bytecode[++pc]] = thisCtx; return regs[bytecode[++pc]]` → RET_CLEANUP
+- Variable-width: `for (w = bytecode[++pc]; w > 0; w--) h.push(regs[bytecode[++pc]])` → FUNC_CREATE or APPLY
 
-The module should use acorn (already installed as a dependency) to parse the tdc.js source into an AST, then navigate the AST to find the dispatch function and extract variable roles.
+**Matching strategy**: Rather than exact string matching, analyze the AST structure of each case body:
+1. Count the number of bytecode reads (`bytecode[++pc]`) — this gives operand count
+2. Identify the operation type (binary operator, call expression, property access, etc.)
+3. For binary ops: which operator (+, -, *, /, %, ^, &, |, <<, >>, >>>)
+4. For calls: is `this` arg from a register or `thisCtx`? how many arguments?
+5. For compound ops: how many statements? what sequence of sub-operations?
+
+**Reference opcode table**: `decompiler/disassembler.js` lines 27-123 has the complete Template A mapping (95 entries).
 
 **Key files**:
-- `targets/tdc.js` lines 124-586 — the `__TENCENT_CHAOS_VM` function (Template A reference)
-- `targets/tdc-v2.js` — Template B, must also work on this
-- `decompiler/decoder.js` — the existing decoder, which handles the base64→varint→int array part (we don't need to reimplement this)
-- `package.json` — acorn is already a dependency
+- `pipeline/vm-parser.js` — provides the parsed switch AST and variable roles
+- `decompiler/disassembler.js` lines 27-123 — reference opcode table (ground truth for Template A)
+- `docs/OPCODE_REFERENCE.md` — all 95 operations with pseudocode patterns
+- `targets/tdc.js` — Template A reference (95 cases)
+- `targets/tdc-v2.js` — Template B (94 cases, fully reshuffled)
+- `targets/tdc-v5.js` — Template C (100 cases, newly discovered)
 
-**Output location**: `pipeline/vm-parser.js` (create `pipeline/` directory)
+**Output location**: `pipeline/opcode-mapper.js`
 
 ### Implementation Steps
-1. Create `pipeline/` directory
-2. Create `pipeline/vm-parser.js` — a module that exports a `parseVmFunction(sourceCode)` function
-3. Use acorn to parse the full tdc.js source into an AST
-4. Find the `__TENCENT_CHAOS_VM` function declaration/expression (search for the function containing a large switch statement with 90+ cases)
-5. Navigate into the inner dispatch function — find the `while(true) { try { while(true) { switch(...) { ... } } } }` pattern
-6. Extract variable roles by structural analysis:
-   - **bytecode + pc**: from the switch discriminant — it will be `bytecodeVar[++pcVar]`, giving both names
-   - **regs**: from case handler bodies — the array indexed by `bytecodeVar[++pcVar]` as an operand, e.g., `regsVar[bytecodeVar[++pcVar]]`
-   - **thisCtx**: from `.call()` arguments in CALLQ-type handlers — the non-register argument that is always the same variable
-   - **catchStack**: the array variable that has `.push()` and `.pop()` calls in exception-related handlers
-   - **excVal**: a simple variable (not array) assigned in catch blocks and read in LOAD_EXCEPTION handlers
-7. Also extract: the full switch statement AST node (for task 3.2), the case count, and the initial register array structure
-8. Return a structured result: `{ variables: { bytecode, pc, regs, thisCtx, catchStack, excVal, ... }, switchNode: <AST>, caseCount: N }`
+1. Create `pipeline/opcode-mapper.js` exporting `mapOpcodes(parseResult)` where `parseResult` is from `vm-parser.parseVmFunction()`
+2. For each `SwitchCase` node in `switchNode.cases`:
+   a. Extract the case number from `case.test.value`
+   b. Analyze the case body AST to determine the semantic operation
+3. Pattern matching approach — analyze each case body structurally:
+   - Count bytecode reads (MemberExpression with `bytecode[++pc]` pattern)
+   - Identify statement types (assignment, return, call, throw, for-loop)
+   - For assignments: what's on the RHS? (binary expression, call expression, unary, member access, literal, etc.)
+   - For binary expressions: which operator?
+   - Distinguish `regs[bytecode[++pc]]` (register operand, R) from `bytecode[++pc]` (immediate, K)
+   - Handle compound opcodes by analyzing the full sequence of statements
+4. Return `{ opcodeTable: { '0': 'ADD', '1': 'IN', ... }, unmapped: [...], notes: [...] }`
+5. The opcodeTable should use the exact mnemonic names from `decompiler/disassembler.js`
 
 ### Verification
-- [ ] `pipeline/vm-parser.js` exists and exports `parseVmFunction`
-- [ ] `node -e "const p = require('./pipeline/vm-parser'); const fs = require('fs'); const src = fs.readFileSync('targets/tdc.js','utf8'); const r = p.parseVmFunction(src); console.log(JSON.stringify(r.variables))"` outputs `{"bytecode":"Y","pc":"C","regs":"i","thisCtx":"Q","catchStack":"F","excVal":"G"}` (or equivalent correct mapping)
-- [ ] Same command with `targets/tdc-v2.js` outputs a different set of variable names but with the same role keys
-- [ ] `r.caseCount` is 95 for tdc.js and 94 for tdc-v2.js
-- [ ] No modifications to existing files (especially nothing in `targets/`, `decompiler/`, `token/`)
+- [ ] `pipeline/opcode-mapper.js` exists and exports `mapOpcodes`
+- [ ] Running on tdc.js produces a table that matches the reference in `decompiler/disassembler.js` (all 95 opcodes correctly identified)
+- [ ] Running on tdc-v2.js produces 94 entries with no unmapped cases (or minimal unmapped)
+- [ ] Running on tdc-v5.js produces 100 entries (new Template C)
+- [ ] `unmapped` array is empty for tdc.js (since we know all 95 operations)
+- [ ] No modifications to existing files
 
 ### Suggested Agent
-general-purpose — AST parsing with acorn, moderate complexity
+general-purpose — AST pattern matching, complex but well-defined
