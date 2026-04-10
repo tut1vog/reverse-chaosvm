@@ -70,10 +70,17 @@ function buildOpcodeLookups(opcodeTable) {
 
 function patchTdcSource(source, variables) {
   const { bytecode, pc, regs } = variables;
-  const target = `switch (${bytecode}[++${pc}])`;
-  const idx = source.indexOf(target);
+  // Try both "switch (...)" and "switch(...)" — some builds omit the space
+  const targetSpaced = `switch (${bytecode}[++${pc}])`;
+  const targetCompact = `switch(${bytecode}[++${pc}])`;
+  let idx = source.indexOf(targetSpaced);
+  let target = targetSpaced;
   if (idx < 0) {
-    throw new Error(`Could not find dispatch switch "${target}" in tdc.js`);
+    idx = source.indexOf(targetCompact);
+    target = targetCompact;
+  }
+  if (idx < 0) {
+    throw new Error(`Could not find dispatch switch "${targetSpaced}" or "${targetCompact}" in tdc.js`);
   }
 
   // Patch: save opcode, call trace hook, then dispatch

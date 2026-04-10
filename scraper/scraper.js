@@ -23,10 +23,11 @@ const { generateCollect } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
 const { extractTdcName, extractEks } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
+const { parseVmFunction } = require('../pipeline/vm-parser');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 
-const DEFAULT_AID = '2090803262';
+const DEFAULT_AID = '2046626881';
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36';
@@ -34,7 +35,8 @@ const DEFAULT_USER_AGENT =
 class Scraper {
   /**
    * @param {Object} [config]
-   * @param {string} [config.aid='2090803262'] - App ID for urlsec.qq.com
+   * @param {string} [config.aid='2046626881'] - App ID for urlsec.qq.com CAPTCHA
+   * @param {string} [config.referer='https://urlsec.qq.com/'] - Referer header (must match iframe origin)
    * @param {string} [config.userAgent] - User-Agent string
    * @param {Object} [config.profile] - Browser fingerprint profile (default: profiles/default.json)
    * @param {number} [config.slideRatio=0.5] - Slide image ratio (may need tuning)
@@ -46,6 +48,7 @@ class Scraper {
   constructor(config) {
     const cfg = config || {};
     this.aid = cfg.aid || DEFAULT_AID;
+    this.referer = cfg.referer || 'https://urlsec.qq.com/';
     this.userAgent = cfg.userAgent || DEFAULT_USER_AGENT;
     this.profile = cfg.profile || null;
     this.slideRatio = cfg.slideRatio !== undefined ? cfg.slideRatio : 0.5;
@@ -121,6 +124,7 @@ class Scraper {
   _createClient() {
     return new CaptchaClient({
       aid: this.aid,
+      referer: this.referer,
       userAgent: this.userAgent,
     });
   }
@@ -265,7 +269,24 @@ class Scraper {
         }
         this._log(`  TDC_NAME: ${tdcName}`);
 
-        const cached = this._templateCache.lookup(tdcName);
+        let cached = this._templateCache.lookup(tdcName);
+        if (!cached) {
+          // TDC_NAME rotates per session — fall back to structural matching
+          // by running the VM parser to identify template by opcode count
+          this._log(`  TDC_NAME not in cache, running structural lookup...`);
+          try {
+            const vmInfo = parseVmFunction(tdcSource);
+            this._log(`  Parsed VM: ${vmInfo.caseCount} opcodes`);
+            cached = this._templateCache.lookupByStructure(vmInfo.caseCount);
+            if (cached) {
+              // Cache this TDC_NAME for faster future lookups
+              this._templateCache.store(tdcName, cached);
+              this._log(`  Matched template ${cached.template} by structure (${vmInfo.caseCount} opcodes)`);
+            }
+          } catch (parseErr) {
+            this._log(`  VM parse failed: ${parseErr.message}`);
+          }
+        }
         if (!cached) {
           throw new Error(`Unknown template ${tdcName}, run pipeline to port it`);
         }

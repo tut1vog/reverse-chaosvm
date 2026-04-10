@@ -45,6 +45,21 @@ class TemplateCache {
   }
 
   /**
+   * Look up cached XTEA params by template structure (caseCount).
+   * Returns the first entry that matches the given caseCount.
+   * @param {number} caseCount - Number of opcodes in the VM dispatch switch
+   * @returns {object|null} Entry with {template, key, delta, rounds, keyModConstants, caseCount} or null
+   */
+  lookupByStructure(caseCount) {
+    for (const [, entry] of Object.entries(this._cache)) {
+      if (entry.caseCount === caseCount) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Add or update an entry, set lastSeen timestamp, and save.
    * @param {string} tdcName
    * @param {object} params - {template, key, delta, rounds, keyModConstants, caseCount}

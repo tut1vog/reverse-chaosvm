@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: All phases complete
-Current task: none
+Current phase: Phase 12
+Current task: 12.1 — Puppeteer capture: intercept collect token, tdc.js, and verify POST
 
 ---
 
@@ -101,22 +101,53 @@ Current task: none
 | 11.1 | End-to-end live test and debugging | done |
 | 11.2 | Update CLAUDE.md, create scrape command | done |
 
+### Phase 12: Scraper Debugging — Collect Token Analysis
+> Use Puppeteer to capture a successful CAPTCHA solve, intercept the real collect token and tdc.js, decrypt the collect to understand what fingerprint data the real browser sends, and use that data to fix the headless scraper.
+
+| ID | Task | Status |
+|----|------|--------|
+| 12.1 | Puppeteer capture: intercept collect token, tdc.js, and verify POST | in-progress |
+| 12.2 | Extract XTEA key from captured tdc.js and decrypt the collect token | pending |
+| 12.3 | Analyze decrypted collect — compare field-by-field with our profile | pending |
+| 12.4 | Update default profile and fix scraper to produce valid collect tokens | pending |
+| 12.5 | Live end-to-end verification of headless scraper | pending |
+
 ---
 
-## Summary
+## Current Task
 
-All 11 phases complete (Phases 1-7: porting pipeline, Phases 8-11: headless scraper).
+**ID**: 12.1
+**Title**: Puppeteer capture: intercept collect token, tdc.js, and verify POST
+**Phase**: Scraper Debugging — Collect Token Analysis
+**Status**: in-progress
 
-### Scraper deliverables (Phases 8-11)
-- `scraper/tdc-utils.js` — TDC_NAME and eks extraction
-- `scraper/template-cache.js` — TDC_NAME → XTEA params cache (pre-seeded with 3 templates)
-- `scraper/collect-generator.js` — Parameterized XTEA encryption for any template
-- `scraper/vdata-generator.js` — jsdom-based vData generation (XHR hook approach)
-- `scraper/scraper.js` — Main orchestrator (full CAPTCHA flow + urlsec query)
-- `scraper/cli.js` — CLI entry point
-- 73 new tests (163/165 total), `.claude/commands/scrape.md`
+### Goal
+Run the Puppeteer-based solver (`puppeteer/cli.js`) against a domain, and capture three artifacts from the successful solve: (1) the full tdc.js source code, (2) the raw collect token from the verify POST body, (3) the full verify POST body for reference. These artifacts are needed to decrypt and analyze what fingerprint data a real browser sends vs our headless scraper.
 
-### Live test findings
-- urlsec.qq.com now serves click-image CAPTCHAs (not slide)
-- `cap_union_new_show` returns 403 for non-browser TLS clients
-- New template `XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR` observed (not yet ported)
+### Context
+- `puppeteer/captcha-solver.js` — the Puppeteer solver. Already intercepts images and verify response. Needs enhancement to also intercept and save:
+  - tdc.js source (from the `page.on('response')` handler, URL contains `/tdc.js`)
+  - The full verify POST body (already partially logged — the `page.on('request')` handler captures it but only logs collect field length)
+- `puppeteer/cli.js` — CLI entry point. Runs the solver and writes results to JSON.
+- The solver already works end-to-end with real Chrome. AID = `2046626881`.
+- The solver should save captured artifacts to `output/puppeteer-capture/` as:
+  - `tdc-source.js` — the tdc.js source
+  - `verify-post.json` — the full parsed POST body (all 38+ fields)
+  - `result.json` — the verify response (ticket, randstr, errorCode)
+- The current `solve()` method returns `{ticket, randstr, errorCode, _raw}`. Extend `_raw` (or add a `_capture` field) to include `tdcSource` and `verifyPostBody`.
+
+### Implementation Steps
+1. In `captcha-solver.js`, add a response interceptor for `/tdc.js` URLs — capture the response body text and store on the instance.
+2. In the `page.on('request')` handler for verify, capture the full POST body text (not just log it) — parse it into a key-value object and store on the instance.
+3. Extend the return value of `solve()` to include `_capture: { tdcSource, verifyPostBody }`.
+4. In `cli.js` or a new script, after a successful solve (errorCode 0), write the captured artifacts to `output/puppeteer-capture/`.
+5. Run `node puppeteer/cli.js --domain example.com` and confirm artifacts are saved.
+
+### Verification
+- [ ] `node puppeteer/cli.js --domain example.com` completes with errorCode 0
+- [ ] `output/puppeteer-capture/tdc-source.js` exists and contains valid tdc.js (starts with `window.TDC_NAME`)
+- [ ] `output/puppeteer-capture/verify-post.json` exists and contains all POST fields including `collect`, `eks`, `vData`, `ans`, `nonce`
+- [ ] `output/puppeteer-capture/result.json` exists and contains `errorCode: 0` and a ticket
+
+### Suggested Agent
+general-purpose — needs to modify existing Puppeteer solver code and run a live browser test
