@@ -10,6 +10,10 @@ decompiled-annotated.js (7,362 lines, readable JavaScript)
 standalone token generator (byte-identical to tdc.js output)
     ↓  CAPTCHA automation
 slide CAPTCHA solver (Puppeteer + OpenCV)
+
+new tdc.js build (reshuffled opcodes)
+    ↓  automated pipeline (4 stages)
+working token generator (byte-identical, no manual work)
 ```
 
 ## What This Project Does
@@ -19,6 +23,8 @@ slide CAPTCHA solver (Puppeteer + OpenCV)
 2. **Generates valid TDC tokens** — Standalone reimplementation (`token/`): Modified XTEA encryption and 59-field collector schema from scratch. Produces byte-identical tokens to the real VM.
 
 3. **Solves Tencent slide CAPTCHAs** — Puppeteer-based bot that intercepts CAPTCHA images, solves the slide puzzle with OpenCV (Canny edge detection + normalized cross-correlation), performs a realistic mouse drag, and captures the verification ticket.
+
+4. **Automated porting pipeline** — `pipeline/` takes any new tdc.js build through 4 stages (parse VM → map opcodes → extract XTEA key → verify token). Tested on 5 builds across 3 distinct templates — all produce byte-identical tokens.
 
 ## Quick Start
 
@@ -33,6 +39,9 @@ node decompiler/run.js --input tdc.js --output output/
 # Generate a TDC token (standalone — uses reverse-engineered pipeline)
 node token/cli.js --profile profiles/default.json
 
+# Port a new tdc.js build (automated — parse, map, extract key, verify)
+node pipeline/run.js targets/tdc.js
+
 # Solve a slide CAPTCHA
 node puppeteer/cli.js --domain example.com
 ```
@@ -42,8 +51,12 @@ node puppeteer/cli.js --domain example.com
 ```
 reverse-chaosvm/
 │
-├── tdc.js                      # Primary analysis target (READ-ONLY)
-├── tdc-v2.js ... tdc-v4.js     # Alternate VM templates for comparison
+├── targets/                    # Read-only tdc.js builds (analysis targets)
+│   ├── tdc.js                  # Reference build — fully analyzed (Template A)
+│   ├── tdc-v2.js               # Template B (94 opcodes)
+│   ├── tdc-v3.js               # Template A (same as tdc.js)
+│   ├── tdc-v4.js               # Template A (same as tdc.js)
+│   └── tdc-v5.js               # Template C (100 opcodes)
 │
 ├── decompiler/                 # ChaosVM decompiler pipeline
 │   ├── run.js                  # Unified CLI entry point
@@ -67,6 +80,13 @@ reverse-chaosvm/
 │   ├── collector-schema.js     # 59-field browser fingerprint schema
 │   └── generate-token.js       # Integrated generator
 │
+├── pipeline/                   # Automated porting pipeline
+│   ├── run.js                  # Single-command orchestrator
+│   ├── vm-parser.js            # AST-based VM variable identification
+│   ├── opcode-mapper.js        # Pattern-match opcodes to known mnemonics
+│   ├── key-extractor.js        # Puppeteer-based XTEA key extraction
+│   └── token-verifier.js       # Decrypt/re-encrypt token comparison
+│
 ├── puppeteer/                  # CAPTCHA solver
 │   ├── cli.js                  # CLI — batch or single domain
 │   ├── captcha-solver.js       # Puppeteer stealth + drag automation
@@ -81,19 +101,19 @@ reverse-chaosvm/
 │   ├── encoding-tracer.js      # Base64/URL encoding tracing
 │   └── payload-tracer.js       # Token assembly tracing
 │
-├── output/                     # Decompiler output artifacts
-│   ├── decompiled-annotated.js # Final output (7,362 lines)
-│   ├── disasm-full.txt         # Full disassembly listing
-│   ├── strings.json            # Extracted string literals
-│   ├── functions.json          # Function boundary table
-│   ├── cfg.json                # Control flow graphs
-│   └── ...                     # Other intermediate artifacts
+├── output/                     # Decompiler and pipeline output artifacts
+│   ├── tdc/                    # Reference build artifacts
+│   │   ├── decompiled-annotated.js # Final output (7,362 lines)
+│   │   ├── disasm-full.txt     # Full disassembly listing
+│   │   ├── strings.json        # Extracted string literals
+│   │   └── ...                 # Other intermediate artifacts
+│   └── <version>/              # Per-version pipeline output
 │
 ├── profiles/                   # Browser fingerprint profiles
 │   ├── default.json            # Default profile for token generation
 │   └── chrome-fingerprint.json # Harvested real Chrome fingerprint
 │
-├── tests/                      # Test suite (11 passing, 2 known issues)
+├── tests/                      # Test suite (90 passing, 2 known issues)
 ├── docs/                       # Technical documentation (13 files)
 ├── sample/                     # Reference files (HAR capture, bot.py)
 └── archive/                    # Historical test reports (51 rounds)
@@ -130,6 +150,39 @@ Reimplements the entire token pipeline from scratch — Modified XTEA encryption
 node token/cli.js --profile profiles/default.json
 node token/cli.js --profile profiles/default.json --verbose
 ```
+
+### Automated Porting Pipeline
+
+Takes any new tdc.js build and produces a working token generator without manual intervention. The pipeline runs 4 stages:
+
+```
+tdc-vN.js
+    ↓  1. Parse VM — AST-based identification of bytecode array, registers, PC
+    ↓  2. Map opcodes — pattern-match each opcode to known mnemonics
+    ↓  3. Extract XTEA key — Puppeteer-based dynamic key extraction
+    ↓  4. Verify token — decrypt and re-encrypt to confirm byte-identical output
+working token generator
+```
+
+```bash
+# Port a new build (all 4 stages)
+node pipeline/run.js targets/tdc-vN.js
+
+# Skip token verification (faster, for initial analysis)
+node pipeline/run.js targets/tdc-vN.js --skip-verify
+```
+
+All 5 targets produce byte-identical tokens:
+
+| Target | Template | Opcodes | Mapped | Token |
+|--------|----------|---------|--------|-------|
+| tdc.js | A | 95 | 95/95 | byte-identical |
+| tdc-v2.js | B | 94 | 92/94 | byte-identical |
+| tdc-v3.js | A | 95 | 95/95 | byte-identical |
+| tdc-v4.js | A | 95 | 95/95 | byte-identical |
+| tdc-v5.js | C | 100 | 91/100 | byte-identical |
+
+3 distinct templates observed. Each has a unique XTEA key. Unmapped opcodes are novel compound operations that don't affect token generation.
 
 ### CAPTCHA Solver (Puppeteer)
 
@@ -188,7 +241,7 @@ The VM is a **register machine** with:
 - A value stack for expression evaluation
 - An exception handler stack (`F[]`)
 - A call stack for function frames
-- 95 opcodes covering arithmetic, property access, function calls, control flow, type coercion, and string operations
+- 94-100 opcodes (varies by template) covering arithmetic, property access, function calls, control flow, type coercion, and string operations
 
 The VM collects 59 browser fingerprint fields (screen resolution, WebGL renderer, audio context, canvas hash, installed fonts, etc.), encrypts them with Modified XTEA, and assembles a ~4,500-character URL-encoded token.
 
@@ -211,9 +264,11 @@ npm test
 node --test tests/test-decoder.js
 node --test tests/test-disasm.js
 node --test tests/test-slide-solver.js
+node --test tests/test-vm-parser.js
+node --test tests/test-opcode-mapper.js
 ```
 
-11 of 13 tests pass. The 2 failures are known pre-existing issues:
+90 of 92 tests pass. The 2 failures are known pre-existing issues:
 - `test-cfg.js`: 583/584 assertions pass (1 edge case in func 272)
 - `test-emit.js`: Code quality threshold assertions (cosmetic, not functional)
 
