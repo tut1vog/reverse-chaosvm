@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 18.1 — Create token forensics script
+Current task: 18.3 — Live forensics test
 
 ---
 
@@ -173,9 +173,9 @@ Current task: 18.1 — Create token forensics script
 
 | ID | Task | Status |
 |----|------|--------|
-| 18.1 | Create token forensics script | in-progress |
+| 18.1 | Create token forensics script | done |
 | 18.2 | Tests for token forensics helpers | pending |
-| 18.3 | Live forensics test | pending |
+| 18.3 | Live forensics test | in-progress |
 | 18.4 | Fix identified divergence | pending |
 | 18.5 | Live re-test with fix | pending |
 
@@ -183,98 +183,22 @@ Current task: 18.1 — Create token forensics script
 
 ## Current Task
 
-**ID**: 18.1
-**Title**: Create token forensics script
+**ID**: 18.3
+**Title**: Live forensics test
 **Phase**: Token Forensics — Decrypt-Reencrypt Round-Trip
 **Status**: in-progress
 
 ### Goal
-Create `scripts/token-forensics.js` — a Puppeteer script that performs three precise comparisons for the same CAPTCHA session:
-
-**Comparison A — Plaintext Serialization**: Decrypt Chrome's collect token to get the raw plaintext string. Build a standalone plaintext from the same cd array values using `buildCdString()` + `buildSdString()`. Compare the two plaintext strings character-by-character. This isolates whether our hand-rolled JSON serialization (`buildCdString`) matches the VM's `func_276`.
-
-**Comparison B — Encryption Round-Trip**: Take Chrome's decrypted plaintext, split it into chunks (hash/header/cdBody/sig), re-encrypt with the same XTEA params, and compare byte-by-byte against Chrome's original encrypted token. If they match → our encryption is correct. If they differ → our encryption code or params are wrong.
-
-**Comparison C — Full Reconstruction**: Build a complete standalone token from Chrome's cd array values (going through our full pipeline: buildCdString → buildInputChunks → encrypt → assembleToken) and compare against Chrome's token. This is the end-to-end check.
-
-The three comparisons triangulate the root cause:
-- If A fails → serialization bug (fix `buildCdString`)
-- If A passes but B fails → encryption bug (fix `cipherRound` or params)
-- If A and B pass but C fails → assembly bug (chunk splitting, segment order)
+Run `scripts/token-forensics.js` live to identify where standalone tokens diverge from Chrome's.
 
 ### Context
-
-**Existing code to reuse:**
-- `scripts/chrome-cd-inject.js` (current, ~830 lines) — already does: launch Chrome, prehandle, show page, intercept tdc.js, call TDC.getData(), decrypt Chrome's collect, look up template cache. Clone this as the base.
-- `token/outer-pipeline.js` — `buildCdString()` (line 58), `buildSdString()` (line 31), `assembleToken()` (line 114)
-- `token/generate-token.js` — `buildInputChunks()` (line 91), `buildHashChunk()` (line 65)
-- `scraper/collect-generator.js` — `encrypt()` (line 117), `cipherRound()` (line 79), `createEncryptFn()` (line 169)
-
-**How decryptCollect works** (already in chrome-cd-inject.js lines 160-178):
-1. URL-decode: `%2B→+, %2F→/, %3D→=`
-2. Base64 decode → binary string
-3. `decryptXtea(entireBinaryString, params)` — decrypts ALL bytes as one stream
-4. Strip trailing nulls/whitespace
-5. `JSON.parse()` → `{ cd: [...], sd: {...} }`
-6. Returns `{ plaintext, parsed }`
-
-**Critical insight**: `decryptCollect` decrypts the ENTIRE base64 blob as one stream. But our encryption pipeline encrypts 4 SEPARATE chunks then base64-encodes each separately and concatenates in [1,0,2,3] order. So for Comparison B, we need to understand how the segments are split.
-
-**Segment split logic** (from `docs/TOKEN_FORMAT.md`):
-- The encrypted token is base64-decoded to one binary blob
-- But it was assembled from 4 base64 segments: `btoa[1] + btoa[0] + btoa[2] + btoa[3]`
-- Each segment, when base64-decoded, is an independently encrypted block
-- The segment boundaries correspond to: header(192 b64 chars = 144 bytes), hash(64 b64 chars = 48 bytes), cdBody(variable), sig(variable)
-
-For Comparison B, we need to:
-1. Split Chrome's base64 token into the 4 segments (using known sizes: header=192 chars, hash=64 chars)
-2. Base64-decode each segment independently
-3. Re-encrypt the plaintext chunks with our XTEA
-4. Base64-encode each and reassemble
-5. Compare
-
-**Files to create:**
-- `scripts/token-forensics.js` — main script
-
-**Key imports needed:**
-```js
-const { buildCdString, buildSdString, assembleToken, urlEncode } = require('../token/outer-pipeline');
-const { buildInputChunks } = require('../token/generate-token');
-const { generateCollect, createEncryptFn, encrypt, buildDefaultCdArray } = require('../scraper/collect-generator');
-```
-
-### Implementation Steps
-1. Clone `scripts/chrome-cd-inject.js` structure (Chrome launch, session setup, TDC.getData, template lookup, decryption)
-2. After decrypting Chrome's token (getting `plaintext` and `parsed`), perform:
-
-   **Comparison A** — Plaintext:
-   - Extract `chromeCd = parsed.cd`, `chromeSd = parsed.sd`
-   - Build `ourCdString = buildCdString(chromeCd)`
-   - Build `ourSdString = buildSdString(chromeSd)`
-   - Extract Chrome's cd/sd strings from `plaintext` (split on `"sd":` boundary)
-   - Compare character-by-character, report first divergence position and surrounding context
-
-   **Comparison B** — Encryption round-trip:
-   - Take Chrome's raw base64 token (before URL-decode), split into 4 segment base64 strings
-   - Segment sizes: segment[0] (in assembly position 1) = 192 b64 chars, segment[1] (position 0) = 64 b64 chars, then cdBody = variable, sig = remainder
-   - Wait — the assembly order is `btoa[1] + btoa[0] + btoa[2] + btoa[3]`. So in the concatenated string: first 192 chars = btoa[1] (header), next 64 chars = btoa[0] (hash), then cdBody, then sig.
-   - For cdBody length: we know header=144 bytes=192 b64, hash=48 bytes=64 b64, sig we can estimate from sd string length rounded up to 8-byte then base64'd
-   - Decrypt each segment separately, then re-encrypt each, compare
-   - Also: take Chrome's decrypted plaintext, run it through our `buildInputChunks` to get chunks, encrypt each chunk, compare byte-by-byte with Chrome's encrypted segments
-
-   **Comparison C** — Full reconstruction:
-   - Use Chrome's cd array + sd object + Chrome's timestamp
-   - Run through full `generateCollect()` with `cdArrayOverride`
-   - Compare output token with Chrome's original token
-
-3. Log all comparisons with detailed diff output
-4. Save results to `output/token-forensics.json`
+- Script performs 3 comparisons: A (plaintext serialization), B (encryption round-trip), C (full reconstruction)
+- Requires Chrome + a template the cache can decrypt (Template A or the 98-opcode template that worked in Phase 17)
 
 ### Verification
-- [ ] `node -c scripts/token-forensics.js` passes syntax check
-- [ ] `npm test` still passes 173/175
-- [ ] Script has all three comparison functions (A, B, C) implemented
-- [ ] Script logs character-level and byte-level diffs
+- [ ] Script runs to completion, decryption succeeds
+- [ ] All three comparisons produce results
+- [ ] Results saved to `output/token-forensics.json`
 
 ### Suggested Agent
 general-purpose
