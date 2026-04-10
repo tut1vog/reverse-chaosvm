@@ -253,6 +253,8 @@ class CaptchaPuppeteer {
 
       // Set up response interceptors BEFORE navigation
       const interceptedImages = {}; // { 'bg': Buffer, 'slice': Buffer }
+      let capturedTdcSource = null;
+      let capturedVerifyPost = null;
       let verifyResolve;
       let verifyReject;
       const verifyPromise = new Promise((resolve, reject) => {
@@ -260,7 +262,7 @@ class CaptchaPuppeteer {
         verifyReject = (err) => { clearTimeout(verifyTimer); reject(err); };
       });
 
-      // ── Fix C: Log verify request body (collect field length) ──
+      // ── Capture verify request body (full POST fields) ──
       page.on('request', (request) => {
         const url = request.url();
         if (url.includes('cap_union_new_verify') && request.method() === 'POST') {
@@ -270,6 +272,12 @@ class CaptchaPuppeteer {
             const collect = params.get('collect') || '';
             log(`  [pptr] Verify request: POST body ${postData.length} chars`);
             log(`  [pptr] Verify request: collect field length = ${collect.length}`);
+            // Capture full POST body as plain object
+            capturedVerifyPost = {};
+            for (const [key, value] of params.entries()) {
+              capturedVerifyPost[key] = value;
+            }
+            log(`  [pptr] Verify request: captured ${Object.keys(capturedVerifyPost).length} fields`);
           } catch (err) {
             log(`  [pptr] Failed to parse verify request body: ${err.message}`);
           }
@@ -298,6 +306,15 @@ class CaptchaPuppeteer {
                 interceptedImages.slice = buffer;
                 log(`  [pptr] Intercepted image (assumed slice): ${buffer.length} bytes`);
               }
+            }
+          }
+
+          // Intercept tdc.js source
+          if (url.includes('/tdc.js') || url.includes('tdc.js?')) {
+            const tdcText = await response.text();
+            if (tdcText.length > 1000) { // Skip error pages
+              capturedTdcSource = tdcText;
+              log(`  [pptr] Intercepted tdc.js source: ${tdcText.length} chars`);
             }
           }
 
@@ -401,6 +418,10 @@ class CaptchaPuppeteer {
         randstr: verifyData.randstr || '',
         errorCode: errorCode,
         _raw: verifyData,
+        _capture: {
+          tdcSource: capturedTdcSource,
+          verifyPostBody: capturedVerifyPost,
+        },
       };
     } finally {
       if (verifyTimer) clearTimeout(verifyTimer);

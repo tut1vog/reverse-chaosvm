@@ -90,10 +90,35 @@ async function main() {
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const ticket = await solver.solve(domain);
+          const ticket = await solver.solve();
           result = { domain, status: 'solved', ...ticket };
           console.error(`  Attempt ${attempt}: ${ticket.errorCode === 0 ? 'SUCCESS' : `errorCode ${ticket.errorCode}`}`);
-          if (ticket.errorCode === 0) break;
+          if (ticket.errorCode === 0) {
+            // Write captured artifacts on success
+            const captureDir = path.resolve(__dirname, '..', 'output', 'puppeteer-capture');
+            fs.mkdirSync(captureDir, { recursive: true });
+            if (ticket._capture) {
+              if (ticket._capture.tdcSource) {
+                fs.writeFileSync(path.join(captureDir, 'tdc-source.js'), ticket._capture.tdcSource);
+                console.error(`  Wrote tdc-source.js (${ticket._capture.tdcSource.length} chars)`);
+              }
+              if (ticket._capture.verifyPostBody) {
+                fs.writeFileSync(
+                  path.join(captureDir, 'verify-post.json'),
+                  JSON.stringify(ticket._capture.verifyPostBody, null, 2)
+                );
+                console.error(`  Wrote verify-post.json (${Object.keys(ticket._capture.verifyPostBody).length} fields)`);
+              }
+            }
+            if (ticket._raw) {
+              fs.writeFileSync(
+                path.join(captureDir, 'result.json'),
+                JSON.stringify(ticket._raw, null, 2)
+              );
+              console.error(`  Wrote result.json`);
+            }
+            break;
+          }
         } catch (err) {
           console.error(`  Attempt ${attempt}: ${err.message}`);
           result = { domain, status: 'error', error: err.message };
