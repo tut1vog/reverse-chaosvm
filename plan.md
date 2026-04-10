@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 13
-Current task: 13.2 — Investigate vsig/websig source + fetch live vm-slide.js
+Current task: 13.3 — Live re-test after fixes
 
 ---
 
@@ -118,50 +118,39 @@ Current task: 13.2 — Investigate vsig/websig source + fetch live vm-slide.js
 | ID | Task | Status |
 |----|------|--------|
 | 13.1 | Fix session-specific cd field overrides and scraper test | done |
-| 13.2 | Investigate vsig/websig source + fetch live vm-slide.js | in-progress |
-| 13.3 | Live re-test after fixes | pending |
+| 13.2 | Investigate vsig/websig source + fetch live vm-slide.js | done |
+| 13.3 | Live re-test after fixes | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 13.2
-**Title**: Switch to show page path, fetch live vm-slide.js, ensure vsig/websig
+**ID**: 13.3
+**Title**: Live re-test after session-specific fixes
 **Phase**: ErrorCode 9 Debugging
 **Status**: in-progress
 
 ### Goal
-Ensure the scraper uses the show page path (not legacy JSONP) to get vsig/websig, showUrl, and live vm-slide.js URL. The legacy path (`_getSigLegacy`) does not set `showUrl` and may not provide vsig/websig. The show page path (`_getShowConfig`) provides all of these.
+Run the scraper against the live endpoint with all Phase 13 fixes applied and document results.
 
 ### Context
-In `puppeteer/captcha-client.js`, `getSig()` tries legacy JSONP first, falls back to show page on 404. The legacy endpoint:
-- Does NOT set `showUrl` in its return object
-- May return empty vsig/websig
-- Does not provide vm-slide URL
-
-The show page (`_getShowConfig`):
-- Sets `showUrl` (the full show page URL with session params)
-- Provides vsig/websig from embedded config
-- HTML contains vm-slide script URL (parseable via `parseVmSlideUrl`)
-
-The scraper's `_getVmSlideSource` already tries to find vm-slide from `sig._raw` but uses wrong field names (`vmSlide`, `vm_slide`, `vmSlideFileName`). The actual show page config likely uses a different key.
-
-Key files:
-- `puppeteer/captcha-client.js` — `getSig()`, `_getSigLegacy()`, `_getShowConfig()`
-- `scraper/scraper.js` — `solveCaptcha()`, `_getVmSlideSource()`
-- `scraper/vdata-generator.js` — `parseVmSlideUrl()` for extracting script URL from HTML
+Fixes applied in 13.1 and 13.2:
+- pageUrl overridden from `sig.showUrl` (dynamic per session)
+- Timestamps refreshed per session
+- canvasHash/mathFingerprint/performanceHash randomized
+- `showUrl` set in both legacy and show page getSig paths
+- Live vm-slide.js fetched via 4-strategy approach
+- Show page HTML returned as `_html` for vm-slide URL parsing
 
 ### Implementation Steps
-1. In `scraper/scraper.js`, after getSig, check if `sig.showUrl` is set. If not (legacy path was used), construct a show page URL from session params, OR force the show page path by adding a `useShowPage` option.
-2. Fetch live vm-slide.js: after getting the show page config, look for vm-slide URL in `sig._raw` or in the show page HTML. Use `parseVmSlideUrl` on the HTML if available.
-3. Update `_getVmSlideSource` to look for the correct field names in `sig._raw`.
-4. Live test: run the scraper and observe whether showUrl, vsig/websig, and vm-slide are populated.
+1. Run `node scraper/cli.js --captcha-only --verbose` 2-3 times
+2. Document results in `output/scraper-live-test-13.json`
+3. Note any improvements vs Phase 12.5 results
 
 ### Verification
-- [ ] `sig.showUrl` is always populated (even if legacy path is used)
-- [ ] Live vm-slide.js is fetched when available (not always falling back to sample/)
-- [ ] `npm test` — 163/165 pass (no regressions)
-- [ ] `node -c scraper/scraper.js && node -c puppeteer/captcha-client.js` — no syntax errors
+- [ ] Scraper completes without crashes
+- [ ] Results documented
+- [ ] Any error code change from 12.5 noted
 
 ### Suggested Agent
 general-purpose
