@@ -153,39 +153,10 @@ Current task: 16.5 — Live re-test after fixes
 | 16.2 | Capture Chrome collect + generate standalone, diff both for same session | done |
 | 16.3 | Fix sd.coordinate format and slideValue timestamp format | done |
 | 16.4 | Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition) | done |
-| 16.5 | Live re-test after fixes | in-progress |
+| 16.5 | Live re-test after fixes | done |
 
 ---
 
 ## Current Task
 
-**ID**: 16.5
-**Title**: Live re-test after fixes
-**Phase**: Definitive Test — Chrome tdc.js vs Standalone Collect
-**Status**: in-progress
-
-### Goal
-Run the hybrid solver with the fixed sd format and updated profile to see if errorCode 9 is resolved.
-
-### Context
-Fixes applied:
-- sd.coordinate: now `[10, 60, ratio]` instead of `[xAnswer, slideY, timestamp]`
-- sd.slideValue: first entry `[firstDx, cursorY, firstDt]` instead of `[totalX, totalY, totalElapsed]`; relative dt for all entries
-- cd fields: platform="Linux x86_64", maxTouchPoints=4, vendor="Intel Inc.", screenPosition="1;0"
-
-Remaining known cd differences (unfixable, environment-dependent):
-- webglImage: different canvas fingerprint per environment
-- detectedFonts: different hash per environment
-- plugins: minor difference
-
-### Implementation Steps
-1. Run `node scripts/hybrid-solver.js` 3 times
-2. Record errorCode for each run
-3. If still errorCode 9, the remaining differences (or a new issue) are the cause
-
-### Verification
-- [ ] 3 runs completed
-- [ ] Results documented
-
-### Suggested Agent
-general-purpose
+Phase 16 complete. ErrorCode 9 persists after all sd/cd fixes. Ready to plan next phase.
