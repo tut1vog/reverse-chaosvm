@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 15
-Current task: 15.2 — Fix all identified discrepancies
+Current task: 15.3 — Modify hybrid solver: Chrome vData generation
 
 ---
 
@@ -136,48 +136,51 @@ Current task: 15.2 — Fix all identified discrepancies
 | ID | Task | Status |
 |----|------|--------|
 | 15.1 | Build POST body comparison script | done |
-| 15.2 | Fix all identified discrepancies | pending |
-| 15.3 | Tests for fixes | pending |
-| 15.4 | Live end-to-end verification | pending |
+| 15.2 | vData and jQuery serialization comparison | done |
+| 15.3 | Modify hybrid solver: Chrome vData generation | pending |
+| 15.4 | Live test with Chrome-generated vData | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 15.2
-**Title**: Fix all identified discrepancies
+**ID**: 15.3
+**Title**: Modify hybrid solver: Chrome vData generation
 **Phase**: Byte-Level POST Body Comparison
 **Status**: in-progress
 
 ### Goal
-The comparison script (task 15.1) revealed the cd array is very clean: 48/60 fields match, 8 are dynamic, only 4 are mismatched — and those 4 are all profile-vs-capture-environment differences (the capture was on Linux, our profile claims Windows). This means **the collect token content is NOT the primary cause of errorCode 9**.
-
-The remaining suspects are:
-1. **vData integrity** — vm-slide.enc.js in jsdom may produce different vData than in a real browser
-2. **POST body encoding** — jQuery serialization in jsdom may differ from real browser jQuery
-3. **Timing** — server detects non-human timing patterns
-
-This task creates a diagnostic script that captures the FULL encrypted POST body from both a Puppeteer real solve and the scraper, then compares them byte-by-byte — including the encrypted collect, vData, and jQuery serialization.
+Modify `scripts/hybrid-solver.js` to generate vData inside Chrome (via page.evaluate) instead of jsdom. Task 15.2 proved that jsdom's vm-slide produces different vData than a real browser (likely environment detection). The Phase 14 hybrid solver used jsdom for vData — that's why it still got errorCode 9 even with Chrome TLS. This task fixes that by moving vData generation into Chrome's context.
 
 ### Context
-- The 4 cd mismatches are: `platform` (Win32 vs Linux x86_64), `maxTouchPoints` (0 vs 4), `vendor` ("Google Inc. (Google)" vs "Intel Inc."), `screenPosition` ("0;0" vs "1;0")
-- These are profile design choices, not bugs — the profile intentionally claims Windows Chrome
-- sd structure matches perfectly when using matching slide data
-- POST field names match (only `vData` missing from static list, which is added at runtime)
-- The real question is now: does the encrypted collect + vData + jQuery encoding differ in a way the server detects?
+- `scripts/hybrid-solver.js` — existing hybrid solver, currently uses jsdom vData (line 386-441)
+- `scraper/vdata-generator.js` — jsdom-based vData generator (to be replaced for Chrome path)
+- `sample/vm_slide.js` (43688 bytes) — vm-slide source, needs to execute in Chrome context
+- `sample/slide-jy.js` (96410 bytes) — jQuery source, needs to execute in Chrome context
+- The hybrid solver already has Puppeteer's `page` object available and intercepts responses
+
+**Approach**: Instead of calling `generateVData()` (jsdom), inject jQuery + vm-slide into the Puppeteer page, build the postFields object in Chrome's context, fire jQuery.ajax, intercept the vData from the XHR hook, and return it to Node.js.
+
+Specifically, modify the hybrid solver's Step 8 to:
+1. Read slide-jy.js and vm_slide.js sources in Node.js
+2. Use `page.evaluate()` to:
+   a. Inject jQuery and vm-slide into the page's JS context
+   b. Hook XHR.send to capture the body
+   c. Build the postFields object (pass from Node.js via evaluate args)
+   d. Fire `$.ajax({type:'POST', data: postFields})` — vm-slide hooks and appends vData
+   e. Return the captured body (with vData) back to Node.js
+3. Parse the returned body to extract vData and the serialized POST body
+4. Use these for the verify POST (via page.evaluate(fetch()))
 
 ### Implementation Steps
-1. Create `scripts/full-post-compare.js` that:
-   a. Uses Puppeteer to perform a REAL CAPTCHA solve (same as Phase 12.1 capture) and intercepts the exact verify POST body bytes
-   b. Uses the scraper's code path (same session params) to generate its verify POST body
-   c. Compares the two POST bodies: field-by-field after URL-decoding
-   d. Special focus on: collect token structure (length, segment count, encoding), vData format, jQuery serialization differences
-2. Run the script and capture results
+1. In `scripts/hybrid-solver.js`, replace the jsdom vData generation (lines ~386-441) with Chrome-based generation
+2. Keep the jsdom path as a fallback (in case Chrome page context is unavailable), behind a flag
+3. Ensure the verify POST still uses the jQuery-serialized body + vData from Chrome
 
 ### Verification
-- [ ] Script runs and captures both POST bodies
-- [ ] Comparison report identifies encoding/format differences
-- [ ] At least one new insight about why errorCode 9 occurs
+- [ ] `scripts/hybrid-solver.js` modified — Chrome vData path is the default
+- [ ] The script still runs: `node scripts/hybrid-solver.js --headful` (manual check — no crash)
+- [ ] vData is generated via page.evaluate, not jsdom (check log output: should say "Chrome" not "jsdom")
 
 ### Suggested Agent
 general-purpose
