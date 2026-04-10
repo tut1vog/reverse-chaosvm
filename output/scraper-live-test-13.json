@@ -1,0 +1,168 @@
+{
+  "timestamp": "2026-04-10T00:00:00Z",
+  "fixesApplied": [
+    "pageUrl from sig.showUrl",
+    "fresh timestamps per session",
+    "randomized canvasHash/mathFingerprint/performanceHash",
+    "showUrl in legacy getSig path",
+    "live vm-slide.js fetch (4-strategy)"
+  ],
+  "runs": [
+    {
+      "attempt": 1,
+      "subAttempts": [
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
+          "templateMatch": "96 opcodes, UNKNOWN (not in cache, parse succeeded but no match)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": null,
+          "verifyErrorCode": null,
+          "ticket": null,
+          "notes": "Failed at step 4: unknown template with 96 opcodes"
+        },
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "KhaJbXNVBBaBOAalQnkbOEZmGXAAcmFh",
+          "templateMatch": "94 opcodes, Template B (cached)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 5328,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "Full pipeline completed, verify returned errorCode 9"
+        },
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR",
+          "templateMatch": "94 opcodes, Template B (cached)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 5216,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "Full pipeline completed, verify returned errorCode 9"
+        }
+      ],
+      "outcome": "All 3 sub-attempts failed (1 unknown template, 2 errorCode 9)"
+    },
+    {
+      "attempt": 2,
+      "subAttempts": [
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn",
+          "templateMatch": "98 opcodes, unknown template (structural lookup found no match)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 6464,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "98-opcode template labeled 'unknown' but collect was still generated (6464 chars - longer than Template B's ~5300)"
+        },
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD",
+          "templateMatch": "94 opcodes, Template B (cached)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 5304,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "Full pipeline completed, verify returned errorCode 9"
+        },
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG",
+          "templateMatch": "UNKNOWN (VM parse failed: Could not identify thisCtx variable)",
+          "vmSlideSource": "N/A",
+          "verifyReferer": "N/A",
+          "collectLength": null,
+          "verifyErrorCode": null,
+          "ticket": null,
+          "notes": "162790 chars source - VM parser failed completely"
+        }
+      ],
+      "outcome": "All sub-attempts failed"
+    },
+    {
+      "attempt": 3,
+      "subAttempts": [
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR",
+          "templateMatch": "94 opcodes, Template B (cached)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 5316,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "Full pipeline completed, verify returned errorCode 9"
+        },
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD",
+          "templateMatch": "94 opcodes, Template B (cached)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 5272,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "Full pipeline completed, verify returned errorCode 9"
+        },
+        {
+          "prehandle": "success",
+          "getSig": "success (show page)",
+          "tdcName": "SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD",
+          "templateMatch": "94 opcodes, Template B (cached)",
+          "vmSlideSource": "strategy: show page HTML parse (vm-slide.e201876f.enc.js)",
+          "verifyReferer": "https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...",
+          "collectLength": 5344,
+          "verifyErrorCode": 9,
+          "ticket": null,
+          "notes": "Full pipeline completed, verify returned errorCode 9"
+        }
+      ],
+      "outcome": "All 3 sub-attempts reached verify, all returned errorCode 9"
+    }
+  ],
+  "templateDistribution": {
+    "totalSubAttempts": 27,
+    "templateB_94ops": "~12 (most common: SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD, KhaJbXNVBBaBOAalQnkbOEZmGXAAcmFh, XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR, CSMHFmMCDWYSdnHeTJAbbedQBMaAnGdl)",
+    "templateA_95ops": "1 (hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig)",
+    "unknown_96ops": "2 (SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk - parsed but no match)",
+    "unknown_98ops": "3 (MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn, XcabTONObCYZeEGNPRmPGBQbTmYKEAHj)",
+    "parseFailure_thisCtx": "4 (DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG 162790 chars, BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ 199611 chars)",
+    "notes": "Tencent is now serving at least 6+ distinct TDC_NAMEs across 5+ template types"
+  },
+  "phaseFixes": {
+    "pageUrl": "WORKING - Referer shows full cap_union_new_show URL with all params",
+    "timestamps": "WORKING - fresh timestamps per session (each sub-attempt gets new sess)",
+    "randomizedHashes": "WORKING - different collect lengths across attempts indicate varying fingerprints",
+    "showUrl": "WORKING - Referer consistently set to show URL",
+    "vmSlideFetch": "WORKING - live vm-slide.e201876f.enc.js fetched from show page HTML every time (43688 chars)"
+  },
+  "comparison": {
+    "vs12_5": "Phase 13 fixes are all working correctly: (1) Referer now shows real show URL instead of bare cap_union_new_show, (2) vm-slide is fetched live from show page HTML, (3) collect lengths vary per attempt indicating randomized fingerprints. However, errorCode 9 persists for ALL successful template matches. The template pool has expanded significantly - at least 5 distinct template families are now in rotation (94, 95, 96, 98 opcodes + parse failures at 162K/199K chars). Template B (94 ops) is most common (~45% of attempts)."
+  },
+  "newObservations": [
+    "Nonce is STATIC across all attempts: eda1152f11f1daf0 - this should be per-session and is suspicious",
+    "Two very large TDC builds (162790, 199611 chars) cause VM parser to fail with 'Could not identify thisCtx variable'",
+    "Unknown 98-opcode templates still generate collect tokens (6456-6552 chars, longer than Template B's ~5200-5300)",
+    "Unknown 96-opcode template (SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk) parses but has no template match",
+    "Template A (95 ops) appeared only once across all 27 sub-attempts",
+    "vm-slide.e201876f.enc.js hash is constant - same VM slide code across all sessions",
+    "Collect lengths for Template B: 5216-5344 (varying, confirming randomized hashes)",
+    "Collect lengths for unknown 98-op template: 6456-6552 (larger, likely different schema)"
+  ],
+  "diagnosis": "errorCode 9 persists despite all Phase 13 fixes working. Top suspects: (1) STATIC NONCE - nonce 'eda1152f11f1daf0' is identical across ALL 27 sub-attempts and all 3 CLI runs, suggesting it is hardcoded or cached rather than derived from each session's sig response. This is the most likely cause of errorCode 9. (2) TLS fingerprinting (JA3/JA4) - Node.js HTTP client has a distinct TLS fingerprint from browsers. (3) Missing or incorrect request headers in the verify POST. (4) Collect token schema mismatch for Template B builds served live vs the cached XTEA params. Investigation priority: FIX NONCE FIRST - verify it comes fresh from each getSig response."
+}

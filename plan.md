@@ -119,38 +119,27 @@ Current task: 13.3 — Live re-test after fixes
 |----|------|--------|
 | 13.1 | Fix session-specific cd field overrides and scraper test | done |
 | 13.2 | Investigate vsig/websig source + fetch live vm-slide.js | done |
-| 13.3 | Live re-test after fixes | in-progress |
+| 13.3 | Live re-test after fixes | done |
 
 ---
 
 ## Current Task
 
-**ID**: 13.3
-**Title**: Live re-test after session-specific fixes
-**Phase**: ErrorCode 9 Debugging
-**Status**: in-progress
+Phase 13 complete. Awaiting user direction.
 
-### Goal
-Run the scraper against the live endpoint with all Phase 13 fixes applied and document results.
+### Phase 13 Results
 
-### Context
-Fixes applied in 13.1 and 13.2:
-- pageUrl overridden from `sig.showUrl` (dynamic per session)
-- Timestamps refreshed per session
-- canvasHash/mathFingerprint/performanceHash randomized
-- `showUrl` set in both legacy and show page getSig paths
-- Live vm-slide.js fetched via 4-strategy approach
-- Show page HTML returned as `_html` for vm-slide URL parsing
+All 5 fixes confirmed working: dynamic pageUrl, fresh timestamps, randomized hashes, showUrl in both getSig paths, live vm-slide.js fetch. **errorCode 9 persists across all 27 sub-attempts (3 runs × 9 retries).**
 
-### Implementation Steps
-1. Run `node scraper/cli.js --captcha-only --verbose` 2-3 times
-2. Document results in `output/scraper-live-test-13.json`
-3. Note any improvements vs Phase 12.5 results
+**Key finding**: The nonce `eda1152f11f1daf0` is static across ALL sessions, suggesting the server may be fingerprinting the TLS client (JA3/JA4) and returning a fixed/dummy nonce for non-browser clients.
 
-### Verification
-- [ ] Scraper completes without crashes
-- [ ] Results documented
-- [ ] Any error code change from 12.5 noted
+**Top suspects for errorCode 9 (revised)**:
+1. **TLS fingerprinting** — Node.js `https` has a distinct JA3/JA4 fingerprint. Server may reject based on this regardless of token quality. The static nonce supports this theory.
+2. **Collect token content** — jsdom environment may be detectable in fingerprint values.
+3. **vData integrity** — vm-slide ChaosVM may detect jsdom and produce invalid vData.
+4. **Unported templates** — 96/98-opcode templates need pipeline porting.
 
-### Suggested Agent
-general-purpose
+**Possible next steps**:
+- Use `undici` or `tls-client` for TLS fingerprint spoofing
+- Compare the exact nonce behavior between Puppeteer (real Chrome) and Node.js HTTP
+- Port the 96-opcode template via `pipeline/run.js`
