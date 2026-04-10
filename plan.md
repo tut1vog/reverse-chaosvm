@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 10.3 — Tests for scraper orchestrator
+Current task: 11.1 — End-to-end live test and debugging
 
 ---
 
@@ -91,53 +91,59 @@ Current task: 10.3 — Tests for scraper orchestrator
 |----|------|--------|
 | 10.1 | Scraper orchestrator class (scraper.js) | done |
 | 10.2 | CLI entry point (cli.js) | done |
-| 10.3 | Tests for scraper orchestrator | in-progress |
+| 10.3 | Tests for scraper orchestrator | done |
 
 ### Phase 11: End-to-End Integration
 > Live integration testing against urlsec.qq.com and final documentation updates.
 
 | ID | Task | Status |
 |----|------|--------|
-| 11.1 | End-to-end live test and debugging | pending |
+| 11.1 | End-to-end live test and debugging | in-progress |
 | 11.2 | Update CLAUDE.md, create scrape command | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 10.3
-**Title**: Tests for scraper orchestrator
-**Phase**: Scraper Orchestrator
+**ID**: 11.1
+**Title**: End-to-end live test and debugging
+**Phase**: End-to-End Integration
 **Status**: in-progress
 
 ### Goal
-Write unit tests for `scraper/scraper.js` and `scraper/cli.js`. Since solveCaptcha/solve require live network access, tests focus on construction, init, _buildPostFields, and module loading — not live integration.
+Run the scraper against live Tencent endpoints and debug any issues. This is where we discover whether the headless approach actually works — vData acceptance, collect validation, slide ratio, TLS fingerprinting, etc.
 
 ### Context
-- **`scraper/scraper.js`** exports `Scraper` class.
-  - Constructor: `{aid, userAgent, profile, slideRatio, calibration, slideY, maxRetries, verbose}`
-  - `init()` — loads cache, profile, jQuery, vm-slide fallback
-  - `_buildPostFields(client, session, sig, ans, collectVal, eks)` — builds 38-field POST object
-  - `solveCaptcha()` — needs network (skip in unit tests)
-  - `queryUrlSec()` — needs network (skip)
-  - `solve()` — needs network (skip)
-- **`scraper/cli.js`** — has `require.main === module` guard. Loads without executing.
-- Use `node:test` and `node:assert`. Add to `package.json` test script.
+- All modules are built and unit-tested. The full flow is wired in `scraper/scraper.js`.
+- **Known unknowns** (from project-brief.md):
+  1. Will jsdom-generated vData pass server validation?
+  2. Will faked fingerprint values in collect pass?
+  3. Is the vm-slide.enc.js URL stable? (must parse from show page per session)
+  4. Slide ratio without a browser — may need tuning (0.5 default, bot.py uses dynamic ratio)
+  5. Does the server check TLS fingerprint? (Node.js HTTP may be flagged)
+  6. vm-slide.enc.js fetching — need to parse show page HTML for script URLs
+- **Rate limiting**: wait ≥1s between requests to live endpoints.
+- The live test should be run via `node scraper/cli.js --captcha-only --verbose` first (just solve CAPTCHA, don't query urlsec).
+- Then if CAPTCHA solving works: `node scraper/cli.js --verbose https://example.com`
+- **This task is investigative** — the agent should run, observe, diagnose, and fix issues iteratively.
 - **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
+- **May modify**: `scraper/*.js` to fix bugs discovered during live testing.
 
 ### Implementation Steps
-1. Create `tests/test-scraper.js` with suites:
-   - **Scraper: constructor defaults** — aid, userAgent, slideRatio, calibration, slideY, maxRetries, verbose all have correct defaults
-   - **Scraper: constructor overrides** — custom values are stored
-   - **Scraper: init()** — loads template cache (3 entries), loads profile, loads jQuery source, loads vm-slide fallback
-   - **Scraper: _buildPostFields** — returns object with all 38 keys in correct order, correct types
-   - **Scraper: _buildPostFields values** — aid, protocol, accver, showtype, ans, collect, eks, nonce match inputs
-   - **CLI: module loads** — require('./scraper/cli') doesn't throw
-2. Update `package.json` test script.
+1. Run `node scraper/cli.js --captcha-only --verbose 2>&1` and observe the output.
+2. If it fails, diagnose the error and fix it in `scraper/` modules.
+3. Common issues to watch for:
+   - Unknown template (new TDC_NAME not in cache) → need to run pipeline or manually add
+   - vm-slide.enc.js not found → fix URL parsing or fetching
+   - errorCode 9 → vData or body serialization mismatch
+   - errorCode 7 → slide answer wrong (ratio/calibration issue)
+   - Network errors → TLS fingerprinting or blocked IP
+4. Iterate until `solveCaptcha()` returns errorCode=0 with a valid ticket.
+5. Then test full flow with urlsec query.
 
 ### Verification
-- [ ] `node --test tests/test-scraper.js` — all tests pass
-- [ ] `npm test` — no regressions
+- [ ] `node scraper/cli.js --captcha-only --verbose` returns errorCode=0 with a ticket
+- [ ] OR: clear diagnosis of what blocks success with a remediation plan
 
 ### Suggested Agent
-general-purpose — unit test writing
+general-purpose — live debugging with iterative fixes

@@ -6,7 +6,7 @@
     "decompile": "node decompiler/run.js --input targets/tdc.js --output output/tdc",
     "token:standalone": "node token/cli.js",
     "solve:puppeteer": "node puppeteer/cli.js",
-    "test": "node --test tests/test-decoder.js tests/test-disasm.js tests/test-strings.js tests/test-cfg.js tests/test-patterns.js tests/test-semantics.js tests/test-fold.js tests/test-reconstruct.js tests/test-emit.js tests/test-collector-schema.js tests/outer-pipeline.test.js tests/test-vm-parser.js tests/test-opcode-mapper.js tests/test-key-extractor.js tests/test-scraper-foundation.js tests/test-vdata-generator.js"
+    "test": "node --test tests/test-decoder.js tests/test-disasm.js tests/test-strings.js tests/test-cfg.js tests/test-patterns.js tests/test-semantics.js tests/test-fold.js tests/test-reconstruct.js tests/test-emit.js tests/test-collector-schema.js tests/outer-pipeline.test.js tests/test-vm-parser.js tests/test-opcode-mapper.js tests/test-key-extractor.js tests/test-scraper-foundation.js tests/test-vdata-generator.js tests/test-scraper.js"
   },
   "dependencies": {
     "acorn": "^8.16.0",
