@@ -16,7 +16,7 @@
  *   5. Extract TDC_NAME + eks from captured tdc.js
  *   6. Look up template cache for XTEA params
  *   7. Generate collect token standalone (collect-generator)
- *   8. Generate vData via jsdom (vdata-generator)
+ *   8. Generate vData via Chrome page.evaluate (real DOM/canvas/WebGL)
  *   9. Submit verify POST via page.evaluate(fetch()) -> Chrome TLS
  *  10. Log result
  *
@@ -36,7 +36,8 @@ puppeteer.use(StealthPlugin());
 const { CaptchaClient } = require('../puppeteer/captcha-client');
 const { solveSlider } = require('../puppeteer/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('../scraper/collect-generator');
-const { generateVData } = require('../scraper/vdata-generator');
+// NOTE: jsdom vData generation (generateVData from scraper/vdata-generator) has been
+// replaced with Chrome-based generation via page.evaluate() for real DOM/canvas/WebGL.
 const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const TemplateCache = require('../scraper/template-cache');
 
@@ -383,8 +384,8 @@ async function solve(opts) {
       }
       log(`  collect length: ${collectVal.length}`);
 
-      // ── Step 8: Generate vData via jsdom ──
-      log('Step 8: Generate vData via jsdom...');
+      // ── Step 8: Generate vData via Chrome ──
+      log('Step 8: Generate vData via Chrome...');
 
       // Build the 38 verify POST fields
       const postFields = {
@@ -432,13 +433,90 @@ async function solve(opts) {
         throw new Error('No vm-slide source available (sample/vm_slide.js not found)');
       }
 
-      const { vData, serializedBody } = generateVData(
-        postFields,
-        vmSlideSource,
-        jquerySource,
-        { userAgent }
-      );
-      log(`  vData: ${vData.slice(0, 30)}...`);
+      // Generate vData inside a fresh Chrome page (real DOM, canvas, WebGL, etc.)
+      let vData;
+      let serializedBody;
+      const vdataPage = await browser.newPage();
+      await vdataPage.setUserAgent(userAgent);
+      try {
+        // Navigate to a page on the captcha domain so vm-slide sees a realistic
+        // origin.  We use about:blank (fastest) — vm-slide hooks XHR.send and
+        // computes vData from the POST body; it never makes a real network request.
+        await vdataPage.goto('about:blank');
+
+        const chromeResult = await vdataPage.evaluate(
+          (postFieldsJson, jqSrc, vmSlideSrc) => {
+            return new Promise((resolve, reject) => {
+              try {
+                // Hook XHR.send BEFORE loading vm-slide
+                let capturedBody = null;
+                const origSend = XMLHttpRequest.prototype.send;
+                XMLHttpRequest.prototype.send = function(body) {
+                  capturedBody = body;
+                };
+
+                // Load jQuery if not already present
+                if (!window.jQuery) {
+                  (new Function(jqSrc))();
+                }
+
+                // Load vm-slide — hooks XHR.prototype.send with the vData injector
+                (new Function(vmSlideSrc))();
+
+                // Parse the post fields
+                const postFields = JSON.parse(postFieldsJson);
+
+                // Fire jQuery.ajax — vm-slide intercepts, computes vData, appends it
+                jQuery.ajax({
+                  type: 'POST',
+                  url: '/cap_union_new_verify',
+                  data: postFields,
+                  timeout: 15000,
+                });
+
+                // Restore original XHR.send
+                XMLHttpRequest.prototype.send = origSend;
+
+                if (!capturedBody) {
+                  reject(new Error('XHR.send was never called — vm-slide did not fire'));
+                  return;
+                }
+
+                // Manually extract vData to avoid URLSearchParams corrupting base64 '+' chars
+                const vdataIdx = capturedBody.indexOf('&vData=');
+                const vData = vdataIdx >= 0
+                  ? capturedBody.substring(vdataIdx + 7)
+                  : '';
+                const serializedBody = vdataIdx >= 0
+                  ? capturedBody.substring(0, vdataIdx)
+                  : capturedBody;
+
+                resolve({
+                  vData: vData,
+                  serializedBody: serializedBody,
+                  fullBodyLength: capturedBody.length,
+                });
+              } catch (err) {
+                reject(new Error(err.message || String(err)));
+              }
+            });
+          },
+          JSON.stringify(postFields),
+          jquerySource,
+          vmSlideSource
+        );
+
+        if (!chromeResult.vData) {
+          throw new Error('Chrome vData generation returned empty vData');
+        }
+
+        vData = chromeResult.vData;
+        serializedBody = chromeResult.serializedBody;
+        log(`  vData: ${vData.slice(0, 30)}...`);
+        log(`  Full body length from Chrome: ${chromeResult.fullBodyLength}`);
+      } finally {
+        await vdataPage.close().catch(() => {});
+      }
 
       // Build the final POST body: jQuery-serialized fields + vData appended
       const finalBody = serializedBody + '&vData=' + encodeURIComponent(vData);
