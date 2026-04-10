@@ -2,177 +2,190 @@
 
 ## Project Overview
 
-**reverse-chaosvm** reverse-engineers Tencent's ChaosVM (JSVMP) — a bytecode virtual machine used for browser fingerprinting and bot detection. The project's primary goal is **automated token generation for any version of tdc.js** that Tencent serves. A solo developer project with no team coordination needs.
+Build a headless HTTP scraper for urlsec.qq.com that solves Tencent slide CAPTCHAs and queries URL security results — entirely without Puppeteer or any browser. This proves the full CAPTCHA flow can be replicated using reverse-engineered token generation, a jsdom-based vData generator, and the existing porting pipeline.
 
-The existing codebase has a working decompiler pipeline and byte-identical token generator for one reference build (`targets/tdc.js`). The rewrite transforms this into a fully automated pipeline where a single command takes any new `tdc-vN.js` and produces a working token generator — no human in the loop.
-
-**Critical operating principle**: The agent must be skeptical of existing scripts and documentation. Although the token generator currently produces correct output for tdc.js, there may be bugs in the code and inaccuracies in the docs. The agent must **verify against live behavior** rather than trust documentation at face value. For example, `docs/VERSION_DIFFERENCES.md` stated the XTEA key was "LIKELY IDENTICAL" across templates, but dynamic tracing proved the key **differs** between Template A and Template B.
+The scraper should be a new `scraper/` module with a CLI entry point, reusing existing building blocks from `token/`, `pipeline/`, and `puppeteer/captcha-client.js`.
 
 ## Current State
 
-### Stack
-- **Runtime**: Node.js (CommonJS — `'use strict'`, `require()`/`module.exports`)
-- **Dependencies**: acorn (AST parsing), canvas, puppeteer + stealth plugin
-- **Python**: Only for `puppeteer/slide-solver.py` (OpenCV Canny + NCC)
-- **No linter, no CI, no settings.json currently configured**
+### What exists and works
+- **Token generator** (`token/`): Standalone XTEA reimplementation producing byte-identical `collect` tokens for all 3 templates (A/B/C). Uses `crypto-core.js` (XTEA cipher), `collector-schema.js` (59-field fingerprint), `outer-pipeline.js` (segment assembly), `generate-token.js` (orchestrator).
+- **Porting pipeline** (`pipeline/`): Automated 4-stage pipeline (`vm-parser` → `opcode-mapper` → `key-extractor` → `token-verifier`) that takes any tdc.js build and extracts XTEA params. Tested on 5 builds across 3 templates. **Note: key-extractor.js uses Puppeteer internally** for dynamic tracing — this is acceptable since it only runs once per new template, not per scrape.
+- **HTTP client** (`puppeteer/captcha-client.js`): Pure Node.js HTTP implementation of the full 4-endpoint CAPTCHA flow (prehandle → getSig/getShowConfig → downloadImages → verify). Cookie jar, JSONP parsing, gzip decompression, subsid tracking — all built with Node.js builtins (no axios/fetch). Also has `downloadTdc()` method to fetch the session-specific tdc.js.
+- **Slide solver** (`puppeteer/slide-solver.js`): Calls Python OpenCV script for Canny edge detection + NCC template matching to compute pixel offset. Returns raw offset.
+- **Profiles** (`profiles/`): Browser fingerprint JSON files (`default.json`, `windows-chrome.json`, `chrome-fingerprint.json`) used by the token generator.
+- **Reference scripts** (`sample/`): `vm_slide.js` (decoded vm-slide.enc.js — 43KB, `__TENCENT_CHAOS_STACK` variant), `t_captcha_slide.js`, `slide-jy.js` (jQuery), `bot.py` (reference DrissionPage implementation), `captcha-har.har` (ground truth network capture).
 
-### Project Structure
-```
-targets/              Read-only tdc builds (5 files: tdc.js, tdc-v2 through v5)
-decompiler/           12-step decompile pipeline (14 files including run.js)
-token/                Standalone token generator (6 files)
-puppeteer/            CAPTCHA solver (6 files)
-dynamic/              Runtime tracers (10 files)
-output/               Decompiler artifacts for reference build + partial tdc-v2
-profiles/             Browser fingerprint profiles
-tests/                Test suite (14 files, 11/13 passing)
-docs/                 Technical reference (12 files)
-sample/               Reference files (HAR capture, bot.py)
-```
+### Key technical facts established by prior work
 
-### Existing Claude Code Setup
-Completely gutted. All prior agents, commands, rules, and skills have been deleted from the working tree. Empty directories remain at `.claude/agents/`, `.claude/commands/`, `.claude/rules/`, `.claude/skills/`. There is a stale nested `.claude/agents/agents/` directory that should be removed. The `CLAUDE.md` exists but references deleted commands and contains outdated version status. No `.claude/settings.json` exists.
+**Version identification**: TDC_NAME (line 1 of tdc.js) identifies the template. Same TDC_NAME = identical bytecode = identical XTEA key. Only line 123 (the `eks` value) differs between builds of the same template. Verified by diffing `targets/tdc.js` vs `tdc-v3.js` vs `tdc-v4.js` — byte-identical except line 123.
 
-### Git State
-A `.git/` directory exists with history from the old project, but the user wants it **wiped and replaced with a fresh `git init`**. A stale `plan.md` exists at project root — remove it and replace with the director's own plan.
+| Template | TDC_NAME | Opcodes | XTEA Key |
+|---|---|---|---|
+| A | `FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk` | 95 | `6257584F 462A4564 636A5062 6D644140` |
+| B | `SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD` | 94 | `6B516842 4D554B69 69655456 452C233E` |
+| C | `WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE` | 100 | `5949415A 454D6265 6D686358 6C66525F` |
 
-### What Works Today
-- `decompiler/decoder.js` — universal bytecode decoder (base64 -> varint/zigzag -> integer array), works on all tdc versions
-- Full decompiler pipeline for `targets/tdc.js` (reference build only)
-- `token/` pipeline — byte-identical token generation for tdc.js (Template A)
-- CAPTCHA solver via Puppeteer + OpenCV
-- Dynamic crypto tracers in `dynamic/` (Puppeteer-based instrumentation)
+**eks token**: Server-baked into each tdc.js response at line 123 as `window[TDC_NAME] = '<base64>'`. Not generated by the VM — extract via regex. 312 chars base64, 232 bytes decoded. Different per session, same structure.
 
-### What Doesn't Work
-- No automated opcode mapping for new templates
-- No automated XTEA key extraction for new templates
-- No pipeline to go from "new tdc file" to "working token generator" without extensive manual work
-- tdc-v2 through tdc-v5 have no opcode tables mapped and no working token generation
-- The previous attempt at tdc-v2 stalled at opcode mapping (Phase 3 of old plan.md)
+**vData**: 152-char token generated by `vm-slide.enc.js`, a **stack-based** ChaosVM variant (`__TENCENT_CHAOS_STACK`, 36 opcodes). Injected into the verify POST via jQuery `$.ajaxPrefilter`. Dynamic probe proved it reads only:
+- `navigator.userAgent` (3×)
+- `Date.now()` (1×)
+- `document.readyState` (1×)
+- `document.createElement('fake')` (1×)
+
+**No bot detection, no fingerprinting.** vData is computed purely from the POST body string. This means a minimal jsdom environment can execute vm-slide.enc.js to generate vData without any browser.
+
+**collect token**: The verify POST `collect` field is the URL-encoded output of `token/generate-token.js`. It contains 59 fingerprint fields encrypted with the template's XTEA key. The existing generator uses profile JSON files for fingerprint values.
+
+**Puppeteer path**: Already achieves errorCode=0 and valid tickets. The challenge is replicating this without any browser.
+
+**The verify POST body** requires 38 fields in exact order (25 queryMap base fields from show page URL params + 13 verify-specific fields including `collect`, `eks`, `nonce`, `vData`). Field order matters because vData is computed over the POST body string. See `puppeteer/captcha-client.js` `verify()` method for the exact field construction.
+
+### What does NOT exist yet
+- Headless scraper module (`scraper/`)
+- vData generator using jsdom (no Puppeteer)
+- Template/XTEA key cache with version detection
+- eks extraction from fetched tdc.js source
+- urlsec.qq.com result submission flow
+- Collect token generation with dynamic (per-template) XTEA keys
 
 ## Constraints
 
-- **Language**: Node.js CommonJS exclusively (Python only for slide-solver.py)
-- **Dependencies**: Minimize — prefer Node.js built-ins. New npm packages require user confirmation.
-- **Solo project**: No team workflow, no CI, no deployment infrastructure
-- **targets/*.js are READ-ONLY**: These are Tencent's property. Never modify them.
-- **Puppeteer availability**: Puppeteer is installed. If headless Chrome fails to launch, ask the user to install required system dependencies.
-- **No budget/compliance constraints**
+- **Language**: Node.js CommonJS (`'use strict'`, `require()`/`module.exports`). Python only for slide-solver.py.
+- **Style**: 2-space indent, single quotes, semicolons, `const`/`let` only. See `.claude/rules/coding-style.md`.
+- **Dependencies**: Minimize external deps. `jsdom` is approved as a new dependency for vData generation. Any other new npm packages require user confirmation.
+- **Protected paths**: Never modify files in `targets/`, `token/`, `decompiler/`, `pipeline/`, `puppeteer/`. These are stable, working modules. Read and import from them freely.
+- **Rate limiting**: When testing against live endpoints, wait at least 1 second between requests.
+- **Scope**: Proof-of-concept demonstrating the approach works. Slide CAPTCHA only (no click/rotate).
 
 ## Scope
 
-**Stable** (keep, may refactor):
-- `decompiler/decoder.js` — universal decoder, works on all builds
-- `token/` pipeline structure — crypto-core, outer-pipeline, collector-schema, generate-token
-- `puppeteer/` CAPTCHA solver
-- `dynamic/` tracers (especially crypto-tracer variants)
-- `docs/` — valuable reference but must be treated as potentially inaccurate
-- `tests/` — existing test suite
+**Stable (do not modify)**:
+- `token/` — byte-identical token generator for all 3 templates
+- `pipeline/` — automated porting pipeline (vm-parser, opcode-mapper, key-extractor, token-verifier)
+- `decompiler/` — 12-step decompile pipeline
+- `puppeteer/captcha-client.js` — HTTP client (import and reuse, don't modify)
+- `puppeteer/slide-solver.js` — OpenCV slide solver (import and reuse)
+- `targets/` — read-only analysis targets
 
-**Primary goal — build the automated porting pipeline**:
-- Single command takes any `tdc-vN.js` and produces a working token generator config
-- Pipeline stages: decode -> opcode auto-map -> XTEA key extract (via Puppeteer) -> token verify
-- Each stage should be independently runnable and testable
-- Output: per-version config (opcode table + crypto parameters) that the token pipeline can consume
-
-**Secondary goal — fetch fresh builds**:
-- Command to fetch new tdc.js versions from Tencent's endpoint and save to `targets/`
-
-**Out of scope**:
-- Full decompilation of every version (nice-to-have, not required)
-- Deployment as a service
-- Team collaboration features
-- License
+**To build**:
+1. `scraper/` module — headless HTTP scraper with CLI
+2. vData generation via jsdom + vm-slide.enc.js execution
+3. Template cache (TDC_NAME → XTEA params mapping)
+4. eks extraction from fetched tdc.js
+5. End-to-end urlsec.qq.com scraping flow
+6. Tests for new modules
 
 ## Technical Direction
 
-### Automated Porting Pipeline Architecture
+### Architecture
 
-The pipeline must handle these steps for any new `tdc-vN.js`:
+```
+scraper/
+├── cli.js              # CLI entry point (like puppeteer/cli.js)
+├── scraper.js          # Main orchestrator class
+├── vdata-generator.js  # jsdom-based vData generation
+├── template-cache.js   # TDC_NAME → XTEA params cache
+├── tdc-utils.js        # Extract TDC_NAME, eks from tdc.js source
+└── collect-generator.js # Parameterized XTEA encryption + token generation
+```
 
-1. **Decode bytecode** — `decoder.js` works universally, no changes needed
-2. **Identify VM variables by structural role** — parse the `__TENCENT_CHAOS_VM` function, find registers/PC/bytecode/exception-stack by pattern (not by variable name, since names are minified differently per build)
-3. **Auto-map opcodes** — extract each `case N:` handler, normalize variable names to canonical roles, pattern-match against known semantic operations from `docs/OPCODE_REFERENCE.md`. The case handler code is structurally identical across builds (same JS expression pattern), just with different variable names and case numbers.
-4. **Extract XTEA key** — dynamic tracing via Puppeteer. The key (`STATE_A`, 4 x uint32) differs between templates. Also extract: delta (expect `0x9E3779B9`), round count (expect 32), key modification constants (may differ from +2368517/+592130).
-5. **Verify token** — capture a live token from the tdc build via Puppeteer, generate a standalone token using extracted parameters, byte-compare.
+### Flow
 
-### Key Technical References (treat as guidance, verify against live behavior)
-- `docs/OPCODE_REFERENCE.md` — 95 known semantic operations with handler patterns
-- `docs/VERSION_DIFFERENCES.md` — what changes vs what stays the same between builds (porting strategy section is valuable)
-- `docs/CRYPTO_ANALYSIS.md` — Modified XTEA analysis
-- `docs/TOKEN_FORMAT.md` — token structure (4 segments)
-- `docs/COLLECTOR_SCHEMA.md` — 59-field fingerprint schema
-- `decompiler/disassembler.js` — reference opcode table for Template A (lines 27-80+)
+```
+1. CaptchaClient.prehandle()           → session {sess, sid}
+2. CaptchaClient.getSig(session)       → sig {bgUrl, sliceUrl, nonce, vsig, websig, showUrl}
+3. CaptchaClient.downloadImages(sig)   → {bgBuffer, sliceBuffer}
+4. CaptchaClient.downloadTdc(sig)      → tdc.js source string
+5. Extract TDC_NAME from tdc.js        → look up template cache
+   - Known: use cached XTEA params
+   - Unknown: save to temp file, run pipeline/run.js, cache result
+6. Extract eks from tdc.js source      → regex on line 123
+7. solveSlider(bgBuffer, sliceBuffer)  → raw pixel offset
+8. Compute slide answer string          → "x,y;" format with calibration
+9. Generate collect token               → parameterized XTEA with template's key
+10. Build verify POST body (38 fields)  → exact field order from captcha-client.js
+11. Generate vData from POST body       → jsdom + vm-slide.enc.js + jQuery
+12. Append vData to POST body
+13. CaptchaClient.verify(params)        → {ticket, randstr, errorCode}
+14. Submit ticket to cgi.urlsec.qq.com  → URL security results
+```
 
-### Version Status (from prior investigation)
-| Target | Template | Decoded | Opcode table | XTEA key | Token verified |
-|--------|----------|---------|--------------|----------|----------------|
-| tdc.js | A | yes | yes (95 opcodes) | yes | yes (byte-identical) |
-| tdc-v2.js | B (different) | yes | NOT mapped | DIFFERS from A | no |
-| tdc-v3.js | A (same as tdc.js) | yes | reuse tdc.js table | reuse tdc.js key | untested |
-| tdc-v4.js | unknown | yes | NOT mapped | unknown | no |
-| tdc-v5.js | unknown | yes | NOT mapped | unknown | no |
+### vData Generation Strategy
 
-### Testing Strategy
-- Node.js built-in test runner (`node --test`)
-- Each pipeline stage should have its own test file
-- Verification against live Tencent tokens is the ultimate acceptance test
+Execute `vm-slide.enc.js` in a jsdom environment with minimal stubs:
+
+1. Create a jsdom window with `url: 'https://t.captcha.qq.com/cap_union_new_show'`
+2. Set `navigator.userAgent` to match the profile
+3. Load jQuery (`sample/slide-jy.js` or fetch from live endpoint)
+4. Load `vm-slide.enc.js` (fetch from live endpoint — URL parsed from show page HTML)
+5. Trigger `$.ajax({ type: 'POST', url: '/cap_union_new_verify', data: postFields })`
+6. Intercept via `$.ajaxPrefilter` or `XMLHttpRequest` mock to capture the POST body with `vData` appended
+7. Extract vData from the intercepted body
+
+The vm-slide.enc.js URL appears in the show page HTML. The `captcha-client.js` already has `_parseShowConfig()` that extracts embedded config — check if it includes the vm-slide URL or if we need to parse it separately.
+
+### Collect Token with Dynamic XTEA Key
+
+The existing `token/crypto-core.js` has hardcoded `STATE_A` for Template A. For multi-template support without modifying the protected `token/` directory:
+- Create `scraper/collect-generator.js` that reimplements the XTEA encryption with parameterized keys (key, delta, rounds, keyModConstants as constructor/function arguments)
+- Reuse `token/outer-pipeline.js` (buildCdString, buildSdString, urlEncode) and `token/collector-schema.js` (buildDefaultCdArray) via require — these are key-independent
+- Only the encryption step (`encryptSegments`) needs to be parameterized
+
+### Template Cache
+
+Simple JSON file at `scraper/cache/templates.json`:
+```json
+{
+  "FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk": {
+    "template": "A",
+    "key": [1647925327, 1177797988, 1668419682, 1835647296],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [2368517, 592130],
+    "caseCount": 95,
+    "lastSeen": "2026-04-10T..."
+  }
+}
+```
+
+Pre-seed with all 3 known templates from `output/*/pipeline-config.json`.
+
+### Slide Answer Computation
+
+From the Puppeteer solver findings:
+- `rawOffset` comes from Python OpenCV slide solver
+- `ratio` = rendered width / natural width. Without a browser, use 0.5 (default) initially. The Puppeteer solver found 1.8557 dynamically — but that was the CSS rendered ratio, not what the verify endpoint expects. The answer coordinates map to the natural image coordinate space scaled by the display ratio that the show page uses.
+- `calibration` = -25 (fixed, from bot.py line 80)
+- `answer` = `"${Math.round(rawOffset * ratio + calibration)},${yCoord};"`
+- `yCoord` = 45 (default from captcha-solver.js DEFAULT_SLIDE_Y) or extracted from show page
+
+### urlsec.qq.com Submission
+
+After obtaining a ticket, submit to `cgi.urlsec.qq.com/index.php`:
+```
+GET https://cgi.urlsec.qq.com/index.php?m=check&a=gw_check&callback=jQuery...&url=<target>&ticket=<ticket>&randstr=<randstr>&_=<timestamp>
+```
+Parse the JSONP response → extract `data.results`. See `sample/bot.py` lines 24-27 for `extract_result()`.
 
 ## Collaboration
 
-Solo developer. No branching strategy, no code review, no CI. The director manages the plan and dispatches work to subagents.
+Solo developer (yilin). No CI, no PR templates. Commit style: `chore(ai): <description>`.
 
 ## Standards
 
-### Linting & Formatting (TO BE SET UP)
-- ESLint + Prettier for all JavaScript
-- 2-space indentation, single quotes, semicolons required
-- `const`/`let` over `var`
-- CommonJS (`require`/`module.exports`)
-
-### Code Conventions
-- Minimize external dependencies — prefer Node.js built-ins
-- Disassembly format: `[PC]  MNEMONIC  r<dst>, r<src1>, r<src2>    ; comment`
-- Decompiled variable names: camelCase; `v0`, `v1`... when context unclear
-- Output directories: versioned — `output/<target-stem>/`
-
-### Commit Style
-- Short descriptive messages
-- No enforced conventional commit format
+- CommonJS, 2-space indent, single quotes, semicolons, const/let
+- No linter enforced (conventions in `.claude/rules/coding-style.md`)
+- Commit style: `chore(ai): <description>`
+- No LICENSE file
+- Output directories versioned under `output/<target-stem>/`
 
 ## Claude Code Setup
 
-### CLAUDE.md
-Full rewrite. Must reflect the new project direction:
-- Primary workflow is the automated porting pipeline
-- Remove all references to deleted commands/agents
-- Update version status and project memory
-- Document the new command/agent/skill structure
-- Keep the valuable architecture sections (VM internals, key mapping table) but mark docs as "reference, verify before trusting"
-
-### Rules (`.claude/rules/`)
-1. **`targets-readonly.md`** — Never modify any file in `targets/`. These are Tencent's property and read-only analysis targets.
-2. **`verify-dont-assume.md`** — When working with crypto parameters, token structure, opcode semantics, or any behavior documented in `docs/`: verify against live behavior via dynamic tracing or testing. Do not assume documentation is correct. Document any discrepancies found.
-3. **`coding-style.md`** — 2-space indent, single quotes, semicolons, `const`/`let`, CommonJS modules. Follow ESLint/Prettier config. Minimize external dependencies.
-
-### Commands (`.claude/commands/`)
-1. **`port-version.md`** — Primary command. Takes a tdc file path as argument. Runs the full automated pipeline: decode bytecode -> auto-map opcodes -> extract XTEA key via Puppeteer -> generate token -> verify against live capture. Outputs a per-version config file with opcode table and crypto parameters. Should report progress at each stage and halt with diagnostics if any stage fails.
-2. **`fetch-latest.md`** — Fetch fresh tdc.js builds from Tencent's CAPTCHA endpoint. Save to `targets/` with appropriate naming. Report which template each build matches (if recognizable) or flag as new template.
-
-### Agents (`.claude/agents/`)
-1. **`opcode-mapper.md`** — Specialized agent for parsing `__TENCENT_CHAOS_VM` switch/case handlers. Identifies VM variables by structural role (not by name). Normalizes each case handler and pattern-matches against known semantic operations. Outputs opcode table as JSON. Must handle variable opcode counts (94-100 observed) and compound/fused opcodes.
-2. **`key-extractor.md`** — Dynamic tracing agent using Puppeteer. Instruments the tdc.js VM to capture XTEA key schedule: STATE_A (4 x uint32), delta, round count, key modification constants. Uses the crypto tracer approach from `dynamic/crypto-tracer*.js` as reference but must adapt to each template's variable names and opcode numbering.
-3. **`token-verifier.md`** — Captures a live token from a tdc build via Puppeteer, generates a standalone token using the extracted config (opcode table + crypto parameters), and performs byte-by-byte comparison. Reports match/mismatch with detailed diagnostics showing which segment diverges.
-
-### Skills (`.claude/skills/`)
-1. **`port-opcodes.md`** — Detailed step-by-step instructions for the opcode mapping process. Can be invoked by the opcode-mapper agent or run manually. Includes the pattern-matching reference table and handling for ambiguous/compound opcodes.
-
-### Hooks
-- Auto-lint: Run ESLint `--fix` on staged `.js` files before commits
-
-### Settings (`.claude/settings.json`)
-- Tool permissions aligned with the director permissions table below
-- ESLint hook configuration
+After implementation is complete:
+- **CLAUDE.md**: Add `scraper/` module to Project Structure, Commands section, and Architecture section. Add scraper CLI usage examples.
+- **`.claude/commands/scrape.md`**: New slash command for running the scraper against URLs.
 
 ## Director Permissions
 
@@ -180,23 +193,22 @@ The following permissions govern what the director and its subagents may do auto
 
 | Category | Policy | Details |
 |---|---|---|
-| Bash — allowed | Freely | `node`, `npm install`, `npm test`, `npm run *`, `npx eslint`, `npx prettier`, `python3`, `pip install`, `ls`, `mkdir`, `cat`, `head`, `tail`, `wc`, `diff`, `git` (all git commands after fresh init) |
-| Bash — denied | Never | `rm -rf` (except initial `.git/` wipe for fresh repo setup), `sudo`, `docker`, `curl` to arbitrary endpoints |
-| File creation | Freely | Create/modify files anywhere in the project except protected paths |
-| Protected paths | Never modify | `targets/*.js` (read-only analysis targets), `node_modules/` (npm-managed) |
-| Git commits | Auto | Wipe existing `.git/` and `git init` fresh repo as first task. Auto-commit plan files: yes. Create branches: yes. Push: no (user does manually). |
-| Network access | Allowed | WebSearch/WebFetch for dependency docs and version checks. Puppeteer to Tencent endpoints for token capture and verification. |
-| Package management | Confirm first | Any `npm install <new-package>`, `npm update`, `npm remove` requires user confirmation before execution. |
-| Always confirm | Must ask | Deleting source files (output artifacts can be regenerated freely). Any `git push`. Adding new npm dependencies. Modifying `package.json` scripts section. |
+| Bash — allowed | Standard tools | `node`, `npm install`, `npm test`, `python3`, `git add`, `git commit`, `ls`, `mkdir`, `cat`, `head`, `tail`, `wc`, `diff`, `curl` |
+| Bash — denied | Destructive/privileged | `rm -rf`, `sudo`, `docker` |
+| File creation | Freely in new paths | Create files freely within `scraper/`, `tests/`, `.claude/`. |
+| Protected paths | Read-only | `targets/`, `token/`, `decompiler/`, `pipeline/`, `puppeteer/` — import from these but never modify them |
+| Git commits | Limited | Auto-commit plan/history files: yes. Create branches: yes. Push to remote: no. |
+| Network access | Allowed | May use WebSearch/WebFetch and hit live Tencent endpoints during testing. Wait ≥1s between requests to live endpoints. |
+| Package management | Confirm first | `jsdom` is pre-approved. Any other new npm packages require user confirmation. |
+| Always confirm | Destructive ops | Deleting files, modifying any existing module outside `scraper/`, force-pushing, any `rm` command. |
 
 Any operation not explicitly listed here requires user confirmation before execution.
 
 ## Known Unknowns
 
-1. **How many distinct VM templates does Tencent serve?** Observed 2 (Template A and B) across 5 builds, but pool size is unknown (estimated 2-10).
-2. **Does the collector field count (currently 59) vary between templates?** Unverified — must check dynamically.
-3. **Does the token assembly order vary?** One report suggested `btoa[1]+btoa[2]+btoa[0]+btoa[3]` vs the confirmed `btoa[1]+btoa[0]+btoa[2]+btoa[3]`. May be a documentation error or a real difference.
-4. **Are compound/fused opcodes stable across templates?** Template A has 95 opcodes, Template B has 94. Some may be split or merged differently.
-5. **Existing code quality** — the user explicitly warns that current scripts may have bugs and docs may have inaccuracies despite producing correct output for tdc.js. The agent pipeline must verify everything against live behavior.
-6. **Puppeteer system dependencies** — headless Chrome may need system packages installed. If Puppeteer fails to launch, ask the user to install dependencies.
-7. **What key modification constants does each template use?** Only verified for Template A (+2368517, +592130). Template B's constants are unknown.
+1. **Will jsdom-generated vData pass server validation?** The probe showed vm-slide reads only userAgent/Date.now/readyState — no fingerprinting. But the jsdom environment may behave differently in subtle ways. First live test will answer this.
+2. **Will faked fingerprint values in collect pass?** The Puppeteer path generates collect with real Chrome fingerprints (5176 chars). Our standalone generator may produce different-length collect with profile values. Need to test whether the server validates fingerprint content or just structure.
+3. **Is the vm-slide.enc.js URL stable?** The HAR shows `vm-slide.e201876f.enc.js` — the hash may change. Need to parse it from the show page HTML each session, not hardcode it.
+4. **Slide ratio without a browser**: The Puppeteer solver found dynamic ratio was 1.8557, not the expected 0.5. Without a browser to measure rendered width, we may need to try multiple ratios or extract it from the show page config.
+5. **Does the server check TLS fingerprint?** The jsdom/HTTP path failed with errorCode 9 in earlier attempts. The Puppeteer path succeeded. It's possible Node.js's TLS fingerprint is flagged. If so, we may need `undici` or a custom TLS config.
+6. **vm-slide.enc.js and jQuery fetching**: Need to parse the show page HTML for script URLs for vm-slide and jQuery, then fetch them per session (or cache if URLs are stable).

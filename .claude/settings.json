@@ -1,14 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node*)",
+      "Bash(node:*)",
       "Bash(npm install)",
-      "Bash(npm test)",
-      "Bash(npm run *)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
       "Bash(npx eslint *)",
       "Bash(npx prettier *)",
       "Bash(python3 *)",
-      "Bash(git *)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
       "Bash(ls *)",
       "Bash(mkdir *)",
       "Bash(cat *)",

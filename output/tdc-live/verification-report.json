@@ -1,0 +1,42 @@
+{
+  "match": true,
+  "liveTokenLength": 4512,
+  "standaloneTokenLength": 4512,
+  "segments": [
+    {
+      "name": "hash",
+      "liveLength": 64,
+      "standaloneLength": 64,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "header",
+      "liveLength": 2816,
+      "standaloneLength": 2816,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "cdBody",
+      "liveLength": 1248,
+      "standaloneLength": 1248,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "sig",
+      "liveLength": 120,
+      "standaloneLength": 120,
+      "match": true,
+      "firstDivergenceOffset": null
+    }
+  ],
+  "capturedData": {
+    "cdString": "×ÅYV·QÈ$*!yA\u001df\u001a\u0006cÒm¾ÒÒ¯rèîgvN1ê°à:àUW>\u0014¥Nù8¤¤Ô~^H6­\u001c\u001c\u0006ÿrxHnÏa)\u001cÅéÅee%J¶](ì¹ÆCU|¦ÍÒO-L!<¸\u00054«ÖGë\u0010À&\u0012¿'ã,l\u000bú]vë{v=­×øñë\u001eØ\u001f²Á«ò\t¥ý/æ­õÝ­76¹³*õÇl\u00038Ãá\u0018²Êâýßµ1¼&\"<Ë;Ö\u0007þ¥gT]3h÷cÏäíîk§\u0015óºC-++ÁO`(\u0007ö\u001f±\u00124\u0017KùØuøÏù+%\u001d>U9|D\b«>9®ê/²Ý!\u001aÊ\u0018aÜ¬ö1FGÕØ¡&\"<Ë;Ö\u0007cÏäíîk§\u0015iIÉncpg¤\fIî)ª-=ìË\u0007©\\K¼þ¦ë¯×»àÔ±>/¶%èAz¶\u0006\tFÿ;Ê\u0010íí×zÓYßEB\u000fæû³Y¤4\fú¦GuÉ\u0003`KdÆë-H`#Ü·FuÖÏ@ãO\u000b~hRHõ!·­Ç;\u0010©OD­\u000e\u0015ÔIJp9È¶±yXÂÍ§\"d«\u0004·­Ç;\u0010m³¯v¤\u0007êÛ\u0019Ûÿ.kÂÍ§\"d«\u0004\u000f\u0002»\u0002\u0003NrY\u0002øn¡3û³\u0005°fÒöÁHOÓ»\u001f®à\u001fZ_×ÎöSÌß©\t6!8\u001cjgØºÅìrûRÄà\u0001 \u0017 çrY1¿Eh\\ãx\u0004¥lÒÌÖ?iÄEí\u0019n=ðúî;?ø<v=°ÝÓÃ\u001b\u0015«D¨ÕNc=Òþ\u001e³µÇÈ\u0001¶ÄKÝ¯Xþ¢Q\u0017­\u0019È\u001dÀÇÕÍ u\u0010qm=Àqæ\u0005Åxå[¸¦-µvÂÚxAÞ\u0019¹\u001cføË¯'0V\u0017á¹;§Ã¨5´àDch4\u0018|h´öê÷ÁJ½b6jÙy\\.4ê\u0014÷ó ´uÙ£¶\u0007Õ3³\u0006ï?ï\u001bÅ\u0011óÅíÐ\u000bÓ\r±Óê¯½\u0012æË¨ï\u001f\u0014\u0013VyÜC_\u001aýmk\u0005âk÷NtèPè\u0013v\u000eÈÿmD{ì@[©èd¾Çvê¿J347\u0014\u0014W[\u0012Ièm\u0015'<uâ­·¹ï«×4¼r~ë=¼ì#ç\u0003'úæ\u000b^¸szL\u0011\u001e¹ú\u0001T{Ì6a,\u000f= Ø,dk\u000fñ\u0010_<ºy3l>Æ\u0017\u000b|p¿¾Ceuà8LýI\u001a4ò*·\u0014ÎTGW¨ä\u0006Þ÷\u001c\n\u0003ô*±bÐëäB2^h\u0015ÉNâi`uÅòs\u0015N}¢\u0019ñIý*\nK\b$Äç\u0004õCðv3¿^\f\u0013Ä¤UÛäcD'\"t\u0019òé&w{8©û³òyä\"C\u001fA¬&rÕun§ÙydÃ_¸º]îô¯ÎqÈÒñÆ\\\u0004æ#3Vâ\u001a¿ ¥§tèPè\u0013v\u000eÈÿmD{ì@ÐQ,^­åÏ&¿J347\u0014\u0014WïÈ9p¤ÔÞãxW\u0017«×4¼r~ë=r\u001fÔh`¡2Æ\u000b^¸szL\u0011\u001e¹ú\u0001T{Ì6aahéõlÆ+ÔÞãxW\u0017£mrÔªVõWè}<ñÐ9Ô\\[1ç0\u0017é2\u001f!\u0005{GÕ|ß®ýY¡=óêÈL© Äkç\u0019ïøÔ´¯#Ñ]Äb±±\u0011\u0012\u001fÄ¸P\u0010S\u0010k»mÃí\r\u001d**å:°[âÙ#\u0017\u00126\u0005Qsräâ`á\u001fiÒãî¢NÞ{\fßIÓá½ù\u00040/\u000fK~UûDI\u0001ëcâæÂ'*©\fß£\\¾ð^ ùf¦\rPm¹S}íwÚÇrU}r´\u0014\u0002/¶'Ë\u001d\u000eS\u001f\u0019Æ\"ÞÄdé\u0012A¹\u0012¤\u000f\"Já$Gÿa¹I\u0017\u0005(a\u0002%§û¬Xæ\u0014§Oµjw@÷ö\u001b¹\u0014\u000eÿûO\u00013ÌèOÜêLî`!åoÂl\u00144ý\u0005Â»ÝOñ±JØÝþoO\u001eà\u0015FqáÏo5læÈ\u0012a^GO\u0018Î-Û!B9\u0017Ûð\u001b ¹¥/nó|¶ÌÑ\u0002rdõwÔð\u0019FÀÍ\u001d\u001b\u0015Êð)mÑ\u001b?¼\fã¤\u0000ªzè\u0003cC\u001dõE3\\\b\u0002X¯KkJ°f\b\ba,~ÕLoÿÄ XÞCÅ!O0>\u00014Ë:\u000b2ç®) ®½_\u0003'øjä\u001cì*hüñ¬Î¾Ië@IYùæ>\u0016lÎ!Ö\u0007Npg|§\u0019\u000f­îQ¨p#HJÊ`Âhù2\u001bÌNCòWï¶Dd\u0016Ãm¼7\u0018»µËr%{¾o5læÈ\u0012a^GO\u0018Î-Û!B9\u0017Ûð\u001b ¹¥/nó|¶ÌÑ\u0002rdõwÔð\u0019FÀÍ\u001d\u001b\u0015Êð)mÑ\u001b?¼\fã¤\u0000ªzè\u0003cC\u001dõE3\\\b\u0002X¯KkJ°f\bíB¼¿\u0017ËÛ\u0014Lí\u001c\t7.Ä XÞCÅ!O0>\u00014Ë:\u000b2ç®) ®½_\u0003'øjä\u001cì*hüñ¬Î¾Ië@IYùæ>\u0016lÎ!Ö\u0007Npg|§\u0019\u000f­îQ¨p#HJÊ`Âhù2\u001bÌNCòWï¶DQ\u0018L¹%Q=¶å\u001d[¤°B4(\u0006(wGLa^GO\u0018Î-Û!B9\u0017Ûð\u001b ¹¥/nó|¶ÌÑ\u0002rdõwÔð\u0019FÀÍ\u001d\u001b\u0015Êð)mÑ\u001b?¼\fã¤\u0000ªzè\u0003cC\u001dõE3\\\b\u0002}B\"Î\u001d\f\néaE\\\u00190¿³øi¥ÐÙ\u0001ýªþ<©¯in*\u000eÉt_\u0006wÈÍs¹\u001aâ\r{¾ÑÕ­ËQÐYè/£O kÈôW\u00128\u000e84pµ[ùÎþ\"M<Ó­Þ\u0017=¤k\u0012te!\u000fES;Ü8Ñ[ä¦rC\u0007\f¬Î¹÷8ççHýÇ\\KSXm!=ò¢{¾ìÃÓ\u0016N?\u0015ì]ÐYdÚ]Gb¼ÏP£þC`\u001a\u000e¾¾\u001crg,«ÅÎæ\"J¸s^µG\u0015ýèEõÑT  \u001fÏ\u001fÍ\u000eÉ'W\u0018o\rÆ£:\\Ù\f«Ifjø\f«IfjøD\u0006þìÆhó\u0004¤¯\u000b+¾4\u0017KùØuøÏù+%\u001d>U9|D\b«>9®ê/²Z¶ûädþïøEÅ0Ï´\fíÍ2qçZ\u0004\u0012\u0015|Óyjö \"+%ÎÖYF¦\u000bf/\fIî)ª-=ìË\u0007©\\K¼þ¦ë¯×»àÔ±>/¶%èÕfZm¯;\u0015bó9®§á\u0015*Ú·FuÖÏ@ãO\u000b~hRHõ!·­Ç;\u0010Å¡jÆV^ßÝ4\u0017KùØuøÏù+%\u001d>U9|D\b«>9®ê/²Ö+°­\u0011]\u0006Sÿ;Ê\u0010íí×zÓYßEB\u000fæû³Y¤4\fúxÄ^wÿLé¤Ö¨\u0015'0ÿý\u0007¼Ùò´·FuÖÏ@ãO\u000b~hRHõ!·­Ç;\u0010f´\u0006g¸ôØfO\u001e}ïä¸ÿ;Ê\u0010íí×zÓYßEB\u000fæû³Y¤4\fúLû>ä¾¦ÐcÒ¬÷i¡\u0015&\u000bÁ²\u0018r\u0005ïæÈK\u0007MÊ®´åû¬Xæ\u0014§OÈú=\u0018ôs¸%ª\u0005\u0017Â.\u0005~l^Tê\u0015ÆÛÍ2£õ(Êç\u001bÅ¸\u0001«ç^d6ÚEë@ð<>?\u0016í¿å\u0010\u0010Ö>Ê_ÈØq·Eí\u0019n=ðúî?×âw:ë\u00111«,±øá5ôIïdõC|Um\u000eòÞK¯ê8\u0018kw\u001d$ÜÀ\u001fÂvÆh\u001e2µã¶À+\rN\u001fpmîÄÉ~\u0005@ð<>?\u0016í¿å\u0010\u0010Ö>Ê_ÈØq·Eí\u0019n=ðúî\u001aÊÞÖ°?ç½ÁÃÓ}ü©Îí4zìÈÕ%®\u0019¥>\u000b\u001bó*èÝ³\u000fÎtû>g\tÌL¯\u000bv\b\u0002îãÍUÚ>þø:Ë§\b[¼\u0011\u0015ijõáú\"ÀkµÇÈ\u0001¶ÄKÝ¯XþJ\u0003\u0002ô=­øÆe/ÏM¡\u000eGªaQ vÿ­ñ\u0003â(EIK@´-û¡¨ÏíGKüùî~<´\u0014\u0018%L®\u0001£ão¡W\u0012u\u001f\t\u0002Ü¯¹É×èbomóöôÉS±E¶\u001dÆ|+«-¯(f3¿\\×Ô|ÏÈáÅòÒáìîÍ¯¥¸\u0017ëÂ)MxL\u0007\u0010ôNãËçD\nzæ\u0017æmóc\u0006unEc({/RÝ3\u0013KÖü>¦tÛw\br&{úA·D\u001dBÖr\bu\u0014´»\u001faÙ0R´Òý%\u001f\u001bÆ©W89r\u001b$×4T(CWi\u0016BÒ±1Ù\u001e¦tâp1Wu\u001f¸©\u0002ÓOµÐæ\u0019J\u0015Rª\u001e¾@¡E\f«Ifjø\f«Ifjø]}",
+    "sdString": "ð×k#[d}ÅÎÐm4Ý-X\u0015Å*#\u0018W²\f\n$ÞÉê¹¹\f¸ÆpÿEçèè¹®Y-0F\u0001Ò'Õ¦~\u0007\u0018\u0014ç\u001c«:¾\fb×Y*î[vYVfB³ÇñkeöðA>Põ",
+    "timestamp": 1700000000000
+  },
+  "eksToken": "zzATw8Wg41r2aNt+yHGxJuGvZ8gGutQLIWNP1EGkONA91XCiX37k4f9Wav8jZaVLJev2eTIlUNRuvV8wIT/nCbBot+CURopNHfYR3GLrsCCtR/yZ1nGin7djl/vF4pkd+4F8kucDTmgMJXolz2A2/uC6wa9ukomL8qdJIInjDt0TKG2cCSWSq+ftwhmnDZDKt5dY5pYfKgGptfvWkegKMXH7srvIq6tycpCIdtaAHfEE1ZCrKvgyzqhK6G/QMXnm+Pb2g1wEqF4J2Rq33Hw0cwgJYc7vpl168IJxeyF1cwwfEftNTVFdyw==",
+  "notes": "Tokens are byte-identical; Frozen timestamp confirmed (2 Date.now calls)"
+}

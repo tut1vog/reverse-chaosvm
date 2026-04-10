@@ -1,0 +1,16 @@
+{
+  "key": [
+    1765552186,
+    1094997825,
+    1210005836,
+    1330075971
+  ],
+  "delta": 2654435769,
+  "rounds": 32,
+  "keyModConstants": [
+    0,
+    0
+  ],
+  "verified": false,
+  "notes": "Found 9867 sum+=delta at PC 63422; 9867 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x693C303A, 0x41445741, 0x481F394C, 0x4F475943]; No key modification constants found (standard XTEA or undetected)"
+}

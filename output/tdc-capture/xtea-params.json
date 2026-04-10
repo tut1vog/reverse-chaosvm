@@ -1,0 +1,16 @@
+{
+  "key": [
+    1330473042,
+    1631741767,
+    1163091008,
+    1815822680
+  ],
+  "delta": 2654435769,
+  "rounds": 32,
+  "keyModConstants": [
+    0,
+    1513228
+  ],
+  "verified": false,
+  "notes": "Found 9760 sum+=delta at PC 25730; 305 cipher calls x 32 rounds; Key: [0x4F4D6852, 0x61426747, 0x45535C40, 0x6C3B4158]; Key mod constants: [0, 1513228]"
+}
