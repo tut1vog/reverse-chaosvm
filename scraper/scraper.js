@@ -19,7 +19,7 @@ const path = require('path');
 
 const { CaptchaClient, httpRequest, parseJSONP } = require('../puppeteer/captcha-client');
 const { solveSlider } = require('../puppeteer/slide-solver');
-const { generateCollect } = require('./collect-generator');
+const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
 const { extractTdcName, extractEks } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
@@ -297,6 +297,7 @@ class Scraper {
           delta: cached.delta,
           rounds: cached.rounds,
           keyModConstants: cached.keyModConstants,
+          keyMods: cached.keyMods || null,
         };
 
         // (f) Extract eks from tdc.js source
@@ -317,11 +318,52 @@ class Scraper {
         const ans = `${xAnswer},${this.slideY};`;
         this._log(`  ans: ${ans}`);
 
-        // (i) Generate collect token
+        // (i) Generate behavioral events and slide sd
+        const now = Date.now();
+        const behavioralEvents = generateBehavioralEvents(xAnswer, this.slideY, now);
+
+        // Build slideValue for sd from behavioral events (8-element → 3-element tuples)
+        // First entry: [totalX, totalY, totalElapsed], rest: [dx, dy, dt], last: [0,0,0]
+        const slideValueArray = [];
+        let totalX = 0;
+        let totalY = 0;
+        let firstMoveTime = null;
+        let lastMoveTime = null;
+        for (const ev of behavioralEvents) {
+          if (ev[0] === 1) { // mousemove
+            if (firstMoveTime === null) firstMoveTime = ev[3];
+            totalX += ev[1];
+            totalY += ev[2];
+            lastMoveTime = ev[3];
+          }
+        }
+        const totalElapsed = (lastMoveTime && firstMoveTime) ? lastMoveTime - firstMoveTime : 1000;
+        slideValueArray.push([totalX, totalY, totalElapsed]);
+        let prevTime = firstMoveTime;
+        for (const ev of behavioralEvents) {
+          if (ev[0] === 1) {
+            const dt = prevTime ? ev[3] - prevTime : 0;
+            slideValueArray.push([ev[1], ev[2], dt]);
+            prevTime = ev[3];
+          }
+        }
+        slideValueArray.push([0, 0, 0]); // terminator
+
+        const slideSd = buildSlideSd(
+          { x: xAnswer, y: this.slideY },
+          slideValueArray,
+          { trycnt: attempt, refreshcnt: 0, elapsed: totalElapsed }
+        );
+
+        // (j) Generate collect token
         this._log('Step 6: generateCollect');
         const collectEncoded = generateCollect(this.profile, xteaParams, {
           appid: this.aid,
           nonce: sig.nonce,
+          sdOverride: slideSd,
+          cdFieldOrder: cached.cdFieldOrder || null,
+          behavioralEvents: behavioralEvents,
+          timestamp: now,
         });
         // Decode URI-encoded collect for the POST fields (captcha-client does this too)
         let collectVal = collectEncoded;

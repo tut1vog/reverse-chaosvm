@@ -379,8 +379,8 @@ describe('collect-generator: different templates produce different tokens', () =
   it('both produce non-empty strings of similar length', () => {
     const tokenA = generateCollect(profile, XTEA_A, FIXED_OPTS);
     const tokenB = generateCollect(profile, XTEA_B, FIXED_OPTS);
-    assert.ok(tokenA.length >= 4600, 'Template A token should be >= 4600 chars');
-    assert.ok(tokenB.length >= 4600, 'Template B token should be >= 4600 chars');
+    assert.ok(tokenA.length >= 4000, 'Template A token should be >= 4000 chars');
+    assert.ok(tokenB.length >= 4000, 'Template B token should be >= 4000 chars');
     assert.ok(
       Math.abs(tokenA.length - tokenB.length) < 200,
       'tokens should be of similar length'

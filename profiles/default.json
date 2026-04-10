@@ -1,41 +1,41 @@
 {
-  "_comment": "Default profile — Chrome/Headless on Linux x86_64, matches ground truth trace",
+  "_comment": "Default profile — Chrome on Windows 10, realistic desktop fingerprint",
 
-  "osPlatform": "linux",
-  "platform": "Linux x86_64",
-  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36",
+  "osPlatform": "windows",
+  "platform": "Win32",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
   "vendor": "Google Inc. (Google)",
 
-  "screenWidth": 1920,
-  "screenHeight": 1080,
+  "screenWidth": 1280,
+  "screenHeight": 1400,
   "viewportWidth": 800,
   "availHeight": 600,
   "colorDepth": 24,
   "devicePixelRatio": 1,
 
   "hardwareConcurrency": 8,
-  "maxTouchPoints": 20,
+  "maxTouchPoints": 0,
   "touchSupport": 2,
 
-  "languages": ["en-US"],
+  "languages": ["en-US", "en"],
   "timezone": "Asia/Shanghai",
   "timezoneOffset": "+08",
 
-  "fonts": "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
+  "fonts": "7448307515255877632",
 
   "canvasHash": 991783254,
   "mathFingerprint": 0.8410000801086426,
   "performanceHash": 679647370,
   "featureBitmask": 1023,
 
-  "webglRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "webglRenderer": "Intel Iris OpenGL Engine",
   "webglImage": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
 
-  "pageUrl": "http://127.0.0.1:46577/?rand=1519713624347",
+  "pageUrl": "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
 
   "audioFingerprint": {
     "nt_vc_output": {
-      "ac-baseLatency": 0.011609977324263039,
+      "ac-baseLatency": 0.01,
       "ac-outputLatency": 0,
       "ac-sampleRate": 44100,
       "ac-maxChannelCount": 2,
@@ -55,7 +55,7 @@
       "an-channelCountMode": "max",
       "an-channelInterpretation": "speakers"
     },
-    "pxi_output": 11888.616780045351
+    "pxi_output": 10240
   },
 
   "storageEstimate": {
@@ -67,40 +67,27 @@
 
   "highEntropyValues": {
     "_state": 0,
-    "architecture": "x86",
-    "bitness": "64",
-    "brands": [
-      { "brand": "Not-A.Brand", "version": "24" },
-      { "brand": "Chromium", "version": "146" }
-    ],
-    "fullVersionList": [
-      { "brand": "Not-A.Brand", "version": "24.0.0.0" },
-      { "brand": "Chromium", "version": "146.0.7680.153" }
-    ],
+    "architecture": "",
+    "bitness": "",
+    "brands": [],
+    "fullVersionList": [],
     "mobile": false,
     "model": "",
-    "platform": "Linux",
+    "platform": "",
     "platformVersion": "",
-    "uaFullVersion": "146.0.7680.153",
+    "uaFullVersion": "",
     "wow64": false
   },
 
   "userAgentData": {
-    "brands": [
-      { "brand": "Not-A.Brand", "version": "24" },
-      { "brand": "Chromium", "version": "146" }
-    ],
+    "brands": [],
     "mobile": false,
-    "platform": "Linux"
+    "platform": ""
   },
 
   "permissionStatus": { "_state": -2 },
 
   "timestamp": 1775062183,
   "timestampCollectionEnd": 1775062186,
-  "timestampCollectionStart": 1775062183,
-
-  "appid": "2090803262",
-  "nonce": "0.12345678",
-  "token": "test_token_123"
+  "timestampCollectionStart": 1775062183
 }
