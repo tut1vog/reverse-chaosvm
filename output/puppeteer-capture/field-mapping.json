@@ -1,0 +1,542 @@
+[
+  {
+    "browserIndex": 0,
+    "fieldName": "connectionInfo",
+    "schemaIndex": 35,
+    "scraperIndex": 35,
+    "browserValueSummary": "null",
+    "scraperValueSummary": "null",
+    "match": true
+  },
+  {
+    "browserIndex": 1,
+    "fieldName": "timezoneOffset",
+    "schemaIndex": 26,
+    "scraperIndex": 26,
+    "browserValueSummary": "\"+08\"",
+    "scraperValueSummary": "\"+08\"",
+    "match": true
+  },
+  {
+    "browserIndex": 2,
+    "fieldName": "plugins",
+    "schemaIndex": 23,
+    "scraperIndex": 23,
+    "browserValueSummary": "[5 plugins: PDF Viewer, Chrome PDF Viewer, ...]",
+    "scraperValueSummary": "[5 plugins: PDF Viewer, Chrome PDF Viewer, ...]",
+    "match": true
+  },
+  {
+    "browserIndex": 3,
+    "fieldName": "indexedDbAvail",
+    "schemaIndex": 24,
+    "scraperIndex": 24,
+    "browserValueSummary": "0",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 4,
+    "fieldName": "flashFonts",
+    "schemaIndex": 5,
+    "scraperIndex": 5,
+    "browserValueSummary": "\"\" (empty)",
+    "scraperValueSummary": "\"\" (empty)",
+    "match": true
+  },
+  {
+    "browserIndex": 5,
+    "fieldName": "audioFingerprint",
+    "schemaIndex": 18,
+    "scraperIndex": 18,
+    "browserValueSummary": "{nt_vc_output:{...}, pxi_output:10240}",
+    "scraperValueSummary": "{nt_vc_output:{...}, pxi_output:11888.6...}",
+    "match": false
+  },
+  {
+    "browserIndex": 6,
+    "fieldName": "audioCodecs",
+    "schemaIndex": 29,
+    "scraperIndex": 29,
+    "browserValueSummary": "[9 codecs: AAC, MP3, Ogg Vorbis, ...]",
+    "scraperValueSummary": "[9 codecs: AAC, MP3, Ogg Vorbis, ...]",
+    "match": true
+  },
+  {
+    "browserIndex": 7,
+    "fieldName": "touchSupport",
+    "schemaIndex": 2,
+    "scraperIndex": 2,
+    "browserValueSummary": "2 (no touch)",
+    "scraperValueSummary": "2 (no touch)",
+    "match": true
+  },
+  {
+    "browserIndex": 8,
+    "fieldName": "webglRenderer",
+    "schemaIndex": 40,
+    "scraperIndex": 40,
+    "browserValueSummary": "\"Intel Iris OpenGL Engine\"",
+    "scraperValueSummary": "\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader...))\"",
+    "match": false
+  },
+  {
+    "browserIndex": 9,
+    "fieldName": "availHeight",
+    "schemaIndex": 44,
+    "scraperIndex": 44,
+    "browserValueSummary": "600",
+    "scraperValueSummary": "600",
+    "match": true
+  },
+  {
+    "browserIndex": 10,
+    "fieldName": "frameStatus",
+    "schemaIndex": 41,
+    "scraperIndex": 41,
+    "browserValueSummary": "\"top\"",
+    "scraperValueSummary": "\"top\"",
+    "match": true
+  },
+  {
+    "browserIndex": 11,
+    "fieldName": "headlessFlag",
+    "schemaIndex": 45,
+    "scraperIndex": 45,
+    "browserValueSummary": "0 (not headless)",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 12,
+    "fieldName": "cssOverflowResult",
+    "schemaIndex": 55,
+    "scraperIndex": 55,
+    "browserValueSummary": "\"\" (empty)",
+    "scraperValueSummary": "\"\" (empty)",
+    "match": true
+  },
+  {
+    "browserIndex": 13,
+    "fieldName": "colorGamut",
+    "schemaIndex": 28,
+    "scraperIndex": 28,
+    "browserValueSummary": "\"srgb\"",
+    "scraperValueSummary": "\"srgb\"",
+    "match": true
+  },
+  {
+    "browserIndex": 14,
+    "fieldName": "timestampInit",
+    "schemaIndex": 16,
+    "scraperIndex": 16,
+    "browserValueSummary": "1775814897 (unix seconds)",
+    "scraperValueSummary": "1775062183 (unix seconds)",
+    "match": true
+  },
+  {
+    "browserIndex": 15,
+    "fieldName": "userAgentData",
+    "schemaIndex": 46,
+    "scraperIndex": 46,
+    "browserValueSummary": "{brands:[], mobile:false, platform:\"\"}",
+    "scraperValueSummary": "{brands:[{Not-A.Brand,Chromium}], mobile:false, platform:\"Linux\"}",
+    "match": false
+  },
+  {
+    "browserIndex": 16,
+    "fieldName": "webglImage",
+    "schemaIndex": 20,
+    "scraperIndex": 20,
+    "browserValueSummary": "\"GgoAAAAN...CYII=\" (base64 PNG, truncated)",
+    "scraperValueSummary": "\"GgoAAAAN...Ggg==\" (base64 PNG, different)",
+    "match": false
+  },
+  {
+    "browserIndex": 17,
+    "fieldName": "hardwareConcurrency",
+    "schemaIndex": 8,
+    "scraperIndex": 8,
+    "browserValueSummary": "8",
+    "scraperValueSummary": "8",
+    "match": true
+  },
+  {
+    "browserIndex": 18,
+    "fieldName": "videoCodecs",
+    "schemaIndex": 12,
+    "scraperIndex": 12,
+    "browserValueSummary": "[8 codecs: H.264, VP8, VP9, AV1, ...]",
+    "scraperValueSummary": "[8 codecs: H.264 (CORRUPTED with event data appended), ...]",
+    "match": false
+  },
+  {
+    "browserIndex": 19,
+    "fieldName": "errorLog",
+    "schemaIndex": 58,
+    "scraperIndex": 58,
+    "browserValueSummary": "\"\" (empty)",
+    "scraperValueSummary": "\"\" (empty)",
+    "match": true
+  },
+  {
+    "browserIndex": 20,
+    "fieldName": "screenComposite",
+    "schemaIndex": 47,
+    "scraperIndex": 47,
+    "browserValueSummary": "\"800-600-600-24-*-*-|-*\"",
+    "scraperValueSummary": "\"800-600-600-24-*-*-|-*\"",
+    "match": true
+  },
+  {
+    "browserIndex": 21,
+    "fieldName": "maxTouchPoints",
+    "schemaIndex": 14,
+    "scraperIndex": 14,
+    "browserValueSummary": "4",
+    "scraperValueSummary": "20",
+    "match": false
+  },
+  {
+    "browserIndex": 22,
+    "fieldName": "userAgent",
+    "schemaIndex": 31,
+    "scraperIndex": 31,
+    "browserValueSummary": "\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) ... Chrome/146.0.0.0\"",
+    "scraperValueSummary": "\"Mozilla/5.0 (X11; Linux x86_64) ... HeadlessChrome/146.0.0.0\"",
+    "match": false
+  },
+  {
+    "browserIndex": 23,
+    "fieldName": "highEntropyValues",
+    "schemaIndex": 37,
+    "scraperIndex": 37,
+    "browserValueSummary": "{_state:0, architecture:\"\", brands:[], ...}",
+    "scraperValueSummary": "{_state:0, architecture:\"x86\", brands:[Not-A.Brand,Chromium], ...}",
+    "match": false
+  },
+  {
+    "browserIndex": 24,
+    "fieldName": "adBlockDetected",
+    "schemaIndex": 27,
+    "scraperIndex": 27,
+    "browserValueSummary": "0 (none detected)",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 25,
+    "fieldName": "storageEstimate",
+    "schemaIndex": 21,
+    "scraperIndex": 21,
+    "browserValueSummary": "{_state:0, quota:10737418240, usage:null, usageDetails:{}}",
+    "scraperValueSummary": "{_state:0, quota:10737418240, usage:null, usageDetails:{}}",
+    "match": true
+  },
+  {
+    "browserIndex": 26,
+    "fieldName": "viewportWidth",
+    "schemaIndex": 3,
+    "scraperIndex": 3,
+    "browserValueSummary": "800",
+    "scraperValueSummary": "800",
+    "match": true
+  },
+  {
+    "browserIndex": 27,
+    "fieldName": "doNotTrack",
+    "schemaIndex": 50,
+    "scraperIndex": 50,
+    "browserValueSummary": "\"\" (empty)",
+    "scraperValueSummary": "\"\" (empty)",
+    "match": true
+  },
+  {
+    "browserIndex": 28,
+    "fieldName": "featureBitmask",
+    "schemaIndex": 57,
+    "scraperIndex": 57,
+    "browserValueSummary": "1023",
+    "scraperValueSummary": "1023",
+    "match": true
+  },
+  {
+    "browserIndex": 29,
+    "fieldName": "vendor",
+    "schemaIndex": 36,
+    "scraperIndex": 36,
+    "browserValueSummary": "\"Intel Inc.\"",
+    "scraperValueSummary": "\"Google Inc. (Google)\"",
+    "match": false
+  },
+  {
+    "browserIndex": 30,
+    "fieldName": "canvasHash",
+    "schemaIndex": 15,
+    "scraperIndex": 15,
+    "browserValueSummary": "1189887932",
+    "scraperValueSummary": "991783254",
+    "match": false
+  },
+  {
+    "browserIndex": 31,
+    "fieldName": "timestampCollectionEnd",
+    "schemaIndex": 52,
+    "scraperIndex": 52,
+    "browserValueSummary": "1775814894 (unix seconds)",
+    "scraperValueSummary": "1775062186 (unix seconds)",
+    "match": true
+  },
+  {
+    "browserIndex": 32,
+    "fieldName": "performanceHash",
+    "schemaIndex": 54,
+    "scraperIndex": 54,
+    "browserValueSummary": "681731712",
+    "scraperValueSummary": "679647370",
+    "match": true
+  },
+  {
+    "browserIndex": 33,
+    "fieldName": "screenResolution",
+    "schemaIndex": 9,
+    "scraperIndex": 9,
+    "browserValueSummary": "[1280, 1400]",
+    "scraperValueSummary": "[1920, 1080]",
+    "match": false
+  },
+  {
+    "browserIndex": 34,
+    "fieldName": "screenPosition",
+    "schemaIndex": 33,
+    "scraperIndex": 33,
+    "browserValueSummary": "\"1;0\"",
+    "scraperValueSummary": "\"0;0\"",
+    "match": true
+  },
+  {
+    "browserIndex": 35,
+    "fieldName": "canvasBlocked",
+    "schemaIndex": 56,
+    "scraperIndex": 56,
+    "browserValueSummary": "0 (not blocked)",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 36,
+    "fieldName": "sessionStorageAvail",
+    "schemaIndex": 11,
+    "scraperIndex": 11,
+    "browserValueSummary": "0 (available)",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 37,
+    "fieldName": "localStorageAvail",
+    "schemaIndex": 13,
+    "scraperIndex": 13,
+    "browserValueSummary": "1 (available)",
+    "scraperValueSummary": "1",
+    "match": true
+  },
+  {
+    "browserIndex": 38,
+    "fieldName": "webdriverFlag",
+    "schemaIndex": 30,
+    "scraperIndex": 30,
+    "browserValueSummary": "0 (not detected)",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 39,
+    "fieldName": "cookiesEnabled",
+    "schemaIndex": 51,
+    "scraperIndex": 51,
+    "browserValueSummary": "0",
+    "scraperValueSummary": "0",
+    "match": true
+  },
+  {
+    "browserIndex": 40,
+    "fieldName": "detectedFonts",
+    "schemaIndex": 4,
+    "scraperIndex": 4,
+    "browserValueSummary": "\"7448307515255877632\" (hash, not font list)",
+    "scraperValueSummary": "\"Arial,Courier New,Times New Roman,...\" (font names)",
+    "match": false
+  },
+  {
+    "browserIndex": 41,
+    "fieldName": "pageUrl",
+    "schemaIndex": 22,
+    "scraperIndex": 22,
+    "browserValueSummary": "\"https://t.captcha.qq.com/cap_union_new_show?rand=...\"",
+    "scraperValueSummary": "\"http://127.0.0.1:46577/?rand=...\"",
+    "match": false
+  },
+  {
+    "browserIndex": 42,
+    "fieldName": "internalToken",
+    "schemaIndex": 38,
+    "scraperIndex": 38,
+    "browserValueSummary": "\"98k\"",
+    "scraperValueSummary": "\"98k\"",
+    "match": true
+  },
+  {
+    "browserIndex": 43,
+    "fieldName": "callCounter",
+    "schemaIndex": 0,
+    "scraperIndex": 0,
+    "browserValueSummary": "1",
+    "scraperValueSummary": "1",
+    "match": true
+  },
+  {
+    "browserIndex": 44,
+    "fieldName": "languages",
+    "schemaIndex": 6,
+    "scraperIndex": 6,
+    "browserValueSummary": "[\"en-US\", \"en\"]",
+    "scraperValueSummary": "[\"en-US\"]",
+    "match": false
+  },
+  {
+    "browserIndex": 45,
+    "fieldName": "characterSet",
+    "schemaIndex": 32,
+    "scraperIndex": 32,
+    "browserValueSummary": "\"UTF-8\"",
+    "scraperValueSummary": "\"UTF-8\"",
+    "match": true
+  },
+  {
+    "browserIndex": 46,
+    "fieldName": "maxTouchPointsDup",
+    "schemaIndex": 25,
+    "scraperIndex": 25,
+    "browserValueSummary": "0",
+    "scraperValueSummary": "20",
+    "match": false
+  },
+  {
+    "browserIndex": 47,
+    "fieldName": "colorGamutLegacy",
+    "schemaIndex": 7,
+    "scraperIndex": 7,
+    "browserValueSummary": "\"\" (empty)",
+    "scraperValueSummary": "\"\" (empty)",
+    "match": true
+  },
+  {
+    "browserIndex": 48,
+    "fieldName": "mathFingerprint",
+    "schemaIndex": 17,
+    "scraperIndex": 17,
+    "browserValueSummary": "1.0739998817443848",
+    "scraperValueSummary": "0.8410000801086426",
+    "match": false
+  },
+  {
+    "browserIndex": 49,
+    "fieldName": "intlOptions",
+    "schemaIndex": 34,
+    "scraperIndex": 34,
+    "browserValueSummary": "{timeZone:\"Asia/Shanghai\", calendar:\"gregory\", ...}",
+    "scraperValueSummary": "{timeZone:\"Asia/Shanghai\", calendar:\"gregory\", ...}",
+    "match": true
+  },
+  {
+    "browserIndex": 50,
+    "fieldName": "mimeTypes",
+    "schemaIndex": 19,
+    "scraperIndex": 19,
+    "browserValueSummary": "[{application/pdf}, {text/pdf}]",
+    "scraperValueSummary": "[{application/pdf}, {text/pdf}]",
+    "match": true
+  },
+  {
+    "browserIndex": 51,
+    "fieldName": "connectionType",
+    "schemaIndex": 39,
+    "scraperIndex": 39,
+    "browserValueSummary": "\"unknown\"",
+    "scraperValueSummary": "\"unknown\"",
+    "match": true
+  },
+  {
+    "browserIndex": 52,
+    "fieldName": "timestampCollectionStart",
+    "schemaIndex": 53,
+    "scraperIndex": 53,
+    "browserValueSummary": "1775814894 (unix seconds)",
+    "scraperValueSummary": "1775062183 (unix seconds)",
+    "match": true
+  },
+  {
+    "browserIndex": 53,
+    "fieldName": "devicePixelRatio",
+    "schemaIndex": 10,
+    "scraperIndex": 10,
+    "browserValueSummary": "1",
+    "scraperValueSummary": "1",
+    "match": true
+  },
+  {
+    "browserIndex": 54,
+    "fieldName": "osPlatform",
+    "schemaIndex": 1,
+    "scraperIndex": 1,
+    "browserValueSummary": "\"windows\"",
+    "scraperValueSummary": "\"linux\"",
+    "match": false
+  },
+  {
+    "browserIndex": 55,
+    "fieldName": "behavioralEvents",
+    "schemaIndex": -1,
+    "scraperIndex": null,
+    "browserValueSummary": "[[4,-1,-1,1775814894970,...], [1,159,812,1239,...], ...] (24 events: mouse/touch tracking)",
+    "scraperValueSummary": "N/A (field missing from scraper — new in 60-field template)",
+    "match": false
+  },
+  {
+    "browserIndex": 56,
+    "fieldName": "permissionStatus",
+    "schemaIndex": 42,
+    "scraperIndex": 42,
+    "browserValueSummary": "{_state:-2} (rejected/timeout)",
+    "scraperValueSummary": "{_state:-2} (rejected/timeout)",
+    "match": true
+  },
+  {
+    "browserIndex": 57,
+    "fieldName": "platform",
+    "schemaIndex": 48,
+    "scraperIndex": 48,
+    "browserValueSummary": "\"Linux x86_64\"",
+    "scraperValueSummary": "\"Linux x86_64\"",
+    "match": true
+  },
+  {
+    "browserIndex": 58,
+    "fieldName": "webrtcIp",
+    "schemaIndex": 43,
+    "scraperIndex": 43,
+    "browserValueSummary": "\"\" (empty)",
+    "scraperValueSummary": "\"\" (empty)",
+    "match": true
+  },
+  {
+    "browserIndex": 59,
+    "fieldName": "colorDepth",
+    "schemaIndex": 49,
+    "scraperIndex": 49,
+    "browserValueSummary": "24",
+    "scraperValueSummary": "24",
+    "match": true
+  }
+]
