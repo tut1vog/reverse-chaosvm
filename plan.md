@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 10.2 — CLI entry point
+Current task: 10.3 — Tests for scraper orchestrator
 
 ---
 
@@ -90,8 +90,8 @@ Current task: 10.2 — CLI entry point
 | ID | Task | Status |
 |----|------|--------|
 | 10.1 | Scraper orchestrator class (scraper.js) | done |
-| 10.2 | CLI entry point (cli.js) | in-progress |
-| 10.3 | Tests for scraper orchestrator | pending |
+| 10.2 | CLI entry point (cli.js) | done |
+| 10.3 | Tests for scraper orchestrator | in-progress |
 
 ### Phase 11: End-to-End Integration
 > Live integration testing against urlsec.qq.com and final documentation updates.
@@ -105,34 +105,39 @@ Current task: 10.2 — CLI entry point
 
 ## Current Task
 
-**ID**: 10.2
-**Title**: CLI entry point
+**ID**: 10.3
+**Title**: Tests for scraper orchestrator
 **Phase**: Scraper Orchestrator
 **Status**: in-progress
 
 ### Goal
-Create `scraper/cli.js` — a CLI entry point for the headless scraper, similar in style to `puppeteer/cli.js`.
+Write unit tests for `scraper/scraper.js` and `scraper/cli.js`. Since solveCaptcha/solve require live network access, tests focus on construction, init, _buildPostFields, and module loading — not live integration.
 
 ### Context
-- **`scraper/scraper.js`** exports `Scraper` class with `init()`, `solveCaptcha()`, `queryUrlSec(url, ticket, randstr)`, `solve(url)`.
-- Constructor takes: `{aid, userAgent, profile, slideRatio, calibration, slideY, maxRetries, verbose}`.
-- The CLI should accept domain/URL arguments and options.
-- Follow the pattern of `puppeteer/cli.js` for argument parsing style.
+- **`scraper/scraper.js`** exports `Scraper` class.
+  - Constructor: `{aid, userAgent, profile, slideRatio, calibration, slideY, maxRetries, verbose}`
+  - `init()` — loads cache, profile, jQuery, vm-slide fallback
+  - `_buildPostFields(client, session, sig, ans, collectVal, eks)` — builds 38-field POST object
+  - `solveCaptcha()` — needs network (skip in unit tests)
+  - `queryUrlSec()` — needs network (skip)
+  - `solve()` — needs network (skip)
+- **`scraper/cli.js`** — has `require.main === module` guard. Loads without executing.
+- Use `node:test` and `node:assert`. Add to `package.json` test script.
 - **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
 
 ### Implementation Steps
-1. Read `puppeteer/cli.js` to understand the existing CLI pattern.
-2. Create `scraper/cli.js` with:
-   - `#!/usr/bin/env node` shebang
-   - Parse args: positional URL/domain, `--verbose`, `--ratio <n>`, `--retries <n>`, `--captcha-only` (just solve, don't query urlsec)
-   - Initialize Scraper, call `solve()` or `solveCaptcha()`, print results to stdout as JSON.
-   - Error handling with process.exit(1).
-3. Make it executable: `chmod +x scraper/cli.js`.
+1. Create `tests/test-scraper.js` with suites:
+   - **Scraper: constructor defaults** — aid, userAgent, slideRatio, calibration, slideY, maxRetries, verbose all have correct defaults
+   - **Scraper: constructor overrides** — custom values are stored
+   - **Scraper: init()** — loads template cache (3 entries), loads profile, loads jQuery source, loads vm-slide fallback
+   - **Scraper: _buildPostFields** — returns object with all 38 keys in correct order, correct types
+   - **Scraper: _buildPostFields values** — aid, protocol, accver, showtype, ans, collect, eks, nonce match inputs
+   - **CLI: module loads** — require('./scraper/cli') doesn't throw
+2. Update `package.json` test script.
 
 ### Verification
-- [ ] `node scraper/cli.js --help` or `node scraper/cli.js` (no args) prints usage info
-- [ ] Module loads without error: `node -e "require('./scraper/cli')"` (when called as module it should not auto-execute)
-- [ ] The file has proper shebang and is executable
+- [ ] `node --test tests/test-scraper.js` — all tests pass
+- [ ] `npm test` — no regressions
 
 ### Suggested Agent
-general-purpose — CLI boilerplate with known patterns
+general-purpose — unit test writing
