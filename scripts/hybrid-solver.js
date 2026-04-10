@@ -327,27 +327,25 @@ async function solve(opts) {
       const behavioralEvents = generateBehavioralEvents(xAnswer, DEFAULT_SLIDE_Y, now);
 
       // Build slideValue for sd from behavioral events
+      // First entry: [firstDx, cursorViewportY, firstDt] — absolute cursor position of first move
+      // Subsequent entries: [dx, dy, dt] — relative deltas
+      // Last entry: [0, 0, 0] — terminator
       const slideValueArray = [];
-      let totalX = 0;
-      let totalY = 0;
-      let firstMoveTime = null;
-      let lastMoveTime = null;
+      const cursorViewportY = 800 + Math.floor(Math.random() * 30);
+      let firstMove = true;
+      let prevTime = null;
       for (const ev of behavioralEvents) {
         if (ev[0] === 1) { // mousemove
-          if (firstMoveTime === null) firstMoveTime = ev[3];
-          totalX += ev[1];
-          totalY += ev[2];
-          lastMoveTime = ev[3];
-        }
-      }
-      const totalElapsed = (lastMoveTime && firstMoveTime) ? lastMoveTime - firstMoveTime : 1000;
-      slideValueArray.push([totalX, totalY, totalElapsed]);
-      let prevTime = firstMoveTime;
-      for (const ev of behavioralEvents) {
-        if (ev[0] === 1) {
-          const dt = prevTime ? ev[3] - prevTime : 0;
-          slideValueArray.push([ev[1], ev[2], dt]);
-          prevTime = ev[3];
+          if (firstMove) {
+            const firstDt = Math.floor(Math.random() * 60 + 60);
+            slideValueArray.push([ev[1], cursorViewportY, firstDt]);
+            firstMove = false;
+            prevTime = ev[3];
+          } else {
+            const dt = ev[3] - prevTime;
+            slideValueArray.push([ev[1], ev[2], dt]);
+            prevTime = ev[3];
+          }
         }
       }
       slideValueArray.push([0, 0, 0]); // terminator
@@ -355,7 +353,7 @@ async function solve(opts) {
       const slideSd = buildSlideSd(
         { x: xAnswer, y: DEFAULT_SLIDE_Y },
         slideValueArray,
-        { trycnt: attempt, refreshcnt: 0, elapsed: totalElapsed }
+        { trycnt: attempt, refreshcnt: 0 }
       );
 
       const profileOverrides = Object.assign({}, profile, {

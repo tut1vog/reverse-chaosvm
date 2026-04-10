@@ -369,28 +369,27 @@ class Scraper {
         const behavioralEvents = generateBehavioralEvents(xAnswer, this.slideY, now);
 
         // Build slideValue for sd from behavioral events (8-element → 3-element tuples)
-        // First entry: [totalX, totalY, totalElapsed], rest: [dx, dy, dt], last: [0,0,0]
+        // First entry: [firstDx, cursorViewportY, firstDt] — absolute cursor position of first move
+        // Subsequent entries: [dx, dy, dt] — relative deltas
+        // Last entry: [0, 0, 0] — terminator
         const slideValueArray = [];
-        let totalX = 0;
-        let totalY = 0;
-        let firstMoveTime = null;
-        let lastMoveTime = null;
+        const cursorViewportY = 800 + Math.floor(Math.random() * 30); // typical captcha Y in viewport
+        let dragStartTime = null;
+        let firstMove = true;
+        let prevTime = null;
         for (const ev of behavioralEvents) {
           if (ev[0] === 1) { // mousemove
-            if (firstMoveTime === null) firstMoveTime = ev[3];
-            totalX += ev[1];
-            totalY += ev[2];
-            lastMoveTime = ev[3];
-          }
-        }
-        const totalElapsed = (lastMoveTime && firstMoveTime) ? lastMoveTime - firstMoveTime : 1000;
-        slideValueArray.push([totalX, totalY, totalElapsed]);
-        let prevTime = firstMoveTime;
-        for (const ev of behavioralEvents) {
-          if (ev[0] === 1) {
-            const dt = prevTime ? ev[3] - prevTime : 0;
-            slideValueArray.push([ev[1], ev[2], dt]);
-            prevTime = ev[3];
+            if (firstMove) {
+              dragStartTime = ev[3];
+              const firstDt = Math.floor(Math.random() * 60 + 60); // ~60-120ms from drag start
+              slideValueArray.push([ev[1], cursorViewportY, firstDt]);
+              firstMove = false;
+              prevTime = ev[3];
+            } else {
+              const dt = ev[3] - prevTime;
+              slideValueArray.push([ev[1], ev[2], dt]);
+              prevTime = ev[3];
+            }
           }
         }
         slideValueArray.push([0, 0, 0]); // terminator
@@ -398,7 +397,7 @@ class Scraper {
         const slideSd = buildSlideSd(
           { x: xAnswer, y: this.slideY },
           slideValueArray,
-          { trycnt: attempt, refreshcnt: 0, elapsed: totalElapsed }
+          { trycnt: attempt, refreshcnt: 0 }
         );
 
         // (j) Generate collect token

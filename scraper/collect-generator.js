@@ -274,15 +274,15 @@ function generateFt() {
  * @param {number} [options.refreshcnt=0] - Refresh count
  * @param {string} [options.ft] - Fingerprint token (generated if not provided)
  * @param {number} [options.elapsed] - Total drag elapsed time in ms
+ * @param {Array<number>} [options.coordinate] - [leftOffset, topOffset, ratio] CSS layout geometry
  * @returns {Object} sd object for verify POST
  */
 function buildSlideSd(slideAnswer, slideValue, options) {
   const opts = options || {};
-  const elapsed = opts.elapsed || (slideValue.length > 0 ? slideValue[0][2] : 1000);
   return {
     od: 'C',
     clientType: '',
-    coordinate: [slideAnswer.x, slideAnswer.y, elapsed],
+    coordinate: opts.coordinate || [10, 60, 1.0],
     trycnt: opts.trycnt || 1,
     refreshcnt: opts.refreshcnt || 0,
     slideValue: slideValue,
