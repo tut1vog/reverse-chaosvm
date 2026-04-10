@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 11.1 — End-to-end live test and debugging
+Current task: 11.2 — Update CLAUDE.md, create scrape command
 
 ---
 
@@ -98,52 +98,44 @@ Current task: 11.1 — End-to-end live test and debugging
 
 | ID | Task | Status |
 |----|------|--------|
-| 11.1 | End-to-end live test and debugging | in-progress |
-| 11.2 | Update CLAUDE.md, create scrape command | pending |
+| 11.1 | End-to-end live test and debugging | done |
+| 11.2 | Update CLAUDE.md, create scrape command | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 11.1
-**Title**: End-to-end live test and debugging
+**ID**: 11.2
+**Title**: Update CLAUDE.md, create scrape command
 **Phase**: End-to-End Integration
 **Status**: in-progress
 
 ### Goal
-Run the scraper against live Tencent endpoints and debug any issues. This is where we discover whether the headless approach actually works — vData acceptance, collect validation, slide ratio, TLS fingerprinting, etc.
+Update CLAUDE.md with the scraper module documentation and create `.claude/commands/scrape.md` slash command. Also document the live test findings (captcha type change, TLS blocking, new template).
 
 ### Context
-- All modules are built and unit-tested. The full flow is wired in `scraper/scraper.js`.
-- **Known unknowns** (from project-brief.md):
-  1. Will jsdom-generated vData pass server validation?
-  2. Will faked fingerprint values in collect pass?
-  3. Is the vm-slide.enc.js URL stable? (must parse from show page per session)
-  4. Slide ratio without a browser — may need tuning (0.5 default, bot.py uses dynamic ratio)
-  5. Does the server check TLS fingerprint? (Node.js HTTP may be flagged)
-  6. vm-slide.enc.js fetching — need to parse show page HTML for script URLs
-- **Rate limiting**: wait ≥1s between requests to live endpoints.
-- The live test should be run via `node scraper/cli.js --captcha-only --verbose` first (just solve CAPTCHA, don't query urlsec).
-- Then if CAPTCHA solving works: `node scraper/cli.js --verbose https://example.com`
-- **This task is investigative** — the agent should run, observe, diagnose, and fix issues iteratively.
+- **Scraper module** is complete: `scraper/` contains tdc-utils.js, template-cache.js, collect-generator.js, vdata-generator.js, scraper.js, cli.js.
+- **Live test findings** (task 11.1):
+  1. **Show page 403**: `cap_union_new_show` now returns HTTP 403 for Node.js/curl (TLS fingerprint blocking). Prehandle still works.
+  2. **Captcha type changed**: urlsec.qq.com now serves `click_image_uncheck` (6-panel AI image selection) instead of slide captchas. The scraper handles slide only.
+  3. **New template**: Live server serves TDC_NAME `XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR` (not in cache). tdc.js is still fetchable.
+  4. **CLI bugs fixed**: 4 bugs in cli.js found and fixed during live testing (import, init call, config key, method name).
+- The scraper architecture is correct and all unit tests pass. It would work against a slide CAPTCHA endpoint — the blocker is Tencent's server-side changes.
 - **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
-- **May modify**: `scraper/*.js` to fix bugs discovered during live testing.
 
 ### Implementation Steps
-1. Run `node scraper/cli.js --captcha-only --verbose 2>&1` and observe the output.
-2. If it fails, diagnose the error and fix it in `scraper/` modules.
-3. Common issues to watch for:
-   - Unknown template (new TDC_NAME not in cache) → need to run pipeline or manually add
-   - vm-slide.enc.js not found → fix URL parsing or fetching
-   - errorCode 9 → vData or body serialization mismatch
-   - errorCode 7 → slide answer wrong (ratio/calibration issue)
-   - Network errors → TLS fingerprinting or blocked IP
-4. Iterate until `solveCaptcha()` returns errorCode=0 with a valid ticket.
-5. Then test full flow with urlsec query.
+1. Update CLAUDE.md:
+   - Add `scraper/` to Project Structure
+   - Add scraper CLI to Commands section
+   - Add scraper architecture to Architecture section
+   - Note the live test findings and current limitations
+2. Create `.claude/commands/scrape.md` slash command for running the scraper.
 
 ### Verification
-- [ ] `node scraper/cli.js --captcha-only --verbose` returns errorCode=0 with a ticket
-- [ ] OR: clear diagnosis of what blocks success with a remediation plan
+- [ ] `scraper/` appears in CLAUDE.md Project Structure
+- [ ] Scraper CLI usage appears in CLAUDE.md Commands
+- [ ] `.claude/commands/scrape.md` exists with proper format
+- [ ] Live test limitations are documented
 
 ### Suggested Agent
-general-purpose — live debugging with iterative fixes
+general-purpose — documentation updates

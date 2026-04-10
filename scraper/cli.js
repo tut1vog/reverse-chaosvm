@@ -97,13 +97,14 @@ async function main() {
     ? (...a) => console.error('[scraper]', ...a)
     : () => {};
 
-  const { Scraper } = require('./scraper');
+  const Scraper = require('./scraper');
 
   const scraper = new Scraper({
-    ratio: args.ratio,
+    slideRatio: args.ratio,
     calibration: args.calibration,
     verbose: args.verbose,
   });
+  await scraper.init();
 
   if (args.captchaOnly) {
     log('Solving CAPTCHA only (no urlsec query)');
@@ -127,9 +128,7 @@ async function main() {
   // Full flow: solve CAPTCHA + query urlsec
   log(`Full flow for URL: ${args.url}`);
   try {
-    const result = await scraper.run(args.url, {
-      retries: args.retries,
-    });
+    const result = await scraper.solve(args.url);
     log('Result:', result);
     process.stdout.write(JSON.stringify(result, null, 2) + '\n');
   } catch (err) {
