@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 10.1 — Scraper orchestrator class
+Current task: 10.2 — CLI entry point
 
 ---
 
@@ -89,8 +89,8 @@ Current task: 10.1 — Scraper orchestrator class
 
 | ID | Task | Status |
 |----|------|--------|
-| 10.1 | Scraper orchestrator class (scraper.js) | in-progress |
-| 10.2 | CLI entry point (cli.js) | pending |
+| 10.1 | Scraper orchestrator class (scraper.js) | done |
+| 10.2 | CLI entry point (cli.js) | in-progress |
 | 10.3 | Tests for scraper orchestrator | pending |
 
 ### Phase 11: End-to-End Integration
@@ -105,78 +105,34 @@ Current task: 10.1 — Scraper orchestrator class
 
 ## Current Task
 
-**ID**: 10.1
-**Title**: Scraper orchestrator class
+**ID**: 10.2
+**Title**: CLI entry point
 **Phase**: Scraper Orchestrator
 **Status**: in-progress
 
 ### Goal
-Create `scraper/scraper.js` — the main orchestrator that wires CaptchaClient, slide-solver, collect-generator, vData-generator, and template-cache into a complete headless CAPTCHA-solving flow for urlsec.qq.com.
+Create `scraper/cli.js` — a CLI entry point for the headless scraper, similar in style to `puppeteer/cli.js`.
 
 ### Context
-
-**Modules to wire (all read-only — import, don't modify):**
-- `puppeteer/captcha-client.js` — `CaptchaClient` class with `prehandle()`, `_getShowConfig(session)` (private but needed), `downloadImages(sig)`, `downloadTdc(sig)`, `verify(params)`. Constructor takes `{aid, userAgent, referer, timeout}`.
-- `puppeteer/slide-solver.js` — `solveSlider(bgBuffer, sliceBuffer)` → raw pixel offset (integer).
-
-**Modules to wire (from scraper/):**
-- `scraper/tdc-utils.js` — `extractTdcName(source)`, `extractEks(source)`
-- `scraper/template-cache.js` — `TemplateCache` class with `load()`, `lookup(tdcName)`, `store(tdcName, params)`
-- `scraper/collect-generator.js` — `generateCollect(profile, xteaParams, options)`
-- `scraper/vdata-generator.js` — `generateVData(postFields, vmSlideSource, jquerySource, options)`, `parseVmSlideUrl(html)`
-
-**The full flow** (from project-brief.md):
-1. `CaptchaClient.prehandle()` → `{sess, sid, ...}`
-2. `CaptchaClient._getShowConfig(session)` → sig with `{bgUrl, sliceUrl, nonce, vsig, websig, showUrl, _raw}`
-   - Note: `_getShowConfig` is private. Either use `getSig` (which calls it internally) or access it directly.
-   - Actually, check: `CaptchaClient` may have a public `getSig()` method. Read the file to find the public API.
-3. `CaptchaClient.downloadImages(sig)` → `{bgBuffer, sliceBuffer}`
-4. `CaptchaClient.downloadTdc(sig)` → tdc.js source string
-5. Extract TDC_NAME → look up template cache → get XTEA params
-   - If unknown template: log warning and run `pipeline/run.js` (or error out for now — the pipeline requires Puppeteer)
-6. Extract eks from tdc.js source
-7. `solveSlider(bgBuffer, sliceBuffer)` → raw pixel offset
-8. Compute slide answer: `ans = "${Math.round(rawOffset * ratio + calibration)},${yCoord};"`
-   - `ratio`: start with 0.5, may need tuning (known unknown #4 in project-brief)
-   - `calibration`: -25 (from bot.py)
-   - `yCoord`: 45 (default)
-9. `generateCollect(profile, xteaParams, {appid, nonce})` → collect token
-10. Fetch jQuery source (from show page or use `sample/slide-jy.js` as fallback)
-11. Fetch vm-slide.enc.js source (URL from show page config)
-12. Build verify POST fields (all 38 fields, exact order from captcha-client.js verify method)
-13. `generateVData(postFields, vmSlideSource, jquerySource, {userAgent})` → `{vData, serializedBody}`
-14. `CaptchaClient.verify({session, sig, ans, collect, eks, tlg, vData, prebuiltBody: serializedBody})` → `{errorCode, ticket, randstr}`
-15. If ticket obtained, submit to `cgi.urlsec.qq.com` for URL security results
-
-**CaptchaClient.verify() already supports `prebuiltBody`** — when provided, it uses the jQuery-serialized body directly instead of rebuilding it. This is critical because vData was computed over that exact serialization.
-
-**urlsec.qq.com submission** (from sample/bot.py):
-```
-GET https://cgi.urlsec.qq.com/index.php?m=check&a=gw_check&callback=jQuery...&url=<target>&ticket=<ticket>&randstr=<randstr>&_=<timestamp>
-```
-Parse JSONP response → extract `data.results`.
-
-**Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
+- **`scraper/scraper.js`** exports `Scraper` class with `init()`, `solveCaptcha()`, `queryUrlSec(url, ticket, randstr)`, `solve(url)`.
+- Constructor takes: `{aid, userAgent, profile, slideRatio, calibration, slideY, maxRetries, verbose}`.
+- The CLI should accept domain/URL arguments and options.
+- Follow the pattern of `puppeteer/cli.js` for argument parsing style.
+- **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
 
 ### Implementation Steps
-1. Read `puppeteer/captcha-client.js` to find the public API for getting show config (is it `getSig()`?).
-2. Create `scraper/scraper.js` with a `Scraper` class:
-   - Constructor: `new Scraper({aid, userAgent, profile, ratios, maxRetries})`
-   - `async solve(targetUrl)` — full flow: prehandle → getSig → images → tdc → solve → collect → vData → verify → urlsec
-   - `async solveCaptcha()` — just the CAPTCHA part (returns ticket/randstr)
-   - `async queryUrlSec(targetUrl, ticket, randstr)` — submit to urlsec.qq.com
-3. The module should handle:
-   - Template cache loading at startup
-   - jQuery source caching (fetch once, reuse)
-   - vm-slide source fetching per session
-   - Retry logic for CAPTCHA failures (errorCode != 0)
-   - Configurable slide ratio (default 0.5, can be overridden)
+1. Read `puppeteer/cli.js` to understand the existing CLI pattern.
+2. Create `scraper/cli.js` with:
+   - `#!/usr/bin/env node` shebang
+   - Parse args: positional URL/domain, `--verbose`, `--ratio <n>`, `--retries <n>`, `--captcha-only` (just solve, don't query urlsec)
+   - Initialize Scraper, call `solve()` or `solveCaptcha()`, print results to stdout as JSON.
+   - Error handling with process.exit(1).
+3. Make it executable: `chmod +x scraper/cli.js`.
 
 ### Verification
-- [ ] `node -e "const S = require('./scraper/scraper'); console.log(typeof S)"` — loads without error
-- [ ] The class imports all required modules without errors
-- [ ] The `solve()` method signature exists and includes the full flow logic
-- [ ] The `queryUrlSec()` method makes a GET request to `cgi.urlsec.qq.com` with correct JSONP format
+- [ ] `node scraper/cli.js --help` or `node scraper/cli.js` (no args) prints usage info
+- [ ] Module loads without error: `node -e "require('./scraper/cli')"` (when called as module it should not auto-execute)
+- [ ] The file has proper shebang and is executable
 
 ### Suggested Agent
-general-purpose — wiring orchestrator using known module APIs
+general-purpose — CLI boilerplate with known patterns
