@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 16
-Current task: 16.5 — Live re-test after fixes
+Current phase: Phase 17
+Current task: 17.1 — Chrome cd injection script
 
 ---
 
@@ -155,8 +155,99 @@ Current task: 16.5 — Live re-test after fixes
 | 16.4 | Fix cd field mismatches (platform, maxTouchPoints, vendor, screenPosition) | done |
 | 16.5 | Live re-test after fixes | done |
 
+### Phase 17: Chrome cd Injection — Identify Which Fields the Server Validates
+> Use Puppeteer to extract Chrome's actual cd array from tdc.js execution, inject those exact values into the standalone collect token, and test. If accepted → progressively replace Chrome values with hardcoded ones to identify which specific fields the server validates.
+
+| ID | Task | Status |
+|----|------|--------|
+| 17.1 | Chrome cd injection script | in-progress |
+| 17.2 | Tests for Chrome cd injection script | pending |
+| 17.3 | Full Chrome cd injection — live test | pending |
+| 17.4 | Binary search: identify which cd fields the server validates | pending |
+| 17.5 | Fix identified fields in standalone generator | pending |
+| 17.6 | Live re-test with fixes | pending |
+
 ---
 
 ## Current Task
 
-Phase 16 complete. ErrorCode 9 persists after all sd/cd fixes. Ready to plan next phase.
+**ID**: 17.1
+**Title**: Chrome cd injection script
+**Phase**: Chrome cd Injection — Identify Which Fields the Server Validates
+**Status**: in-progress
+
+### Goal
+Create `scripts/chrome-cd-inject.js` — a Puppeteer-based script that:
+1. Launches Chrome, completes CAPTCHA session setup (prehandle → show page → intercept tdc.js)
+2. Executes tdc.js in Chrome to call `TDC.getData()` and intercepts the cd array BEFORE encryption
+3. Feeds those exact cd values into the standalone `generateCollect()` to produce the collect token
+4. Submits via Chrome TLS (same as hybrid-solver.js)
+5. Reports whether errorCode 9 is resolved
+
+This is the critical experiment: if the server accepts a standalone-encrypted token with Chrome's cd values, we know the issue is **which** cd values we hardcode, not the encryption or token structure.
+
+### Context
+**Existing code to reuse:**
+- `scripts/hybrid-solver.js` (705 lines) — already does steps 1, 4-5. Clone and modify steps 2-3.
+- `scripts/collect-diff.js` — already extracts Chrome cd array from decrypted token (lines 410-460). But this approach requires decrypting Chrome's token (needs XTEA key extraction to work, which is unreliable for many templates). A better approach: instrument `tdc.js` before execution to intercept the cd array at the point it's built, before encryption.
+
+**Two approaches to extract Chrome's cd array:**
+
+**Approach A (preferred): Pre-encryption interception**
+- The real tdc.js builds the cd array as a JS array, then JSON-stringifies it, then encrypts.
+- Instrument the tdc.js source before injecting into Chrome: replace `JSON.stringify` or the specific function that assembles cd with a wrapper that captures the array.
+- From `docs/TOKEN_FORMAT.md` and `token/collector-schema.js`: the cd array is 59-60 elements, assembled by the collector function inside the VM.
+- Key insight: the VM calls `JSON.stringify()` on the cd array. We can intercept that call.
+
+**Approach B (fallback): Post-encryption decryption**
+- Capture Chrome's collect token from the verify POST body.
+- Extract XTEA params via pipeline (unreliable for many templates).
+- Decrypt and parse cd array.
+- This is what `collect-diff.js` does — but only works for ~1/4 of live template rotations.
+
+**Recommended implementation:**
+1. Clone `scripts/hybrid-solver.js` as the base
+2. After loading tdc.js in Chrome, intercept `JSON.stringify` to capture the cd array:
+   ```js
+   const origStringify = JSON.stringify;
+   let capturedCd = null;
+   JSON.stringify = function(obj) {
+     if (Array.isArray(obj) && obj.length >= 55 && obj.length <= 65) {
+       capturedCd = JSON.parse(JSON.stringify(obj)); // deep clone
+     }
+     return origStringify.apply(this, arguments);
+   };
+   ```
+3. After `TDC.getData()` returns, `capturedCd` should contain the raw cd array
+4. Feed `capturedCd` directly into `generateCollect()` via a new `cdArrayOverride` option
+5. The `generateCollect()` function needs a minor extension: if `cdArrayOverride` is provided, skip `buildDefaultCdArray()` and use the override directly
+
+**Files to create/modify:**
+- Create: `scripts/chrome-cd-inject.js` — main script
+- Modify: `scraper/collect-generator.js` — add `cdArrayOverride` option to `generateCollect()`
+
+**Key constraints:**
+- Must use the SAME session (same sess, sid, nonce) for both Chrome cd extraction and standalone token generation
+- Must use Chrome TLS for the verify POST (same as hybrid-solver.js)
+- The sd values should still come from our standalone generation (we already fixed the format)
+- Log the captured cd array to `output/chrome-cd-inject.json` for analysis
+
+### Implementation Steps
+1. Add `cdArrayOverride` option to `generateCollect()` in `scraper/collect-generator.js` — if provided, use it instead of `buildDefaultCdArray(profile)`, skip `reorderCdArray` 
+2. Create `scripts/chrome-cd-inject.js` based on `scripts/hybrid-solver.js`:
+   - Keep steps 1-3 (launch, prehandle, show page + intercept tdc.js)
+   - Add step 3b: Before tdc.js executes, inject `JSON.stringify` interceptor via `page.evaluateOnNewDocument`
+   - After tdc.js loads + `TDC.setData(appid)` + `TDC.getData()`, extract `capturedCd` from the page
+   - Replace step 7 (generate collect): use `generateCollect(profile, xteaParams, { cdArrayOverride: capturedCd, ... })`
+   - Keep steps 8-10 (vData via Chrome, submit via Chrome TLS, parse result)
+3. Add detailed logging: print the captured cd array length, first/last few values, and the diff count vs standalone cd
+4. Save full results to `output/chrome-cd-inject.json`
+
+### Verification
+- [ ] `scraper/collect-generator.js` accepts `cdArrayOverride` option and skips `buildDefaultCdArray` when provided
+- [ ] `npm test` passes (163/165)
+- [ ] `scripts/chrome-cd-inject.js` exists, runs without syntax errors (`node -c scripts/chrome-cd-inject.js`)
+- [ ] Script captures cd array (length 55-65) from Chrome's tdc.js execution
+
+### Suggested Agent
+general-purpose
