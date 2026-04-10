@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 18.3 — Live forensics test
+Current task: none — blocked on key extraction, awaiting direction
 
 ---
 
@@ -175,8 +175,9 @@ Current task: 18.3 — Live forensics test
 |----|------|--------|
 | 18.1 | Create token forensics script | done |
 | 18.2 | Tests for token forensics helpers | pending |
-| 18.3 | Live forensics test | in-progress |
+| 18.3 | Live forensics test | blocked |
 | 18.3.1 | Extract XTEA key from live tdc.js at runtime | done |
+| 18.3.2 | Fix keyMods derivation from keyModConstants | done |
 | 18.4 | Fix identified divergence | pending |
 | 18.5 | Live re-test with fix | pending |
 
@@ -189,33 +190,22 @@ Current task: 18.3 — Live forensics test
 **Phase**: Token Forensics — Decrypt-Reencrypt Round-Trip
 **Status**: in-progress
 
-### Goal
-Modify `scripts/token-forensics.js` to extract the XTEA key from the captured live tdc.js source at runtime using the pipeline modules (`parseVmFunction`, `mapOpcodes`, `extractKey`), instead of relying on the template cache which has stale keys.
+*No active task — Phase 18 blocked on key extraction.*
 
-**Why needed**: Live test showed decryption produced garbage because the cached Template A key doesn't match the live TDC build `hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig`. Tencent rotates XTEA keys while keeping the same opcode structure. Comparison B confirmed our crypto code is correct — the only issue is using the wrong key.
+### Phase 18 Blockers
 
-### Context
-- `scripts/token-forensics.js` — already captures the tdc.js source (via `capturedTdcSource`), stores it at ~line 280
-- Pipeline modules: `pipeline/vm-parser.js` exports `parseVmFunction(source)`, `pipeline/opcode-mapper.js` exports `mapOpcodes(parsed, source)`, `pipeline/key-extractor.js` exports `extractKey(filePath, opcodeTable, variables)` 
-- `extractKey` needs a FILE PATH (reads from disk), so we need to write the captured source to a temp file
-- The pipeline flow: `parseVmFunction(src)` → `mapOpcodes(parsed, src)` → `extractKey(tmpFile, opcodeTable, variables)` → returns `{ key, delta, rounds, keyMods, ... }`
-- The script should still fall back to template cache if pipeline extraction fails
+**Core problem**: The pipeline key extractor produces wrong XTEA keys for live tdc.js builds. It works perfectly for static target files (all 5 verified byte-identical), but live builds produce garbage when decrypted. Three live attempts all failed.
 
-### Implementation Steps
-1. Add imports: `parseVmFunction` from `../pipeline/vm-parser`, `mapOpcodes` from `../pipeline/opcode-mapper`, `extractKey` from `../pipeline/key-extractor`
-2. After capturing the tdc.js source and BEFORE the template cache lookup:
-   - Write `capturedTdcSource` to a temp file (e.g., `/tmp/tdc-forensics-<timestamp>.js`)
-   - Run `parseVmFunction(capturedTdcSource)` → `mapOpcodes(parsed, capturedTdcSource)` → `extractKey(tmpFile, opcodeTable, variables)`
-   - If successful, use the extracted XTEA params instead of the template cache
-   - Clean up the temp file
-3. Fall back to template cache if pipeline extraction fails
-4. Log which method was used (pipeline vs cache)
+**What works**: Comparison B (round-trip) proves our XTEA cipher code is mathematically correct. The keyMods derivation bug was fixed (keyModConstants→keyMods mapping). The pipeline successfully parses live source — but the extracted key doesn't match what the VM actually uses at runtime.
 
-### Verification
-- [ ] `node -c scripts/token-forensics.js` passes
-- [ ] `npm test` still passes 173/175
-- [ ] Script imports pipeline modules and has extraction logic
-- [ ] Script falls back to template cache on extraction failure
+**Likely cause**: The pipeline runs tdc.js in an isolated Puppeteer page for key extraction. The live VM's key derivation may depend on browser/page state absent in the isolated environment.
 
-### Suggested Agent
-general-purpose
+### Possible Next Steps
+
+**Option A — In-page key instrumentation**: Patch the live tdc.js source (via request interception already in place) to instrument the cipher rounds on the actual CAPTCHA page. Captures the real runtime key.
+
+**Option B — Brute-force key verification**: Try decrypting Chrome's token with systematic key variations.
+
+**Option C — Bypass token generation**: Capture Chrome's real collect token and replay it.
+
+**Option D — Debug the key extractor**: Compare extraction traces between known-good target files and live builds.
