@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 4 — XTEA Key Extractor
-Current task: 4.2 — Tests for key extractor
+Current phase: Phase 5 — Token Verifier & Pipeline Orchestrator
+Current task: 5.1 — Implement token verifier module
 
 ---
 
@@ -39,14 +39,14 @@ Current task: 4.2 — Tests for key extractor
 | ID | Task | Status |
 |----|------|--------|
 | 4.1 | Implement dynamic key extraction module | done |
-| 4.2 | Tests for key extractor (validate against tdc.js known key) | in-progress |
+| 4.2 | Tests for key extractor (validate against tdc.js known key) | done |
 
 ### Phase 5: Token Verifier & Pipeline Orchestrator
 > Build the token comparison module and the single-command orchestrator that chains all stages.
 
 | ID | Task | Status |
 |----|------|--------|
-| 5.1 | Implement token verifier module (capture live, generate standalone, byte-compare) | pending |
+| 5.1 | Implement token verifier module (capture live, generate standalone, byte-compare) | in-progress |
 | 5.2 | Implement pipeline orchestrator (decode → map → extract → verify) | pending |
 | 5.3 | Tests for verifier and orchestrator | pending |
 
@@ -64,29 +64,56 @@ Current task: 4.2 — Tests for key extractor
 
 ## Current Task
 
-**ID**: 4.2
-**Title**: Tests for key extractor
-**Phase**: XTEA Key Extractor
+**ID**: 5.1
+**Title**: Implement token verifier module
+**Phase**: Token Verifier & Pipeline Orchestrator
 **Status**: in-progress
 
 ### Goal
-Write tests for `pipeline/key-extractor.js` validating that it correctly extracts XTEA parameters from tdc.js (Template A). Tests must be written by a different agent than the implementation.
+Build a module that captures a live token from a tdc.js build via Puppeteer (with deterministic environment), generates a standalone token using the extracted XTEA key, and byte-compares the results. This is the end-to-end validation step.
 
 ### Context
-- `pipeline/key-extractor.js` exports `extractKey(tdcPath, opcodeTable, variables)` (async)
-- Returns `{ key, delta, rounds, keyModConstants, verified, notes }`
-- Known-good values for tdc.js: key=[0x6257584f, 0x462a4564, 0x636a5062, 0x6d644140], delta=0x9E3779B9, rounds=32, keyModConstants=[2368517, 592130]
-- Tests require Puppeteer (headless Chrome) — each test takes ~4-5 seconds
-- The module needs opcode table and variables from the pipeline modules
+The existing `dynamic/comparison-harness.js` does exactly this for Template A, but it's a standalone script hardcoded to tdc.js. The pipeline version must accept any tdc build + its extracted key parameters.
+
+**The proven comparison approach** (from comparison-harness.js):
+1. Run the tdc.js in Puppeteer with frozen Date.now/Math.random/performance.now
+2. Instrument the VM to capture the `cdString` and `sdObject` (the raw data BEFORE encryption)
+3. Capture the live token from `TDC.getData()`
+4. Feed the captured cdString+sdObject to `generateTokenFromStrings()` with the same timestamp
+5. Compare the two tokens
+
+This is better than generating from a profile because it isolates the encryption pipeline — any mismatch must be in the crypto, not in the data collection.
+
+**Key files**:
+- `dynamic/comparison-harness.js` — reference implementation (study lines 60-200 for instrumentation approach)
+- `token/generate-token.js` — `generateTokenFromStrings(cdString, sdString, timestamp)` and `generateToken(cdEntries, sdObject, timestamp)`
+- `token/crypto-core.js` — `encryptSegments(chunks)` — currently hardcoded to Template A key. The verifier will need to handle this.
+- `token/outer-pipeline.js` — `buildCdString()`, `buildSdString()`, `urlEncode()`
+
+**Important constraint**: `token/crypto-core.js` has the XTEA key hardcoded as `STATE_A`. For multi-template support, the verifier needs to either:
+- Temporarily modify the key constants (bad — violates no-modify-existing-files)
+- Create a parameterized version of the encrypt function
+- Override the module at runtime
+The best approach: create a local encrypt function in the verifier that accepts key parameters, based on `crypto-core.js` but parameterized.
+
+**Output location**: `pipeline/token-verifier.js`
 
 ### Implementation Steps
-1. Create `tests/test-key-extractor.js`
-2. Update `package.json` test script to include it
+1. Create `pipeline/token-verifier.js` exporting `verifyToken(tdcPath, keyParams)` (async)
+2. Build the Puppeteer harness that:
+   - Serves the tdc.js with frozen deterministic environment
+   - Instruments the VM to capture cdString and sdObject (same approach as comparison-harness.js)
+   - Captures the live token from TDC.getData() and the timestamp
+3. Build a parameterized XTEA encrypt function (based on `token/crypto-core.js`) that accepts key parameters
+4. Generate a standalone token using the captured cdString+sdObject+timestamp and the provided key
+5. Compare the tokens byte-by-byte
+6. Return a verification report with per-segment comparison
 
 ### Verification
-- [ ] `node --test tests/test-key-extractor.js` passes
-- [ ] Tests validate: key values, delta, round count, key mod constants, return type structure
-- [ ] Existing tests still pass (83/85)
+- [ ] `pipeline/token-verifier.js` exists and exports `verifyToken`
+- [ ] Running on tdc.js with its known key produces a byte-identical match
+- [ ] The report includes per-segment match status
+- [ ] No modifications to existing files
 
 ### Suggested Agent
-general-purpose — test writing (different agent than implementation)
+general-purpose — Puppeteer + token pipeline, reference implementation available
