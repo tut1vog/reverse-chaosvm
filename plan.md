@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 8.3 — Tests for foundation modules
+Current task: 9.1 — vData generator
 
 ---
 
@@ -74,14 +74,14 @@ Current task: 8.3 — Tests for foundation modules
 |----|------|--------|
 | 8.1 | Template cache and TDC utilities (tdc-utils.js, template-cache.js) | done |
 | 8.2 | Parameterized collect token generator (collect-generator.js) | done |
-| 8.3 | Tests for foundation modules | in-progress |
+| 8.3 | Tests for foundation modules | done |
 
 ### Phase 9: vData Generation
 > Execute vm-slide.enc.js in jsdom to produce vData without a browser.
 
 | ID | Task | Status |
 |----|------|--------|
-| 9.1 | vData generator (vdata-generator.js) — jsdom + vm-slide.enc.js + jQuery interception | pending |
+| 9.1 | vData generator (vdata-generator.js) — jsdom + vm-slide.enc.js + jQuery interception | in-progress |
 | 9.2 | Tests for vData generator | pending |
 
 ### Phase 10: Scraper Orchestrator
@@ -105,48 +105,41 @@ Current task: 8.3 — Tests for foundation modules
 
 ## Current Task
 
-**ID**: 8.3
-**Title**: Tests for foundation modules
-**Phase**: Scraper Foundation Modules
+**ID**: 9.1
+**Title**: vData generator
+**Phase**: vData Generation
 **Status**: in-progress
 
 ### Goal
-Write comprehensive tests for the three Phase 8 modules: `scraper/tdc-utils.js`, `scraper/template-cache.js`, and `scraper/collect-generator.js`. Tests must be written by a different agent than the one that wrote the implementation.
+Create `scraper/vdata-generator.js` that executes `vm-slide.enc.js` in a jsdom environment to generate the `vData` token without a browser. vData is a ~152-char token computed from the POST body string by the `__TENCENT_CHAOS_STACK` VM.
 
 ### Context
-- **`scraper/tdc-utils.js`** exports `extractTdcName(source)` and `extractEks(source)`. Both take a tdc.js source string and return a string or null.
-- **`scraper/template-cache.js`** exports `TemplateCache` class with `load()`, `save()`, `lookup(tdcName)`, `store(tdcName, params)`, `seed()`. Cache file at `scraper/cache/templates.json`.
-- **`scraper/collect-generator.js`** exports `generateCollect(profile, xteaParams, options)` and `createEncryptFn({key, delta, rounds, keyModConstants})`. Also exports internal cipher functions for testing.
-- **Known test data**:
-  - Template A: TDC_NAME=`FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk`, key=`[0x6257584F,0x462A4564,0x636A5062,0x6D644140]`, delta=`0x9E3779B9`, rounds=32, keyModConstants=`[2368517,592130]`
-  - Template B: TDC_NAME=`SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD`, key=`[0x6B516842,0x4D554B69,0x69655456,0x452C233E]`
-  - Template C: TDC_NAME=`WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE`, key=`[0x5949415A,0x454D6265,0x6D686358,0x6C66525F]`
-  - EKS length is always 312 for all targets
-  - `token/crypto-core.js` `encryptFn` is the reference for Template A encryption
-  - `token/generate-token.js` `generateToken(cdArray, sdObject, timestamp)` is the reference for full token output
-- **Target files** for testing: `targets/tdc.js`, `targets/tdc-v2.js`, `targets/tdc-v5.js`
-- **Profile**: `profiles/default.json`
-- **Existing test pattern**: see `tests/test-vm-parser.js` or `tests/test-opcode-mapper.js` — uses Node.js built-in `node:test` and `node:assert`.
+- **How vData works in the browser**: `tcaptcha-slide.js` builds the POST data object, then calls `window.getVData(serializedBody)` (see offset ~163046 in `sample/t_captcha_slide.js`). The `getVData` function is registered by `vm-slide.enc.js`. There may also be an `$.ajaxPrefilter` path.
+- **vm-slide.enc.js** is a `__TENCENT_CHAOS_STACK` variant (stack-based VM, 36 opcodes, ~44KB). A decoded copy is at `sample/vm_slide.js`. It registers itself on the window object.
+- **Dynamic probe findings**: vm-slide reads only `navigator.userAgent` (3×), `Date.now()` (1×), `document.readyState` (1×), `document.createElement('fake')` (1×). No fingerprinting.
+- **jQuery/Zepto**: Required by vm-slide for `$.ajaxPrefilter`. A copy at `sample/slide-jy.js` (~29KB).
+- **POST body serialization**: The body must be jQuery-serialized via `$.param()`, not `encodeURIComponent`. vData is computed over this exact string, so serialization must match.
+- **jsdom** is pre-approved. Already installed or install via `npm install jsdom`.
 - **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
-- Update `package.json` test script to include the new test file.
 
 ### Implementation Steps
-1. Create `tests/test-scraper-foundation.js` using `node:test` and `node:assert`.
-2. Test suites to include:
-   - **tdc-utils: extractTdcName** — all 3 targets return correct names, invalid input returns null
-   - **tdc-utils: extractEks** — all 3 targets return 312-char strings, invalid input returns null
-   - **template-cache: lookup** — pre-seeded cache returns correct params for all 3 templates, unknown name returns null
-   - **template-cache: store** — stores new entry and can look it up, updates lastSeen
-   - **template-cache: seed** — seeds from output/ files and produces correct entries
-   - **collect-generator: createEncryptFn** — Template A params produce byte-identical output to `token/crypto-core.encryptFn`
-   - **collect-generator: generateCollect** — Template A with fixed inputs matches `token/generate-token.generateToken` exactly (use fixed timestamp, nonce, appid)
-   - **collect-generator: different templates** — Template A and B produce different tokens
-3. Update `package.json` test glob to include the new file.
+1. Ensure `jsdom` is installed (`npm install jsdom` — pre-approved).
+2. Create `scraper/vdata-generator.js` with:
+   - `generateVData(postFields, vmSlideSource, jquerySource, options)` → `{vData, serializedBody}`
+   - Create JSDOM with `url: 'https://t.captcha.qq.com/cap_union_new_show'`, `runScripts: 'dangerously'`
+   - Stub `navigator.userAgent` from options
+   - Execute jQuery source, then vm-slide source in the window context
+   - Serialize postFields via `window.jQuery.param(postFields)`
+   - Try `window.getVData(serializedBody)` first
+   - If `getVData` doesn't exist, trigger `$.ajax` POST and intercept via XHR mock
+   - Return `{vData, serializedBody}`
+3. Also export `parseVmSlideUrl(html)` to extract vm-slide.enc.js URL from show page HTML.
 
 ### Verification
-- [ ] `node --test tests/test-scraper-foundation.js` — all tests pass
-- [ ] `npm test` — full suite passes (no regressions)
-- [ ] Tests contain meaningful assertions (not just "runs without error") — verify by reading the test source
+- [ ] `npm ls jsdom` confirms installed
+- [ ] Offline smoke test: load `sample/slide-jy.js` + `sample/vm_slide.js` in jsdom, pass mock POST fields, get non-empty vData
+- [ ] vData is a string of ~100-200 chars, printable ASCII
+- [ ] The serialized body from `$.param()` uses `&` separators and `=` delimiters
 
 ### Suggested Agent
-general-purpose — writing tests against known interfaces with reference data
+general-purpose — jsdom environment setup, script execution, XHR interception
