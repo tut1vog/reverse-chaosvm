@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 12
-Current task: 12.1 — Puppeteer capture: intercept collect token, tdc.js, and verify POST
+Current task: 12.3 — Analyze decrypted collect — compare field-by-field with our profile
 
 ---
 
@@ -107,8 +107,8 @@ Current task: 12.1 — Puppeteer capture: intercept collect token, tdc.js, and v
 | ID | Task | Status |
 |----|------|--------|
 | 12.1 | Puppeteer capture: intercept collect token, tdc.js, and verify POST | done |
-| 12.2 | Extract XTEA key from captured tdc.js and decrypt the collect token | in-progress |
-| 12.3 | Analyze decrypted collect — compare field-by-field with our profile | pending |
+| 12.2 | Extract XTEA key from captured tdc.js and decrypt the collect token | done |
+| 12.3 | Analyze decrypted collect — compare field-by-field with our profile | in-progress |
 | 12.4 | Update default profile and fix scraper to produce valid collect tokens | pending |
 | 12.5 | Live end-to-end verification of headless scraper | pending |
 
@@ -116,36 +116,40 @@ Current task: 12.1 — Puppeteer capture: intercept collect token, tdc.js, and v
 
 ## Current Task
 
-**ID**: 12.2
-**Title**: Extract XTEA key from captured tdc.js and decrypt the collect token
+**ID**: 12.3
+**Title**: Analyze decrypted collect — build field mapping and identify scraper fixes
 **Phase**: Scraper Debugging — Collect Token Analysis
 **Status**: in-progress
 
 ### Goal
-After running the Puppeteer solver (task 12.1) to capture `output/puppeteer-capture/tdc-source.js` and `output/puppeteer-capture/verify-post.json`, use the pipeline's key extractor to get the XTEA key from the captured tdc.js, then decrypt the collect token from the verify POST body. Save the decrypted output for field-by-field analysis in task 12.3.
+Analyze the decrypted browser vs scraper collect tokens to produce an actionable field mapping and identify what the scraper needs to fix to produce valid tokens.
 
 ### Context
-- `output/puppeteer-capture/tdc-source.js` — captured tdc.js source (written by task 12.1 code, but file may not exist yet since live run hasn't happened)
-- `output/puppeteer-capture/verify-post.json` — captured POST body with `collect` field
-- `pipeline/key-extractor.js` — extracts XTEA key from any tdc.js build
-- `pipeline/vm-parser.js` — identifies VM variables
-- `pipeline/opcode-mapper.js` — maps opcodes
-- `token/crypto-core.js` — XTEA encrypt/decrypt functions
-- `docs/TOKEN_DECRYPTION.md` — documents the decryption process
-- The collect token is URL-encoded → base64 → XTEA-encrypted segments. Decryption reverses this.
-- Need to: (1) save captured tdc.js to `targets/tdc-live.js`, (2) run pipeline to extract key, (3) decrypt collect token using that key, (4) save decrypted fields to `output/puppeteer-capture/collect-decrypted.json`
+From task 12.2 we have `output/puppeteer-capture/collect-decrypted.json` with both browser (60 entries) and scraper (59 entries) cd arrays, plus sd comparison. Key findings so far:
+- The 98-opcode template uses completely different cd field ordering than Template A
+- Browser sd has slideValue/coordinate/dragobj/ft; scraper sd has appid/nonce/token
+- XTEA key mods are on indices 2 and 3 (not 1 and 3)
+- Browser fingerprint: Chrome/146, Intel Iris GPU, Windows, [1280,1400], audio 44100Hz
+- The collect token is a SINGLE base64 blob (not 4 segments) that decrypts to `{"cd":[...],"sd":{...}}`
+- 98-opcode template key: [0x4F4D6852, 0x61426747, 0x45535C40, 0x6C3B4158], keyMods=[0, 0, 986887, 1513228]
+
+Browser cd fields identified by value:
+- [1] timezone "+08", [2] plugins, [5] audio fingerprint, [6] audio codecs
+- [8] GPU renderer, [9] screen height, [13] color gamut, [16] WebGL canvas
+- [18] video codecs, [22] user agent, [26] screen width, [28] feature bitmask
+- [29] GPU vendor, [33] viewport, [44] languages, [45] charset
+- [49] Intl options, [54] platform, [55] behavioral events + hash array
 
 ### Implementation Steps
-1. Copy `output/puppeteer-capture/tdc-source.js` to `targets/tdc-live.js` (if not already there)
-2. Run `node pipeline/run.js targets/tdc-live.js --skip-verify` to extract opcode table and XTEA key
-3. Create a script `scripts/decrypt-collect.js` that reads the collect token from verify-post.json, URL-decodes it, base64-decodes it, splits into XTEA segments, decrypts with the extracted key, and outputs the plaintext fields
-4. Save decrypted output to `output/puppeteer-capture/collect-decrypted.json`
+1. Map each browser cd index to its semantic meaning
+2. Cross-reference with `docs/COLLECTOR_SCHEMA.md` (scraper's 59-field ordering)
+3. Produce `output/puppeteer-capture/field-mapping.json`
+4. List critical scraper changes needed
 
 ### Verification
-- [ ] `targets/tdc-live.js` exists
-- [ ] `output/tdc-live/xtea-params.json` exists with valid key array
-- [ ] `scripts/decrypt-collect.js` runs without error
-- [ ] `output/puppeteer-capture/collect-decrypted.json` exists with readable field data
+- [ ] field-mapping.json has mappings for all 60 browser cd entries
+- [ ] Each mapping identifies collector schema field and corresponding scraper index
+- [ ] Critical scraper fix list is actionable
 
 ### Suggested Agent
-general-purpose — needs to run pipeline and create a decryption script
+general-purpose — cross-referencing decrypted data with collector schema docs
