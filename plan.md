@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 14
-Current task: 14.3 — Results analysis and documentation
+Current phase: Phase 15
+Current task: 15.1 — Build POST body comparison script
 
 ---
 
@@ -128,32 +128,89 @@ Current task: 14.3 — Results analysis and documentation
 |----|------|--------|
 | 14.1 | Create hybrid solver script | done |
 | 14.2 | Live test of hybrid solver | done |
-| 14.3 | Results analysis and documentation | pending |
+| 14.3 | Results analysis and documentation | done |
+
+### Phase 15: Byte-Level POST Body Comparison
+> Generate a scraper collect token with current code, decrypt it, and do a field-by-field comparison against the known-good browser capture to identify every remaining discrepancy causing errorCode 9.
+
+| ID | Task | Status |
+|----|------|--------|
+| 15.1 | Build POST body comparison script | in-progress |
+| 15.2 | Fix all identified discrepancies | pending |
+| 15.3 | Tests for fixes | pending |
+| 15.4 | Live end-to-end verification | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 14.3
-**Title**: Results analysis and documentation
-**Phase**: Hybrid Puppeteer HTTP + Standalone Token
+**ID**: 15.1
+**Title**: Build POST body comparison script
+**Phase**: Byte-Level POST Body Comparison
 **Status**: in-progress
 
 ### Goal
-Document the conclusion that TLS fingerprinting is NOT the cause of errorCode 9, and update project docs accordingly.
+Create a script that generates a fresh collect token using the current scraper code (with all Phase 12-13 fixes), decrypts it, and compares every field against the known-good browser capture from Phase 12.1. Also compare the full verify POST body field structure. Output a detailed diff report identifying all remaining discrepancies.
 
 ### Context
-- `output/hybrid-test.json` — 4 runs, errorCode 9 with Chrome TLS (same as Node.js)
-- `output/scraper-live-test-13.json` — Phase 13 results (27 sub-attempts, all errorCode 9 with Node.js HTTP)
-- CLAUDE.md Known limitations section mentions TLS fingerprinting
+
+**Ground truth (browser capture, successful errorCode 0):**
+- `output/puppeteer-capture/verify-post.json` — full verify POST body fields (38 fields)
+- `output/puppeteer-capture/collect-decrypted.json` — decrypted collect with 60-field cd array + sd structure
+- `output/tdc-capture/xtea-params.json` — XTEA key from captured tdc.js: key=[0x4F4D6852, 0x61426747, 0x45535C40, 0x6C3B4158], keyModConstants=[0, 1513228]
+- `output/tdc-capture/pipeline-config.json` — 98 opcodes, 6 unmapped
+
+**Scraper code to test:**
+- `scraper/collect-generator.js` — `generateCollect(profile, xteaParams, options)` + `buildSlideSd()` + `generateBehavioralEvents()`
+- `token/collector-schema.js` — `buildDefaultCdArray(profile)` (59-field cd array, schema order)
+- `token/outer-pipeline.js` — `buildCdString()` (hand-rolled JSON serialization), `buildSdString()`, `buildInputChunks()`, `assembleToken()`, `urlEncode()`
+- `token/crypto-core.js` — XTEA encryption
+- `profiles/default.json` — current profile (updated in Phase 12.4)
+- `scraper/cache/templates.json` — template cache with cdFieldOrder for 98-opcode templates
+
+**What the script must do:**
+1. Load the browser capture as ground truth
+2. Load the current profile and 98-opcode template params from cache
+3. Use the SAME session params as the browser capture (nonce, sess, sid, aid, etc. from verify-post.json) so the comparison is apples-to-apples
+4. Call `generateCollect()` with the browser's session params + current profile + 98-opcode XTEA params + cdFieldOrder
+5. Decrypt the generated collect token using the same XTEA params
+6. Compare cd arrays field-by-field (60 fields, using the cdFieldOrder mapping)
+7. Compare sd structures field-by-field
+8. Compare the full verify POST body field list (names, ordering, values where static)
+9. Output a structured diff report to `output/post-body-diff.json` with:
+   - For each cd field: index, name, browser value (summary), scraper value (summary), match/mismatch, severity
+   - sd field comparison
+   - POST body field list comparison
+   - Summary: total fields, matching, mismatched, and a prioritized fix list
+
+**Decryption approach:**
+- Use `token/crypto-core.js` `createDecryptFn()` or reverse the encrypt pipeline:
+  1. URL-decode the token
+  2. Split into 4 base64 segments (reorder from [1,0,2,3] back to [0,1,2,3])
+  3. Decode each base64 segment
+  4. Decrypt each segment with XTEA
+  5. Reassemble into the original JSON string
+
+**Key detail — the token pipeline assembly order:**
+- `assembleToken([seg0, seg1, seg2, seg3])` outputs them in order `[seg1, seg0, seg2, seg3]`
+- Each segment is base64-encoded and concatenated
+- Then URL-encoded
+
+The script can also just call `buildDefaultCdArray()` + `reorderCdArray()` directly (skipping encryption) since we really want to compare the PRE-encryption cd/sd values, not the encrypted token.
 
 ### Implementation Steps
-1. Update CLAUDE.md to reflect TLS disproved finding
-2. Update `docs/WORKFLOW.md` with Phase 14 findings
+1. Create `scripts/post-body-compare.js`
+2. Load ground truth from `output/puppeteer-capture/`
+3. Build scraper cd array using current profile + `buildDefaultCdArray()` + `reorderCdArray()` with 98-opcode cdFieldOrder
+4. Build scraper sd using `buildSlideSd()` with mock slide data matching the browser's ans
+5. Compare field-by-field and output diff
+6. Also compare verify POST field names/values
 
 ### Verification
-- [ ] CLAUDE.md updated with TLS disproved conclusion
-- [ ] Workflow docs updated
+- [ ] `scripts/post-body-compare.js` runs without errors: `node scripts/post-body-compare.js`
+- [ ] `output/post-body-diff.json` is created with structured comparison results
+- [ ] The diff identifies at least the known remaining differences (e.g., vendor field)
+- [ ] Both cd and sd sections have field-by-field comparisons
 
 ### Suggested Agent
 general-purpose
