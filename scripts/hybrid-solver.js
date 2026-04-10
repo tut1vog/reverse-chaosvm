@@ -257,15 +257,15 @@ async function solve(opts) {
       let showSess = session.sess;
       if (capturedShowConfig) {
         // Parse config from show page HTML
-        const nonceMatch = capturedShowConfig.match(/["']nonce["']\s*:\s*["']([^"']+)["']/);
+        const nonceMatch = capturedShowConfig.match(/["']?nonce["']?\s*:\s*["']([^"']+)["']/);
         if (nonceMatch) nonce = nonceMatch[1];
-        const vsigMatch = capturedShowConfig.match(/["']vsig["']\s*:\s*["']([^"']+)["']/);
+        const vsigMatch = capturedShowConfig.match(/["']?vsig["']?\s*:\s*["']([^"']+)["']/);
         if (vsigMatch) vsig = vsigMatch[1];
-        const websigMatch = capturedShowConfig.match(/["']websig["']\s*:\s*["']([^"']+)["']/);
+        const websigMatch = capturedShowConfig.match(/["']?websig["']?\s*:\s*["']([^"']+)["']/);
         if (websigMatch) websig = websigMatch[1];
-        const subcapMatch = capturedShowConfig.match(/["']subcapclass["']\s*:\s*["']([^"']+)["']/);
+        const subcapMatch = capturedShowConfig.match(/["']?subcapclass["']?\s*:\s*["']([^"']+)["']/);
         if (subcapMatch) subcapclass = subcapMatch[1];
-        const sessMatch = capturedShowConfig.match(/["']sess["']\s*:\s*["']([^"']+)["']/);
+        const sessMatch = capturedShowConfig.match(/["']?sess["']?\s*:\s*["']([^"']+)["']/);
         if (sessMatch) showSess = sessMatch[1];
         log(`  Config: nonce=${nonce}, vsig=${vsig.slice(0, 10)}..., subcapclass=${subcapclass}`);
       }
