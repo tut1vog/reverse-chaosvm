@@ -71,10 +71,10 @@
   "MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn": {
     "template": "unknown",
     "key": [
-      1765552186,
-      1094997825,
-      1210005836,
-      1330075971
+      1330473042,
+      1631741767,
+      1163091008,
+      1815822680
     ],
     "delta": 2654435769,
     "rounds": 32,
@@ -151,7 +151,7 @@
       49
     ],
     "caseCount": 98,
-    "lastSeen": "2026-04-10T09:30:30.094Z"
+    "lastSeen": "2026-04-10T14:29:28.006Z"
   },
   "XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR": {
     "template": "B",
@@ -179,10 +179,10 @@
   "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj": {
     "template": "unknown",
     "key": [
-      1765552186,
-      1094997825,
-      1210005836,
-      1330075971
+      1330473042,
+      1631741767,
+      1163091008,
+      1815822680
     ],
     "delta": 2654435769,
     "rounds": 32,
@@ -259,7 +259,7 @@
       49
     ],
     "caseCount": 98,
-    "lastSeen": "2026-04-10T09:34:01.157Z"
+    "lastSeen": "2026-04-10T14:29:28.007Z"
   },
   "KhaJbXNVBBaBOAalQnkbOEZmGXAAcmFh": {
     "template": "B",
@@ -283,5 +283,51 @@
     ],
     "caseCount": 94,
     "lastSeen": "2026-04-10T09:34:01.741Z"
+  },
+  "hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig": {
+    "template": "A",
+    "key": [
+      1649891407,
+      1177175396,
+      1667911778,
+      1835286848
+    ],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [
+      2368517,
+      592130
+    ],
+    "keyMods": [
+      0,
+      2368517,
+      0,
+      592130
+    ],
+    "caseCount": 95,
+    "lastSeen": "2026-04-10T12:12:02.707Z"
+  },
+  "CSMHFmMCDWYSdnHeTJAbbedQBMaAnGdl": {
+    "template": "B",
+    "key": [
+      1800497218,
+      1297435497,
+      1768248406,
+      1160520510
+    ],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [
+      0,
+      2236974
+    ],
+    "keyMods": [
+      0,
+      0,
+      0,
+      2236974
+    ],
+    "caseCount": 94,
+    "lastSeen": "2026-04-10T12:31:19.820Z"
   }
 }
