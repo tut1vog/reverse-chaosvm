@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 17.3.1 — Fix cd capture: decrypt Chrome's collect token
+Current task: 17.3 — Full Chrome cd injection — live test
 
 ---
 
@@ -162,8 +162,8 @@ Current task: 17.3.1 — Fix cd capture: decrypt Chrome's collect token
 |----|------|--------|
 | 17.1 | Chrome cd injection script | done |
 | 17.2 | Tests for Chrome cd injection script | done |
-| 17.3 | Full Chrome cd injection — live test | blocked |
-| 17.3.1 | Fix cd capture: decrypt Chrome's collect token | in-progress |
+| 17.3 | Full Chrome cd injection — live test | in-progress |
+| 17.3.1 | Fix cd capture: decrypt Chrome's collect token | done |
 | 17.4 | Binary search: identify which cd fields the server validates | pending |
 | 17.5 | Fix identified fields in standalone generator | pending |
 | 17.6 | Live re-test with fixes | pending |
@@ -172,42 +172,29 @@ Current task: 17.3.1 — Fix cd capture: decrypt Chrome's collect token
 
 ## Current Task
 
-**ID**: 17.3.1
-**Title**: Fix cd capture: decrypt Chrome's collect token
+**ID**: 17.3
+**Title**: Full Chrome cd injection — live test
 **Phase**: Chrome cd Injection — Identify Which Fields the Server Validates
 **Status**: in-progress
 
 ### Goal
-Fix `scripts/chrome-cd-inject.js` to extract Chrome's cd array by decrypting Chrome's own collect token (returned by `TDC.getData(true)`) using known XTEA params from the template cache, instead of the failed `JSON.stringify` hook approach.
-
-**Why JSON.stringify hook failed**: `docs/TOKEN_FORMAT.md` line 91 explicitly states: "The cd string is built via hand-rolled JSON concatenation (func_276), NOT via JSON.stringify(). This is an anti-hooking measure." The original plan's approach was based on a wrong assumption.
+Run the fixed `scripts/chrome-cd-inject.js` (now using XTEA decryption) live against Tencent's CAPTCHA endpoint. Determine whether a standalone-encrypted token with Chrome's real cd values resolves errorCode 9.
 
 ### Context
-- `scripts/chrome-cd-inject.js` — current script with broken JSON.stringify hook
-- `scripts/collect-diff.js` — already implements XTEA decryption of captured tokens (lines 53-88, `decryptXtea` and `decryptCollect` functions). Copy this approach.
-- `scripts/decrypt-collect.js` — standalone decryption script, another reference
-- The script already captures Chrome's `TDC.getData(true)` return value (line ~341, `chromeGetData.collect`)
-- The script already looks up XTEA params from template cache (lines ~390-417, `xteaParams`)
-- So we already have both the encrypted token AND the decryption key — we just need to decrypt it
+- Script now decrypts Chrome's collect token to extract cd array (fixed in 17.3.1)
+- Previous attempt: JSON.stringify hook failed, script fell back to standalone cd
+- New unported template `DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG` in rotation (2/3 hits)
 
 ### Implementation Steps
-1. Remove the `JSON.stringify` interceptor from `evaluateOnNewDocument` (lines 183-194) — it's useless
-2. Copy `decryptXtea()` and `decryptCollect()` from `scripts/collect-diff.js` (lines 33-89) into `chrome-cd-inject.js`
-3. After `TDC.getData(true)` returns Chrome's collect token AND after template cache lookup provides `xteaParams`:
-   - Call `decryptCollect(chromeCollect, xteaParams)` to decrypt
-   - Parse the decrypted JSON to extract the cd array
-   - Use that cd array as `capturedCd`
-4. Keep everything else the same: standalone encrypt with `cdArrayOverride`, submit via Chrome TLS
-5. Update the logging to show decryption success/failure and the extracted cd array details
-
-**Key constraint**: The decryption must happen AFTER the template cache lookup (step 7 in the script), because we need `xteaParams` to decrypt. Currently the cd extraction happens at step 4 (too early). Reorder: capture Chrome's collect at step 4, decrypt it at step 7b (after cache lookup).
+1. Run `node scripts/chrome-cd-inject.js` (3 attempts by default)
+2. Examine: cd decryption success, cd diff count, verify errorCode
+3. Record results
 
 ### Verification
-- [ ] `JSON.stringify` interceptor removed from the script
-- [ ] `decryptXtea` and `decryptCollect` functions added
-- [ ] Script decrypts Chrome's collect token using template cache XTEA params
-- [ ] `node -c scripts/chrome-cd-inject.js` passes syntax check
-- [ ] `npm test` still passes 173/175
+- [ ] Script runs to completion
+- [ ] cd array extracted via decryption (not fallback)
+- [ ] Verify response received
+- [ ] Results in `output/chrome-cd-inject.json`
 
 ### Suggested Agent
 general-purpose
