@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 18.4 — In-page key instrumentation for live tdc.js
+Current task: 18.5 — Live forensics with in-page key
 
 ---
 
@@ -178,8 +178,8 @@ Current task: 18.4 — In-page key instrumentation for live tdc.js
 | 18.3 | Live forensics test | blocked |
 | 18.3.1 | Extract XTEA key from live tdc.js at runtime | done |
 | 18.3.2 | Fix keyMods derivation from keyModConstants | done |
-| 18.4 | In-page key instrumentation for live tdc.js | in-progress |
-| 18.5 | Live forensics with in-page key | pending |
+| 18.4 | In-page key instrumentation for live tdc.js | done |
+| 18.5 | Live forensics with in-page key | in-progress |
 | 18.6 | Fix identified divergence | pending |
 | 18.7 | Live re-test with fix | pending |
 
