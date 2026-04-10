@@ -39,7 +39,7 @@ const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const TemplateCache = require('../scraper/template-cache');
 const { parseVmFunction } = require('../pipeline/vm-parser');
 const { mapOpcodes } = require('../pipeline/opcode-mapper');
-const { extractKey } = require('../pipeline/key-extractor');
+const { buildOpcodeLookups, patchTdcSource, analyzeTrace } = require('../pipeline/key-extractor');
 const {
   buildCdString,
   buildSdString,
@@ -567,38 +567,81 @@ function comparisonC(chromeCollect, parsed, xteaParams, hashContent) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// Pipeline XTEA extraction
+// In-page instrumentation code builder
 // ═══════════════════════════════════════════════════════════════════════
 
-async function extractXteaFromSource(tdcSource) {
-  const os = require('os');
-  const tmpFile = path.join(os.tmpdir(), `tdc-forensics-${Date.now()}.js`);
-  try {
-    // Write source to temp file (extractKey reads from disk)
-    fs.writeFileSync(tmpFile, tdcSource, 'utf8');
+/**
+ * Build browser instrumentation code for in-page tracing.
+ * This is a variant of buildInstrumentCode from key-extractor.js that
+ * does NOT freeze Date.now, Math.random, performance.now, crypto, or canvas.
+ * Freezing these would corrupt the VM's fingerprint collection and key derivation.
+ */
+function buildInPageInstrumentCode(lookups) {
+  const arithJSON = JSON.stringify(lookups.arithSet);
+  const loadJSON = JSON.stringify(lookups.loadSet);
 
-    // Run pipeline: parse → map → extract
-    const parsed = parseVmFunction(tdcSource);
-    const mapped = mapOpcodes(parsed, tdcSource);
-    const keyResult = await extractKey(tmpFile, mapped.opcodeTable, parsed.variables);
+  return `(function() {
+  'use strict';
 
-    // Derive keyMods from keyModConstants: [0, kmc[0], 0, kmc[1]]
-    // The key extractor returns keyModConstants (2-element), not keyMods (4-element)
-    const kmc = keyResult.keyModConstants || [0, 0];
-    const keyMods = [0, kmc[0] || 0, 0, kmc[1] || 0];
+  // ── Trace storage ──
+  var ARITH_OPS = ${arithJSON};
+  var LOAD_OPS = ${loadJSON};
 
-    return {
-      key: keyResult.key,         // array of 4 ints
-      delta: keyResult.delta,     // 0x9E3779B9
-      rounds: keyResult.rounds,   // 32
-      keyMods,
-      keyModConstants: keyResult.keyModConstants || null,
-      source: 'pipeline',
-    };
-  } finally {
-    // Clean up temp file
-    try { fs.unlinkSync(tmpFile); } catch (_) {}
-  }
+  window.__KT_ACTIVE = false;
+  window.__KT_OPS = [];
+  window.__KT_ERRORS = [];
+
+  var MAX_OPS = 500000;
+
+  window.__KT = function(C, _xop, i, Y) {
+    try {
+      if (!window.__KT_ACTIVE) return;
+      if (window.__KT_OPS.length >= MAX_OPS) return;
+
+      var mn = ARITH_OPS[_xop];
+      if (mn) {
+        var a = Y[C + 1];
+        var b = Y[C + 2];
+        var c = Y[C + 3];
+        var isK = mn.indexOf('_K') >= 0;
+
+        if (mn === 'NEG') {
+          window.__KT_OPS.push({ pc: C, mn: mn, dst: a, srcVal: [i[b]] });
+        } else if (mn === 'RSUB_K') {
+          window.__KT_OPS.push({ pc: C, mn: mn, dst: a, srcVal: [b, i[c]], k: b });
+        } else if (isK) {
+          window.__KT_OPS.push({ pc: C, mn: mn, dst: a, srcVal: [i[b], c], k: c });
+        } else {
+          window.__KT_OPS.push({ pc: C, mn: mn, dst: a, srcVal: [i[b], i[c]] });
+        }
+        return;
+      }
+
+      mn = LOAD_OPS[_xop];
+      if (mn) {
+        var a = Y[C + 1];
+        if (mn === 'PROP_GET_K') {
+          var b = Y[C + 2];
+          var k = Y[C + 3];
+          var arrVal = i[b];
+          var elemVal = (arrVal !== null && arrVal !== undefined) ? arrVal[k] : undefined;
+          window.__KT_OPS.push({ pc: C, mn: mn, dst: a, arrReg: b, key: k, elemVal: elemVal });
+        } else if (mn === 'PROP_GET') {
+          var b = Y[C + 2];
+          var c = Y[C + 3];
+          var arrVal2 = i[b];
+          var keyVal = i[c];
+          var elemVal2 = (arrVal2 !== null && arrVal2 !== undefined) ? arrVal2[keyVal] : undefined;
+          window.__KT_OPS.push({ pc: C, mn: mn, dst: a, keyVal: keyVal, elemVal: elemVal2 });
+        }
+        return;
+      }
+    } catch(e) {
+      window.__KT_ERRORS.push({ pc: C, op: _xop, err: String(e) });
+    }
+  };
+
+})();`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -683,6 +726,19 @@ async function run(opts) {
     const showUrl = `${BASE_URL}/cap_union_new_show?${showParams.toString()}`;
 
     let capturedTdcSource = null;
+    let inPageInstrumented = false;
+
+    await page.setRequestInterception(true);
+
+    page.on('request', async (request) => {
+      const url = request.url();
+      if (url.includes('/tdc.js') || url.includes('tdc.js?')) {
+        // Let the request go through — we'll intercept the response
+        request.continue();
+      } else {
+        request.continue();
+      }
+    });
 
     page.on('response', async (response) => {
       const url = response.url();
@@ -694,6 +750,67 @@ async function run(opts) {
             log(`  Intercepted tdc.js: ${text.length} chars`);
           }
         }
+      } catch (_) { /* ignore */ }
+    });
+
+    // We need to intercept the tdc.js response body and replace it with
+    // instrumented code. Puppeteer's setRequestInterception + respond()
+    // can't easily modify responses. Instead, we'll use a different approach:
+    // intercept the tdc.js request, fetch it ourselves, patch it, and respond.
+    // Remove the simple interception and use a fetch-and-patch approach.
+    await page.setRequestInterception(false);
+
+    // Use CDP to intercept and modify the tdc.js response
+    const cdp = await page.target().createCDPSession();
+    await cdp.send('Fetch.enable', {
+      patterns: [{ urlPattern: '*tdc.js*', requestStage: 'Response' }],
+    });
+
+    cdp.on('Fetch.requestPaused', async (event) => {
+      const { requestId, request: req } = event;
+      try {
+        // Get the original response body
+        const { body, base64Encoded } = await cdp.send('Fetch.getResponseBody', { requestId });
+        const originalSource = base64Encoded
+          ? Buffer.from(body, 'base64').toString('utf8')
+          : body;
+
+        if (originalSource.length > 1000) {
+          capturedTdcSource = originalSource;
+          log(`  Intercepted tdc.js via CDP: ${originalSource.length} chars`);
+
+          // Try to instrument the source for in-page key extraction
+          try {
+            const vmInfo = parseVmFunction(originalSource);
+            const mapped = mapOpcodes(vmInfo, originalSource);
+            const lookups = buildOpcodeLookups(mapped.opcodeTable);
+            const patchedSource = patchTdcSource(originalSource, vmInfo.variables);
+            const instrumentJs = buildInPageInstrumentCode(lookups);
+            const combined = instrumentJs + ';\n' + patchedSource;
+
+            log(`  Patched tdc.js for in-page tracing (${combined.length} chars)`);
+            inPageInstrumented = true;
+
+            // Serve the instrumented source
+            await cdp.send('Fetch.fulfillRequest', {
+              requestId,
+              responseCode: event.responseStatusCode || 200,
+              responseHeaders: event.responseHeaders,
+              body: Buffer.from(combined, 'utf8').toString('base64'),
+            });
+            return;
+          } catch (patchErr) {
+            log(`  WARNING: In-page patching failed: ${patchErr.message}`);
+            log('  Serving original tdc.js (will fall back to template cache)');
+          }
+        }
+      } catch (fetchErr) {
+        log(`  CDP fetch error: ${fetchErr.message}`);
+      }
+
+      // Fall through: serve original response unmodified
+      try {
+        await cdp.send('Fetch.continueRequest', { requestId });
       } catch (_) { /* ignore */ }
     });
 
@@ -709,7 +826,7 @@ async function run(opts) {
       throw new Error('Failed to intercept tdc.js source');
     }
 
-    // ── Step 4: Capture Chrome's collect token ──
+    // ── Step 4: Capture Chrome's collect token (with in-page tracing) ──
     log('Step 4: Wait for TDC.getData()...');
 
     let tdcAvailable = false;
@@ -721,6 +838,15 @@ async function run(opts) {
 
     if (!tdcAvailable) {
       throw new Error('TDC object not available in Chrome after 15s');
+    }
+
+    // Wait briefly for collectors to run
+    await sleep(1500);
+
+    // Enable tracing before getData if instrumented
+    if (inPageInstrumented) {
+      await page.evaluate(() => { window.__KT_ACTIVE = true; });
+      log('  In-page tracing enabled');
     }
 
     const chromeGetData = await page.evaluate(() => {
@@ -741,28 +867,73 @@ async function run(opts) {
     const chromeCollect = chromeGetData.collect;
     log(`  Chrome collect token captured: ${chromeCollect.length} chars`);
 
-    // ── Step 5: Extract TDC_NAME + XTEA params ──
+    // Disable tracing after getData
+    if (inPageInstrumented) {
+      await page.evaluate(() => { window.__KT_ACTIVE = false; });
+    }
+
+    // ── Step 5: Extract TDC_NAME + XTEA params (in-page or cache fallback) ──
     log('Step 5: Extract TDC_NAME + XTEA params...');
     const tdcName = extractTdcName(capturedTdcSource);
     if (!tdcName) throw new Error('Could not extract TDC_NAME');
     log(`  TDC_NAME: ${tdcName}`);
     results.tdcName = tdcName;
 
-    // Try pipeline extraction first (gets current key for live build)
     let xteaParams = null;
     let xteaSource = 'unknown';
-    try {
-      log('  Attempting pipeline XTEA extraction from live tdc.js...');
-      xteaParams = await extractXteaFromSource(capturedTdcSource);
-      xteaSource = 'pipeline';
-      log(`  Pipeline extraction succeeded: key=[${xteaParams.key.map(k => '0x' + (k >>> 0).toString(16)).join(', ')}]`);
-      log(`  keyMods=[${xteaParams.keyMods.join(', ')}], delta=0x${(xteaParams.delta >>> 0).toString(16)}, rounds=${xteaParams.rounds}`);
-      results.template = 'pipeline-extracted';
-    } catch (pipelineErr) {
-      log(`  Pipeline extraction failed: ${pipelineErr.message}`);
-      log('  Falling back to template cache...');
 
-      // Existing template cache lookup as fallback
+    // Primary method: in-page trace analysis
+    if (inPageInstrumented) {
+      try {
+        log('  Collecting in-page trace data...');
+        const opCount = await page.evaluate(() => window.__KT_OPS ? window.__KT_OPS.length : 0);
+        const traceErrors = await page.evaluate(() => window.__KT_ERRORS || []);
+        log(`  Trace captured: ${opCount} ops, ${traceErrors.length} errors`);
+
+        if (opCount > 0) {
+          // Retrieve trace in batches (may be very large)
+          const BATCH_SIZE = 50000;
+          const allOps = [];
+          for (let offset = 0; offset < opCount; offset += BATCH_SIZE) {
+            const batch = await page.evaluate((start, size) => {
+              return window.__KT_OPS.slice(start, start + size);
+            }, offset, BATCH_SIZE);
+            if (batch) allOps.push(...batch);
+          }
+
+          log(`  Retrieved ${allOps.length} ops, analyzing trace...`);
+          const keyResult = analyzeTrace(allOps);
+
+          if (keyResult.key) {
+            log(`  In-page key: [${keyResult.key.map(k => '0x' + (k >>> 0).toString(16)).join(', ')}]`);
+            log(`  keyModConstants: ${JSON.stringify(keyResult.keyModConstants)}`);
+            log(`  delta: 0x${(keyResult.delta >>> 0).toString(16)}, rounds: ${keyResult.rounds}`);
+            log(`  notes: ${keyResult.notes}`);
+
+            const kmc = keyResult.keyModConstants || [0, 0];
+            xteaParams = {
+              key: keyResult.key,
+              delta: keyResult.delta,
+              rounds: keyResult.rounds,
+              keyMods: [0, kmc[0] || 0, 0, kmc[1] || 0],
+              keyModConstants: keyResult.keyModConstants,
+            };
+            xteaSource = 'in-page';
+            results.template = 'in-page-extracted';
+          } else {
+            log(`  In-page trace analysis failed to extract key: ${keyResult.notes}`);
+          }
+        } else {
+          log('  No trace ops captured (tracing may not have triggered)');
+        }
+      } catch (traceErr) {
+        log(`  In-page trace collection failed: ${traceErr.message}`);
+      }
+    }
+
+    // Fallback: template cache
+    if (!xteaParams) {
+      log('  Falling back to template cache...');
       let cached = cache.lookup(tdcName);
       if (!cached) {
         log('  TDC_NAME not in cache, trying structural lookup...');
@@ -777,7 +948,7 @@ async function run(opts) {
           log(`  VM parse failed: ${parseErr.message}`);
         }
       }
-      if (!cached) throw new Error(`Unknown template ${tdcName} (pipeline failed, cache miss)`);
+      if (!cached) throw new Error(`Unknown template ${tdcName} (in-page failed, cache miss)`);
 
       results.template = cached.template;
       log(`  Template: ${cached.template}, opcodes: ${cached.caseCount}`);

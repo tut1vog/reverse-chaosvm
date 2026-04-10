@@ -609,4 +609,4 @@ async function extractKey(tdcPath, opcodeTable, variables) {
   return result;
 }
 
-module.exports = { extractKey };
+module.exports = { extractKey, buildOpcodeLookups, patchTdcSource, buildInstrumentCode, analyzeTrace };
