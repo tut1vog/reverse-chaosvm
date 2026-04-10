@@ -728,38 +728,6 @@ async function run(opts) {
     let capturedTdcSource = null;
     let inPageInstrumented = false;
 
-    await page.setRequestInterception(true);
-
-    page.on('request', async (request) => {
-      const url = request.url();
-      if (url.includes('/tdc.js') || url.includes('tdc.js?')) {
-        // Let the request go through — we'll intercept the response
-        request.continue();
-      } else {
-        request.continue();
-      }
-    });
-
-    page.on('response', async (response) => {
-      const url = response.url();
-      try {
-        if (url.includes('/tdc.js') || url.includes('tdc.js?')) {
-          const text = await response.text();
-          if (text.length > 1000) {
-            capturedTdcSource = text;
-            log(`  Intercepted tdc.js: ${text.length} chars`);
-          }
-        }
-      } catch (_) { /* ignore */ }
-    });
-
-    // We need to intercept the tdc.js response body and replace it with
-    // instrumented code. Puppeteer's setRequestInterception + respond()
-    // can't easily modify responses. Instead, we'll use a different approach:
-    // intercept the tdc.js request, fetch it ourselves, patch it, and respond.
-    // Remove the simple interception and use a fetch-and-patch approach.
-    await page.setRequestInterception(false);
-
     // Use CDP to intercept and modify the tdc.js response
     const cdp = await page.target().createCDPSession();
     await cdp.send('Fetch.enable', {
