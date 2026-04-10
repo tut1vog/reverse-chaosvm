@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 1 — Project Foundation
-Current task: 1.1 — Fresh git init and initial commit
+Current task: 1.2 — Rewrite CLAUDE.md, create rules, create settings.json
 
 ---
 
@@ -13,8 +13,8 @@ Current task: 1.1 — Fresh git init and initial commit
 
 | ID | Task | Status |
 |----|------|--------|
-| 1.1 | Fresh git init and initial commit | in-progress |
-| 1.2 | Rewrite CLAUDE.md, create rules, create settings.json | pending |
+| 1.1 | Fresh git init and initial commit | done |
+| 1.2 | Rewrite CLAUDE.md, create rules, create settings.json | in-progress |
 
 ### Phase 2: Claude Code Tooling
 > Create the agent, command, and skill markdown files that define specialized behaviors for the pipeline.
@@ -64,35 +64,44 @@ Current task: 1.1 — Fresh git init and initial commit
 
 ## Current Task
 
-**ID**: 1.1
-**Title**: Fresh git init and initial commit
+**ID**: 1.2
+**Title**: Rewrite CLAUDE.md, create rules, create settings.json
 **Phase**: Project Foundation
 **Status**: in-progress
 
 ### Goal
-Replace the broken `.git/` directory with a fresh git repository and commit the entire existing codebase as the baseline. This is the foundation for all future work.
+Replace the outdated CLAUDE.md with a clean version reflecting the new automated porting pipeline direction. Create the three rule files and settings.json specified in the project brief.
 
 ### Context
-- `.git/` exists as an empty directory (no valid repo) — just `rmdir` and `git init`
-- `.gitignore` already exists with sensible entries: `node_modules/`, `.venv/`, `output/dynamic/session-*.json`, `*.pyc`, `__pycache__/`
-- Need to add `history/` and plan files to `.gitignore` exclusions — actually no, plan.md and history/ should be tracked in git
-- The stale `plan.md` will be overwritten by this plan before the commit
-- `project-brief.md` should be committed
-- `output/` directory has decompiler artifacts — these should probably be committed as reference
-- `node_modules/` and `.venv/` are already gitignored
+- Current `CLAUDE.md` references deleted slash commands (`/port-new-version`, `/trace-token`) and agents that don't exist. The good parts to keep: architecture sections (VM internals mapping table, pipeline descriptions, project structure), code conventions, known issues, documentation table.
+- Project brief specifies exactly 3 rules: `targets-readonly.md`, `verify-dont-assume.md`, `coding-style.md`
+- Project brief specifies settings.json with tool permissions and ESLint hook config
+- ESLint is NOT yet installed — the hook config should be written but it will only activate after ESLint is added (a future concern; don't block on it)
+- The cc-project-* agents in `.claude/agents/` should be preserved (they're the meta-project management agents)
+- Files to create/modify:
+  - `CLAUDE.md` — full rewrite
+  - `.claude/rules/targets-readonly.md`
+  - `.claude/rules/verify-dont-assume.md`
+  - `.claude/rules/coding-style.md`
+  - `.claude/settings.json`
 
 ### Implementation Steps
-1. Remove the empty `.git/` directory: `rmdir .git`
-2. Run `git init` and `git checkout -b main`
-3. Review `.gitignore` — add any missing entries (e.g., `.claude/settings.local.json` if needed)
-4. `git add -A` then review what's staged with `git status`
-5. Create initial commit: `chore: initial commit — existing codebase baseline`
+1. Read current `CLAUDE.md` to identify sections to preserve vs rewrite
+2. Write new `CLAUDE.md`: remove references to deleted commands/agents, update version status, add automated pipeline as primary workflow, keep VM internals table and architecture sections, mark docs as "reference — verify before trusting"
+3. Create `.claude/rules/targets-readonly.md` — never modify `targets/*.js`
+4. Create `.claude/rules/verify-dont-assume.md` — verify crypto/token/opcode behavior against live tracing, don't trust docs
+5. Create `.claude/rules/coding-style.md` — 2-space indent, single quotes, semicolons, const/let, CommonJS
+6. Create `.claude/settings.json` — tool permissions per the Director Permissions table in project-brief.md
 
 ### Verification
-- [ ] `git log --oneline -1` shows the initial commit
-- [ ] `git status` is clean (no untracked files that should be tracked)
-- [ ] `git branch` shows `main` as the only branch
-- [ ] No `node_modules/`, `.venv/`, or `*.pyc` files in the commit: `git ls-files | grep -E 'node_modules|\.venv|\.pyc'` returns empty
+- [ ] `CLAUDE.md` does not reference `/port-new-version`, `/trace-token`, or any non-existent commands/agents
+- [ ] `CLAUDE.md` contains the VM internals mapping table, code conventions, and documentation table
+- [ ] `CLAUDE.md` version status table is accurate (matches project-brief.md)
+- [ ] `.claude/rules/targets-readonly.md` exists and mentions `targets/*.js`
+- [ ] `.claude/rules/verify-dont-assume.md` exists and mentions live verification
+- [ ] `.claude/rules/coding-style.md` exists and mentions 2-space indent, single quotes, semicolons
+- [ ] `.claude/settings.json` is valid JSON and contains permission entries
+- [ ] No references to deleted agents/commands anywhere in the new files
 
 ### Suggested Agent
-general-purpose — straightforward git setup, no specialized knowledge needed
+general-purpose — documentation and config writing, no specialized knowledge needed
