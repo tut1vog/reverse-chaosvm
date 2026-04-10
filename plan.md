@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 15
-Current task: none — awaiting direction
+Current task: 16.1 — Run full Puppeteer solver as control test
 
 ---
 
@@ -144,4 +144,46 @@ Current task: none — awaiting direction
 
 ## Current Task
 
-*Phase 15 complete. All tasks done.*
+### Phase 16: Definitive Test — Chrome tdc.js vs Standalone Collect
+> Confirm that the real tdc.js VM in Chrome produces a collect token the server accepts, while standalone generation doesn't. This pinpoints the collect token as the root cause.
+
+| ID | Task | Status |
+|----|------|--------|
+| 16.1 | Run full Puppeteer solver as control test | in-progress |
+| 16.2 | Capture and decrypt the Chrome-generated collect token | pending |
+| 16.3 | Diff Chrome collect vs standalone collect for same session | pending |
+
+---
+
+## Current Task
+
+**ID**: 16.1
+**Title**: Run full Puppeteer solver as control test
+**Phase**: Definitive Test — Chrome tdc.js vs Standalone Collect
+**Status**: in-progress
+
+### Goal
+Run the existing full Puppeteer CAPTCHA solver (`puppeteer/captcha-solver.js` via `puppeteer/cli.js`) to confirm it still gets errorCode 0 (success) with Chrome's real tdc.js generating the collect token. This is the control: if it succeeds, the standalone collect token is confirmed as the sole remaining cause of errorCode 9.
+
+If the full Puppeteer solver ALSO gets errorCode 9 now, it means something server-side changed (e.g., switch from slide to click CAPTCHA, new validation, stale session format) and the problem is not in our code.
+
+### Context
+- `puppeteer/captcha-solver.js` — CaptchaPuppeteer class: launches Chrome stealth, navigates show page, intercepts images, solves slider via OpenCV, performs real mouse drag, waits for verify response
+- `puppeteer/cli.js` — CLI entry point: `node puppeteer/cli.js --domain example.com [--headful]`
+- CLAUDE.md note: "urlsec.qq.com has switched to click-image-selection CAPTCHAs" — the slide CAPTCHA may no longer be served, which would cause the Puppeteer solver to fail too
+- The captured verify POST (`output/puppeteer-capture/verify-post.json`) is from Phase 12.1 which got errorCode 0
+
+### Implementation Steps
+1. Run `node puppeteer/cli.js --domain urlsec.qq.com --headful` 2-3 times
+2. If it fails because the CAPTCHA type changed (click instead of slide), note that
+3. If it gets errorCode 0, capture the verify POST body (already intercepted by captcha-solver.js)
+4. Document all results
+
+### Verification
+- [ ] Puppeteer solver runs without crashes
+- [ ] Result documented: errorCode and whether the CAPTCHA type is still slide
+- [ ] If errorCode 0: confirms standalone collect token is the issue
+- [ ] If errorCode 9 or CAPTCHA type changed: documents server-side changes
+
+### Suggested Agent
+general-purpose
