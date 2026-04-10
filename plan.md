@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 13
-Current task: 13.3 — Live re-test after fixes
+Current phase: Phase 14
+Current task: 14.1 — Create hybrid solver script
 
 ---
 
@@ -125,21 +125,51 @@ Current task: 13.3 — Live re-test after fixes
 
 ## Current Task
 
-Phase 13 complete. Awaiting user direction.
+**ID**: 14.1
+**Title**: Create hybrid solver script
+**Phase**: Hybrid Puppeteer HTTP + Standalone Token
+**Status**: in-progress
 
-### Phase 13 Results
+### Goal
+Create a script that uses Puppeteer (Chrome TLS) for all HTTP communication but generates the collect token using our standalone code. This isolates whether TLS fingerprinting is the root cause of errorCode 9.
 
-All 5 fixes confirmed working: dynamic pageUrl, fresh timestamps, randomized hashes, showUrl in both getSig paths, live vm-slide.js fetch. **errorCode 9 persists across all 27 sub-attempts (3 runs × 9 retries).**
+### Context
+The existing `puppeteer/captcha-solver.js` (`CaptchaPuppeteer`) does everything in real Chrome — it navigates to the show page, lets tdc.js run in-browser, and the user drags the slider. It works (errorCode 0 in Phase 12.1 capture).
 
-**Key finding**: The nonce `eda1152f11f1daf0` is static across ALL sessions, suggesting the server may be fingerprinting the TLS client (JA3/JA4) and returning a fixed/dummy nonce for non-browser clients.
+The hybrid approach:
+1. **Puppeteer for HTTP**: Use `page.evaluate(fetch(...))` for prehandle, getSig, image download, tdc download, and verify POST — all with Chrome's TLS fingerprint
+2. **Standalone token**: Generate collect token using `scraper/collect-generator.js` (our XTEA encryption, cd reordering, slide sd)
+3. **OpenCV slider**: Solve the slide puzzle with `puppeteer/slide-solver.js`
+4. **jsdom vData**: Generate vData with `scraper/vdata-generator.js`
 
-**Top suspects for errorCode 9 (revised)**:
-1. **TLS fingerprinting** — Node.js `https` has a distinct JA3/JA4 fingerprint. Server may reject based on this regardless of token quality. The static nonce supports this theory.
-2. **Collect token content** — jsdom environment may be detectable in fingerprint values.
-3. **vData integrity** — vm-slide ChaosVM may detect jsdom and produce invalid vData.
-4. **Unported templates** — 96/98-opcode templates need pipeline porting.
+Key files:
+- `puppeteer/captcha-solver.js` — existing Puppeteer solver (reference for Chrome-based HTTP flow)
+- `puppeteer/captcha-client.js` — existing Node.js HTTP client (reference for request formats)
+- `scraper/scraper.js` — existing scraper (reference for standalone token generation flow)
+- `scraper/collect-generator.js` — standalone collect token generation
+- `scraper/vdata-generator.js` — jsdom vData generation
+- `scraper/tdc-utils.js` — TDC_NAME and eks extraction
+- `scraper/template-cache.js` — template cache lookup
 
-**Possible next steps**:
-- Use `undici` or `tls-client` for TLS fingerprint spoofing
-- Compare the exact nonce behavior between Puppeteer (real Chrome) and Node.js HTTP
-- Port the 96-opcode template via `pipeline/run.js`
+### Implementation Steps
+1. Create `scripts/hybrid-solver.js` that:
+   a. Launches Puppeteer with stealth plugin
+   b. Uses `page.evaluate(fetch(...))` to call prehandle
+   c. Navigates to the show page URL (to get Chrome TLS + cookies) and intercepts tdc.js + images
+   d. Solves the slider with OpenCV
+   e. Extracts TDC_NAME and eks from intercepted tdc.js
+   f. Looks up template cache for XTEA params
+   g. Generates collect token using `generateCollect` with profile overrides
+   h. Generates vData using `generateVData` in jsdom
+   i. Submits verify POST via `page.evaluate(fetch(...))` — Chrome TLS for the verify call
+   j. Logs the errorCode and result
+
+2. The script should be runnable as `node scripts/hybrid-solver.js` and output results to stderr + JSON file.
+
+### Verification
+- [ ] `node -c scripts/hybrid-solver.js` — no syntax errors
+- [ ] Script runs and reaches the verify POST step (even if errorCode != 0)
+- [ ] Verify POST is made via Puppeteer (Chrome TLS), not Node.js HTTP
+
+### Suggested Agent
+general-purpose
