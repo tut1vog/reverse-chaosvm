@@ -1,0 +1,41 @@
+{
+  "testDate": "2026-04-10",
+  "description": "Control test: full Puppeteer solver with Chrome's real tdc.js",
+  "purpose": "Confirm real Chrome tdc.js still produces accepted tokens (errorCode 0)",
+  "runs": [
+    {
+      "run": 1,
+      "captchaType": "slide",
+      "errorCode": 0,
+      "ticket": "t03tserver5g1dhdlN6RiQlrfw57DYQsym92vXfoRKeozjckga89I_pEOVIKqWxCVvLr5lit0fWf3nOgueYNize4VjeSdLX4Wz6CPUZkQUJoLEGPBI7OFOZNVssE_3ZgglqDKT5A4J",
+      "randstr": "@8mB",
+      "collectLength": 4940,
+      "postBodyFields": 39,
+      "tdcSourceLength": 162790,
+      "notes": "First attempt succeeded on first try. Slide CAPTCHA served, not click."
+    },
+    {
+      "run": 2,
+      "captchaType": "slide",
+      "errorCode": 0,
+      "ticket": "t03tservercGvDR7E5JSnQntDXwQaU0dtmiAFUPYIYiSoJtgXoGaAozA5vKjsy9HqmxMOWhwYSD-v8X74sO-dmnAEeTh5cawt72YSnxX2TrxInPgeCaH4qXW5ocIRnJbXcTl1jHybJ",
+      "randstr": "@73O",
+      "collectLength": 5036,
+      "postBodyFields": 39,
+      "tdcSourceLength": 130006,
+      "notes": "Second attempt succeeded on first try. Different tdc.js build served (130006 chars vs 162790)."
+    },
+    {
+      "run": 3,
+      "captchaType": "slide",
+      "errorCode": 0,
+      "ticket": "t03tserveruhNeAILvc50P_unhPP_vZzun_YeJDbA3bb5l8w0DQaxyTrJvvwab4nlWYdO3kDODztsjxfYnGsRicOBFPyZrllTnMFfkrhj-Y348EpOMsIO1r_O1lzZ6IIQ9caPndyLM",
+      "randstr": "@xvx",
+      "collectLength": 5024,
+      "postBodyFields": 39,
+      "tdcSourceLength": 132906,
+      "notes": "Third attempt succeeded on first try. Yet another tdc.js build size (132906 chars)."
+    }
+  ],
+  "conclusion": "All 3 runs returned errorCode 0 (success) with valid tickets. The CAPTCHA type is still 'slide' (not click). This confirms that Chrome's real tdc.js generates accepted collect tokens. The standalone token generator's errorCode 9 rejection is therefore caused by the standalone collect token, not by any server-side change. Notable: Tencent served 3 different tdc.js builds across 3 runs (162790, 130006, 132906 chars), confirming active template rotation."
+}
