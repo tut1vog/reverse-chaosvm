@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 8: Scraper Foundation Modules
-Current task: 8.2 — Parameterized collect token generator
+Current task: 8.3 — Tests for foundation modules
 
 ---
 
@@ -73,8 +73,8 @@ Current task: 8.2 — Parameterized collect token generator
 | ID | Task | Status |
 |----|------|--------|
 | 8.1 | Template cache and TDC utilities (tdc-utils.js, template-cache.js) | done |
-| 8.2 | Parameterized collect token generator (collect-generator.js) | in-progress |
-| 8.3 | Tests for foundation modules | pending |
+| 8.2 | Parameterized collect token generator (collect-generator.js) | done |
+| 8.3 | Tests for foundation modules | in-progress |
 
 ### Phase 9: vData Generation
 > Execute vm-slide.enc.js in jsdom to produce vData without a browser.
@@ -105,41 +105,48 @@ Current task: 8.2 — Parameterized collect token generator
 
 ## Current Task
 
-**ID**: 8.2
-**Title**: Parameterized collect token generator
+**ID**: 8.3
+**Title**: Tests for foundation modules
 **Phase**: Scraper Foundation Modules
 **Status**: in-progress
 
 ### Goal
-Create `scraper/collect-generator.js` — a parameterized XTEA encryption module that generates collect tokens using any template's key (not just Template A's hardcoded key). Reuses `token/outer-pipeline.js` and `token/collector-schema.js` for the key-independent parts; only re-implements the XTEA cipher with dynamic key/delta/keyModConstants parameters.
+Write comprehensive tests for the three Phase 8 modules: `scraper/tdc-utils.js`, `scraper/template-cache.js`, and `scraper/collect-generator.js`. Tests must be written by a different agent than the one that wrote the implementation.
 
 ### Context
-- **`token/crypto-core.js`** has hardcoded `STATE_A = [0x6257584F, ...]`, `DELTA`, `KEY_MOD_1`, `KEY_MOD_3`. These are Template A only. We need a version that accepts these as parameters.
-- **`token/outer-pipeline.js`** exports `buildCdString`, `buildSdString`, `assembleToken`, `urlEncode`, `buildToken` — all key-independent, safe to `require()`.
-- **`token/collector-schema.js`** exports `buildDefaultCdArray` — also key-independent, safe to `require()`.
-- **`token/generate-token.js`** exports `generateToken(profile, options)` and `buildInputChunks(cdString, sdString)` — these call the hardcoded `encryptSegments`. Our module should replicate the chunk-building + encryption pipeline with a parameterized encrypt function.
-- **Template XTEA params** come from `scraper/template-cache.js` (task 8.1) as `{key: [4 ints], delta: int, rounds: int, keyModConstants: [2 ints]}`.
-- The `buildToken` function in `outer-pipeline.js` takes an `encryptFn(chunks) → base64segments[]` — this is the pluggable interface. We create our own `encryptFn` parameterized by key/delta/keyModConstants.
-- **XTEA cipher algorithm** (from `token/crypto-core.js` lines 94-122):
-  - `cipherRound(r9, r92)` — Feistel with sum accumulation, key mod on indices 1 and 3
-  - `encrypt(inputBytes)` — 8-byte block ECB
-  - `encryptSegments(chunks)` — encrypt + btoa each chunk
+- **`scraper/tdc-utils.js`** exports `extractTdcName(source)` and `extractEks(source)`. Both take a tdc.js source string and return a string or null.
+- **`scraper/template-cache.js`** exports `TemplateCache` class with `load()`, `save()`, `lookup(tdcName)`, `store(tdcName, params)`, `seed()`. Cache file at `scraper/cache/templates.json`.
+- **`scraper/collect-generator.js`** exports `generateCollect(profile, xteaParams, options)` and `createEncryptFn({key, delta, rounds, keyModConstants})`. Also exports internal cipher functions for testing.
+- **Known test data**:
+  - Template A: TDC_NAME=`FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk`, key=`[0x6257584F,0x462A4564,0x636A5062,0x6D644140]`, delta=`0x9E3779B9`, rounds=32, keyModConstants=`[2368517,592130]`
+  - Template B: TDC_NAME=`SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD`, key=`[0x6B516842,0x4D554B69,0x69655456,0x452C233E]`
+  - Template C: TDC_NAME=`WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE`, key=`[0x5949415A,0x454D6265,0x6D686358,0x6C66525F]`
+  - EKS length is always 312 for all targets
+  - `token/crypto-core.js` `encryptFn` is the reference for Template A encryption
+  - `token/generate-token.js` `generateToken(cdArray, sdObject, timestamp)` is the reference for full token output
+- **Target files** for testing: `targets/tdc.js`, `targets/tdc-v2.js`, `targets/tdc-v5.js`
+- **Profile**: `profiles/default.json`
+- **Existing test pattern**: see `tests/test-vm-parser.js` or `tests/test-opcode-mapper.js` — uses Node.js built-in `node:test` and `node:assert`.
 - **Protected paths**: Do NOT modify `token/`, `pipeline/`, `puppeteer/`, `targets/`.
+- Update `package.json` test script to include the new test file.
 
 ### Implementation Steps
-1. Create `scraper/collect-generator.js` with:
-   - `createEncryptFn({key, delta, rounds, keyModConstants})` → returns an `encryptFn(chunks)` compatible with `outer-pipeline.buildToken()`.
-   - Internal helpers: `convertBytesToWord`, `convertWordToBytes`, `cipherRound`, `encrypt` — copied from `token/crypto-core.js` but parameterized (key/delta/keyModConstants as closure variables instead of module constants).
-   - `generateCollect(profile, xteaParams, options)` — main entry point. Builds cdArray from profile via `collector-schema.buildDefaultCdArray`, builds cdString/sdString via `outer-pipeline`, builds input chunks (same logic as `generate-token.buildInputChunks`), encrypts with parameterized XTEA, assembles + URL-encodes.
-2. The function signature of `generateCollect` should match what the scraper orchestrator needs:
-   - `profile`: fingerprint profile object (from `profiles/*.json`)
-   - `xteaParams`: `{key, delta, rounds, keyModConstants}` from template cache
-   - `options`: `{appid, nonce}` for sdString
+1. Create `tests/test-scraper-foundation.js` using `node:test` and `node:assert`.
+2. Test suites to include:
+   - **tdc-utils: extractTdcName** — all 3 targets return correct names, invalid input returns null
+   - **tdc-utils: extractEks** — all 3 targets return 312-char strings, invalid input returns null
+   - **template-cache: lookup** — pre-seeded cache returns correct params for all 3 templates, unknown name returns null
+   - **template-cache: store** — stores new entry and can look it up, updates lastSeen
+   - **template-cache: seed** — seeds from output/ files and produces correct entries
+   - **collect-generator: createEncryptFn** — Template A params produce byte-identical output to `token/crypto-core.encryptFn`
+   - **collect-generator: generateCollect** — Template A with fixed inputs matches `token/generate-token.generateToken` exactly (use fixed timestamp, nonce, appid)
+   - **collect-generator: different templates** — Template A and B produce different tokens
+3. Update `package.json` test glob to include the new file.
 
 ### Verification
-- [ ] Generate a collect token with Template A params and compare output length to `token/generate-token.js` output (both should produce ~4460 char URL-encoded strings from the same profile).
-- [ ] Verify the parameterized encrypt produces byte-identical output to `token/crypto-core.encryptFn` for Template A params: `node -e` test that encrypts the same input with both and compares.
-- [ ] Generate a collect token with Template B params (different key) — should succeed and produce a different token than Template A.
+- [ ] `node --test tests/test-scraper-foundation.js` — all tests pass
+- [ ] `npm test` — full suite passes (no regressions)
+- [ ] Tests contain meaningful assertions (not just "runs without error") — verify by reading the test source
 
 ### Suggested Agent
-general-purpose — reimplementation of known algorithm with parameterization
+general-purpose — writing tests against known interfaces with reference data
