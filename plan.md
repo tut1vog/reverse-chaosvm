@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 3 — VM Parser & Opcode Auto-Mapper
-Current task: 3.3 — Tests for VM parser and opcode mapper
+Current phase: Phase 4 — XTEA Key Extractor
+Current task: 4.1 — Implement dynamic key extraction module
 
 ---
 
@@ -31,14 +31,14 @@ Current task: 3.3 — Tests for VM parser and opcode mapper
 |----|------|--------|
 | 3.1 | Implement VM variable identifier module | done |
 | 3.2 | Implement opcode auto-mapper module | done |
-| 3.3 | Tests for VM parser and opcode mapper (validate against tdc.js reference table) | in-progress |
+| 3.3 | Tests for VM parser and opcode mapper (validate against tdc.js reference table) | done |
 
 ### Phase 4: XTEA Key Extractor
 > Build Puppeteer-based dynamic tracing to extract XTEA key schedule from any tdc build.
 
 | ID | Task | Status |
 |----|------|--------|
-| 4.1 | Implement dynamic key extraction module | pending |
+| 4.1 | Implement dynamic key extraction module | in-progress |
 | 4.2 | Tests for key extractor (validate against tdc.js known key) | pending |
 
 ### Phase 5: Token Verifier & Pipeline Orchestrator
@@ -64,32 +64,72 @@ Current task: 3.3 — Tests for VM parser and opcode mapper
 
 ## Current Task
 
-**ID**: 3.3
-**Title**: Tests for VM parser and opcode mapper
-**Phase**: VM Parser & Opcode Auto-Mapper
+**ID**: 4.1
+**Title**: Implement dynamic key extraction module
+**Phase**: XTEA Key Extractor
 **Status**: in-progress
 
 ### Goal
-Write comprehensive tests for `pipeline/vm-parser.js` and `pipeline/opcode-mapper.js` using Node.js built-in test runner. Tests must validate correctness against the known-good reference (tdc.js Template A) and verify cross-template support.
+Build a Puppeteer-based module that dynamically extracts the XTEA key schedule from any tdc.js build. This is the second core pipeline component — after opcodes are mapped, we need the encryption key before we can verify tokens.
 
 ### Context
-- `pipeline/vm-parser.js` — exports `parseVmFunction(src)` returning `{ variables, switchNode, caseCount, dispatchFunction }`
-- `pipeline/opcode-mapper.js` — exports `mapOpcodes(parseResult)` returning `{ opcodeTable, unmapped, notes }`
-- Known-good reference: tdc.js has 95 opcodes mapping to the table in `decompiler/disassembler.js` lines 27-123
-- Cross-template results: tdc-v2 (94 cases, 92 mapped), tdc-v5 (100 cases, 91 mapped)
-- Existing test convention: `tests/test-*.js` files using `node --test`
-- Important: this task must be done by a DIFFERENT agent than the one that wrote the implementation
+The existing `dynamic/crypto-tracer-v3.js` works for Template A but is completely hardcoded:
+- PC addresses: 68860 (cipher CALLQ), 50162/34415/35472 (function entries)
+- Opcode numbers: hardcoded maps (`0: 'ADD'`, `6: 'SHR_K'`, etc.)
+- Switch discriminant: hardcoded `'switch (Y[++C])'` string
+- All of these differ per template
+
+The pipeline key extractor must be **template-agnostic**: given the opcode table from `pipeline/opcode-mapper.js` and the variable roles from `pipeline/vm-parser.js`, it should dynamically find the cipher and extract the key.
+
+**Known values for Template A** (validation target):
+- `STATE_A = [0x6257584f, 0x462a4564, 0x636a5062, 0x6d644140]`
+- `DELTA = 0x9E3779B9`
+- Round count: 32
+- Key mod constants: `+2368517` (KEY_MOD_1), `+592130` (KEY_MOD_3)
+
+**Key reference files**:
+- `dynamic/crypto-tracer-v3.js` — the hardcoded Template A tracer (study approach, don't copy PC values)
+- `token/crypto-core.js` — standalone XTEA implementation (shows the algorithm and known constants)
+- `docs/CRYPTO_ANALYSIS.md` — full XTEA analysis
+- `pipeline/vm-parser.js` — provides variable roles and switch AST
+- `pipeline/opcode-mapper.js` — provides opcode table
+
+**Approach**: The key extraction strategy from crypto-tracer-v3 is sound:
+1. Serve the tdc.js via local HTTP server
+2. Patch the VM dispatch to intercept arithmetic/bitwise operations
+3. Trigger token generation (`TDC.getData()`)
+4. Capture register values during cipher execution
+5. Extract the key from the trace data
+
+But the patching must use the dynamically-determined variable names and opcode numbers.
+
+**Output location**: `pipeline/key-extractor.js`
 
 ### Implementation Steps
-1. Create `tests/test-vm-parser.js`
-2. Create `tests/test-opcode-mapper.js`
-3. Update `package.json` to include the new test files in the test script
+1. Create `pipeline/key-extractor.js` exporting `extractKey(tdcPath, opcodeTable, variables)` (async)
+2. Build the source patching function that:
+   - Uses `variables.bytecode` and `variables.pc` to find the switch discriminant (not hardcoded `'switch (Y[++C])'`)
+   - Uses `opcodeTable` to find which case numbers are arithmetic/bitwise ops
+   - Injects tracing code that captures register values for those operations
+3. Build the Puppeteer harness that:
+   - Serves the patched tdc.js via local HTTP server
+   - Freezes non-deterministic values (Date.now, Math.random, performance.now) for reproducibility
+   - Loads the page and calls `TDC.getData()` to trigger the cipher
+   - Collects the trace data
+4. Build the key extraction logic that:
+   - Identifies the cipher round function by looking for repeated XOR+shift+add patterns
+   - Extracts the XTEA key (4 × uint32) from the traced values
+   - Extracts delta, round count, and key modification constants
+5. Return `{ key: [uint32, uint32, uint32, uint32], delta, rounds, keyModConstants: [n1, n2], verified: bool }`
 
 ### Verification
-- [ ] `node --test tests/test-vm-parser.js` passes
-- [ ] `node --test tests/test-opcode-mapper.js` passes
-- [ ] Tests cover: correct variable identification for all 5 targets, case count accuracy, opcode table correctness for tdc.js (all 95 entries), cross-template mapping works, unmapped cases are reported correctly
-- [ ] Existing tests still pass: `npm test` produces same results as before (9/11 pass)
+- [ ] `pipeline/key-extractor.js` exists and exports `extractKey`
+- [ ] Running on tdc.js with its opcode table and variables extracts the known key: `[0x6257584f, 0x462a4564, 0x636a5062, 0x6d644140]`
+- [ ] Delta is `0x9E3779B9`
+- [ ] Round count is 32
+- [ ] Key mod constants are `[2368517, 592130]`
+- [ ] No hardcoded PC addresses or opcode numbers from Template A in the module
+- [ ] No modifications to existing files
 
 ### Suggested Agent
-general-purpose — test writing (must be different agent than implementation)
+general-purpose — Puppeteer instrumentation, complex but with reference implementation to adapt
