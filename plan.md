@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 12
-Current task: 12.5 — Live end-to-end verification of headless scraper
+Current phase: Phase 13
+Current task: 13.2 — Investigate vsig/websig source + fetch live vm-slide.js
 
 ---
 
@@ -112,21 +112,56 @@ Current task: 12.5 — Live end-to-end verification of headless scraper
 | 12.4 | Update default profile and fix scraper to produce valid collect tokens | done |
 | 12.5 | Live end-to-end verification of headless scraper | done |
 
+### Phase 13: ErrorCode 9 Debugging — Session-Specific Fixes
+> Fix the root causes of errorCode 9: session-specific field overrides, vsig/websig investigation, live vm-slide.js, and re-test.
+
+| ID | Task | Status |
+|----|------|--------|
+| 13.1 | Fix session-specific cd field overrides and scraper test | done |
+| 13.2 | Investigate vsig/websig source + fetch live vm-slide.js | in-progress |
+| 13.3 | Live re-test after fixes | pending |
+
 ---
 
 ## Current Task
 
-Phase 12 complete. Awaiting user direction.
+**ID**: 13.2
+**Title**: Switch to show page path, fetch live vm-slide.js, ensure vsig/websig
+**Phase**: ErrorCode 9 Debugging
+**Status**: in-progress
 
-### Phase 12 Results
+### Goal
+Ensure the scraper uses the show page path (not legacy JSONP) to get vsig/websig, showUrl, and live vm-slide.js URL. The legacy path (`_getSigLegacy`) does not set `showUrl` and may not provide vsig/websig. The show page path (`_getShowConfig`) provides all of these.
 
-The scraper runs end-to-end without crashes. All pipeline steps succeed: prehandle → getSig → images → tdc → template match → slider solve → collect generation → vData → verify POST. However, the server consistently returns **errorCode 9** (token rejected).
+### Context
+In `puppeteer/captcha-client.js`, `getSig()` tries legacy JSONP first, falls back to show page on 404. The legacy endpoint:
+- Does NOT set `showUrl` in its return object
+- May return empty vsig/websig
+- Does not provide vm-slide URL
 
-**Root causes identified (priority order)**:
-1. **HIGH: Static pageUrl** — cd field 22 is hardcoded to a fixed URL from profile instead of the actual session show page URL
-2. **HIGH: Empty vsig/websig** — may indicate a flow issue with getSig
-3. **MEDIUM: Stale vm-slide.js** — cached version may not match live server expectations
-4. **MEDIUM: New template formats** — 96-opcode (unported) and 200k no-switch-case (new obfuscation) seen in rotation
-5. **LOW: Static sid** — session ID in cd array should be overridden with actual session.sid
+The show page (`_getShowConfig`):
+- Sets `showUrl` (the full show page URL with session params)
+- Provides vsig/websig from embedded config
+- HTML contains vm-slide script URL (parseable via `parseVmSlideUrl`)
 
-**Suggested Phase 13**: Fix the HIGH-priority issues (pageUrl override, vsig investigation) and re-test.
+The scraper's `_getVmSlideSource` already tries to find vm-slide from `sig._raw` but uses wrong field names (`vmSlide`, `vm_slide`, `vmSlideFileName`). The actual show page config likely uses a different key.
+
+Key files:
+- `puppeteer/captcha-client.js` — `getSig()`, `_getSigLegacy()`, `_getShowConfig()`
+- `scraper/scraper.js` — `solveCaptcha()`, `_getVmSlideSource()`
+- `scraper/vdata-generator.js` — `parseVmSlideUrl()` for extracting script URL from HTML
+
+### Implementation Steps
+1. In `scraper/scraper.js`, after getSig, check if `sig.showUrl` is set. If not (legacy path was used), construct a show page URL from session params, OR force the show page path by adding a `useShowPage` option.
+2. Fetch live vm-slide.js: after getting the show page config, look for vm-slide URL in `sig._raw` or in the show page HTML. Use `parseVmSlideUrl` on the HTML if available.
+3. Update `_getVmSlideSource` to look for the correct field names in `sig._raw`.
+4. Live test: run the scraper and observe whether showUrl, vsig/websig, and vm-slide are populated.
+
+### Verification
+- [ ] `sig.showUrl` is always populated (even if legacy path is used)
+- [ ] Live vm-slide.js is fetched when available (not always falling back to sample/)
+- [ ] `npm test` — 163/165 pass (no regressions)
+- [ ] `node -c scraper/scraper.js && node -c puppeteer/captcha-client.js` — no syntax errors
+
+### Suggested Agent
+general-purpose
