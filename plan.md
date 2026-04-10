@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 6 — Multi-Version Validation
-Current task: 6.1 — Port tdc-v3 (Template A — same as tdc.js, sanity check)
+Current task: 6.4 — Update documentation with all findings
 
 ---
 
@@ -55,26 +55,28 @@ Current task: 6.1 — Port tdc-v3 (Template A — same as tdc.js, sanity check)
 
 | ID | Task | Status |
 |----|------|--------|
-| 6.1 | Port tdc-v3 (Template A — same as tdc.js, sanity check) | in-progress |
-| 6.2 | Port tdc-v2 (Template B — different opcodes and XTEA key) | pending |
-| 6.3 | Port tdc-v4 and tdc-v5 (unknown templates) | pending |
-| 6.4 | Update documentation with all findings | pending |
+| 6.1 | Port tdc-v3 (Template A — same as tdc.js, sanity check) | done |
+| 6.2 | Port tdc-v2 (Template B — different opcodes and XTEA key) | done |
+| 6.3 | Port tdc-v4 and tdc-v5 (unknown templates) | done |
+| 6.4 | Update documentation with all findings | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 6.1
-**Title**: Port tdc-v3 (Template A — same as tdc.js, sanity check)
+**ID**: 6.4
+**Title**: Update documentation with all findings
 **Phase**: Multi-Version Validation
 **Status**: in-progress
 
 ### Goal
-Run the automated pipeline on tdc-v3.js as a sanity check. This is the same template as tdc.js (Template A, 95 opcodes) so it should pass with byte-identical token match.
+Update CLAUDE.md version status table and project memory with the verified multi-version results.
+
+### Implementation Steps
+1. Update CLAUDE.md version status table with all 5 targets verified
+2. Update the "Open questions" section — we now have answers
+3. Add pipeline usage instructions to CLAUDE.md
 
 ### Verification
-- [ ] `node pipeline/run.js targets/tdc-v3.js` completes all 4 stages
-- [ ] Template classified as A (95 opcodes)
-- [ ] XTEA key matches tdc.js key (same template)
-- [ ] Token verification: byte-identical match
-- [ ] Output files saved to `output/tdc-v3/`
+- [ ] CLAUDE.md version status shows all 5 targets with verified status
+- [ ] Open questions updated with findings

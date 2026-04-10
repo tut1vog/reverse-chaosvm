@@ -1,0 +1,42 @@
+{
+  "match": true,
+  "liveTokenLength": 4458,
+  "standaloneTokenLength": 4458,
+  "segments": [
+    {
+      "name": "hash",
+      "liveLength": 64,
+      "standaloneLength": 64,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "header",
+      "liveLength": 96,
+      "standaloneLength": 96,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "cdBody",
+      "liveLength": 3936,
+      "standaloneLength": 3936,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "sig",
+      "liveLength": 120,
+      "standaloneLength": 120,
+      "match": true,
+      "firstDivergenceOffset": null
+    }
+  ],
+  "capturedData": {
+    "cdString": "{\"cd\":[1,\"linux\",2,800,\"\",\"\",[\"en-US\"],\"\",8,[1920,1080],1,              ,0,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],1,20,840000000,1700000000,0,{\"nt_vc_output\":{\"ac-baseLatency\":0.01,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":10240},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"data:image/png;base64,FROZEN_CANVAS_FINGERPRINT\",{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},\"http://127.0.0.1:44387/?rand=1519713624347\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,4,\"+08\",0,\"srgb\",[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],0,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",\"UTF-8\",\"0;0\",{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},null,\"Google Inc. (Google)\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},\"98k\",\"unknown\",\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",\"top\",{\"_state\":-2},\"\",600,0,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"800-600-600-24-*-*-|-*\",\"Linux x86_64\",24,\"\",0,1700000000,1700000000,679647370,\"\",0,1023,\"\"]}",
+    "sdString": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+    "timestamp": 1700000000000
+  },
+  "eksToken": "7r8JkaohOcTRG3tzmb1bIvPmzTU4U46LUSQvpvcY1XZ8zcPp+59TCvjmbwQKzfwdYydqDHyCH8SPzdikmXIGaNt5aKsCWetmE5ayCudet2HAyDCzdvPSNc8ag4z3cdyoWG7GTVTHJS5pYnNAvWWvDAE6BXH9iosOJXBSwXZ4kpW4Xi+8tsEFdxehDVoMYJUVSWRizCJXl3Saalbr2LDURJwPvUCReGp1eZEqP6FD4xQpSxXdUIXoJr9GW4h9LingPbesB13E3nnpr09nr+sF2cu7hi80uqPO6YadlFXntLMicO7X534yJw==",
+  "notes": "Tokens are byte-identical; Frozen timestamp confirmed (2 Date.now calls)"
+}

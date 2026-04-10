@@ -1,0 +1,42 @@
+{
+  "match": true,
+  "liveTokenLength": 4508,
+  "standaloneTokenLength": 4508,
+  "segments": [
+    {
+      "name": "hash",
+      "liveLength": 64,
+      "standaloneLength": 64,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "header",
+      "liveLength": 1152,
+      "standaloneLength": 1152,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "cdBody",
+      "liveLength": 2880,
+      "standaloneLength": 2880,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "sig",
+      "liveLength": 120,
+      "standaloneLength": 120,
+      "match": true,
+      "firstDivergenceOffset": null
+    }
+  ],
+  "capturedData": {
+    "cdString": "ÁÚ}À!FÙæn¿×äoòÃÆK\u0013$õ¡5yëo¬ÑÁXýiU;°wÚL\u0018½×\bYä\u001d<¬é\u0018\u0010ð;¾þ ,ülþ¶AäáîQ¾3DR@gxwF>«Þ\u0012'86\u0014¸9$½ø ²GÔM<\u0001\u000f=¦²I\fG=®wñµY'\rMö'õÝ<\u001býïñ½¸¾´Há/´\b¶ñç%n7·äÇ\u001d^®ú\u0017§Ñ}ø\u0015~ÆÞ:'z\u0003-µa\u0017x\tkkÁ°ÄWö\u0001¶Ú8s*I¬í\n1ì\u0014mí\tsö <\u0016a4³<®Ó\u001bprµæ=S´÷>î4ÖÇéOQ$ÃhÒ¬Åa\u000b\u0007Z\u001f¸\u0017/<\u0001\u000f=¦²I\fG=®wñµY'\rMö'õÝ<\u001býï\u0015-¾«c\u001c]þÛÇÈ\u0012îÌ¬\"07¸û\u0010&CÀ-\u001c¯¦øaÈçØ?\u0001z-äSºOª?\u0000c¹NF´÷>î4ÖÇéOQ$ÃhÒ¬Åa\u000b\u0007@õÛS\rlÐ-Q('þÛÇÈ\u0012îÌ¬\"07¸û\u0010&CÀ-\u001c¯¦øaÈçØ?\u0001p;-._KÉ´÷>î4ÖÍ\"2¦û\u001cÝâg2<>°ÑªÛgñ&-ªmp|q _WK*h\u0012cªÞô³íØÏM\u0014BÀÌ¨«tû44{µcF\u000eC]½\u0000g½lþöÎÁ£ÔmõÉ\u0011k\u001f×y·hÁó\u0018Aðm%¸=WÇÏD|ÍV4a60(ìX\f\u0005ù&ßf$];\"ú½ ï4cjô9'uò]Û¶T¥\u0001\u0001\u00195¯Û»\u0019cÑ'ß\u000f\u0010vÌ0ó\u001cöîû X\u0018KÙxá/ãÝb?V°ùDaÌç%ð5îùr1R\u0019§'ySGÁ'\u0004[E-V<Ïq½A,>x\u0012ÿ\fB\u00152\u000bô}#jÂzÈ{Ð\n¦Æ¥æ¢Ñ\u0012SÊÎ\u001fÛ\u001ehß,#W°#P\u000eAnvqT§oÝ+ å8o\u0002\fxÙJ=±[òÒùÝOñOÖ¸ö9æã,¥Kf\u0015ð\u0005Ú}`ºsþ\u0005À\u0017\u0004 R\u0002º\u0014?®ÚRà9\fªÈ©30HóVç.Æù\u001dî9W\u0002\u0015oþT÷hîcæÚ¥=; YcþÇ¯\u0003\u0012§ª6nÒ\u001aU(d\u0013ø7ä×F1#iÒ\u000b *  ¹±ÿªËµ-kõÝ<\u001býïG +\u0019\u0015{KzPs*BºEÛÓÈw}Ý\u0015vA\u0013YkHþm9¤R>8M¢\u0015)­ÓVï\u0010¢>÷J¾\u0007´÷>î4ÖÇéOQ$ÃhÒ¬Åa\u000b\u0007ñ?A\u0014{å\u0000²8?k0\u001eÚPs*BºEÛ\"¥Ñ\u0003îZy¤R>8MóØæÄv{s$hX±Ð`\u000fç\u0001:\nâÍc\u0017¸ÞIîÍ§Ä¼-ÇDNwH\nc£~©Ë¦«î$ö\u0001¶Ú8s*I¬í\n1ì\u0014mí\tsö <\u0016aÄEMÆ8&þÛÇÈ\u0012îÌ¬\"07¸û\u0010&CÀ-\u001c¯¦øaÈçØ?\u0001Dó¡ÏíÙÜþÛÇÈ\u0012îÌ>øªn$àaÈçØ?\u0001o\u00075*ü\u001câþÛÇÈ\u0012îÌ$Ë~(\u000e\u000b\u0003Õø*\u000f?<,ºÎq¤?Bô\u0016\u0014\u0004¼>ø÷m7 WÝã¡ÎÍ»¢\u0018B\u0002/\u0011HÛð\u0012²_\u0019zRCÚ\u0017±0»Ç7#Ô­pÍ:Î.ð[:º³Ñ\u0002Ù76&Ot¹2¢Et+»uv@|ð\"\b(LëM¶-\u000fÈùQ½1ÉüJ,ï¨ÞE°\føÇÁÓªpkt{Áè+3Wû$ïR\u0019u[KÜÕÝã²ß\u001ev°\u0005\u0004çþmÊ¿á}Ä\u0004£¾í6\u0007iø5ì&ö\"åÎ\u001b}²´\u0013\"Æ\u001b3\u0011±K\u001c}|õó@Aöqy|\u0013ì1þ\u001dñpe\u000b¹ å ªRN­\u0006é¢§\u0007ß»dv\u0018B:\u0013î8U01æ4­M¾\u0003Ü0'\u0007tY\u001eKUïõF\bÖP\u000f(\u001dakãáÃZApùþ-í\u0001vËó\u001d+åÙ$×òÞa¡Ø¥A½\bO´hJ¤þÆ;º5ÿ]¬½\u0010Öm!3ö6>^}MÅÿ\u0014éz\u001c\u0018àúP#\u000ej\u0016ÚÇû¶;üYuÔ¢ä\u001d\u0011í\\\u0005wË^26ù\t8j\n®m¥(_\u0010äkþ\u0017?G±¸¾â\rNCÀ\"czJ\n*¤i'ñ\u0013Jv0ôxC¶NÞ6>^}MÅÿ\u0014éz\u001c\u0018àúP#\u000ej\u0016ÚÇû¶;üYuÔùHVS§\u0005²­Èï}Ê5[ög%\u001e\u0000\u0011©`c!\tÛ© B-\r£<ô^85S\u001a7 Q\u0017{JVx \u001c\u0018\tÁX\u001bPî2\u000bô}#jÂz\u0001sÃ\u0014òÎZ\u0013ËÞ-U\u0017ÏJÎ ßÐa¸Öí0Ã1nÿÐ[Th\u0016×[û¿²\rT$¸NÓRÒ£8)¨p`g\u0015Em¿ºH8~ã\u0007*u\u0015ëQÁ\u0013­MPf\b\fC×À¸ê\u00064½í1ZÖ\u0000ÌM27¬N±R}x\"¿ºxÑ\u0014£ç±PÒm\f>ÅäVÒ/ôpñ\rå¥¿t`HúRQÊ¡]abÚÌ.ÆR\"qÔj.¬ÜÌö¯X«Òko´æÞ\u0013\u0018Ibt·v\u0005³Ô÷wm»ÀéFLx\u001dì²i\fJ\u0014úÊé`úPD ¸\u0014@æwîý\u001a.fÌÿ6Ã\\ÈG{yT\u0010¿dZë.äþÅõÜ÷Ë=KOÁR\fëHb6(#[@ôM²Kóe\u0011ÇÂ\u0007§ \u0002ÃbÏ\tg\u0003m@pÆ0m\u0017~Û%{=éÜF<\"¤\u0012§ìÏr³\u0015lòê\rw=±\t¸°z_ÀãWd(ÅÐ7±\u001dykS#\\JLäù¢\u0000\u0007ä,z_¼#ûù`­Jû&R©üøV\u0000Â{²\u0005\u0016ñ]+,®f]eóEë8£¹1X×\u001a\u0012\u0014þ^v-{üìUÕ¨³õ)&!Úý&õÄ¥øp\u0002·\u000b+z{yT\u0010¿dZë.äþÅõÜ÷Ë=KOÁR\fëHb6(#[@ôM²Kóe\u0011ÇÂ\u0007§ \u0002ÃbÏ\tg\u0003m@pÆ0m\u0017~Û%{=éÜF<\"¤\u0012§ìÏr³\u0015m´\u0012Ì\bÛU\bÔ5à®\u0016Jc¸°z_ÀãWd(ÅÐ7±\u001dykS#\\JLäù¢\u0000\u0007ä,z_¼#ûù`­Jû&R©üøV\u0000Â{²\u0005\u0016ñ]+,®f]eóEë8£¹1X×\u001a\u0012\u0014þ^v-{üìUÕ¨³õ\u001cfQ´8½ÁÝ`¢o39ïõwsÈs`\u001aë.äþÅõÜ÷Ë=KOÁR\fëHb6(#[@ôM²Kóe\u0011ÇÂ\u0007§ \u0002ÃbÏ\tg\u0003m@pÆ0m\u0017~Û%{=éÜF<\"¤\u0002µ¡µÝ|2(»ÿ¹¡ÒÞà.%f]ÿ\u0011þ»Xúªvh:ß«\t\u0010%n@`ÊB¥öÙÈ\u0002_èæ«¡y)\r9%}É|?ÁîY)\n\u0010Üc ¹\u0005eÓ\u0006\u0003ÄÞpÙ¢^DÂäPßeç[^)5Þ½¼L\tû÷Ê\u001cþ\u001buLÖ«\fJ$í­Ð\u0004\rÒ*¡\u0006¯ððäÙv£Þú+A¼ÙÊ\u001aóøe{Ê~\u0013ñ¡omôø¼\u001e\u0013\u001e,õTz5ñÇ\u0000Üñ8H2AoXèrcYkù\u0018¤LáTs<×¥Ìï\u0011´&TÂñM¼yF\u0001cÈ§%þÿ\u0002h­\u0015ÕcgÄÁ\u0018´Q]\u0017\b\u0018aãÊñOebKÃò¸$dWî¶v®\u0018g\u0016D@Ô±PdÈ7&­'\u0018\r½b\u001bdS·V­g\u0003\u001e`¸¯\u0016~jû\u0003­÷«r:ÿx9ó²Ê\u0007±\\Dÿüª¦ªI\u000fñ7l|Ñg\u001a@}_È2÷Ä\u0010\rÓ£\u0016­Á\u000b`\u001dmóÐ?æí:ïd@êº¾³=zøÕÔè¡)\u0012ZR\u0004\rÒ*¡\u0006¯ððäÙv£\f7¯`¦c-~óøe{Ê~\u0013ñ}ê\u0017ì|Ä*ÐÛuµôÃ ÿ\u0000Üñ8H2Aoñç\rHZjzù\u0018¤LáTs<×¥Ìï\u0011´hkîl>W{ÐÛuµôÃ ÿÇ\u0018?Püïûæ¸k§ÍÓÚ<¶\r\u001b&ðÊ\u0018¾Ì¯\u001b'\u0006ú>×¶Ìóí\n¶Ç&ç\t¨\\ëÀ\u001b])ïS;ÍãOY;k4:lÅ³<LÆ\fÚáÁ\tG¹T&ZwÄ\u0004x:Ó]}",
+    "sdString": "÷Ê·W~îsÙ¦o`\b?Nò\u0013`í\u001dÜåDÖ\bË?=O=?Y\u0003¥ö\tøòi¨¬²SþúÅvìêÿ¤\u0015ö3#Ê\u0000f^ßEÎzw²õñ^Ò\u001bÖzQQ",
+    "timestamp": 1700000000000
+  },
+  "eksToken": "pha0SmbyuhyKBPkmNxwLrbkXMED5zsOwv6ChhznCu2AvQY42JfaZWNyy0g/99ptvKPeO6IdhCSmZYHf9GvKzU16InksBRewP6mT0f0qGsrtJwCiPFEj1nkycoNWpCWr0szILcGeOj2+J8aY0438Yp6NohBabAHOWfK3Y1s6o4V8QxvDgfiXFCZ+TB3wX30YPcXCSvnHfjDRM3ZYIc4j0UxA6XK6MO9609O875n0wvHaTAzF6F6DlopARHVFss/2ck8pUh8g990vR1j0c820x2+EXewIlvp7WlD0pOPKf/9A4k3J1bhMuyA==",
+  "notes": "Tokens are byte-identical; Frozen timestamp confirmed (2 Date.now calls)"
+}

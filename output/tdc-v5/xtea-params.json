@@ -1,0 +1,16 @@
+{
+  "key": [
+    1497973082,
+    1162699365,
+    1835557720,
+    1818645087
+  ],
+  "delta": 2654435769,
+  "rounds": 32,
+  "keyModConstants": [
+    0,
+    263180
+  ],
+  "verified": false,
+  "notes": "Found 9756 sum+=delta at PC 36640; 9756 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x5949415A, 0x454D6265, 0x6D686358, 0x6C66525F]; Key mod constants: [0, 263180]"
+}
