@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: none — blocked, awaiting direction
+Current task: 19.1 — Create reference injection forensics script
 
 ---
 
@@ -180,90 +180,79 @@ Current task: none — blocked, awaiting direction
 | 18.3.2 | Fix keyMods derivation from keyModConstants | done |
 | 18.4 | In-page key instrumentation for live tdc.js | done |
 | 18.5 | Live forensics with in-page key | blocked |
-| 18.6 | Fix identified divergence | pending |
-| 18.7 | Live re-test with fix | pending |
+
+**Phase 18 outcome**: Comparison B (round-trip) proved our XTEA cipher is correct. Key extraction fails for all live builds — 4 attempts, 3 methods (cache, pipeline, in-page), all garbage. Blocking issue: `analyzeTrace()` extracts wrong keys for live templates.
+
+### Phase 19: Reference tdc.js Injection Forensics
+> Bypass the key extraction problem entirely: inject our known reference tdc.js (`targets/tdc.js`, Template A, key fully verified) into Chrome's CAPTCHA page via request interception, then compare Chrome's token output vs standalone output byte-by-byte. Both use the same known key.
+
+| ID | Task | Status |
+|----|------|--------|
+| 19.1 | Create reference injection forensics script | in-progress |
+| 19.2 | Live test with reference tdc.js injection | pending |
+| 19.3 | Fix identified divergence | pending |
+| 19.4 | Live re-test with fix | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 18.3
-**Title**: Live forensics test
-**Phase**: Token Forensics — Decrypt-Reencrypt Round-Trip
+**ID**: 19.1
+**Title**: Create reference injection forensics script
+**Phase**: Reference tdc.js Injection Forensics
 **Status**: in-progress
 
-**ID**: 18.5
-**Title**: Live forensics — blocked
-**Phase**: Token Forensics — Decrypt-Reencrypt Round-Trip
-**Status**: blocked
-
 ### Goal
-Modify `scripts/token-forensics.js` to instrument the live tdc.js on the actual CAPTCHA page (not an isolated page) to capture the real XTEA key used at runtime. The key-extractor's `patchTdcSource` + `buildInstrumentCode` + `analyzeTrace` provide the instrumentation and analysis logic — we need to apply them in-page via request interception.
+Create `scripts/ref-inject-forensics.js` — a Puppeteer script that:
+1. Launches Chrome, sets up a CAPTCHA session (prehandle → show page)
+2. Intercepts the tdc.js request and replaces the response with our reference build (`targets/tdc.js`) — a file we have the verified XTEA key for
+3. Chrome executes the reference tdc.js, calls `TDC.getData()` → produces encrypted collect token
+4. Decrypts Chrome's token with the known Template A key (guaranteed to work — byte-identical verified)
+5. Generates a standalone token with the same cd/sd/timestamp
+6. Runs the three forensic comparisons (A: plaintext, B: round-trip, C: full reconstruction)
+
+This completely bypasses the key extraction problem. We KNOW the reference key works (all 5 targets verified byte-identical). By injecting it into Chrome's actual CAPTCHA page, we can finally compare our pipeline output vs Chrome's output with a known-good key.
 
 ### Context
 
-**Why the pipeline key extractor fails for live builds**:
-The pipeline runs tdc.js on an isolated page (`http://127.0.0.1`) with frozen Date/Math/crypto and a minimal DOM. The live VM's key derivation likely depends on real CAPTCHA page state — the `cap_union_new_show` page has specific DOM elements, cookies, and session data that affect the VM's execution path, including the key schedule.
+**Known Template A XTEA params** (from `scraper/cache/` or `CLAUDE.md`):
+- Key: `[0x6257584F, 0x462A4564, 0x636A5062, 0x6D644140]`
+- Delta: `0x9E3779B9`
+- Rounds: `32`
+- keyModConstants: `[2368517, 592130]`
+- keyMods: `[0, 2368517, 0, 592130]`
 
-**What the key extractor does internally** (all in `pipeline/key-extractor.js`):
-1. `patchTdcSource(source, variables)` — finds the VM dispatch `switch(Y[++C])` and patches it to call `window.__KT(pc, opcode, regs, bytecode)` before each dispatch (line 71-94)
-2. `buildInstrumentCode(lookups)` — builds JS that defines `window.__KT` hook + freezes non-deterministic APIs (line 100-197). **For in-page use, we must NOT freeze Date/Math/crypto/canvas** — those affect fingerprinting and thus the key derivation!
-3. `analyzeTrace(ops)` — extracts key, delta, rounds, keyModConstants from traced ops (line 328-546). This is pure analysis, works independently.
-4. `buildOpcodeLookups(opcodeTable)` — converts opcode table to fast lookup sets (line 29-68)
+**Reference tdc.js**: `targets/tdc.js` — fully analyzed, byte-identical token generation verified.
 
-**These functions are currently NOT exported.** We need to either:
-- Export them from key-extractor.js (preferred — reuse existing code)
-- Or inline the necessary logic
+**Implementation approach**:
+- Base on `scripts/token-forensics.js` (already has Puppeteer setup, CAPTCHA flow, forensic comparisons, decryption functions)
+- Replace the tdc.js interception: instead of patching/instrumenting, serve `targets/tdc.js` content as the response
+- Hardcode the Template A XTEA params (no extraction needed)
+- Remove all key extraction logic (pipeline, in-page instrumentation, template cache)
+- Keep the three comparison functions (A, B, C) exactly as they are
 
-**The instrumentation approach for in-page**:
-1. Capture tdc.js source via request interception (already done in forensics script)
-2. Run `parseVmFunction` + `mapOpcodes` on the source (already done)
-3. Call `patchTdcSource(source, parsed.variables)` to add trace hooks
-4. Build a MODIFIED instrument code (like `buildInstrumentCode` but WITHOUT the Date/Math/crypto freezing — only the `__KT` hook definition, trace storage, and ARITH_OPS/LOAD_OPS lookup tables)
-5. Serve the patched source to Chrome via request interception response
-6. After page loads and TDC initializes, enable tracing: `window.__KT_ACTIVE = true`
-7. Call `TDC.setData({appid, ...})` + `TDC.getData(true)` (which triggers the cipher)
-8. Disable tracing, retrieve `__KT_OPS` from the page
-9. Call `analyzeTrace(ops)` to extract the key
-10. Use the extracted key (with correct keyMods derivation) to decrypt Chrome's collect token
-11. Now Comparisons A/B/C can all run
+**Key concern**: The `eks` token is server-baked into each tdc.js build. By injecting the reference tdc.js, the `eks` extracted from it will be stale/wrong for the current session. This is fine — we're NOT submitting to the server for verification. We're purely comparing token generation.
+
+**Files**:
+- Read: `scripts/token-forensics.js` (clone as base, ~950 lines)
+- Read: `targets/tdc.js` (the reference build to inject)
+- Create: `scripts/ref-inject-forensics.js`
 
 ### Implementation Steps
-
-**Step 1: Export internals from `pipeline/key-extractor.js`**
-Add to `module.exports`: `buildOpcodeLookups`, `patchTdcSource`, `buildInstrumentCode`, `analyzeTrace`
-
-**Step 2: Create `buildInPageInstrumentCode(lookups)` in `scripts/token-forensics.js`**
-This is a variant of `buildInstrumentCode` that ONLY includes:
-- The `__KT` trace hook function
-- The `__KT_OPS`, `__KT_ERRORS`, `__KT_ACTIVE` globals
-- The `ARITH_OPS` and `LOAD_OPS` lookup tables
-- Does NOT freeze Date.now, Math.random, performance.now, crypto, canvas
-This ensures the VM runs with real browser values so key derivation is authentic.
-
-**Step 3: Modify the forensics script's tdc.js interception**
-The script already intercepts tdc.js to capture the source. Modify it to:
-- After capturing source: parse VM, map opcodes, patch source, build instrument code
-- Serve the PATCHED+INSTRUMENTED source as the response (instead of the original)
-- This means the page loads our instrumented version of tdc.js
-
-**Step 4: After TDC.getData(), collect trace and analyze**
-- `await page.evaluate(() => window.__KT_ACTIVE = true)` before getData
-- Call getData
-- `await page.evaluate(() => window.__KT_ACTIVE = false)` 
-- Retrieve `__KT_OPS` (may be large — use batched retrieval like collectTrace does)
-- Call `analyzeTrace(ops)` → get `{ key, delta, rounds, keyModConstants }`
-- Derive keyMods = [0, kmc[0], 0, kmc[1]]
-
-**Step 5: Use the in-page extracted key for decryption and comparisons**
-Replace the current `extractXteaFromSource()` call with the in-page extraction result.
+1. Clone `scripts/token-forensics.js` as the base
+2. Remove all key extraction code (in-page instrumentation, buildInPageInstrumentCode, parseVmFunction/mapOpcodes imports, CDP Fetch patching logic, trace collection, analyzeTrace)
+3. Replace tdc.js interception with simple injection: when tdc.js is requested, respond with `fs.readFileSync('targets/tdc.js', 'utf8')`
+4. Hardcode Template A XTEA params (no extraction, no cache lookup)
+5. Keep all three comparison functions (A: plaintext, B: round-trip, C: full reconstruction)
+6. Save results to `output/ref-inject-forensics.json`
 
 ### Verification
-- [ ] `pipeline/key-extractor.js` exports `buildOpcodeLookups`, `patchTdcSource`, `analyzeTrace`
-- [ ] `node -c scripts/token-forensics.js` passes
+- [ ] `node -c scripts/ref-inject-forensics.js` passes
 - [ ] `npm test` still passes 173/175
-- [ ] Script instruments tdc.js on the real CAPTCHA page (not isolated)
-- [ ] Script does NOT freeze Date/Math/crypto in the instrument code
+- [ ] Script reads `targets/tdc.js` and serves it via interception
+- [ ] Template A XTEA params are hardcoded (not extracted)
+- [ ] No key extraction code remains (no pipeline, no in-page, no cache)
+- [ ] All three comparisons (A, B, C) are present
 
 ### Suggested Agent
 general-purpose
