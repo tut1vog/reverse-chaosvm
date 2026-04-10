@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 14
-Current task: 14.1 — Create hybrid solver script
+Current task: 14.3 — Results analysis and documentation
 
 ---
 
@@ -121,55 +121,39 @@ Current task: 14.1 — Create hybrid solver script
 | 13.2 | Investigate vsig/websig source + fetch live vm-slide.js | done |
 | 13.3 | Live re-test after fixes | done |
 
+### Phase 14: Hybrid Puppeteer HTTP + Standalone Token
+> Use Puppeteer for HTTP transport (Chrome TLS) with the scraper's standalone token generation. This isolates whether TLS fingerprinting causes errorCode 9 vs token content issues.
+
+| ID | Task | Status |
+|----|------|--------|
+| 14.1 | Create hybrid solver script | done |
+| 14.2 | Live test of hybrid solver | done |
+| 14.3 | Results analysis and documentation | pending |
+
 ---
 
 ## Current Task
 
-**ID**: 14.1
-**Title**: Create hybrid solver script
+**ID**: 14.3
+**Title**: Results analysis and documentation
 **Phase**: Hybrid Puppeteer HTTP + Standalone Token
 **Status**: in-progress
 
 ### Goal
-Create a script that uses Puppeteer (Chrome TLS) for all HTTP communication but generates the collect token using our standalone code. This isolates whether TLS fingerprinting is the root cause of errorCode 9.
+Document the conclusion that TLS fingerprinting is NOT the cause of errorCode 9, and update project docs accordingly.
 
 ### Context
-The existing `puppeteer/captcha-solver.js` (`CaptchaPuppeteer`) does everything in real Chrome — it navigates to the show page, lets tdc.js run in-browser, and the user drags the slider. It works (errorCode 0 in Phase 12.1 capture).
-
-The hybrid approach:
-1. **Puppeteer for HTTP**: Use `page.evaluate(fetch(...))` for prehandle, getSig, image download, tdc download, and verify POST — all with Chrome's TLS fingerprint
-2. **Standalone token**: Generate collect token using `scraper/collect-generator.js` (our XTEA encryption, cd reordering, slide sd)
-3. **OpenCV slider**: Solve the slide puzzle with `puppeteer/slide-solver.js`
-4. **jsdom vData**: Generate vData with `scraper/vdata-generator.js`
-
-Key files:
-- `puppeteer/captcha-solver.js` — existing Puppeteer solver (reference for Chrome-based HTTP flow)
-- `puppeteer/captcha-client.js` — existing Node.js HTTP client (reference for request formats)
-- `scraper/scraper.js` — existing scraper (reference for standalone token generation flow)
-- `scraper/collect-generator.js` — standalone collect token generation
-- `scraper/vdata-generator.js` — jsdom vData generation
-- `scraper/tdc-utils.js` — TDC_NAME and eks extraction
-- `scraper/template-cache.js` — template cache lookup
+- `output/hybrid-test.json` — 4 runs, errorCode 9 with Chrome TLS (same as Node.js)
+- `output/scraper-live-test-13.json` — Phase 13 results (27 sub-attempts, all errorCode 9 with Node.js HTTP)
+- CLAUDE.md Known limitations section mentions TLS fingerprinting
 
 ### Implementation Steps
-1. Create `scripts/hybrid-solver.js` that:
-   a. Launches Puppeteer with stealth plugin
-   b. Uses `page.evaluate(fetch(...))` to call prehandle
-   c. Navigates to the show page URL (to get Chrome TLS + cookies) and intercepts tdc.js + images
-   d. Solves the slider with OpenCV
-   e. Extracts TDC_NAME and eks from intercepted tdc.js
-   f. Looks up template cache for XTEA params
-   g. Generates collect token using `generateCollect` with profile overrides
-   h. Generates vData using `generateVData` in jsdom
-   i. Submits verify POST via `page.evaluate(fetch(...))` — Chrome TLS for the verify call
-   j. Logs the errorCode and result
-
-2. The script should be runnable as `node scripts/hybrid-solver.js` and output results to stderr + JSON file.
+1. Update CLAUDE.md to reflect TLS disproved finding
+2. Update `docs/WORKFLOW.md` with Phase 14 findings
 
 ### Verification
-- [ ] `node -c scripts/hybrid-solver.js` — no syntax errors
-- [ ] Script runs and reaches the verify POST step (even if errorCode != 0)
-- [ ] Verify POST is made via Puppeteer (Chrome TLS), not Node.js HTTP
+- [ ] CLAUDE.md updated with TLS disproved conclusion
+- [ ] Workflow docs updated
 
 ### Suggested Agent
 general-purpose
