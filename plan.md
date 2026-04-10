@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 15
-Current task: 15.4 — Live test with Chrome-generated vData
+Current task: none — awaiting direction
 
 ---
 
@@ -138,35 +138,10 @@ Current task: 15.4 — Live test with Chrome-generated vData
 | 15.1 | Build POST body comparison script | done |
 | 15.2 | vData and jQuery serialization comparison | done |
 | 15.3 | Modify hybrid solver: Chrome vData generation | done |
-| 15.4 | Live test with Chrome-generated vData | in-progress |
+| 15.4 | Live test with Chrome-generated vData | done |
 
 ---
 
 ## Current Task
 
-**ID**: 15.4
-**Title**: Live test with Chrome-generated vData
-**Phase**: Byte-Level POST Body Comparison
-**Status**: in-progress
-
-### Goal
-Run the modified hybrid solver (Chrome vData instead of jsdom) against the live endpoint. This is the critical experiment: if errorCode 9 disappears, vData was the cause. If it persists, there's something else.
-
-### Context
-- `scripts/hybrid-solver.js` — modified to use Chrome page.evaluate for vData generation
-- Phase 14 hybrid test: Chrome TLS + jsdom vData → errorCode 9
-- Phase 15.2 finding: jsdom vData differs completely from browser vData
-
-### Implementation Steps
-1. Run `node scripts/hybrid-solver.js` 2-3 times
-2. Document results in `output/hybrid-test-chrome-vdata.json`
-3. Compare errorCode with Phase 14 results
-
-### Verification
-- [ ] Script completes without crashes
-- [ ] Chrome vData generation succeeds (log shows "Step 8: Generate vData via Chrome")
-- [ ] Results documented with errorCode
-- [ ] Comparison with Phase 14 (jsdom vData) results documented
-
-### Suggested Agent
-general-purpose
+*Phase 15 complete. All tasks done.*
