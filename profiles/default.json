@@ -1,10 +1,10 @@
 {
-  "_comment": "Default profile — Chrome on Windows 10, realistic desktop fingerprint",
+  "_comment": "Default profile — Chrome with stealth plugin on Linux server (UA mimics Windows)",
 
   "osPlatform": "windows",
-  "platform": "Win32",
+  "platform": "Linux x86_64",
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-  "vendor": "Google Inc. (Google)",
+  "vendor": "Intel Inc.",
 
   "screenWidth": 1280,
   "screenHeight": 1400,
@@ -14,7 +14,8 @@
   "devicePixelRatio": 1,
 
   "hardwareConcurrency": 8,
-  "maxTouchPoints": 0,
+  "maxTouchPoints": 4,
+  "screenPosition": "1;0",
   "touchSupport": 2,
 
   "languages": ["en-US", "en"],
