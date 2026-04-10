@@ -1,0 +1,10442 @@
+[
+  {
+    "pc": 16,
+    "register": "r11",
+    "value": "window",
+    "endPC": 28
+  },
+  {
+    "pc": 258,
+    "register": "r12",
+    "value": "stack",
+    "endPC": 270
+  },
+  {
+    "pc": 231,
+    "register": "r13",
+    "value": "get",
+    "endPC": 241
+  },
+  {
+    "pc": 313,
+    "register": "r14",
+    "value": "indexOf",
+    "endPC": 330
+  },
+  {
+    "pc": 356,
+    "register": "r26",
+    "value": "document",
+    "endPC": 373
+  },
+  {
+    "pc": 382,
+    "register": "r16",
+    "value": "createElement",
+    "endPC": 414
+  },
+  {
+    "pc": 153,
+    "register": "r20",
+    "value": "changedTouches",
+    "endPC": 185
+  },
+  {
+    "pc": 214,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 231
+  },
+  {
+    "pc": 420,
+    "register": "r16",
+    "value": "canvas",
+    "endPC": 432
+  },
+  {
+    "pc": 451,
+    "register": "r20",
+    "value": "getContext",
+    "endPC": 473
+  },
+  {
+    "pc": 500,
+    "register": "r19",
+    "value": "console",
+    "endPC": 517
+  },
+  {
+    "pc": 523,
+    "register": "r18",
+    "value": "profile",
+    "endPC": 540
+  },
+  {
+    "pc": 596,
+    "register": "r19",
+    "value": "sd",
+    "endPC": 598
+  },
+  {
+    "pc": 37,
+    "register": "r22",
+    "value": "_ZHSgZVHWDjhEmdXcRcbPbBEVhgAmaF",
+    "endPC": 123
+  },
+  {
+    "pc": 647,
+    "register": "r14",
+    "value": "get",
+    "endPC": 657
+  },
+  {
+    "pc": 723,
+    "register": "r14",
+    "value": "setTimeout",
+    "endPC": 745
+  },
+  {
+    "pc": 779,
+    "register": "r36",
+    "value": "document",
+    "endPC": 796
+  },
+  {
+    "pc": 861,
+    "register": "r35",
+    "value": "document",
+    "endPC": 878
+  },
+  {
+    "pc": 843,
+    "register": "r49",
+    "value": "div",
+    "endPC": 850
+  },
+  {
+    "pc": 902,
+    "register": "r36",
+    "value": "document",
+    "endPC": 919
+  },
+  {
+    "pc": 887,
+    "register": "r14",
+    "value": "p",
+    "endPC": 887
+  },
+  {
+    "pc": 805,
+    "register": "r33",
+    "value": "createElement",
+    "endPC": 837
+  },
+  {
+    "pc": 932,
+    "register": "r33",
+    "value": "span",
+    "endPC": 939
+  },
+  {
+    "pc": 990,
+    "register": "r33",
+    "value": "cloneNode",
+    "endPC": 1012
+  },
+  {
+    "pc": 952,
+    "register": "r49",
+    "value": "appendChild",
+    "endPC": 979
+  },
+  {
+    "pc": 1110,
+    "register": "r49",
+    "value": "cll1",
+    "endPC": 1117
+  },
+  {
+    "pc": 1085,
+    "register": "r36",
+    "value": "className",
+    "endPC": 1107
+  },
+  {
+    "pc": 1128,
+    "register": "r49",
+    "value": "setAttribute",
+    "endPC": 1155
+  },
+  {
+    "pc": 1179,
+    "register": "r14",
+    "value": "sss",
+    "endPC": 1186
+  },
+  {
+    "pc": 1040,
+    "register": "r33",
+    "value": "insertBefore",
+    "endPC": 1067
+  },
+  {
+    "pc": 1244,
+    "register": "r33",
+    "value": "innerHTML",
+    "endPC": 1266
+  },
+  {
+    "pc": 1340,
+    "register": "r33",
+    "value": "navigator",
+    "endPC": 1362
+  },
+  {
+    "pc": 482,
+    "register": "r20",
+    "value": "2d",
+    "endPC": 484
+  },
+  {
+    "pc": 630,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 647
+  },
+  {
+    "pc": 1411,
+    "register": "r52",
+    "value": "window",
+    "endPC": 1423
+  },
+  {
+    "pc": 1432,
+    "register": "r21",
+    "value": "CSS",
+    "endPC": 1439
+  },
+  {
+    "pc": 680,
+    "register": "r11",
+    "value": "exports",
+    "endPC": 697
+  },
+  {
+    "pc": 1497,
+    "register": "r11",
+    "value": "window",
+    "endPC": 1509
+  },
+  {
+    "pc": 1518,
+    "register": "r18",
+    "value": "matchMedia",
+    "endPC": 1547
+  },
+  {
+    "pc": 1556,
+    "register": "r18",
+    "value": "(any-ho",
+    "endPC": 1573
+  },
+  {
+    "pc": 1207,
+    "register": "r31",
+    "value": "divdivdivppdiv",
+    "endPC": 1239
+  },
+  {
+    "pc": 1639,
+    "register": "r32",
+    "value": "onicecandidate",
+    "endPC": 1671
+  },
+  {
+    "pc": 1692,
+    "register": "r32",
+    "value": "createDataChannel",
+    "endPC": 1734
+  },
+  {
+    "pc": 1740,
+    "register": "r32",
+    "value": "bl",
+    "endPC": 1742
+  },
+  {
+    "pc": 1758,
+    "register": "r31",
+    "value": "createOffer",
+    "endPC": 1785
+  },
+  {
+    "pc": 1795,
+    "register": "r26",
+    "value": "then",
+    "endPC": 1802
+  },
+  {
+    "pc": 1445,
+    "register": "r21",
+    "value": "supports",
+    "endPC": 1462
+  },
+  {
+    "pc": 1837,
+    "register": "r9",
+    "value": "navigator",
+    "endPC": 1859
+  },
+  {
+    "pc": 1865,
+    "register": "r14",
+    "value": "plugins",
+    "endPC": 1882
+  },
+  {
+    "pc": 1608,
+    "register": "r18",
+    "value": "matches",
+    "endPC": 1625
+  },
+  {
+    "pc": 1895,
+    "register": "r14",
+    "value": "push",
+    "endPC": 1902
+  },
+  {
+    "pc": 1913,
+    "register": "r9",
+    "value": "name",
+    "endPC": 1920
+  },
+  {
+    "pc": 1937,
+    "register": "r27",
+    "value": "description",
+    "endPC": 1964
+  },
+  {
+    "pc": 2036,
+    "register": "r11",
+    "value": "exports",
+    "endPC": 2053
+  },
+  {
+    "pc": 2082,
+    "register": "r8",
+    "value": "getSupportedExtensions",
+    "endPC": 2134
+  },
+  {
+    "pc": 2147,
+    "register": "r11",
+    "value": "indexOf",
+    "endPC": 2164
+  },
+  {
+    "pc": 697,
+    "register": "r12",
+    "value": "get",
+    "endPC": 707
+  },
+  {
+    "pc": 2170,
+    "register": "r11",
+    "value": "WEBGL_debug_renderer_info",
+    "endPC": 2232
+  },
+  {
+    "pc": 2053,
+    "register": "r13",
+    "value": "get",
+    "endPC": 2063
+  },
+  {
+    "pc": 2282,
+    "register": "r19",
+    "value": "some",
+    "endPC": 2289
+  },
+  {
+    "pc": 2336,
+    "register": "r34",
+    "value": "document",
+    "endPC": 2353
+  },
+  {
+    "pc": 2418,
+    "register": "r12",
+    "value": "document",
+    "endPC": 2435
+  },
+  {
+    "pc": 2400,
+    "register": "r22",
+    "value": "div",
+    "endPC": 2407
+  },
+  {
+    "pc": 2444,
+    "register": "r22",
+    "value": "body",
+    "endPC": 2451
+  },
+  {
+    "pc": 2523,
+    "register": "r37",
+    "value": "<p class=\"firstp\">firstp</p>\n        <p id=\"secondp\">secondp</p>\n        <p class=\"thirdp\">thirdp</p>\n        <h2>\n          <span class=\"foo\">foo</span>\n          <span class=\"bar\" id=\"bar\">bar</span>\n        </h2>",
+    "endPC": 3060
+  },
+  {
+    "pc": 3069,
+    "register": "r37",
+    "value": "document",
+    "endPC": 3086
+  },
+  {
+    "pc": 2362,
+    "register": "r17",
+    "value": "createElement",
+    "endPC": 2394
+  },
+  {
+    "pc": 3122,
+    "register": "r14",
+    "value": "body :not(.firstp, .thirdp) {\n        color: blue;\n      }\n      h2 :not(span.foo) {\n        color: red;\n      }",
+    "endPC": 3399
+  },
+  {
+    "pc": 3410,
+    "register": "r14",
+    "value": "document",
+    "endPC": 3427
+  },
+  {
+    "pc": 2498,
+    "register": "r12",
+    "value": "innerHTML",
+    "endPC": 2520
+  },
+  {
+    "pc": 3099,
+    "register": "r17",
+    "value": "style",
+    "endPC": 3111
+  },
+  {
+    "pc": 3436,
+    "register": "r12",
+    "value": "head",
+    "endPC": 3443
+  },
+  {
+    "pc": 3499,
+    "register": "r17",
+    "value": "getComputedStyle",
+    "endPC": 3536
+  },
+  {
+    "pc": 2460,
+    "register": "r22",
+    "value": "appendChild",
+    "endPC": 2487
+  },
+  {
+    "pc": 3545,
+    "register": "r22",
+    "value": "document",
+    "endPC": 3562
+  },
+  {
+    "pc": 3571,
+    "register": "r14",
+    "value": "getElementById",
+    "endPC": 3603
+  },
+  {
+    "pc": 3612,
+    "register": "r14",
+    "value": "secondp",
+    "endPC": 3629
+  },
+  {
+    "pc": 3644,
+    "register": "r14",
+    "value": "getPropertyValue",
+    "endPC": 3681
+  },
+  {
+    "pc": 3729,
+    "register": "r29",
+    "value": "localStorage",
+    "endPC": 3756
+  },
+  {
+    "pc": 3765,
+    "register": "r10",
+    "value": "setItem",
+    "endPC": 3782
+  },
+  {
+    "pc": 3818,
+    "register": "r13",
+    "value": "screen",
+    "endPC": 3830
+  },
+  {
+    "pc": 3870,
+    "register": "r22",
+    "value": "undefined",
+    "endPC": 3892
+  },
+  {
+    "pc": 3839,
+    "register": "r19",
+    "value": "pixelDepth",
+    "endPC": 3861
+  },
+  {
+    "pc": 3810,
+    "register": "r15",
+    "value": "-",
+    "endPC": 3810
+  },
+  {
+    "pc": 3910,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 3922
+  },
+  {
+    "pc": 3898,
+    "register": "r22",
+    "value": "|",
+    "endPC": 3898
+  },
+  {
+    "pc": 3931,
+    "register": "r19",
+    "value": "fontSmoothingEnabled",
+    "endPC": 3978
+  },
+  {
+    "pc": 3987,
+    "register": "r19",
+    "value": "undefined",
+    "endPC": 4009
+  },
+  {
+    "pc": 3690,
+    "register": "r14",
+    "value": "color",
+    "endPC": 3702
+  },
+  {
+    "pc": 3462,
+    "register": "r12",
+    "value": "rgb(0, 0, 255)",
+    "endPC": 3494
+  },
+  {
+    "pc": 1368,
+    "register": "r20",
+    "value": "appVersion",
+    "endPC": 1390
+  },
+  {
+    "pc": 1978,
+    "register": "r26",
+    "value": "filename",
+    "endPC": 1995
+  },
+  {
+    "pc": 4139,
+    "register": "r17",
+    "value": "document",
+    "endPC": 4156
+  },
+  {
+    "pc": 4165,
+    "register": "r34",
+    "value": "getElementsByTagName",
+    "endPC": 4212
+  },
+  {
+    "pc": 4221,
+    "register": "r34",
+    "value": "body",
+    "endPC": 4228
+  },
+  {
+    "pc": 4056,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 4073
+  },
+  {
+    "pc": 4286,
+    "register": "r38",
+    "value": "push",
+    "endPC": 4293
+  },
+  {
+    "pc": 4304,
+    "register": "r38",
+    "value": "codec",
+    "endPC": 4316
+  },
+  {
+    "pc": 4359,
+    "register": "r44",
+    "value": "canPlayType",
+    "endPC": 4386
+  },
+  {
+    "pc": 4319,
+    "register": "r18",
+    "value": "name",
+    "endPC": 4326
+  },
+  {
+    "pc": 4441,
+    "register": "r17",
+    "value": "indexOf",
+    "endPC": 4458
+  },
+  {
+    "pc": 4095,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 4112
+  },
+  {
+    "pc": 4569,
+    "register": "r16",
+    "value": "setErrorStack",
+    "endPC": 4601
+  },
+  {
+    "pc": 4649,
+    "register": "r16",
+    "value": "cd",
+    "endPC": 4651
+  },
+  {
+    "pc": 4695,
+    "register": "r25",
+    "value": "RegExp",
+    "endPC": 4707
+  },
+  {
+    "pc": 4663,
+    "register": "r35",
+    "value": "sd",
+    "endPC": 4665
+  },
+  {
+    "pc": 4679,
+    "register": "r23",
+    "value": "C",
+    "endPC": 4679
+  },
+  {
+    "pc": 4733,
+    "register": "r35",
+    "value": "g",
+    "endPC": 4733
+  },
+  {
+    "pc": 4716,
+    "register": "r16",
+    "value": "\\+|/|=",
+    "endPC": 4728
+  },
+  {
+    "pc": 4752,
+    "register": "r16",
+    "value": "2B",
+    "endPC": 4754
+  },
+  {
+    "pc": 4748,
+    "register": "r35",
+    "value": "+",
+    "endPC": 4748
+  },
+  {
+    "pc": 4767,
+    "register": "r35",
+    "value": "2F",
+    "endPC": 4769
+  },
+  {
+    "pc": 4763,
+    "register": "r16",
+    "value": "/",
+    "endPC": 4763
+  },
+  {
+    "pc": 4782,
+    "register": "r16",
+    "value": "3D",
+    "endPC": 4784
+  },
+  {
+    "pc": 4778,
+    "register": "r35",
+    "value": "=",
+    "endPC": 4778
+  },
+  {
+    "pc": 4799,
+    "register": "r16",
+    "value": "mSet",
+    "endPC": 4806
+  },
+  {
+    "pc": 4822,
+    "register": "r35",
+    "value": "mClear",
+    "endPC": 4834
+  },
+  {
+    "pc": 4847,
+    "register": "r16",
+    "value": "mInit",
+    "endPC": 4859
+  },
+  {
+    "pc": 4918,
+    "register": "r23",
+    "value": "exports",
+    "endPC": 4935
+  },
+  {
+    "pc": 4672,
+    "register": "r15",
+    "value": "od",
+    "endPC": 4674
+  },
+  {
+    "pc": 4998,
+    "register": "r12",
+    "value": "document",
+    "endPC": 5015
+  },
+  {
+    "pc": 4260,
+    "register": "r10",
+    "value": "0",
+    "endPC": 4260
+  },
+  {
+    "pc": 5024,
+    "register": "r8",
+    "value": "characterSet",
+    "endPC": 5051
+  },
+  {
+    "pc": 5089,
+    "register": "r8",
+    "value": "window",
+    "endPC": 5101
+  },
+  {
+    "pc": 5147,
+    "register": "r16",
+    "value": "Array",
+    "endPC": 5159
+  },
+  {
+    "pc": 4464,
+    "register": "r17",
+    "value": "a=candidate:",
+    "endPC": 4491
+  },
+  {
+    "pc": 5165,
+    "register": "r18",
+    "value": "isArray",
+    "endPC": 5182
+  },
+  {
+    "pc": 4873,
+    "register": "r35",
+    "value": "mGetData",
+    "endPC": 4890
+  },
+  {
+    "pc": 4026,
+    "register": "r70",
+    "value": "ms",
+    "endPC": 4028
+  },
+  {
+    "pc": 4339,
+    "register": "r19",
+    "value": "support",
+    "endPC": 4356
+  },
+  {
+    "pc": 5327,
+    "register": "r18",
+    "value": "length",
+    "endPC": 5339
+  },
+  {
+    "pc": 5304,
+    "register": "r13",
+    "value": "sd",
+    "endPC": 5306
+  },
+  {
+    "pc": 5471,
+    "register": "r19",
+    "value": "navigator",
+    "endPC": 5493
+  },
+  {
+    "pc": 5499,
+    "register": "r25",
+    "value": "userAgentData",
+    "endPC": 5531
+  },
+  {
+    "pc": 5537,
+    "register": "r25",
+    "value": "brands",
+    "endPC": 5549
+  },
+  {
+    "pc": 5558,
+    "register": "r25",
+    "value": "length",
+    "endPC": 5570
+  },
+  {
+    "pc": 5600,
+    "register": "r19",
+    "value": "getParameter",
+    "endPC": 5627
+  },
+  {
+    "pc": 4112,
+    "register": "r26",
+    "value": "get",
+    "endPC": 4122
+  },
+  {
+    "pc": 5640,
+    "register": "r23",
+    "value": "getExtension",
+    "endPC": 5667
+  },
+  {
+    "pc": 5676,
+    "register": "r23",
+    "value": "WEBGL_debug_renderer_info",
+    "endPC": 5738
+  },
+  {
+    "pc": 5746,
+    "register": "r23",
+    "value": "UNMASKED_RENDERER_WEBGL",
+    "endPC": 5803
+  },
+  {
+    "pc": 5860,
+    "register": "r20",
+    "value": "changedTouches",
+    "endPC": 5892
+  },
+  {
+    "pc": 6027,
+    "register": "r33",
+    "value": "substr",
+    "endPC": 6039
+  },
+  {
+    "pc": 6086,
+    "register": "r37",
+    "value": "]",
+    "endPC": 6086
+  },
+  {
+    "pc": 6050,
+    "register": "r53",
+    "value": "length",
+    "endPC": 6062
+  },
+  {
+    "pc": 6118,
+    "register": "r23",
+    "value": "Intl",
+    "endPC": 6125
+  },
+  {
+    "pc": 6134,
+    "register": "r17",
+    "value": "DateTimeFormat",
+    "endPC": 6166
+  },
+  {
+    "pc": 6179,
+    "register": "r18",
+    "value": "resolvedOptions",
+    "endPC": 6216
+  },
+  {
+    "pc": 6231,
+    "register": "r23",
+    "value": "timeZone",
+    "endPC": 6248
+  },
+  {
+    "pc": 6261,
+    "register": "r17",
+    "value": "calendar",
+    "endPC": 6278
+  },
+  {
+    "pc": 6291,
+    "register": "r23",
+    "value": "numberingSystem",
+    "endPC": 6328
+  },
+  {
+    "pc": 6369,
+    "register": "r23",
+    "value": "JSON",
+    "endPC": 6376
+  },
+  {
+    "pc": 6338,
+    "register": "r17",
+    "value": "locale",
+    "endPC": 6350
+  },
+  {
+    "pc": 6385,
+    "register": "r17",
+    "value": "stringify",
+    "endPC": 6407
+  },
+  {
+    "pc": 5998,
+    "register": "r14",
+    "value": "get",
+    "endPC": 6008
+  },
+  {
+    "pc": 6454,
+    "register": "r16",
+    "value": "getGuid",
+    "endPC": 6471
+  },
+  {
+    "pc": 6488,
+    "register": "r9",
+    "value": "tokenid",
+    "endPC": 6505
+  },
+  {
+    "pc": 6551,
+    "register": "r9",
+    "value": "get",
+    "endPC": 6561
+  },
+  {
+    "pc": 6586,
+    "register": "r8",
+    "value": "navigator",
+    "endPC": 6608
+  },
+  {
+    "pc": 5901,
+    "register": "r20",
+    "value": "length",
+    "endPC": 5913
+  },
+  {
+    "pc": 6729,
+    "register": "r18",
+    "value": "navigator",
+    "endPC": 6751
+  },
+  {
+    "pc": 6757,
+    "register": "r9",
+    "value": "languages",
+    "endPC": 6779
+  },
+  {
+    "pc": 6660,
+    "register": "r11",
+    "value": "usage",
+    "endPC": 6672
+  },
+  {
+    "pc": 6675,
+    "register": "r23",
+    "value": "usage",
+    "endPC": 6687
+  },
+  {
+    "pc": 6833,
+    "register": "r23",
+    "value": "navigator",
+    "endPC": 6855
+  },
+  {
+    "pc": 6534,
+    "register": "r13",
+    "value": "exports",
+    "endPC": 6551
+  },
+  {
+    "pc": 6882,
+    "register": "r11",
+    "value": "0",
+    "endPC": 6882
+  },
+  {
+    "pc": 6906,
+    "register": "r24",
+    "value": "slice",
+    "endPC": 6918
+  },
+  {
+    "pc": 6614,
+    "register": "r16",
+    "value": "userAgentData",
+    "endPC": 6646
+  },
+  {
+    "pc": 6974,
+    "register": "r16",
+    "value": "window",
+    "endPC": 6986
+  },
+  {
+    "pc": 6806,
+    "register": "r18",
+    "value": "get",
+    "endPC": 6816
+  },
+  {
+    "pc": 7013,
+    "register": "r8",
+    "value": "window",
+    "endPC": 7025
+  },
+  {
+    "pc": 7034,
+    "register": "r17",
+    "value": "matchMedia",
+    "endPC": 7056
+  },
+  {
+    "pc": 6789,
+    "register": "r12",
+    "value": "exports",
+    "endPC": 6806
+  },
+  {
+    "pc": 6878,
+    "register": "r15",
+    "value": "-",
+    "endPC": 6878
+  },
+  {
+    "pc": 6861,
+    "register": "r13",
+    "value": "gpu",
+    "endPC": 6868
+  },
+  {
+    "pc": 7142,
+    "register": "r33",
+    "value": "return",
+    "endPC": 7154
+  },
+  {
+    "pc": 1164,
+    "register": "r49",
+    "value": "class",
+    "endPC": 1176
+  },
+  {
+    "pc": 7187,
+    "register": "r37",
+    "value": "[",
+    "endPC": 7187
+  },
+  {
+    "pc": 7120,
+    "register": "r30",
+    "value": "mac",
+    "endPC": 7127
+  },
+  {
+    "pc": 7393,
+    "register": "r30",
+    "value": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+    "endPC": 7555
+  },
+  {
+    "pc": 5981,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 5998
+  },
+  {
+    "pc": 7642,
+    "register": "r12",
+    "value": "window",
+    "endPC": 7654
+  },
+  {
+    "pc": 7592,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 7609
+  },
+  {
+    "pc": 4392,
+    "register": "r44",
+    "value": "type",
+    "endPC": 4399
+  },
+  {
+    "pc": 6949,
+    "register": "r21",
+    "value": "undefined",
+    "endPC": 6971
+  },
+  {
+    "pc": 7826,
+    "register": "r17",
+    "value": "style",
+    "endPC": 7838
+  },
+  {
+    "pc": 7609,
+    "register": "r9",
+    "value": "get",
+    "endPC": 7619
+  },
+  {
+    "pc": 7779,
+    "register": "r24",
+    "value": "getData",
+    "endPC": 7796
+  },
+  {
+    "pc": 7969,
+    "register": "r23",
+    "value": "Symbol",
+    "endPC": 7981
+  },
+  {
+    "pc": 7663,
+    "register": "r10",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 7745
+  },
+  {
+    "pc": 7947,
+    "register": "r15",
+    "value": "function",
+    "endPC": 7964
+  },
+  {
+    "pc": 8016,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 8033
+  },
+  {
+    "pc": 8096,
+    "register": "r23",
+    "value": "JSON",
+    "endPC": 8103
+  },
+  {
+    "pc": 8112,
+    "register": "r22",
+    "value": "stringify",
+    "endPC": 8134
+  },
+  {
+    "pc": 8210,
+    "register": "r18",
+    "value": "window",
+    "endPC": 8222
+  },
+  {
+    "pc": 8231,
+    "register": "r15",
+    "value": "matchMedia",
+    "endPC": 8253
+  },
+  {
+    "pc": 8262,
+    "register": "r15",
+    "value": "(prefers-color-scheme: light)",
+    "endPC": 8335
+  },
+  {
+    "pc": 8440,
+    "register": "r57",
+    "value": "Number",
+    "endPC": 8452
+  },
+  {
+    "pc": 8417,
+    "register": "r13",
+    "value": "unshift",
+    "endPC": 8434
+  },
+  {
+    "pc": 8461,
+    "register": "r13",
+    "value": "customElements",
+    "endPC": 8493
+  },
+  {
+    "pc": 8503,
+    "register": "r13",
+    "value": "window",
+    "endPC": 8515
+  },
+  {
+    "pc": 8529,
+    "register": "r13",
+    "value": "replace",
+    "endPC": 8546
+  },
+  {
+    "pc": 8564,
+    "register": "r38",
+    "value": "RegExp",
+    "endPC": 8576
+  },
+  {
+    "pc": 8552,
+    "register": "r13",
+    "value": "^\\S",
+    "endPC": 8559
+  },
+  {
+    "pc": 8163,
+    "register": "r34",
+    "value": "removeAttribute",
+    "endPC": 8200
+  },
+  {
+    "pc": 8652,
+    "register": "r18",
+    "value": "document",
+    "endPC": 8669
+  },
+  {
+    "pc": 8614,
+    "register": "r34",
+    "value": "appendChild",
+    "endPC": 8641
+  },
+  {
+    "pc": 8678,
+    "register": "r34",
+    "value": "getElementById",
+    "endPC": 8710
+  },
+  {
+    "pc": 8759,
+    "register": "r21",
+    "value": "window",
+    "endPC": 8771
+  },
+  {
+    "pc": 8780,
+    "register": "r16",
+    "value": "$",
+    "endPC": 8782
+  },
+  {
+    "pc": 8896,
+    "register": "r20",
+    "value": "Math",
+    "endPC": 8903
+  },
+  {
+    "pc": 8892,
+    "register": "r79",
+    "value": "x",
+    "endPC": 8892
+  },
+  {
+    "pc": 8943,
+    "register": "r79",
+    "value": "Math",
+    "endPC": 8950
+  },
+  {
+    "pc": 8971,
+    "register": "r20",
+    "value": "pressure",
+    "endPC": 8988
+  },
+  {
+    "pc": 8939,
+    "register": "r32",
+    "value": "y",
+    "endPC": 8939
+  },
+  {
+    "pc": 9017,
+    "register": "r32",
+    "value": "Math",
+    "endPC": 9024
+  },
+  {
+    "pc": 8997,
+    "register": "r20",
+    "value": "radiusX",
+    "endPC": 9014
+  },
+  {
+    "pc": 9065,
+    "register": "r20",
+    "value": "Math",
+    "endPC": 9072
+  },
+  {
+    "pc": 8912,
+    "register": "r75",
+    "value": "floor",
+    "endPC": 8924
+  },
+  {
+    "pc": 9099,
+    "register": "r21",
+    "value": "window",
+    "endPC": 9111
+  },
+  {
+    "pc": 8734,
+    "register": "r19",
+    "value": "undefined",
+    "endPC": 8756
+  },
+  {
+    "pc": 9155,
+    "register": "r13",
+    "value": "addEventListener",
+    "endPC": 9192
+  },
+  {
+    "pc": 8345,
+    "register": "r15",
+    "value": "ma\u0002",
+    "endPC": 8399
+  },
+  {
+    "pc": 9120,
+    "register": "r19",
+    "value": "TCaptchaSid",
+    "endPC": 9147
+  },
+  {
+    "pc": 8827,
+    "register": "r12",
+    "value": "2",
+    "endPC": 8827
+  },
+  {
+    "pc": 8860,
+    "register": "r10",
+    "value": "length",
+    "endPC": 8872
+  },
+  {
+    "pc": 9271,
+    "register": "r14",
+    "value": "get",
+    "endPC": 9281
+  },
+  {
+    "pc": 9362,
+    "register": "r19",
+    "value": "isString",
+    "endPC": 9379
+  },
+  {
+    "pc": 9216,
+    "register": "r11",
+    "value": "length",
+    "endPC": 9228
+  },
+  {
+    "pc": 9314,
+    "register": "r18",
+    "value": "get",
+    "endPC": 9324
+  },
+  {
+    "pc": 9297,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 9314
+  },
+  {
+    "pc": 9503,
+    "register": "r15",
+    "value": "charCodeAt",
+    "endPC": 9525
+  },
+  {
+    "pc": 9491,
+    "register": "r25",
+    "value": "B0JC",
+    "endPC": 9498
+  },
+  {
+    "pc": 9601,
+    "register": "r16",
+    "value": "window",
+    "endPC": 9613
+  },
+  {
+    "pc": 9622,
+    "register": "r17",
+    "value": "matchMedia",
+    "endPC": 9644
+  },
+  {
+    "pc": 9653,
+    "register": "r17",
+    "value": "(any-pointer: fine)",
+    "endPC": 9700
+  },
+  {
+    "pc": 9254,
+    "register": "r12",
+    "value": "exports",
+    "endPC": 9271
+  },
+  {
+    "pc": 9708,
+    "register": "r17",
+    "value": "matches",
+    "endPC": 9725
+  },
+  {
+    "pc": 9841,
+    "register": "r8",
+    "value": "getContext",
+    "endPC": 9863
+  },
+  {
+    "pc": 9946,
+    "register": "r19",
+    "value": "join",
+    "endPC": 9953
+  },
+  {
+    "pc": 9975,
+    "register": "r12",
+    "value": "document",
+    "endPC": 9992
+  },
+  {
+    "pc": 10001,
+    "register": "r17",
+    "value": "body",
+    "endPC": 10008
+  },
+  {
+    "pc": 10117,
+    "register": "r18",
+    "value": "window",
+    "endPC": 10129
+  },
+  {
+    "pc": 10138,
+    "register": "r21",
+    "value": "CSS",
+    "endPC": 10145
+  },
+  {
+    "pc": 10151,
+    "register": "r21",
+    "value": "supports",
+    "endPC": 10168
+  },
+  {
+    "pc": 7206,
+    "register": "r53",
+    "value": ",",
+    "endPC": 7206
+  },
+  {
+    "pc": 10252,
+    "register": "r23",
+    "value": "replace",
+    "endPC": 10269
+  },
+  {
+    "pc": 10055,
+    "register": "r12",
+    "value": "remove",
+    "endPC": 10067
+  },
+  {
+    "pc": 10314,
+    "register": "r12",
+    "value": "RegExp",
+    "endPC": 10326
+  },
+  {
+    "pc": 10310,
+    "register": "r28",
+    "value": "g",
+    "endPC": 10310
+  },
+  {
+    "pc": 10275,
+    "register": "r23",
+    "value": "<|>|\\/|\\s|\"|'",
+    "endPC": 10307
+  },
+  {
+    "pc": 10351,
+    "register": "r28",
+    "value": "toLowerCase",
+    "endPC": 10378
+  },
+  {
+    "pc": 10196,
+    "register": "r48",
+    "value": "isTrusted",
+    "endPC": 10218
+  },
+  {
+    "pc": 9958,
+    "register": "r19",
+    "value": ";",
+    "endPC": 9958
+  },
+  {
+    "pc": 10411,
+    "register": "r48",
+    "value": "x",
+    "endPC": 10413
+  },
+  {
+    "pc": 9872,
+    "register": "r8",
+    "value": "experimental-webgl",
+    "endPC": 9914
+  },
+  {
+    "pc": 10422,
+    "register": "r62",
+    "value": "y",
+    "endPC": 10424
+  },
+  {
+    "pc": 10433,
+    "register": "r48",
+    "value": "pressure",
+    "endPC": 10450
+  },
+  {
+    "pc": 10017,
+    "register": "r17",
+    "value": "removeChild",
+    "endPC": 10044
+  },
+  {
+    "pc": 10462,
+    "register": "r62",
+    "value": "radiusX",
+    "endPC": 10479
+  },
+  {
+    "pc": 10488,
+    "register": "r48",
+    "value": "radiusY",
+    "endPC": 10505
+  },
+  {
+    "pc": 9802,
+    "register": "r13",
+    "value": "get",
+    "endPC": 9812
+  },
+  {
+    "pc": 10573,
+    "register": "r48",
+    "value": "isTrusted",
+    "endPC": 10595
+  },
+  {
+    "pc": 10601,
+    "register": "r48",
+    "value": "undefined",
+    "endPC": 10623
+  },
+  {
+    "pc": 10235,
+    "register": "r9",
+    "value": "divdiv",
+    "endPC": 10247
+  },
+  {
+    "pc": 10648,
+    "register": "r9",
+    "value": "clearInterval",
+    "endPC": 10680
+  },
+  {
+    "pc": 10731,
+    "register": "r9",
+    "value": "window",
+    "endPC": 10743
+  },
+  {
+    "pc": 9785,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 9802
+  },
+  {
+    "pc": 10752,
+    "register": "r13",
+    "value": "navigator",
+    "endPC": 10774
+  },
+  {
+    "pc": 10780,
+    "register": "r13",
+    "value": "cookieEnabled",
+    "endPC": 10812
+  },
+  {
+    "pc": 10839,
+    "register": "r15",
+    "value": "get",
+    "endPC": 10849
+  },
+  {
+    "pc": 10694,
+    "register": "r10",
+    "value": "tdc",
+    "endPC": 10701
+  },
+  {
+    "pc": 10873,
+    "register": "r17",
+    "value": "candidate",
+    "endPC": 10895
+  },
+  {
+    "pc": 10822,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 10839
+  },
+  {
+    "pc": 11010,
+    "register": "r20",
+    "value": "createAnalyser",
+    "endPC": 11042
+  },
+  {
+    "pc": 11058,
+    "register": "r20",
+    "value": "fftSize",
+    "endPC": 11075
+  },
+  {
+    "pc": 11087,
+    "register": "r54",
+    "value": "smoothingTimeConstant",
+    "endPC": 11139
+  },
+  {
+    "pc": 9045,
+    "register": "r79",
+    "value": "radiusY",
+    "endPC": 9062
+  },
+  {
+    "pc": 11152,
+    "register": "r20",
+    "value": "minDecibels",
+    "endPC": 11179
+  },
+  {
+    "pc": 11319,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 11336
+  },
+  {
+    "pc": 11336,
+    "register": "r13",
+    "value": "get",
+    "endPC": 11346
+  },
+  {
+    "pc": 11381,
+    "register": "r10",
+    "value": "setLocalDescription",
+    "endPC": 11428
+  },
+  {
+    "pc": 10972,
+    "register": "r39",
+    "value": "innerHTML",
+    "endPC": 10994
+  },
+  {
+    "pc": 7315,
+    "register": "r40",
+    "value": "]",
+    "endPC": 7315
+  },
+  {
+    "pc": 11577,
+    "register": "r8",
+    "value": "window",
+    "endPC": 11589
+  },
+  {
+    "pc": 9398,
+    "register": "r26",
+    "value": "ios",
+    "endPC": 9405
+  },
+  {
+    "pc": 11698,
+    "register": "r42",
+    "value": "window",
+    "endPC": 11710
+  },
+  {
+    "pc": 11719,
+    "register": "r29",
+    "value": "TDC",
+    "endPC": 11726
+  },
+  {
+    "pc": 11735,
+    "register": "r29",
+    "value": "getInfo",
+    "endPC": 11752
+  },
+  {
+    "pc": 11565,
+    "register": "r24",
+    "value": "info",
+    "endPC": 11572
+  },
+  {
+    "pc": 11780,
+    "register": "r24",
+    "value": "setData",
+    "endPC": 11797
+  },
+  {
+    "pc": 11800,
+    "register": "r29",
+    "value": "mSet",
+    "endPC": 11807
+  },
+  {
+    "pc": 11822,
+    "register": "r42",
+    "value": "clearTc",
+    "endPC": 11839
+  },
+  {
+    "pc": 11842,
+    "register": "r24",
+    "value": "mClear",
+    "endPC": 11854
+  },
+  {
+    "pc": 11869,
+    "register": "r29",
+    "value": "getData",
+    "endPC": 11886
+  },
+  {
+    "pc": 11921,
+    "register": "r24",
+    "value": "mInit",
+    "endPC": 11933
+  },
+  {
+    "pc": 12031,
+    "register": "r19",
+    "value": "captureStream",
+    "endPC": 12063
+  },
+  {
+    "pc": 11238,
+    "register": "r18",
+    "value": "ac-baseLatency",
+    "endPC": 11270
+  },
+  {
+    "pc": 12080,
+    "register": "r24",
+    "value": "document",
+    "endPC": 12097
+  },
+  {
+    "pc": 12106,
+    "register": "r19",
+    "value": "body",
+    "endPC": 12113
+  },
+  {
+    "pc": 11598,
+    "register": "r23",
+    "value": "FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk",
+    "endPC": 11675
+  },
+  {
+    "pc": 12191,
+    "register": "r15",
+    "value": "window",
+    "endPC": 12203
+  },
+  {
+    "pc": 11950,
+    "register": "r16",
+    "value": "string",
+    "endPC": 11962
+  },
+  {
+    "pc": 12212,
+    "register": "r8",
+    "value": "matchMedia",
+    "endPC": 12234
+  },
+  {
+    "pc": 12243,
+    "register": "r8",
+    "value": "(prefers-color-scheme: no-preference)",
+    "endPC": 12335
+  },
+  {
+    "pc": 11454,
+    "register": "r20",
+    "value": "symbol",
+    "endPC": 11466
+  },
+  {
+    "pc": 12431,
+    "register": "r21",
+    "value": "d",
+    "endPC": 12433
+  },
+  {
+    "pc": 12445,
+    "register": "r10",
+    "value": "bind",
+    "endPC": 12452
+  },
+  {
+    "pc": 11889,
+    "register": "r42",
+    "value": "mGetData",
+    "endPC": 11906
+  },
+  {
+    "pc": 12343,
+    "register": "r8",
+    "value": "matches",
+    "endPC": 12360
+  },
+  {
+    "pc": 12122,
+    "register": "r19",
+    "value": "removeChild",
+    "endPC": 12149
+  },
+  {
+    "pc": 12564,
+    "register": "r13",
+    "value": "isObject",
+    "endPC": 12581
+  },
+  {
+    "pc": 12374,
+    "register": "r12",
+    "value": "innerHTML",
+    "endPC": 12396
+  },
+  {
+    "pc": 12600,
+    "register": "r12",
+    "value": "toString",
+    "endPC": 12617
+  },
+  {
+    "pc": 12633,
+    "register": "r12",
+    "value": "indexOf",
+    "endPC": 12650
+  },
+  {
+    "pc": 12513,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 12530
+  },
+  {
+    "pc": 12530,
+    "register": "r11",
+    "value": "get",
+    "endPC": 12540
+  },
+  {
+    "pc": 12697,
+    "register": "r19",
+    "value": "join",
+    "endPC": 12704
+  },
+  {
+    "pc": 11515,
+    "register": "r27",
+    "value": "exports",
+    "endPC": 11532
+  },
+  {
+    "pc": 12726,
+    "register": "r27",
+    "value": "window",
+    "endPC": 12738
+  },
+  {
+    "pc": 12747,
+    "register": "r24",
+    "value": "matchMedia",
+    "endPC": 12769
+  },
+  {
+    "pc": 12778,
+    "register": "r24",
+    "value": "(color-gamut: ",
+    "endPC": 12810
+  },
+  {
+    "pc": 12819,
+    "register": "r24",
+    "value": ")",
+    "endPC": 12819
+  },
+  {
+    "pc": 12862,
+    "register": "r21",
+    "value": "JSON",
+    "endPC": 12869
+  },
+  {
+    "pc": 12878,
+    "register": "r9",
+    "value": "stringify",
+    "endPC": 12900
+  },
+  {
+    "pc": 12933,
+    "register": "r15",
+    "value": "0",
+    "endPC": 12933
+  },
+  {
+    "pc": 12941,
+    "register": "r15",
+    "value": "slice",
+    "endPC": 12953
+  },
+  {
+    "pc": 12976,
+    "register": "r13",
+    "value": "length",
+    "endPC": 12988
+  },
+  {
+    "pc": 12832,
+    "register": "r10",
+    "value": "matches",
+    "endPC": 12849
+  },
+  {
+    "pc": 13046,
+    "register": "r17",
+    "value": "length",
+    "endPC": 13058
+  },
+  {
+    "pc": 12709,
+    "register": "r19",
+    "value": ",",
+    "endPC": 12709
+  },
+  {
+    "pc": 13131,
+    "register": "r16",
+    "value": "navigator",
+    "endPC": 13153
+  },
+  {
+    "pc": 13159,
+    "register": "r8",
+    "value": "userAgentData",
+    "endPC": 13191
+  },
+  {
+    "pc": 13286,
+    "register": "r19",
+    "value": "window",
+    "endPC": 13298
+  },
+  {
+    "pc": 13321,
+    "register": "r75",
+    "value": "window",
+    "endPC": 13333
+  },
+  {
+    "pc": 13371,
+    "register": "r27",
+    "value": "push",
+    "endPC": 13378
+  },
+  {
+    "pc": 13261,
+    "register": "r16",
+    "value": "undefined",
+    "endPC": 13283
+  },
+  {
+    "pc": 13098,
+    "register": "r17",
+    "value": "undefined",
+    "endPC": 13120
+  },
+  {
+    "pc": 13479,
+    "register": "r17",
+    "value": "window",
+    "endPC": 13491
+  },
+  {
+    "pc": 13342,
+    "register": "r48",
+    "value": "event",
+    "endPC": 13354
+  },
+  {
+    "pc": 13638,
+    "register": "r26",
+    "value": "document",
+    "endPC": 13655
+  },
+  {
+    "pc": 13387,
+    "register": "r27",
+    "value": "value",
+    "endPC": 13399
+  },
+  {
+    "pc": 13720,
+    "register": "r27",
+    "value": "document",
+    "endPC": 13737
+  },
+  {
+    "pc": 13702,
+    "register": "r25",
+    "value": "div",
+    "endPC": 13709
+  },
+  {
+    "pc": 13746,
+    "register": "r25",
+    "value": "body",
+    "endPC": 13753
+  },
+  {
+    "pc": 13825,
+    "register": "r16",
+    "value": "<section><h3 id='firsth'>green</h3><p id='firstp'>red</p>green</section><section class='with-revert'><h3 id='secondh'>black</h3><p id='secondp'>red</p>black</section>",
+    "endPC": 14237
+  },
+  {
+    "pc": 14248,
+    "register": "r16",
+    "value": "document",
+    "endPC": 14265
+  },
+  {
+    "pc": 13664,
+    "register": "r40",
+    "value": "createElement",
+    "endPC": 13696
+  },
+  {
+    "pc": 12929,
+    "register": "r24",
+    "value": "+",
+    "endPC": 12929
+  },
+  {
+    "pc": 14301,
+    "register": "r11",
+    "value": "section { color: green } p { color: red } section.with-revert { color: revert }",
+    "endPC": 14498
+  },
+  {
+    "pc": 14507,
+    "register": "r11",
+    "value": "document",
+    "endPC": 14524
+  },
+  {
+    "pc": 13800,
+    "register": "r27",
+    "value": "innerHTML",
+    "endPC": 13822
+  },
+  {
+    "pc": 14278,
+    "register": "r40",
+    "value": "style",
+    "endPC": 14290
+  },
+  {
+    "pc": 14533,
+    "register": "r27",
+    "value": "head",
+    "endPC": 14540
+  },
+  {
+    "pc": 14596,
+    "register": "r40",
+    "value": "getComputedStyle",
+    "endPC": 14633
+  },
+  {
+    "pc": 13762,
+    "register": "r25",
+    "value": "appendChild",
+    "endPC": 13789
+  },
+  {
+    "pc": 14642,
+    "register": "r25",
+    "value": "document",
+    "endPC": 14659
+  },
+  {
+    "pc": 14668,
+    "register": "r11",
+    "value": "getElementById",
+    "endPC": 14700
+  },
+  {
+    "pc": 14709,
+    "register": "r11",
+    "value": "firsth",
+    "endPC": 14721
+  },
+  {
+    "pc": 14738,
+    "register": "r11",
+    "value": "getPropertyValue",
+    "endPC": 14775
+  },
+  {
+    "pc": 14874,
+    "register": "r17",
+    "value": "window",
+    "endPC": 14886
+  },
+  {
+    "pc": 13197,
+    "register": "r8",
+    "value": "getHighEntropyValues",
+    "endPC": 13244
+  },
+  {
+    "pc": 14990,
+    "register": "r8",
+    "value": "get",
+    "endPC": 14997
+  },
+  {
+    "pc": 14784,
+    "register": "r11",
+    "value": "color",
+    "endPC": 14796
+  },
+  {
+    "pc": 13601,
+    "register": "r48",
+    "value": "radiusX",
+    "endPC": 13618
+  },
+  {
+    "pc": 15033,
+    "register": "r48",
+    "value": "indexOf",
+    "endPC": 15050
+  },
+  {
+    "pc": 15056,
+    "register": "r48",
+    "value": ";",
+    "endPC": 15056
+  },
+  {
+    "pc": 15133,
+    "register": "r17",
+    "value": "document",
+    "endPC": 15150
+  },
+  {
+    "pc": 15159,
+    "register": "r14",
+    "value": "body",
+    "endPC": 15166
+  },
+  {
+    "pc": 15107,
+    "register": "r13",
+    "value": "get",
+    "endPC": 15117
+  },
+  {
+    "pc": 5826,
+    "register": "r89",
+    "value": "string",
+    "endPC": 5838
+  },
+  {
+    "pc": 13500,
+    "register": "r19",
+    "value": "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+    "endPC": 13582
+  },
+  {
+    "pc": 15292,
+    "register": "r16",
+    "value": "createElement",
+    "endPC": 15324
+  },
+  {
+    "pc": 15330,
+    "register": "r16",
+    "value": "div",
+    "endPC": 15337
+  },
+  {
+    "pc": 15353,
+    "register": "r16",
+    "value": "style",
+    "endPC": 15365
+  },
+  {
+    "pc": 15394,
+    "register": "r38",
+    "value": "position:absolute",
+    "endPC": 15436
+  },
+  {
+    "pc": 15436,
+    "register": "r38",
+    "value": "left:-9999px",
+    "endPC": 15468
+  },
+  {
+    "pc": 15477,
+    "register": "r38",
+    "value": "top:-9999px",
+    "endPC": 15504
+  },
+  {
+    "pc": 15504,
+    "register": "r38",
+    "value": "width:auto",
+    "endPC": 15531
+  },
+  {
+    "pc": 15540,
+    "register": "r38",
+    "value": "height:auto",
+    "endPC": 15567
+  },
+  {
+    "pc": 15567,
+    "register": "r38",
+    "value": "visibility:hidden",
+    "endPC": 15614
+  },
+  {
+    "pc": 15614,
+    "register": "r38",
+    "value": "white-space:nowrap",
+    "endPC": 15661
+  },
+  {
+    "pc": 14895,
+    "register": "r26",
+    "value": "TCaptchaIframeClientPos",
+    "endPC": 14952
+  },
+  {
+    "pc": 15670,
+    "register": "r38",
+    "value": "join",
+    "endPC": 15677
+  },
+  {
+    "pc": 15371,
+    "register": "r16",
+    "value": "cssText",
+    "endPC": 15388
+  },
+  {
+    "pc": 15706,
+    "register": "r41",
+    "value": "appendChild",
+    "endPC": 15733
+  },
+  {
+    "pc": 15682,
+    "register": "r38",
+    "value": ";",
+    "endPC": 15682
+  },
+  {
+    "pc": 15752,
+    "register": "r16",
+    "value": "forEach",
+    "endPC": 15769
+  },
+  {
+    "pc": 14559,
+    "register": "r27",
+    "value": "rgb(0, 128, 0)",
+    "endPC": 14591
+  },
+  {
+    "pc": 15090,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 15107
+  },
+  {
+    "pc": 15823,
+    "register": "r13",
+    "value": "stack",
+    "endPC": 15835
+  },
+  {
+    "pc": 15870,
+    "register": "r11",
+    "value": "candidate",
+    "endPC": 15892
+  },
+  {
+    "pc": 15175,
+    "register": "r14",
+    "value": "clientHeight",
+    "endPC": 15202
+  },
+  {
+    "pc": 15994,
+    "register": "r46",
+    "value": "document",
+    "endPC": 16011
+  },
+  {
+    "pc": 16020,
+    "register": "r18",
+    "value": "createElement",
+    "endPC": 16052
+  },
+  {
+    "pc": 16058,
+    "register": "r18",
+    "value": "video",
+    "endPC": 16070
+  },
+  {
+    "pc": 16098,
+    "register": "r46",
+    "value": "H.264",
+    "endPC": 16110
+  },
+  {
+    "pc": 16129,
+    "register": "r44",
+    "value": "video/mp4; codecs=\"avc1.42E01E\"",
+    "endPC": 16206
+  },
+  {
+    "pc": 16219,
+    "register": "r44",
+    "value": "H.264 High",
+    "endPC": 16241
+  },
+  {
+    "pc": 16250,
+    "register": "r44",
+    "value": "video/mp4; codecs=\"avc1.64001F\"",
+    "endPC": 16327
+  },
+  {
+    "pc": 16340,
+    "register": "r44",
+    "value": "H.265/HEVC",
+    "endPC": 16362
+  },
+  {
+    "pc": 16371,
+    "register": "r44",
+    "value": "video/mp4; codecs=\"hev1.1.6.L93.B0\"",
+    "endPC": 16458
+  },
+  {
+    "pc": 16471,
+    "register": "r44",
+    "value": "VP8",
+    "endPC": 16478
+  },
+  {
+    "pc": 16485,
+    "register": "r44",
+    "value": "video/webm; codecs=\"vp8\"",
+    "endPC": 16542
+  },
+  {
+    "pc": 16557,
+    "register": "r44",
+    "value": "VP9",
+    "endPC": 16564
+  },
+  {
+    "pc": 16571,
+    "register": "r44",
+    "value": "video/webm; codecs=\"vp9\"",
+    "endPC": 16628
+  },
+  {
+    "pc": 16643,
+    "register": "r44",
+    "value": "AV1",
+    "endPC": 16650
+  },
+  {
+    "pc": 16657,
+    "register": "r44",
+    "value": "video/webm; codecs=\"av01.0.08M.08\"",
+    "endPC": 16739
+  },
+  {
+    "pc": 16754,
+    "register": "r44",
+    "value": "Theora",
+    "endPC": 16766
+  },
+  {
+    "pc": 16775,
+    "register": "r44",
+    "value": "video/ogg; codecs=\"theora\"",
+    "endPC": 16837
+  },
+  {
+    "pc": 16852,
+    "register": "r44",
+    "value": "MPEG-4",
+    "endPC": 16864
+  },
+  {
+    "pc": 16982,
+    "register": "r18",
+    "value": "navigator",
+    "endPC": 17004
+  },
+  {
+    "pc": 17052,
+    "register": "r33",
+    "value": "length",
+    "endPC": 17064
+  },
+  {
+    "pc": 17081,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 17093
+  },
+  {
+    "pc": 17102,
+    "register": "r19",
+    "value": "fontSmoothingEnabled",
+    "endPC": 17149
+  },
+  {
+    "pc": 17197,
+    "register": "r20",
+    "value": "document",
+    "endPC": 17214
+  },
+  {
+    "pc": 17010,
+    "register": "r8",
+    "value": "storage",
+    "endPC": 17027
+  },
+  {
+    "pc": 17330,
+    "register": "r13",
+    "value": "substr",
+    "endPC": 17342
+  },
+  {
+    "pc": 15931,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 15948
+  },
+  {
+    "pc": 17353,
+    "register": "r9",
+    "value": "length",
+    "endPC": 17365
+  },
+  {
+    "pc": 17393,
+    "register": "r17",
+    "value": "replace",
+    "endPC": 17410
+  },
+  {
+    "pc": 17435,
+    "register": "r21",
+    "value": "RegExp",
+    "endPC": 17447
+  },
+  {
+    "pc": 17416,
+    "register": "r17",
+    "value": "^[a-z]",
+    "endPC": 17428
+  },
+  {
+    "pc": 17172,
+    "register": "r19",
+    "value": "undefined",
+    "endPC": 17194
+  },
+  {
+    "pc": 17536,
+    "register": "r19",
+    "value": "document",
+    "endPC": 17553
+  },
+  {
+    "pc": 17562,
+    "register": "r31",
+    "value": "createElement",
+    "endPC": 17594
+  },
+  {
+    "pc": 17618,
+    "register": "r24",
+    "value": "document",
+    "endPC": 17635
+  },
+  {
+    "pc": 17600,
+    "register": "r31",
+    "value": "div",
+    "endPC": 17607
+  },
+  {
+    "pc": 17644,
+    "register": "r31",
+    "value": "body",
+    "endPC": 17651
+  },
+  {
+    "pc": 17723,
+    "register": "r22",
+    "value": "<div class=\"left\">\n        <div id=\"startButton\" class=\"button\">\n          Start\n        </div>\n        <h2>Preview</h2>\n        <video id=\"preview\" width=\"160\" height=\"120\" autoplay muted></video>\n      </div>",
+    "endPC": 18245
+  },
+  {
+    "pc": 18256,
+    "register": "r22",
+    "value": "document",
+    "endPC": 18273
+  },
+  {
+    "pc": 17698,
+    "register": "r24",
+    "value": "innerHTML",
+    "endPC": 17720
+  },
+  {
+    "pc": 17660,
+    "register": "r31",
+    "value": "appendChild",
+    "endPC": 17687
+  },
+  {
+    "pc": 18282,
+    "register": "r24",
+    "value": "getElementById",
+    "endPC": 18314
+  },
+  {
+    "pc": 18484,
+    "register": "r17",
+    "value": "RegExp",
+    "endPC": 18496
+  },
+  {
+    "pc": 18454,
+    "register": "r18",
+    "value": "\\bsid=(\\d+)",
+    "endPC": 18481
+  },
+  {
+    "pc": 18510,
+    "register": "r18",
+    "value": "exec",
+    "endPC": 18517
+  },
+  {
+    "pc": 18548,
+    "register": "r8",
+    "value": "document",
+    "endPC": 18565
+  },
+  {
+    "pc": 17295,
+    "register": "r12",
+    "value": "string",
+    "endPC": 17307
+  },
+  {
+    "pc": 18601,
+    "register": "r17",
+    "value": "Object",
+    "endPC": 18613
+  },
+  {
+    "pc": 18622,
+    "register": "r10",
+    "value": "defineProperty",
+    "endPC": 18654
+  },
+  {
+    "pc": 18663,
+    "register": "r10",
+    "value": "console",
+    "endPC": 18680
+  },
+  {
+    "pc": 18323,
+    "register": "r24",
+    "value": "preview",
+    "endPC": 18340
+  },
+  {
+    "pc": 18574,
+    "register": "r12",
+    "value": "charset",
+    "endPC": 18591
+  },
+  {
+    "pc": 18758,
+    "register": "r24",
+    "value": "length",
+    "endPC": 18770
+  },
+  {
+    "pc": 18686,
+    "register": "r14",
+    "value": "log",
+    "endPC": 18693
+  },
+  {
+    "pc": 18793,
+    "register": "r14",
+    "value": "d",
+    "endPC": 18795
+  },
+  {
+    "pc": 18693,
+    "register": "r16",
+    "value": "get",
+    "endPC": 18703
+  },
+  {
+    "pc": 18825,
+    "register": "r18",
+    "value": "length",
+    "endPC": 18837
+  },
+  {
+    "pc": 18884,
+    "register": "r38",
+    "value": "length",
+    "endPC": 18896
+  },
+  {
+    "pc": 18920,
+    "register": "r27",
+    "value": "limits",
+    "endPC": 18932
+  },
+  {
+    "pc": 18945,
+    "register": "r25",
+    "value": "undefined",
+    "endPC": 18967
+  },
+  {
+    "pc": 18984,
+    "register": "r75",
+    "value": "window",
+    "endPC": 18996
+  },
+  {
+    "pc": 19005,
+    "register": "r48",
+    "value": "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+    "endPC": 19087
+  },
+  {
+    "pc": 18353,
+    "register": "r34",
+    "value": "captureStream",
+    "endPC": 18385
+  },
+  {
+    "pc": 19114,
+    "register": "r13",
+    "value": "split",
+    "endPC": 19126
+  },
+  {
+    "pc": 19132,
+    "register": "r13",
+    "value": ":",
+    "endPC": 19132
+  },
+  {
+    "pc": 19171,
+    "register": "r13",
+    "value": "length",
+    "endPC": 19183
+  },
+  {
+    "pc": 15962,
+    "register": "r26",
+    "value": "macos",
+    "endPC": 15974
+  },
+  {
+    "pc": 19206,
+    "register": "r9",
+    "value": "OCY_Fhf",
+    "endPC": 19223
+  },
+  {
+    "pc": 19236,
+    "register": "r9",
+    "value": "\"",
+    "endPC": 19236
+  },
+  {
+    "pc": 19093,
+    "register": "r48",
+    "value": "now",
+    "endPC": 19100
+  },
+  {
+    "pc": 19347,
+    "register": "r12",
+    "value": "undefined",
+    "endPC": 19369
+  },
+  {
+    "pc": 19379,
+    "register": "r12",
+    "value": "JSON",
+    "endPC": 19386
+  },
+  {
+    "pc": 19333,
+    "register": "r20",
+    "value": "cd",
+    "endPC": 19335
+  },
+  {
+    "pc": 19395,
+    "register": "r20",
+    "value": "stringify",
+    "endPC": 19417
+  },
+  {
+    "pc": 19431,
+    "register": "r20",
+    "value": "substr",
+    "endPC": 19443
+  },
+  {
+    "pc": 19454,
+    "register": "r12",
+    "value": "length",
+    "endPC": 19466
+  },
+  {
+    "pc": 18801,
+    "register": "r14",
+    "value": "QRu~",
+    "endPC": 18808
+  },
+  {
+    "pc": 19556,
+    "register": "r15",
+    "value": "Symbol",
+    "endPC": 19568
+  },
+  {
+    "pc": 19284,
+    "register": "r17",
+    "value": "undefined",
+    "endPC": 19306
+  },
+  {
+    "pc": 19616,
+    "register": "r20",
+    "value": "JSON",
+    "endPC": 19623
+  },
+  {
+    "pc": 17479,
+    "register": "r23",
+    "value": "length",
+    "endPC": 17491
+  },
+  {
+    "pc": 18388,
+    "register": "r19",
+    "value": "captureStream",
+    "endPC": 18420
+  },
+  {
+    "pc": 19679,
+    "register": "r19",
+    "value": "console",
+    "endPC": 19696
+  },
+  {
+    "pc": 19702,
+    "register": "r18",
+    "value": "profile",
+    "endPC": 19719
+  },
+  {
+    "pc": 19577,
+    "register": "r17",
+    "value": "prototype",
+    "endPC": 19599
+  },
+  {
+    "pc": 19734,
+    "register": "r18",
+    "value": "console",
+    "endPC": 19751
+  },
+  {
+    "pc": 19757,
+    "register": "r15",
+    "value": "profileEnd",
+    "endPC": 19779
+  },
+  {
+    "pc": 19824,
+    "register": "r15",
+    "value": "get",
+    "endPC": 19834
+  },
+  {
+    "pc": 19807,
+    "register": "r16",
+    "value": "exports",
+    "endPC": 19824
+  },
+  {
+    "pc": 19870,
+    "register": "r8",
+    "value": "exports",
+    "endPC": 19887
+  },
+  {
+    "pc": 19921,
+    "register": "r8",
+    "value": "navigator",
+    "endPC": 19943
+  },
+  {
+    "pc": 19949,
+    "register": "r13",
+    "value": "userAgentData",
+    "endPC": 19981
+  },
+  {
+    "pc": 19987,
+    "register": "r13",
+    "value": "getHighEntropyValues",
+    "endPC": 20034
+  },
+  {
+    "pc": 19632,
+    "register": "r12",
+    "value": "stringify",
+    "endPC": 19654
+  },
+  {
+    "pc": 20046,
+    "register": "r12",
+    "value": "architecture",
+    "endPC": 20073
+  },
+  {
+    "pc": 20082,
+    "register": "r12",
+    "value": "bitness",
+    "endPC": 20099
+  },
+  {
+    "pc": 20099,
+    "register": "r12",
+    "value": "brands",
+    "endPC": 20116
+  },
+  {
+    "pc": 20125,
+    "register": "r12",
+    "value": "mobile",
+    "endPC": 20137
+  },
+  {
+    "pc": 20146,
+    "register": "r12",
+    "value": "model",
+    "endPC": 20158
+  },
+  {
+    "pc": 20158,
+    "register": "r12",
+    "value": "platform",
+    "endPC": 20180
+  },
+  {
+    "pc": 20189,
+    "register": "r12",
+    "value": "platformVersion",
+    "endPC": 20226
+  },
+  {
+    "pc": 20226,
+    "register": "r12",
+    "value": "uaFullVersion",
+    "endPC": 20263
+  },
+  {
+    "pc": 20263,
+    "register": "r12",
+    "value": "fullVersionList",
+    "endPC": 20305
+  },
+  {
+    "pc": 20305,
+    "register": "r12",
+    "value": "wow64",
+    "endPC": 20322
+  },
+  {
+    "pc": 20333,
+    "register": "r13",
+    "value": "then",
+    "endPC": 20340
+  },
+  {
+    "pc": 20360,
+    "register": "r13",
+    "value": "catch",
+    "endPC": 20372
+  },
+  {
+    "pc": 19887,
+    "register": "r17",
+    "value": "get",
+    "endPC": 19897
+  },
+  {
+    "pc": 20399,
+    "register": "r19",
+    "value": "_state",
+    "endPC": 20411
+  },
+  {
+    "pc": 20429,
+    "register": "r19",
+    "value": "maxTextureDimension1D",
+    "endPC": 20481
+  },
+  {
+    "pc": 20481,
+    "register": "r19",
+    "value": "maxTextureDimension2D",
+    "endPC": 20538
+  },
+  {
+    "pc": 20538,
+    "register": "r19",
+    "value": "maxTextureDimension3D",
+    "endPC": 20595
+  },
+  {
+    "pc": 20595,
+    "register": "r19",
+    "value": "maxTextureArrayLayers",
+    "endPC": 20652
+  },
+  {
+    "pc": 20652,
+    "register": "r19",
+    "value": "maxBindGroups",
+    "endPC": 20689
+  },
+  {
+    "pc": 20689,
+    "register": "r19",
+    "value": "maxBindGroupsPlusVertexBuffers",
+    "endPC": 20766
+  },
+  {
+    "pc": 20775,
+    "register": "r19",
+    "value": "maxBindingsPerBindGroup",
+    "endPC": 20832
+  },
+  {
+    "pc": 20832,
+    "register": "r19",
+    "value": "maxBufferSize",
+    "endPC": 20869
+  },
+  {
+    "pc": 20869,
+    "register": "r19",
+    "value": "maxColorAttachmentBytesPerSample",
+    "endPC": 20951
+  },
+  {
+    "pc": 20960,
+    "register": "r19",
+    "value": "maxColorAttachments",
+    "endPC": 21007
+  },
+  {
+    "pc": 21007,
+    "register": "r19",
+    "value": "maxComputeInvocationsPerWorkgroup",
+    "endPC": 21094
+  },
+  {
+    "pc": 21094,
+    "register": "r19",
+    "value": "maxComputeWorkgroupSizeX",
+    "endPC": 21156
+  },
+  {
+    "pc": 21165,
+    "register": "r19",
+    "value": "maxComputeWorkgroupSizeY",
+    "endPC": 21222
+  },
+  {
+    "pc": 21231,
+    "register": "r19",
+    "value": "maxComputeWorkgroupSizeZ",
+    "endPC": 21288
+  },
+  {
+    "pc": 21297,
+    "register": "r19",
+    "value": "maxComputeWorkgroupStorageSize",
+    "endPC": 21369
+  },
+  {
+    "pc": 21378,
+    "register": "r19",
+    "value": "maxComputeWorkgroupsPerDimension",
+    "endPC": 21455
+  },
+  {
+    "pc": 21464,
+    "register": "r19",
+    "value": "maxDynamicStorageBuffersPerPipelineLayout",
+    "endPC": 21566
+  },
+  {
+    "pc": 21566,
+    "register": "r19",
+    "value": "maxDynamicUniformBuffersPerPipelineLayout",
+    "endPC": 21673
+  },
+  {
+    "pc": 21673,
+    "register": "r19",
+    "value": "maxInterStageShaderVariables",
+    "endPC": 21745
+  },
+  {
+    "pc": 21754,
+    "register": "r19",
+    "value": "maxSampledTexturesPerShaderStage",
+    "endPC": 21831
+  },
+  {
+    "pc": 21840,
+    "register": "r19",
+    "value": "maxSamplersPerShaderStage",
+    "endPC": 21902
+  },
+  {
+    "pc": 21902,
+    "register": "r19",
+    "value": "maxStorageBufferBindingSize",
+    "endPC": 21974
+  },
+  {
+    "pc": 21974,
+    "register": "r19",
+    "value": "maxStorageBuffersPerShaderStage",
+    "endPC": 22056
+  },
+  {
+    "pc": 22056,
+    "register": "r19",
+    "value": "maxStorageTexturesPerShaderStage",
+    "endPC": 22138
+  },
+  {
+    "pc": 22147,
+    "register": "r19",
+    "value": "maxUniformBufferBindingSize",
+    "endPC": 22214
+  },
+  {
+    "pc": 22214,
+    "register": "r19",
+    "value": "maxUniformBuffersPerShaderStage",
+    "endPC": 22296
+  },
+  {
+    "pc": 22296,
+    "register": "r19",
+    "value": "maxVertexAttributes",
+    "endPC": 22348
+  },
+  {
+    "pc": 22348,
+    "register": "r19",
+    "value": "maxVertexBufferArrayStride",
+    "endPC": 22415
+  },
+  {
+    "pc": 22424,
+    "register": "r19",
+    "value": "maxVertexBuffers",
+    "endPC": 22461
+  },
+  {
+    "pc": 22470,
+    "register": "r19",
+    "value": "minStorageBufferOffsetAlignment",
+    "endPC": 22547
+  },
+  {
+    "pc": 22547,
+    "register": "r19",
+    "value": "minUniformBufferOffsetAlignment",
+    "endPC": 22629
+  },
+  {
+    "pc": 22642,
+    "register": "r19",
+    "value": "substring",
+    "endPC": 22664
+  },
+  {
+    "pc": 19256,
+    "register": "r10",
+    "value": "\",",
+    "endPC": 19258
+  },
+  {
+    "pc": 22714,
+    "register": "r15",
+    "value": "clearInterval",
+    "endPC": 22746
+  },
+  {
+    "pc": 22805,
+    "register": "r12",
+    "value": "getComputedStyle",
+    "endPC": 22842
+  },
+  {
+    "pc": 22851,
+    "register": "r14",
+    "value": "document",
+    "endPC": 22868
+  },
+  {
+    "pc": 22877,
+    "register": "r37",
+    "value": "getElementById",
+    "endPC": 22909
+  },
+  {
+    "pc": 22918,
+    "register": "r37",
+    "value": "bar",
+    "endPC": 22925
+  },
+  {
+    "pc": 22940,
+    "register": "r37",
+    "value": "getPropertyValue",
+    "endPC": 22977
+  },
+  {
+    "pc": 16117,
+    "register": "r46",
+    "value": "type",
+    "endPC": 16124
+  },
+  {
+    "pc": 23136,
+    "register": "r18",
+    "value": "0",
+    "endPC": 23136
+  },
+  {
+    "pc": 22768,
+    "register": "r17",
+    "value": "rgb(255, 0, 0)",
+    "endPC": 22800
+  },
+  {
+    "pc": 23153,
+    "register": "r17",
+    "value": "d",
+    "endPC": 23155
+  },
+  {
+    "pc": 23103,
+    "register": "r20",
+    "value": "touchmove",
+    "endPC": 23125
+  },
+  {
+    "pc": 23207,
+    "register": "r19",
+    "value": "charCodeAt",
+    "endPC": 23229
+  },
+  {
+    "pc": 23329,
+    "register": "r13",
+    "value": "navigator",
+    "endPC": 23351
+  },
+  {
+    "pc": 23285,
+    "register": "r8",
+    "value": "get",
+    "endPC": 23295
+  },
+  {
+    "pc": 23357,
+    "register": "r8",
+    "value": "deviceMemory",
+    "endPC": 23384
+  },
+  {
+    "pc": 23397,
+    "register": "r8",
+    "value": "symbol",
+    "endPC": 23409
+  },
+  {
+    "pc": 23161,
+    "register": "r17",
+    "value": "a",
+    "endPC": 23161
+  },
+  {
+    "pc": 23449,
+    "register": "r12",
+    "value": "get",
+    "endPC": 23459
+  },
+  {
+    "pc": 16873,
+    "register": "r44",
+    "value": "video/mp4; codecs=\"mp4v.20.8\"",
+    "endPC": 16945
+  },
+  {
+    "pc": 23498,
+    "register": "r44",
+    "value": "window",
+    "endPC": 23510
+  },
+  {
+    "pc": 23268,
+    "register": "r32",
+    "value": "exports",
+    "endPC": 23285
+  },
+  {
+    "pc": 23651,
+    "register": "r22",
+    "value": "window",
+    "endPC": 23663
+  },
+  {
+    "pc": 23672,
+    "register": "r11",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 23754
+  },
+  {
+    "pc": 23792,
+    "register": "r19",
+    "value": "console",
+    "endPC": 23809
+  },
+  {
+    "pc": 23841,
+    "register": "r11",
+    "value": "screen",
+    "endPC": 23853
+  },
+  {
+    "pc": 23902,
+    "register": "r18",
+    "value": "push",
+    "endPC": 23909
+  },
+  {
+    "pc": 11275,
+    "register": "r54",
+    "value": "baseLatency",
+    "endPC": 11302
+  },
+  {
+    "pc": 24047,
+    "register": "r16",
+    "value": "window",
+    "endPC": 24059
+  },
+  {
+    "pc": 24068,
+    "register": "r19",
+    "value": "TCaptchaSid",
+    "endPC": 24095
+  },
+  {
+    "pc": 24022,
+    "register": "r13",
+    "value": "undefined",
+    "endPC": 24044
+  },
+  {
+    "pc": 24161,
+    "register": "r10",
+    "value": "setErrorStack",
+    "endPC": 24193
+  },
+  {
+    "pc": 24209,
+    "register": "r23",
+    "value": "setError",
+    "endPC": 24226
+  },
+  {
+    "pc": 23862,
+    "register": "r8",
+    "value": "colorDepth",
+    "endPC": 23884
+  },
+  {
+    "pc": 24328,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 24340
+  },
+  {
+    "pc": 24302,
+    "register": "r13",
+    "value": "get",
+    "endPC": 24312
+  },
+  {
+    "pc": 24384,
+    "register": "r12",
+    "value": "document",
+    "endPC": 24401
+  },
+  {
+    "pc": 24466,
+    "register": "r63",
+    "value": "document",
+    "endPC": 24483
+  },
+  {
+    "pc": 24448,
+    "register": "r50",
+    "value": "div",
+    "endPC": 24455
+  },
+  {
+    "pc": 24507,
+    "register": "r12",
+    "value": "document",
+    "endPC": 24524
+  },
+  {
+    "pc": 24552,
+    "register": "r57",
+    "value": "document",
+    "endPC": 24569
+  },
+  {
+    "pc": 24537,
+    "register": "r63",
+    "value": "li",
+    "endPC": 24539
+  },
+  {
+    "pc": 24589,
+    "register": "r50",
+    "value": "document",
+    "endPC": 24606
+  },
+  {
+    "pc": 24639,
+    "register": "r12",
+    "value": "document",
+    "endPC": 24656
+  },
+  {
+    "pc": 23976,
+    "register": "r54",
+    "value": "outputLatency",
+    "endPC": 24008
+  },
+  {
+    "pc": 24678,
+    "register": "r50",
+    "value": "document",
+    "endPC": 24695
+  },
+  {
+    "pc": 24717,
+    "register": "r12",
+    "value": "document",
+    "endPC": 24734
+  },
+  {
+    "pc": 24410,
+    "register": "r60",
+    "value": "createElement",
+    "endPC": 24442
+  },
+  {
+    "pc": 24349,
+    "register": "r13",
+    "value": "deviceXDPI",
+    "endPC": 24371
+  },
+  {
+    "pc": 24916,
+    "register": "r12",
+    "value": "outerHTML",
+    "endPC": 24938
+  },
+  {
+    "pc": 24967,
+    "register": "r8",
+    "value": "data",
+    "endPC": 24974
+  },
+  {
+    "pc": 24285,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 24302
+  },
+  {
+    "pc": 25044,
+    "register": "r21",
+    "value": "window",
+    "endPC": 25056
+  },
+  {
+    "pc": 16086,
+    "register": "r52",
+    "value": "name",
+    "endPC": 16093
+  },
+  {
+    "pc": 25065,
+    "register": "r18",
+    "value": "CSS",
+    "endPC": 25072
+  },
+  {
+    "pc": 25078,
+    "register": "r18",
+    "value": "supports",
+    "endPC": 25095
+  },
+  {
+    "pc": 25145,
+    "register": "r24",
+    "value": "0",
+    "endPC": 25145
+  },
+  {
+    "pc": 24987,
+    "register": "r13",
+    "value": "1",
+    "endPC": 24987
+  },
+  {
+    "pc": 25211,
+    "register": "r13",
+    "value": "toString",
+    "endPC": 25228
+  },
+  {
+    "pc": 24241,
+    "register": "r10",
+    "value": "getError",
+    "endPC": 24258
+  },
+  {
+    "pc": 23432,
+    "register": "r20",
+    "value": "exports",
+    "endPC": 23449
+  },
+  {
+    "pc": 25018,
+    "register": "r16",
+    "value": "]",
+    "endPC": 25018
+  },
+  {
+    "pc": 25460,
+    "register": "r16",
+    "value": "f",
+    "endPC": 25462
+  },
+  {
+    "pc": 25468,
+    "register": "r16",
+    "value": "'0/:",
+    "endPC": 25475
+  },
+  {
+    "pc": 25568,
+    "register": "r9",
+    "value": "a",
+    "endPC": 25570
+  },
+  {
+    "pc": 23519,
+    "register": "r34",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 23601
+  },
+  {
+    "pc": 25283,
+    "register": "r24",
+    "value": "exports",
+    "endPC": 25300
+  },
+  {
+    "pc": 24492,
+    "register": "r46",
+    "value": "a",
+    "endPC": 24492
+  },
+  {
+    "pc": 22986,
+    "register": "r37",
+    "value": "color",
+    "endPC": 22998
+  },
+  {
+    "pc": 25576,
+    "register": "r9",
+    "value": "jK0L",
+    "endPC": 25583
+  },
+  {
+    "pc": 25815,
+    "register": "r36",
+    "value": "window",
+    "endPC": 25827
+  },
+  {
+    "pc": 25370,
+    "register": "r22",
+    "value": "top",
+    "endPC": 25377
+  },
+  {
+    "pc": 25948,
+    "register": "r22",
+    "value": "on",
+    "endPC": 25956
+  },
+  {
+    "pc": 26100,
+    "register": "r14",
+    "value": "length",
+    "endPC": 26112
+  },
+  {
+    "pc": 25836,
+    "register": "r9",
+    "value": "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+    "endPC": 25918
+  },
+  {
+    "pc": 26074,
+    "register": "r16",
+    "value": "get",
+    "endPC": 26084
+  },
+  {
+    "pc": 24894,
+    "register": "r28",
+    "value": "adivdiva",
+    "endPC": 24911
+  },
+  {
+    "pc": 26191,
+    "register": "r275",
+    "value": "length",
+    "endPC": 26203
+  },
+  {
+    "pc": 27152,
+    "register": "r189",
+    "value": "exports",
+    "endPC": 27169
+  },
+  {
+    "pc": 26057,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 26074
+  },
+  {
+    "pc": 27218,
+    "register": "r15",
+    "value": "window",
+    "endPC": 27230
+  },
+  {
+    "pc": 27417,
+    "register": "r30",
+    "value": "document",
+    "endPC": 27434
+  },
+  {
+    "pc": 27239,
+    "register": "r13",
+    "value": "devicePixelRatio",
+    "endPC": 27276
+  },
+  {
+    "pc": 27443,
+    "register": "r11",
+    "value": "createElement",
+    "endPC": 27475
+  },
+  {
+    "pc": 27481,
+    "register": "r11",
+    "value": "style",
+    "endPC": 27493
+  },
+  {
+    "pc": 27546,
+    "register": "r13",
+    "value": "document",
+    "endPC": 27563
+  },
+  {
+    "pc": 27504,
+    "register": "r20",
+    "value": "innerHTML",
+    "endPC": 27526
+  },
+  {
+    "pc": 27529,
+    "register": "r11",
+    "value": "{}",
+    "endPC": 27531
+  },
+  {
+    "pc": 27572,
+    "register": "r20",
+    "value": "head",
+    "endPC": 27579
+  },
+  {
+    "pc": 27626,
+    "register": "r13",
+    "value": "sheet",
+    "endPC": 27638
+  },
+  {
+    "pc": 27588,
+    "register": "r20",
+    "value": "appendChild",
+    "endPC": 27615
+  },
+  {
+    "pc": 27644,
+    "register": "r13",
+    "value": "cssRules",
+    "endPC": 27661
+  },
+  {
+    "pc": 27670,
+    "register": "r13",
+    "value": "length",
+    "endPC": 27682
+  },
+  {
+    "pc": 27700,
+    "register": "r13",
+    "value": "remove",
+    "endPC": 27712
+  },
+  {
+    "pc": 27745,
+    "register": "r13",
+    "value": "unshift",
+    "endPC": 27762
+  },
+  {
+    "pc": 27768,
+    "register": "r13",
+    "value": "Number",
+    "endPC": 27780
+  },
+  {
+    "pc": 27806,
+    "register": "r38",
+    "value": "join",
+    "endPC": 27813
+  },
+  {
+    "pc": 27835,
+    "register": "r38",
+    "value": "parseInt",
+    "endPC": 27852
+  },
+  {
+    "pc": 27878,
+    "register": "r24",
+    "value": "parseInt",
+    "endPC": 27895
+  },
+  {
+    "pc": 27941,
+    "register": "r19",
+    "value": "localDescription",
+    "endPC": 27978
+  },
+  {
+    "pc": 27987,
+    "register": "r19",
+    "value": "sdp",
+    "endPC": 27994
+  },
+  {
+    "pc": 28000,
+    "register": "r19",
+    "value": "split",
+    "endPC": 28012
+  },
+  {
+    "pc": 28018,
+    "register": "r19",
+    "value": "\n",
+    "endPC": 28018
+  },
+  {
+    "pc": 28027,
+    "register": "r19",
+    "value": "forEach",
+    "endPC": 28044
+  },
+  {
+    "pc": 28100,
+    "register": "r9",
+    "value": "navigator",
+    "endPC": 28122
+  },
+  {
+    "pc": 28161,
+    "register": "r28",
+    "value": "length",
+    "endPC": 28173
+  },
+  {
+    "pc": 23934,
+    "register": "r31",
+    "value": "ac-outputLatency",
+    "endPC": 23971
+  },
+  {
+    "pc": 28214,
+    "register": "r37",
+    "value": "[",
+    "endPC": 28214
+  },
+  {
+    "pc": 28128,
+    "register": "r16",
+    "value": "gpu",
+    "endPC": 28135
+  },
+  {
+    "pc": 28282,
+    "register": "r11",
+    "value": "navigator",
+    "endPC": 28304
+  },
+  {
+    "pc": 28310,
+    "register": "r16",
+    "value": "userAgent",
+    "endPC": 28332
+  },
+  {
+    "pc": 28342,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 28359
+  },
+  {
+    "pc": 28359,
+    "register": "r11",
+    "value": "get",
+    "endPC": 28369
+  },
+  {
+    "pc": 28437,
+    "register": "r17",
+    "value": "Object",
+    "endPC": 28449
+  },
+  {
+    "pc": 28458,
+    "register": "r14",
+    "value": "defineProperty",
+    "endPC": 28490
+  },
+  {
+    "pc": 28499,
+    "register": "r14",
+    "value": "Symbol",
+    "endPC": 28511
+  },
+  {
+    "pc": 28520,
+    "register": "r8",
+    "value": "toStringTag",
+    "endPC": 28547
+  },
+  {
+    "pc": 28600,
+    "register": "r23",
+    "value": "navigator",
+    "endPC": 28622
+  },
+  {
+    "pc": 28570,
+    "register": "r19",
+    "value": "Module",
+    "endPC": 28582
+  },
+  {
+    "pc": 28628,
+    "register": "r19",
+    "value": "mimeTypes",
+    "endPC": 28650
+  },
+  {
+    "pc": 28693,
+    "register": "r37",
+    "value": "length",
+    "endPC": 28705
+  },
+  {
+    "pc": 28752,
+    "register": "r13",
+    "value": "window",
+    "endPC": 28764
+  },
+  {
+    "pc": 27297,
+    "register": "r34",
+    "value": "removeChild",
+    "endPC": 27324
+  },
+  {
+    "pc": 28783,
+    "register": "r39",
+    "value": "window",
+    "endPC": 28795
+  },
+  {
+    "pc": 28656,
+    "register": "r19",
+    "value": "length",
+    "endPC": 28668
+  },
+  {
+    "pc": 28804,
+    "register": "r17",
+    "value": "TCaptchaIframeClientPos",
+    "endPC": 28861
+  },
+  {
+    "pc": 28555,
+    "register": "r14",
+    "value": "value",
+    "endPC": 28567
+  },
+  {
+    "pc": 23822,
+    "register": "r40",
+    "value": " ",
+    "endPC": 23822
+  },
+  {
+    "pc": 28938,
+    "register": "r20",
+    "value": "undefined",
+    "endPC": 28960
+  },
+  {
+    "pc": 29056,
+    "register": "r33",
+    "value": "window",
+    "endPC": 29068
+  },
+  {
+    "pc": 29114,
+    "register": "r42",
+    "value": "window",
+    "endPC": 29126
+  },
+  {
+    "pc": 29077,
+    "register": "r8",
+    "value": "callPhantom",
+    "endPC": 29104
+  },
+  {
+    "pc": 29165,
+    "register": "r33",
+    "value": "RegExp",
+    "endPC": 29177
+  },
+  {
+    "pc": 29135,
+    "register": "r8",
+    "value": "_phantom",
+    "endPC": 29152
+  },
+  {
+    "pc": 24816,
+    "register": "r60",
+    "value": "removeChild",
+    "endPC": 24843
+  },
+  {
+    "pc": 29236,
+    "register": "r60",
+    "value": "navigator",
+    "endPC": 29258
+  },
+  {
+    "pc": 29264,
+    "register": "r41",
+    "value": "userAgent",
+    "endPC": 29286
+  },
+  {
+    "pc": 29301,
+    "register": "r41",
+    "value": "RegExp",
+    "endPC": 29313
+  },
+  {
+    "pc": 29339,
+    "register": "r58",
+    "value": "RegExp",
+    "endPC": 29351
+  },
+  {
+    "pc": 29186,
+    "register": "r8",
+    "value": "phantomjs",
+    "endPC": 29208
+  },
+  {
+    "pc": 29382,
+    "register": "r50",
+    "value": "window",
+    "endPC": 29394
+  },
+  {
+    "pc": 29430,
+    "register": "r58",
+    "value": "RegExp",
+    "endPC": 29442
+  },
+  {
+    "pc": 29403,
+    "register": "r8",
+    "value": "WebPage",
+    "endPC": 29420
+  },
+  {
+    "pc": 29451,
+    "register": "r8",
+    "value": "python",
+    "endPC": 29463
+  },
+  {
+    "pc": 29485,
+    "register": "r58",
+    "value": "document",
+    "endPC": 29502
+  },
+  {
+    "pc": 29591,
+    "register": "r50",
+    "value": "document",
+    "endPC": 29608
+  },
+  {
+    "pc": 29511,
+    "register": "r8",
+    "value": "$cdc_asdjflasutopfhvcZLmcfl_",
+    "endPC": 29578
+  },
+  {
+    "pc": 29679,
+    "register": "r58",
+    "value": "window",
+    "endPC": 29691
+  },
+  {
+    "pc": 29617,
+    "register": "r8",
+    "value": "__webdriver_script_fn",
+    "endPC": 29669
+  },
+  {
+    "pc": 29737,
+    "register": "r50",
+    "value": "window",
+    "endPC": 29749
+  },
+  {
+    "pc": 29700,
+    "register": "r8",
+    "value": "fxdriver_id",
+    "endPC": 29727
+  },
+  {
+    "pc": 29818,
+    "register": "r58",
+    "value": "window",
+    "endPC": 29830
+  },
+  {
+    "pc": 29758,
+    "register": "r8",
+    "value": "__fxdriver_unwrapped",
+    "endPC": 29805
+  },
+  {
+    "pc": 29881,
+    "register": "r50",
+    "value": "window",
+    "endPC": 29893
+  },
+  {
+    "pc": 29839,
+    "register": "r8",
+    "value": "domAutomation",
+    "endPC": 29871
+  },
+  {
+    "pc": 29922,
+    "register": "r58",
+    "value": "RegExp",
+    "endPC": 29934
+  },
+  {
+    "pc": 29902,
+    "register": "r8",
+    "value": "ubot",
+    "endPC": 29909
+  },
+  {
+    "pc": 29969,
+    "register": "r41",
+    "value": "navigator",
+    "endPC": 29991
+  },
+  {
+    "pc": 29997,
+    "register": "r22",
+    "value": "vendor",
+    "endPC": 30009
+  },
+  {
+    "pc": 30026,
+    "register": "r22",
+    "value": "RegExp",
+    "endPC": 30038
+  },
+  {
+    "pc": 29943,
+    "register": "r8",
+    "value": "Zombie",
+    "endPC": 29955
+  },
+  {
+    "pc": 30056,
+    "register": "r8",
+    "value": "navigator",
+    "endPC": 30078
+  },
+  {
+    "pc": 30084,
+    "register": "r58",
+    "value": "appName",
+    "endPC": 30101
+  },
+  {
+    "pc": 30116,
+    "register": "r58",
+    "value": "RegExp",
+    "endPC": 30128
+  },
+  {
+    "pc": 30137,
+    "register": "r50",
+    "value": "CasperJS",
+    "endPC": 30154
+  },
+  {
+    "pc": 30176,
+    "register": "r58",
+    "value": "window",
+    "endPC": 30188
+  },
+  {
+    "pc": 30234,
+    "register": "r22",
+    "value": "window",
+    "endPC": 30246
+  },
+  {
+    "pc": 30197,
+    "register": "r50",
+    "value": "CasperError",
+    "endPC": 30224
+  },
+  {
+    "pc": 30280,
+    "register": "r58",
+    "value": "window",
+    "endPC": 30292
+  },
+  {
+    "pc": 30255,
+    "register": "r50",
+    "value": "casper",
+    "endPC": 30267
+  },
+  {
+    "pc": 30341,
+    "register": "r22",
+    "value": "window",
+    "endPC": 30353
+  },
+  {
+    "pc": 30301,
+    "register": "r50",
+    "value": "patchRequire",
+    "endPC": 30328
+  },
+  {
+    "pc": 30362,
+    "register": "r50",
+    "value": "navigator",
+    "endPC": 30384
+  },
+  {
+    "pc": 30390,
+    "register": "r50",
+    "value": "webdriver",
+    "endPC": 30412
+  },
+  {
+    "pc": 30504,
+    "register": "r50",
+    "value": "RegExp",
+    "endPC": 30516
+  },
+  {
+    "pc": 30525,
+    "register": "r22",
+    "value": "^file",
+    "endPC": 30537
+  },
+  {
+    "pc": 29220,
+    "register": "r33",
+    "value": "test",
+    "endPC": 29227
+  },
+  {
+    "pc": 30549,
+    "register": "r33",
+    "value": "window",
+    "endPC": 30561
+  },
+  {
+    "pc": 29211,
+    "register": "r42",
+    "value": "i",
+    "endPC": 29211
+  },
+  {
+    "pc": 30570,
+    "register": "r50",
+    "value": "location",
+    "endPC": 30587
+  },
+  {
+    "pc": 30596,
+    "register": "r50",
+    "value": "href",
+    "endPC": 30603
+  },
+  {
+    "pc": 30620,
+    "register": "r50",
+    "value": "window",
+    "endPC": 30632
+  },
+  {
+    "pc": 30641,
+    "register": "r33",
+    "value": "__playwright",
+    "endPC": 30668
+  },
+  {
+    "pc": 30687,
+    "register": "r22",
+    "value": "window",
+    "endPC": 30699
+  },
+  {
+    "pc": 30708,
+    "register": "r33",
+    "value": "__playwright__",
+    "endPC": 30740
+  },
+  {
+    "pc": 30759,
+    "register": "r50",
+    "value": "window",
+    "endPC": 30771
+  },
+  {
+    "pc": 30780,
+    "register": "r33",
+    "value": "__nightmare",
+    "endPC": 30807
+  },
+  {
+    "pc": 28914,
+    "register": "r29",
+    "value": "object",
+    "endPC": 28926
+  },
+  {
+    "pc": 30869,
+    "register": "r18",
+    "value": "Symbol",
+    "endPC": 30881
+  },
+  {
+    "pc": 30890,
+    "register": "r17",
+    "value": "iterator",
+    "endPC": 30907
+  },
+  {
+    "pc": 30916,
+    "register": "r17",
+    "value": "Object",
+    "endPC": 30928
+  },
+  {
+    "pc": 28064,
+    "register": "r26",
+    "value": "iphone",
+    "endPC": 28076
+  },
+  {
+    "pc": 29025,
+    "register": "r15",
+    "value": "default",
+    "endPC": 29042
+  },
+  {
+    "pc": 31023,
+    "register": "r21",
+    "value": "window",
+    "endPC": 31035
+  },
+  {
+    "pc": 31061,
+    "register": "r19",
+    "value": "window",
+    "endPC": 31073
+  },
+  {
+    "pc": 30834,
+    "register": "r20",
+    "value": "touchstart",
+    "endPC": 30856
+  },
+  {
+    "pc": 31231,
+    "register": "r14",
+    "value": "JSON",
+    "endPC": 31238
+  },
+  {
+    "pc": 31193,
+    "register": "r12",
+    "value": "length",
+    "endPC": 31205
+  },
+  {
+    "pc": 31247,
+    "register": "r13",
+    "value": "parse",
+    "endPC": 31259
+  },
+  {
+    "pc": 31265,
+    "register": "r13",
+    "value": "data",
+    "endPC": 31272
+  },
+  {
+    "pc": 31285,
+    "register": "r8",
+    "value": "message",
+    "endPC": 31302
+  },
+  {
+    "pc": 31311,
+    "register": "r12",
+    "value": "type",
+    "endPC": 31318
+  },
+  {
+    "pc": 31408,
+    "register": "r13",
+    "value": "{\"_state\":-2}",
+    "endPC": 31440
+  },
+  {
+    "pc": 31440,
+    "register": "r13",
+    "value": "{\"_state\":-1}",
+    "endPC": 31477
+  },
+  {
+    "pc": 31513,
+    "register": "r12",
+    "value": "get",
+    "endPC": 31523
+  },
+  {
+    "pc": 31543,
+    "register": "r12",
+    "value": "@",
+    "endPC": 31543
+  },
+  {
+    "pc": 31366,
+    "register": "r14",
+    "value": "get",
+    "endPC": 31376
+  },
+  {
+    "pc": 31349,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 31366
+  },
+  {
+    "pc": 31581,
+    "register": "r16",
+    "value": "Object",
+    "endPC": 31593
+  },
+  {
+    "pc": 31604,
+    "register": "r11",
+    "value": "String",
+    "endPC": 31616
+  },
+  {
+    "pc": 31627,
+    "register": "r16",
+    "value": "Array",
+    "endPC": 31639
+  },
+  {
+    "pc": 31648,
+    "register": "r11",
+    "value": "Boolean",
+    "endPC": 31665
+  },
+  {
+    "pc": 31691,
+    "register": "r23",
+    "value": "isObject",
+    "endPC": 31711
+  },
+  {
+    "pc": 31720,
+    "register": "r23",
+    "value": "isString",
+    "endPC": 31737
+  },
+  {
+    "pc": 31746,
+    "register": "r23",
+    "value": "isArray",
+    "endPC": 31763
+  },
+  {
+    "pc": 31809,
+    "register": "r9",
+    "value": "encodeURIComponent",
+    "endPC": 31851
+  },
+  {
+    "pc": 31674,
+    "register": "r16",
+    "value": "exports",
+    "endPC": 31691
+  },
+  {
+    "pc": 31860,
+    "register": "r10",
+    "value": "Err:",
+    "endPC": 31867
+  },
+  {
+    "pc": 31770,
+    "register": "r23",
+    "value": "isBoolean",
+    "endPC": 31792
+  },
+  {
+    "pc": 31915,
+    "register": "r28",
+    "value": "JSON",
+    "endPC": 31922
+  },
+  {
+    "pc": 31931,
+    "register": "r38",
+    "value": "stringify",
+    "endPC": 31953
+  },
+  {
+    "pc": 31982,
+    "register": "r33",
+    "value": "next",
+    "endPC": 31989
+  },
+  {
+    "pc": 32031,
+    "register": "r14",
+    "value": "document",
+    "endPC": 32048
+  },
+  {
+    "pc": 32057,
+    "register": "r17",
+    "value": "createElement",
+    "endPC": 32089
+  },
+  {
+    "pc": 32095,
+    "register": "r17",
+    "value": "script",
+    "endPC": 32107
+  },
+  {
+    "pc": 32130,
+    "register": "r17",
+    "value": "https://captcha.gtimg.com/1/json2.js",
+    "endPC": 32217
+  },
+  {
+    "pc": 32228,
+    "register": "r17",
+    "value": "document",
+    "endPC": 32245
+  },
+  {
+    "pc": 32120,
+    "register": "r12",
+    "value": "src",
+    "endPC": 32127
+  },
+  {
+    "pc": 32254,
+    "register": "r12",
+    "value": "getElementsByTagName",
+    "endPC": 32301
+  },
+  {
+    "pc": 32310,
+    "register": "r12",
+    "value": "head",
+    "endPC": 32317
+  },
+  {
+    "pc": 32327,
+    "register": "r12",
+    "value": "item",
+    "endPC": 32334
+  },
+  {
+    "pc": 31496,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 31513
+  },
+  {
+    "pc": 32350,
+    "register": "r12",
+    "value": "appendChild",
+    "endPC": 32377
+  },
+  {
+    "pc": 32440,
+    "register": "r12",
+    "value": "get",
+    "endPC": 32450
+  },
+  {
+    "pc": 32423,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 32440
+  },
+  {
+    "pc": 32473,
+    "register": "r12",
+    "value": "exports",
+    "endPC": 32490
+  },
+  {
+    "pc": 32504,
+    "register": "r17",
+    "value": "get",
+    "endPC": 32511
+  },
+  {
+    "pc": 32631,
+    "register": "r16",
+    "value": "exports",
+    "endPC": 32648
+  },
+  {
+    "pc": 32648,
+    "register": "r12",
+    "value": "get",
+    "endPC": 32658
+  },
+  {
+    "pc": 28722,
+    "register": "r70",
+    "value": "SyncManager",
+    "endPC": 28749
+  },
+  {
+    "pc": 32563,
+    "register": "r25",
+    "value": "?rand=1519713624347",
+    "endPC": 32610
+  },
+  {
+    "pc": 32931,
+    "register": "r18",
+    "value": "RegExp",
+    "endPC": 32943
+  },
+  {
+    "pc": 32923,
+    "register": "r15",
+    "value": "\"",
+    "endPC": 32923
+  },
+  {
+    "pc": 32957,
+    "register": "r15",
+    "value": "\\\"",
+    "endPC": 32959
+  },
+  {
+    "pc": 32900,
+    "register": "r19",
+    "value": "replace",
+    "endPC": 32917
+  },
+  {
+    "pc": 33016,
+    "register": "r18",
+    "value": "RegExp",
+    "endPC": 33028
+  },
+  {
+    "pc": 32974,
+    "register": "r19",
+    "value": "[\\u00ff-\\uffff]+",
+    "endPC": 33011
+  },
+  {
+    "pc": 32927,
+    "register": "r8",
+    "value": "g",
+    "endPC": 32927
+  },
+  {
+    "pc": 32741,
+    "register": "r10",
+    "value": "setLocalDescription",
+    "endPC": 32788
+  },
+  {
+    "pc": 32693,
+    "register": "r16",
+    "value": "__esModule",
+    "endPC": 32715
+  },
+  {
+    "pc": 33111,
+    "register": "r16",
+    "value": "Object",
+    "endPC": 33123
+  },
+  {
+    "pc": 33132,
+    "register": "r8",
+    "value": "prototype",
+    "endPC": 33154
+  },
+  {
+    "pc": 33160,
+    "register": "r8",
+    "value": "hasOwnProperty",
+    "endPC": 33192
+  },
+  {
+    "pc": 33201,
+    "register": "r8",
+    "value": "call",
+    "endPC": 33208
+  },
+  {
+    "pc": 33225,
+    "register": "r12",
+    "value": "window",
+    "endPC": 33237
+  },
+  {
+    "pc": 23033,
+    "register": "r89",
+    "value": "null",
+    "endPC": 23040
+  },
+  {
+    "pc": 33290,
+    "register": "r10",
+    "value": "navigator",
+    "endPC": 33312
+  },
+  {
+    "pc": 33246,
+    "register": "r9",
+    "value": "name",
+    "endPC": 33253
+  },
+  {
+    "pc": 24619,
+    "register": "r57",
+    "value": "span",
+    "endPC": 24626
+  },
+  {
+    "pc": 24754,
+    "register": "r63",
+    "value": "appendChild",
+    "endPC": 24781
+  },
+  {
+    "pc": 33362,
+    "register": "r59",
+    "value": "],",
+    "endPC": 33364
+  },
+  {
+    "pc": 32005,
+    "register": "r26",
+    "value": "done",
+    "endPC": 32012
+  },
+  {
+    "pc": 33318,
+    "register": "r13",
+    "value": "platform",
+    "endPC": 33335
+  },
+  {
+    "pc": 32841,
+    "register": "r20",
+    "value": "mousemove",
+    "endPC": 32863
+  },
+  {
+    "pc": 33509,
+    "register": "r27",
+    "value": "document",
+    "endPC": 33526
+  },
+  {
+    "pc": 33535,
+    "register": "r40",
+    "value": "body",
+    "endPC": 33542
+  },
+  {
+    "pc": 31082,
+    "register": "r29",
+    "value": "sessionStorage",
+    "endPC": 31114
+  },
+  {
+    "pc": 33640,
+    "register": "r12",
+    "value": "window",
+    "endPC": 33652
+  },
+  {
+    "pc": 33661,
+    "register": "r8",
+    "value": "matchMedia",
+    "endPC": 33683
+  },
+  {
+    "pc": 33692,
+    "register": "r8",
+    "value": "(prefers-reduced-motion: reduce)",
+    "endPC": 33769
+  },
+  {
+    "pc": 33779,
+    "register": "r8",
+    "value": "matches",
+    "endPC": 33796
+  },
+  {
+    "pc": 33854,
+    "register": "r19",
+    "value": "console",
+    "endPC": 33871
+  },
+  {
+    "pc": 33809,
+    "register": "r46",
+    "value": ",",
+    "endPC": 33809
+  },
+  {
+    "pc": 33952,
+    "register": "r24",
+    "value": "createElement",
+    "endPC": 33984
+  },
+  {
+    "pc": 33990,
+    "register": "r24",
+    "value": "span",
+    "endPC": 33997
+  },
+  {
+    "pc": 34040,
+    "register": "r24",
+    "value": "mmmmmmmmmmmmmwwwwwwwwwww",
+    "endPC": 34097
+  },
+  {
+    "pc": 34010,
+    "register": "r26",
+    "value": "textContent",
+    "endPC": 34037
+  },
+  {
+    "pc": 34148,
+    "register": "r29",
+    "value": "72px",
+    "endPC": 34155
+  },
+  {
+    "pc": 34108,
+    "register": "r24",
+    "value": "style",
+    "endPC": 34120
+  },
+  {
+    "pc": 34170,
+    "register": "r24",
+    "value": "fontFamily",
+    "endPC": 34192
+  },
+  {
+    "pc": 34126,
+    "register": "r12",
+    "value": "fontSize",
+    "endPC": 34143
+  },
+  {
+    "pc": 34207,
+    "register": "r29",
+    "value": "appendChild",
+    "endPC": 34234
+  },
+  {
+    "pc": 34251,
+    "register": "r29",
+    "value": "width",
+    "endPC": 34263
+  },
+  {
+    "pc": 34266,
+    "register": "r26",
+    "value": "offsetWidth",
+    "endPC": 34293
+  },
+  {
+    "pc": 34370,
+    "register": "r12",
+    "value": "removeChild",
+    "endPC": 34397
+  },
+  {
+    "pc": 34469,
+    "register": "r21",
+    "value": "encodeURIComponent",
+    "endPC": 34511
+  },
+  {
+    "pc": 34303,
+    "register": "r20",
+    "value": "height",
+    "endPC": 34315
+  },
+  {
+    "pc": 34528,
+    "register": "r20",
+    "value": "slice",
+    "endPC": 34540
+  },
+  {
+    "pc": 33877,
+    "register": "r17",
+    "value": "log",
+    "endPC": 33884
+  },
+  {
+    "pc": 34572,
+    "register": "r34",
+    "value": "document",
+    "endPC": 34589
+  },
+  {
+    "pc": 34618,
+    "register": "r33",
+    "value": "getTime",
+    "endPC": 34635
+  },
+  {
+    "pc": 34667,
+    "register": "r34",
+    "value": "setCookie",
+    "endPC": 34689
+  },
+  {
+    "pc": 33551,
+    "register": "r40",
+    "value": "removeChild",
+    "endPC": 33578
+  },
+  {
+    "pc": 34726,
+    "register": "r39",
+    "value": ":",
+    "endPC": 34726
+  },
+  {
+    "pc": 34598,
+    "register": "r17",
+    "value": "body",
+    "endPC": 34605
+  },
+  {
+    "pc": 34790,
+    "register": "r11",
+    "value": "length",
+    "endPC": 34802
+  },
+  {
+    "pc": 32822,
+    "register": "r48",
+    "value": "type",
+    "endPC": 32829
+  },
+  {
+    "pc": 34864,
+    "register": "r48",
+    "value": "push",
+    "endPC": 34871
+  },
+  {
+    "pc": 34930,
+    "register": "r19",
+    "value": "navigator",
+    "endPC": 34952
+  },
+  {
+    "pc": 34958,
+    "register": "r23",
+    "value": "mimeTypes",
+    "endPC": 34980
+  },
+  {
+    "pc": 33589,
+    "register": "r27",
+    "value": "remove",
+    "endPC": 33601
+  },
+  {
+    "pc": 34993,
+    "register": "r23",
+    "value": "push",
+    "endPC": 35000
+  },
+  {
+    "pc": 35011,
+    "register": "r19",
+    "value": "type",
+    "endPC": 35018
+  },
+  {
+    "pc": 35092,
+    "register": "r19",
+    "value": "navigator",
+    "endPC": 35114
+  },
+  {
+    "pc": 35120,
+    "register": "r25",
+    "value": "userAgentData",
+    "endPC": 35152
+  },
+  {
+    "pc": 34825,
+    "register": "r20",
+    "value": "undefined",
+    "endPC": 34847
+  },
+  {
+    "pc": 35035,
+    "register": "r9",
+    "value": "suffixes",
+    "endPC": 35052
+  },
+  {
+    "pc": 35188,
+    "register": "r26",
+    "value": "Not supported",
+    "endPC": 35220
+  },
+  {
+    "pc": 35291,
+    "register": "r26",
+    "value": "window",
+    "endPC": 35303
+  },
+  {
+    "pc": 35158,
+    "register": "r25",
+    "value": "brands",
+    "endPC": 35170
+  },
+  {
+    "pc": 35339,
+    "register": "r9",
+    "value": "[",
+    "endPC": 35339
+  },
+  {
+    "pc": 34695,
+    "register": "r34",
+    "value": "TDC_itoken",
+    "endPC": 34717
+  },
+  {
+    "pc": 31044,
+    "register": "r52",
+    "value": "CSS",
+    "endPC": 31051
+  },
+  {
+    "pc": 35378,
+    "register": "r18",
+    "value": "push",
+    "endPC": 35385
+  },
+  {
+    "pc": 35419,
+    "register": "r28",
+    "value": "navigator",
+    "endPC": 35441
+  },
+  {
+    "pc": 35476,
+    "register": "r26",
+    "value": "String",
+    "endPC": 35488
+  },
+  {
+    "pc": 35497,
+    "register": "r14",
+    "value": "fromCharCode",
+    "endPC": 35524
+  },
+  {
+    "pc": 35447,
+    "register": "r23",
+    "value": "gpu",
+    "endPC": 35454
+  },
+  {
+    "pc": 35572,
+    "register": "r25",
+    "value": "navigator",
+    "endPC": 35594
+  },
+  {
+    "pc": 35600,
+    "register": "r36",
+    "value": "userAgentData",
+    "endPC": 35632
+  },
+  {
+    "pc": 35638,
+    "register": "r36",
+    "value": "brands",
+    "endPC": 35650
+  },
+  {
+    "pc": 35666,
+    "register": "r36",
+    "value": "push",
+    "endPC": 35673
+  },
+  {
+    "pc": 35684,
+    "register": "r19",
+    "value": "brand",
+    "endPC": 35696
+  },
+  {
+    "pc": 35347,
+    "register": "r9",
+    "value": "]",
+    "endPC": 35347
+  },
+  {
+    "pc": 35750,
+    "register": "r20",
+    "value": "clientX",
+    "endPC": 35767
+  },
+  {
+    "pc": 35706,
+    "register": "r12",
+    "value": "version",
+    "endPC": 35723
+  },
+  {
+    "pc": 35842,
+    "register": "r10",
+    "value": "e",
+    "endPC": 35844
+  },
+  {
+    "pc": 35921,
+    "register": "r34",
+    "value": "id",
+    "endPC": 35923
+  },
+  {
+    "pc": 35934,
+    "register": "r34",
+    "value": "document",
+    "endPC": 35951
+  },
+  {
+    "pc": 35850,
+    "register": "r10",
+    "value": "B0JC",
+    "endPC": 35857
+  },
+  {
+    "pc": 35806,
+    "register": "r20",
+    "value": "pressure",
+    "endPC": 35823
+  },
+  {
+    "pc": 35312,
+    "register": "r17",
+    "value": "btoa",
+    "endPC": 35319
+  },
+  {
+    "pc": 36005,
+    "register": "r10",
+    "value": "get",
+    "endPC": 36015
+  },
+  {
+    "pc": 36082,
+    "register": "r18",
+    "value": "navigator",
+    "endPC": 36104
+  },
+  {
+    "pc": 36110,
+    "register": "r11",
+    "value": "storage",
+    "endPC": 36127
+  },
+  {
+    "pc": 36133,
+    "register": "r11",
+    "value": "estimate",
+    "endPC": 36150
+  },
+  {
+    "pc": 36163,
+    "register": "r18",
+    "value": "then",
+    "endPC": 36170
+  },
+  {
+    "pc": 36190,
+    "register": "r18",
+    "value": "catch",
+    "endPC": 36202
+  },
+  {
+    "pc": 36056,
+    "register": "r10",
+    "value": "get",
+    "endPC": 36066
+  },
+  {
+    "pc": 36039,
+    "register": "r16",
+    "value": "exports",
+    "endPC": 36056
+  },
+  {
+    "pc": 36233,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 36251
+  },
+  {
+    "pc": 36308,
+    "register": "r30",
+    "value": "navigator",
+    "endPC": 36330
+  },
+  {
+    "pc": 35988,
+    "register": "r20",
+    "value": "exports",
+    "endPC": 36005
+  },
+  {
+    "pc": 36336,
+    "register": "r26",
+    "value": "userAgent",
+    "endPC": 36358
+  },
+  {
+    "pc": 36364,
+    "register": "r26",
+    "value": "toLowerCase",
+    "endPC": 36391
+  },
+  {
+    "pc": 36405,
+    "register": "r26",
+    "value": "unknown",
+    "endPC": 36422
+  },
+  {
+    "pc": 36544,
+    "register": "r18",
+    "value": "Symbol",
+    "endPC": 36556
+  },
+  {
+    "pc": 36519,
+    "register": "r17",
+    "value": "undefined",
+    "endPC": 36541
+  },
+  {
+    "pc": 36624,
+    "register": "r12",
+    "value": "get",
+    "endPC": 36634
+  },
+  {
+    "pc": 36607,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 36624
+  },
+  {
+    "pc": 36475,
+    "register": "r20",
+    "value": "mouseup",
+    "endPC": 36492
+  },
+  {
+    "pc": 36696,
+    "register": "r17",
+    "value": "get",
+    "endPC": 36706
+  },
+  {
+    "pc": 36679,
+    "register": "r8",
+    "value": "exports",
+    "endPC": 36696
+  },
+  {
+    "pc": 11194,
+    "register": "r79",
+    "value": "maxDecibels",
+    "endPC": 11221
+  },
+  {
+    "pc": 36722,
+    "register": "r20",
+    "value": "radiusY",
+    "endPC": 36739
+  },
+  {
+    "pc": 36990,
+    "register": "r54",
+    "value": "ac-sampleRate",
+    "endPC": 37022
+  },
+  {
+    "pc": 37025,
+    "register": "r79",
+    "value": "sampleRate",
+    "endPC": 37047
+  },
+  {
+    "pc": 37060,
+    "register": "r20",
+    "value": "ac-maxChannelCount",
+    "endPC": 37102
+  },
+  {
+    "pc": 37140,
+    "register": "r24",
+    "value": "maxChannelCount",
+    "endPC": 37177
+  },
+  {
+    "pc": 37187,
+    "register": "r41",
+    "value": "ac-numberOfInputs",
+    "endPC": 37229
+  },
+  {
+    "pc": 37280,
+    "register": "r79",
+    "value": "ac-numberOfOutputs",
+    "endPC": 37322
+  },
+  {
+    "pc": 37378,
+    "register": "r78",
+    "value": "ac-channelCount",
+    "endPC": 37415
+  },
+  {
+    "pc": 37461,
+    "register": "r82",
+    "value": "ac-channelCountMode",
+    "endPC": 37508
+  },
+  {
+    "pc": 37107,
+    "register": "r54",
+    "value": "destination",
+    "endPC": 37134
+  },
+  {
+    "pc": 37564,
+    "register": "r77",
+    "value": "ac-channelInterpretation",
+    "endPC": 37621
+  },
+  {
+    "pc": 37692,
+    "register": "r78",
+    "value": "an-fftSize",
+    "endPC": 37714
+  },
+  {
+    "pc": 37719,
+    "register": "r77",
+    "value": "fftSize",
+    "endPC": 37736
+  },
+  {
+    "pc": 37746,
+    "register": "r82",
+    "value": "an-frequencyBinCount",
+    "endPC": 37793
+  },
+  {
+    "pc": 33404,
+    "register": "r59",
+    "value": "cd",
+    "endPC": 33406
+  },
+  {
+    "pc": 37850,
+    "register": "r77",
+    "value": "an-minDecibels",
+    "endPC": 37882
+  },
+  {
+    "pc": 37887,
+    "register": "r82",
+    "value": "minDecibels",
+    "endPC": 37914
+  },
+  {
+    "pc": 37924,
+    "register": "r59",
+    "value": "an-maxDecibels",
+    "endPC": 37956
+  },
+  {
+    "pc": 37961,
+    "register": "r77",
+    "value": "maxDecibels",
+    "endPC": 37988
+  },
+  {
+    "pc": 37998,
+    "register": "r82",
+    "value": "an-smoothingTimeConstant",
+    "endPC": 38055
+  },
+  {
+    "pc": 38122,
+    "register": "r77",
+    "value": "an-numberOfInputs",
+    "endPC": 38164
+  },
+  {
+    "pc": 38174,
+    "register": "r82",
+    "value": "an-numberOfOutputs",
+    "endPC": 38216
+  },
+  {
+    "pc": 38229,
+    "register": "r77",
+    "value": "an-channelCount",
+    "endPC": 38266
+  },
+  {
+    "pc": 38276,
+    "register": "r82",
+    "value": "an-channelCountMode",
+    "endPC": 38323
+  },
+  {
+    "pc": 37798,
+    "register": "r78",
+    "value": "frequencyBinCount",
+    "endPC": 37840
+  },
+  {
+    "pc": 36832,
+    "register": "r13",
+    "value": "exports",
+    "endPC": 36849
+  },
+  {
+    "pc": 36754,
+    "register": "r15",
+    "value": "Not supported",
+    "endPC": 36786
+  },
+  {
+    "pc": 38487,
+    "register": "r25",
+    "value": "brands",
+    "endPC": 38499
+  },
+  {
+    "pc": 38525,
+    "register": "r19",
+    "value": "navigator",
+    "endPC": 38547
+  },
+  {
+    "pc": 38508,
+    "register": "r25",
+    "value": "mobile",
+    "endPC": 38520
+  },
+  {
+    "pc": 38621,
+    "register": "r25",
+    "value": "navigator",
+    "endPC": 38643
+  },
+  {
+    "pc": 36437,
+    "register": "r26",
+    "value": "windows",
+    "endPC": 36454
+  },
+  {
+    "pc": 38667,
+    "register": "r25",
+    "value": "JSON",
+    "endPC": 38674
+  },
+  {
+    "pc": 38599,
+    "register": "r19",
+    "value": "platform",
+    "endPC": 38616
+  },
+  {
+    "pc": 38683,
+    "register": "r19",
+    "value": "stringify",
+    "endPC": 38705
+  },
+  {
+    "pc": 38553,
+    "register": "r12",
+    "value": "userAgentData",
+    "endPC": 38585
+  },
+  {
+    "pc": 38752,
+    "register": "r22",
+    "value": "style",
+    "endPC": 38764
+  },
+  {
+    "pc": 38454,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 38471
+  },
+  {
+    "pc": 36849,
+    "register": "r10",
+    "value": "get",
+    "endPC": 36859
+  },
+  {
+    "pc": 38802,
+    "register": "r12",
+    "value": "get",
+    "endPC": 38812
+  },
+  {
+    "pc": 38785,
+    "register": "r14",
+    "value": "exports",
+    "endPC": 38802
+  },
+  {
+    "pc": 38942,
+    "register": "r15",
+    "value": "clearInterval",
+    "endPC": 38974
+  },
+  {
+    "pc": 35960,
+    "register": "r21",
+    "value": "body",
+    "endPC": 35967
+  },
+  {
+    "pc": 38994,
+    "register": "r31",
+    "value": "JSON",
+    "endPC": 39001
+  },
+  {
+    "pc": 39010,
+    "register": "r35",
+    "value": "stringify",
+    "endPC": 39032
+  },
+  {
+    "pc": 34320,
+    "register": "r29",
+    "value": "offsetHeight",
+    "endPC": 34347
+  },
+  {
+    "pc": 39088,
+    "register": "r66",
+    "value": "not supported",
+    "endPC": 39120
+  },
+  {
+    "pc": 38060,
+    "register": "r59",
+    "value": "smoothingTimeConstant",
+    "endPC": 38112
+  },
+  {
+    "pc": 37331,
+    "register": "r20",
+    "value": "numberOfOutputs",
+    "endPC": 37368
+  },
+  {
+    "pc": 39220,
+    "register": "r10",
+    "value": "removeChild",
+    "endPC": 39247
+  },
+  {
+    "pc": 39263,
+    "register": "r16",
+    "value": "appendChild",
+    "endPC": 39290
+  },
+  {
+    "pc": 39340,
+    "register": "r17",
+    "value": ",",
+    "endPC": 39340
+  },
+  {
+    "pc": 39348,
+    "register": "r17",
+    "value": "window",
+    "endPC": 39360
+  },
+  {
+    "pc": 39406,
+    "register": "r8",
+    "value": "navigator",
+    "endPC": 39428
+  },
+  {
+    "pc": 39434,
+    "register": "r18",
+    "value": "storage",
+    "endPC": 39451
+  },
+  {
+    "pc": 39487,
+    "register": "r31",
+    "value": "window",
+    "endPC": 39499
+  },
+  {
+    "pc": 38855,
+    "register": "r26",
+    "value": "android",
+    "endPC": 38872
+  },
+  {
+    "pc": 39369,
+    "register": "r16",
+    "value": "innerHeight",
+    "endPC": 39396
+  },
+  {
+    "pc": 39303,
+    "register": "r20",
+    "value": "mousedown",
+    "endPC": 39325
+  },
+  {
+    "pc": 39508,
+    "register": "r26",
+    "value": "mozRTCPeerConnection",
+    "endPC": 39555
+  },
+  {
+    "pc": 39640,
+    "register": "r8",
+    "value": "replace",
+    "endPC": 39657
+  },
+  {
+    "pc": 39571,
+    "register": "r14",
+    "value": " ",
+    "endPC": 39580
+  },
+  {
+    "pc": 39724,
+    "register": "r14",
+    "value": "RegExp",
+    "endPC": 39736
+  },
+  {
+    "pc": 39720,
+    "register": "r16",
+    "value": "g",
+    "endPC": 39720
+  },
+  {
+    "pc": 39663,
+    "register": "r8",
+    "value": "[^\\u0020-\\u007E]|[\"\\\\]",
+    "endPC": 39715
+  },
+  {
+    "pc": 39772,
+    "register": "r8",
+    "value": "Object",
+    "endPC": 39784
+  },
+  {
+    "pc": 39457,
+    "register": "r18",
+    "value": "estimate",
+    "endPC": 39474
+  },
+  {
+    "pc": 39793,
+    "register": "r10",
+    "value": "defineProperty",
+    "endPC": 39825
+  },
+  {
+    "pc": 39863,
+    "register": "r19",
+    "value": "value",
+    "endPC": 39875
+  },
+  {
+    "pc": 39990,
+    "register": "r16",
+    "value": "window",
+    "endPC": 40002
+  },
+  {
+    "pc": 40011,
+    "register": "r18",
+    "value": "matchMedia",
+    "endPC": 40033
+  },
+  {
+    "pc": 40042,
+    "register": "r18",
+    "value": "(prefers-color-scheme: dark)",
+    "endPC": 40109
+  },
+  {
+    "pc": 40146,
+    "register": "r35",
+    "value": "length",
+    "endPC": 40165
+  },
+  {
+    "pc": 39921,
+    "register": "r39",
+    "value": "divdivdivppdiv",
+    "endPC": 39953
+  },
+  {
+    "pc": 40182,
+    "register": "r39",
+    "value": "decodeURIComponent",
+    "endPC": 40224
+  },
+  {
+    "pc": 35778,
+    "register": "r48",
+    "value": "clientY",
+    "endPC": 35795
+  },
+  {
+    "pc": 40233,
+    "register": "r48",
+    "value": "substring",
+    "endPC": 40255
+  },
+  {
+    "pc": 40261,
+    "register": "r48",
+    "value": "length",
+    "endPC": 40273
+  },
+  {
+    "pc": 40119,
+    "register": "r18",
+    "value": "matches",
+    "endPC": 40136
+  },
+  {
+    "pc": 40307,
+    "register": "r8",
+    "value": "clearInterval",
+    "endPC": 40339
+  },
+  {
+    "pc": 40353,
+    "register": "r17",
+    "value": "tdc",
+    "endPC": 40360
+  },
+  {
+    "pc": 39834,
+    "register": "r10",
+    "value": "__esModule",
+    "endPC": 39856
+  },
+  {
+    "pc": 40372,
+    "register": "r11",
+    "value": "exports",
+    "endPC": 40389
+  },
+  {
+    "pc": 33911,
+    "register": "r89",
+    "value": "\"",
+    "endPC": 33911
+  },
+  {
+    "pc": 10083,
+    "register": "r56",
+    "value": "undefined",
+    "endPC": 10105
+  },
+  {
+    "pc": 40467,
+    "register": "r15",
+    "value": "navigator",
+    "endPC": 40489
+  },
+  {
+    "pc": 39618,
+    "register": "r20",
+    "value": "width",
+    "endPC": 39630
+  },
+  {
+    "pc": 40495,
+    "register": "r20",
+    "value": "userAgent",
+    "endPC": 40517
+  },
+  {
+    "pc": 40523,
+    "register": "r20",
+    "value": "match",
+    "endPC": 40535
+  },
+  {
+    "pc": 37235,
+    "register": "r24",
+    "value": "numberOfInputs",
+    "endPC": 37267
+  },
+  {
+    "pc": 40590,
+    "register": "r24",
+    "value": "RegExp",
+    "endPC": 40602
+  },
+  {
+    "pc": 40586,
+    "register": "r12",
+    "value": "i",
+    "endPC": 40586
+  },
+  {
+    "pc": 40389,
+    "register": "r16",
+    "value": "get",
+    "endPC": 40399
+  },
+  {
+    "pc": 40649,
+    "register": "r23",
+    "value": "Symbol",
+    "endPC": 40661
+  },
+  {
+    "pc": 40670,
+    "register": "r25",
+    "value": "iterator",
+    "endPC": 40697
+  },
+  {
+    "pc": 40771,
+    "register": "r22",
+    "value": "createElement",
+    "endPC": 40803
+  },
+  {
+    "pc": 40809,
+    "register": "r22",
+    "value": "span",
+    "endPC": 40816
+  },
+  {
+    "pc": 40859,
+    "register": "r22",
+    "value": "mmmmmmmmmmmmmwwwwwwwwwww",
+    "endPC": 40916
+  },
+  {
+    "pc": 40829,
+    "register": "r10",
+    "value": "textContent",
+    "endPC": 40856
+  },
+  {
+    "pc": 40967,
+    "register": "r39",
+    "value": "72px",
+    "endPC": 40974
+  },
+  {
+    "pc": 40927,
+    "register": "r22",
+    "value": "style",
+    "endPC": 40939
+  },
+  {
+    "pc": 40945,
+    "register": "r30",
+    "value": "fontSize",
+    "endPC": 40962
+  },
+  {
+    "pc": 41020,
+    "register": "r10",
+    "value": ",",
+    "endPC": 41020
+  },
+  {
+    "pc": 40989,
+    "register": "r22",
+    "value": "fontFamily",
+    "endPC": 41011
+  },
+  {
+    "pc": 41080,
+    "register": "r39",
+    "value": "offsetWidth",
+    "endPC": 41107
+  },
+  {
+    "pc": 41042,
+    "register": "r22",
+    "value": "appendChild",
+    "endPC": 41069
+  },
+  {
+    "pc": 41160,
+    "register": "r14",
+    "value": "window",
+    "endPC": 41172
+  },
+  {
+    "pc": 41156,
+    "register": "r12",
+    "value": "[",
+    "endPC": 41156
+  },
+  {
+    "pc": 40541,
+    "register": "r20",
+    "value": "chrome\\/([0-9.]+)",
+    "endPC": 40583
+  },
+  {
+    "pc": 41273,
+    "register": "r25",
+    "value": "RegExp",
+    "endPC": 41285
+  },
+  {
+    "pc": 41294,
+    "register": "r21",
+    "value": "^\\d+:\\d+$",
+    "endPC": 41316
+  },
+  {
+    "pc": 41329,
+    "register": "r21",
+    "value": "on",
+    "endPC": 41331
+  },
+  {
+    "pc": 41349,
+    "register": "r25",
+    "value": "get",
+    "endPC": 41356
+  },
+  {
+    "pc": 41399,
+    "register": "r22",
+    "value": "exports",
+    "endPC": 41416
+  },
+  {
+    "pc": 41425,
+    "register": "r12",
+    "value": "replace",
+    "endPC": 41442
+  },
+  {
+    "pc": 41491,
+    "register": "r50",
+    "value": "RegExp",
+    "endPC": 41503
+  },
+  {
+    "pc": 41483,
+    "register": "r60",
+    "value": "g",
+    "endPC": 41488
+  },
+  {
+    "pc": 41448,
+    "register": "r12",
+    "value": "<|>|\\/|\\s|\"|'",
+    "endPC": 41480
+  },
+  {
+    "pc": 41525,
+    "register": "r60",
+    "value": "toLowerCase",
+    "endPC": 41556
+  },
+  {
+    "pc": 37630,
+    "register": "r54",
+    "value": "channelInterpretation",
+    "endPC": 37682
+  },
+  {
+    "pc": 41121,
+    "register": "r39",
+    "value": "width",
+    "endPC": 41133
+  },
+  {
+    "pc": 41583,
+    "register": "r39",
+    "value": "replace",
+    "endPC": 41600
+  },
+  {
+    "pc": 41645,
+    "register": "r14",
+    "value": "RegExp",
+    "endPC": 41657
+  },
+  {
+    "pc": 41641,
+    "register": "r33",
+    "value": "g",
+    "endPC": 41641
+  },
+  {
+    "pc": 41606,
+    "register": "r39",
+    "value": "<|>|\\/|\\s|\"|'",
+    "endPC": 41638
+  },
+  {
+    "pc": 41682,
+    "register": "r33",
+    "value": "toLowerCase",
+    "endPC": 41709
+  },
+  {
+    "pc": 41733,
+    "register": "r8",
+    "value": "window",
+    "endPC": 41745
+  },
+  {
+    "pc": 40628,
+    "register": "r16",
+    "value": "symbol",
+    "endPC": 40640
+  },
+  {
+    "pc": 41181,
+    "register": "r17",
+    "value": "innerWidth",
+    "endPC": 41203
+  },
+  {
+    "pc": 41754,
+    "register": "r16",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 41836
+  },
+  {
+    "pc": 41890,
+    "register": "r16",
+    "value": "m",
+    "endPC": 41890
+  },
+  {
+    "pc": 41908,
+    "register": "r16",
+    "value": "c",
+    "endPC": 41908
+  },
+  {
+    "pc": 41926,
+    "register": "r16",
+    "value": "d",
+    "endPC": 41926
+  },
+  {
+    "pc": 41946,
+    "register": "r16",
+    "value": "r",
+    "endPC": 41946
+  },
+  {
+    "pc": 41965,
+    "register": "r16",
+    "value": "t",
+    "endPC": 41965
+  },
+  {
+    "pc": 41986,
+    "register": "r16",
+    "value": "n",
+    "endPC": 41986
+  },
+  {
+    "pc": 42006,
+    "register": "r16",
+    "value": "o",
+    "endPC": 42006
+  },
+  {
+    "pc": 42025,
+    "register": "r16",
+    "value": "p",
+    "endPC": 42025
+  },
+  {
+    "pc": 42099,
+    "register": "r27",
+    "value": "getComputedStyle",
+    "endPC": 42136
+  },
+  {
+    "pc": 42044,
+    "register": "r11",
+    "value": "s",
+    "endPC": 42044
+  },
+  {
+    "pc": 42145,
+    "register": "r11",
+    "value": "document",
+    "endPC": 42162
+  },
+  {
+    "pc": 42171,
+    "register": "r16",
+    "value": "getElementById",
+    "endPC": 42203
+  },
+  {
+    "pc": 42212,
+    "register": "r16",
+    "value": "firstp",
+    "endPC": 42224
+  },
+  {
+    "pc": 42241,
+    "register": "r16",
+    "value": "getPropertyValue",
+    "endPC": 42278
+  },
+  {
+    "pc": 42315,
+    "register": "r23",
+    "value": "navigator",
+    "endPC": 42337
+  },
+  {
+    "pc": 42343,
+    "register": "r19",
+    "value": "mimeTypes",
+    "endPC": 42365
+  },
+  {
+    "pc": 42371,
+    "register": "r19",
+    "value": "length",
+    "endPC": 42383
+  },
+  {
+    "pc": 42412,
+    "register": "r9",
+    "value": "window",
+    "endPC": 42424
+  },
+  {
+    "pc": 42556,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 42568
+  },
+  {
+    "pc": 42433,
+    "register": "r18",
+    "value": "matchMedia",
+    "endPC": 42455
+  },
+  {
+    "pc": 42577,
+    "register": "r13",
+    "value": "logicalXDPI",
+    "endPC": 42604
+  },
+  {
+    "pc": 42677,
+    "register": "r12",
+    "value": "get",
+    "endPC": 42687
+  },
+  {
+    "pc": 42660,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 42677
+  },
+  {
+    "pc": 41368,
+    "register": "r21",
+    "value": "getGuid",
+    "endPC": 41385
+  },
+  {
+    "pc": 42771,
+    "register": "r29",
+    "value": "encodeURIComponent",
+    "endPC": 42813
+  },
+  {
+    "pc": 42718,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 42735
+  },
+  {
+    "pc": 42826,
+    "register": "r29",
+    "value": "=",
+    "endPC": 42826
+  },
+  {
+    "pc": 42834,
+    "register": "r29",
+    "value": "encodeURIComponent",
+    "endPC": 42876
+  },
+  {
+    "pc": 42898,
+    "register": "r10",
+    "value": "; expires=Tue, 31 Dec 2030 00:00:00 UTC",
+    "endPC": 42995
+  },
+  {
+    "pc": 43041,
+    "register": "r29",
+    "value": "document",
+    "endPC": 43058
+  },
+  {
+    "pc": 43010,
+    "register": "r10",
+    "value": "; path=/",
+    "endPC": 43027
+  },
+  {
+    "pc": 43067,
+    "register": "r10",
+    "value": "cookie",
+    "endPC": 43079
+  },
+  {
+    "pc": 43092,
+    "register": "r10",
+    "value": "window",
+    "endPC": 43104
+  },
+  {
+    "pc": 43193,
+    "register": "r26",
+    "value": "window",
+    "endPC": 43205
+  },
+  {
+    "pc": 43214,
+    "register": "r17",
+    "value": "TCaptchaIframeClientPos",
+    "endPC": 43271
+  },
+  {
+    "pc": 42735,
+    "register": "r14",
+    "value": "get",
+    "endPC": 42745
+  },
+  {
+    "pc": 42287,
+    "register": "r16",
+    "value": "color",
+    "endPC": 42299
+  },
+  {
+    "pc": 43113,
+    "register": "r29",
+    "value": "localStorage",
+    "endPC": 43140
+  },
+  {
+    "pc": 43374,
+    "register": "r9",
+    "value": "o",
+    "endPC": 43376
+  },
+  {
+    "pc": 43460,
+    "register": "r8",
+    "value": "document",
+    "endPC": 43477
+  },
+  {
+    "pc": 43503,
+    "register": "r25",
+    "value": "JSON",
+    "endPC": 43510
+  },
+  {
+    "pc": 43395,
+    "register": "r19",
+    "value": "msCaptureStream",
+    "endPC": 43432
+  },
+  {
+    "pc": 43519,
+    "register": "r27",
+    "value": "stringify",
+    "endPC": 43541
+  },
+  {
+    "pc": 43577,
+    "register": "r38",
+    "value": "JSON",
+    "endPC": 43584
+  },
+  {
+    "pc": 43593,
+    "register": "r44",
+    "value": "stringify",
+    "endPC": 43615
+  },
+  {
+    "pc": 43486,
+    "register": "r10",
+    "value": "URL",
+    "endPC": 43493
+  },
+  {
+    "pc": 43700,
+    "register": "r22",
+    "value": "screen",
+    "endPC": 43712
+  },
+  {
+    "pc": 43721,
+    "register": "r15",
+    "value": "width",
+    "endPC": 43733
+  },
+  {
+    "pc": 43747,
+    "register": "r19",
+    "value": "screen",
+    "endPC": 43759
+  },
+  {
+    "pc": 43768,
+    "register": "r23",
+    "value": "height",
+    "endPC": 43780
+  },
+  {
+    "pc": 43797,
+    "register": "r23",
+    "value": "screen",
+    "endPC": 43809
+  },
+  {
+    "pc": 43818,
+    "register": "r22",
+    "value": "availHeight",
+    "endPC": 43845
+  },
+  {
+    "pc": 43859,
+    "register": "r22",
+    "value": "screen",
+    "endPC": 43871
+  },
+  {
+    "pc": 43880,
+    "register": "r13",
+    "value": "colorDepth",
+    "endPC": 43902
+  },
+  {
+    "pc": 43739,
+    "register": "r15",
+    "value": "-",
+    "endPC": 43739
+  },
+  {
+    "pc": 43919,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 43931
+  },
+  {
+    "pc": 43940,
+    "register": "r13",
+    "value": "deviceXDPI",
+    "endPC": 43962
+  },
+  {
+    "pc": 43971,
+    "register": "r13",
+    "value": "undefined",
+    "endPC": 43993
+  },
+  {
+    "pc": 44038,
+    "register": "r11",
+    "value": "getCookie",
+    "endPC": 44063
+  },
+  {
+    "pc": 43655,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 43672
+  },
+  {
+    "pc": 44021,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 44038
+  },
+  {
+    "pc": 44135,
+    "register": "r13",
+    "value": "get",
+    "endPC": 44145
+  },
+  {
+    "pc": 44196,
+    "register": "r13",
+    "value": "Object",
+    "endPC": 44208
+  },
+  {
+    "pc": 44073,
+    "register": "r8",
+    "value": "setCookie",
+    "endPC": 44095
+  },
+  {
+    "pc": 44217,
+    "register": "r8",
+    "value": "defineProperty",
+    "endPC": 44249
+  },
+  {
+    "pc": 44161,
+    "register": "r21",
+    "value": "string",
+    "endPC": 44173
+  },
+  {
+    "pc": 44321,
+    "register": "r9",
+    "value": "window",
+    "endPC": 44333
+  },
+  {
+    "pc": 44118,
+    "register": "r15",
+    "value": "exports",
+    "endPC": 44135
+  },
+  {
+    "pc": 44342,
+    "register": "r8",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 44424
+  },
+  {
+    "pc": 44260,
+    "register": "r11",
+    "value": "enumerable",
+    "endPC": 44282
+  },
+  {
+    "pc": 44510,
+    "register": "r27",
+    "value": "length",
+    "endPC": 44522
+  },
+  {
+    "pc": 44549,
+    "register": "r9",
+    "value": "speechSynthesis",
+    "endPC": 44586
+  },
+  {
+    "pc": 44592,
+    "register": "r13",
+    "value": "getVoices",
+    "endPC": 44614
+  },
+  {
+    "pc": 44297,
+    "register": "r21",
+    "value": "get",
+    "endPC": 44304
+  },
+  {
+    "pc": 44648,
+    "register": "r12",
+    "value": "charCodeAt",
+    "endPC": 44670
+  },
+  {
+    "pc": 44636,
+    "register": "r23",
+    "value": "jK0L",
+    "endPC": 44643
+  },
+  {
+    "pc": 44747,
+    "register": "r14",
+    "value": "exports",
+    "endPC": 44764
+  },
+  {
+    "pc": 44817,
+    "register": "r26",
+    "value": "length",
+    "endPC": 44829
+  },
+  {
+    "pc": 44877,
+    "register": "r19",
+    "value": "window",
+    "endPC": 44889
+  },
+  {
+    "pc": 44461,
+    "register": "r24",
+    "value": "hasOwnProperty",
+    "endPC": 44493
+  },
+  {
+    "pc": 44898,
+    "register": "r17",
+    "value": "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+    "endPC": 44980
+  },
+  {
+    "pc": 45009,
+    "register": "r26",
+    "value": "substr",
+    "endPC": 45021
+  },
+  {
+    "pc": 45046,
+    "register": "r26",
+    "value": "Math",
+    "endPC": 45053
+  },
+  {
+    "pc": 45062,
+    "register": "r44",
+    "value": "floor",
+    "endPC": 45074
+  },
+  {
+    "pc": 45102,
+    "register": "r23",
+    "value": "slice",
+    "endPC": 45114
+  },
+  {
+    "pc": 45136,
+    "register": "r14",
+    "value": "navigator",
+    "endPC": 45158
+  },
+  {
+    "pc": 45164,
+    "register": "r9",
+    "value": "plugins",
+    "endPC": 45181
+  },
+  {
+    "pc": 45187,
+    "register": "r9",
+    "value": "length",
+    "endPC": 45199
+  },
+  {
+    "pc": 44714,
+    "register": "r13",
+    "value": "%",
+    "endPC": 44714
+  },
+  {
+    "pc": 45270,
+    "register": "r14",
+    "value": "document",
+    "endPC": 45287
+  },
+  {
+    "pc": 44764,
+    "register": "r11",
+    "value": "get",
+    "endPC": 44774
+  },
+  {
+    "pc": 45296,
+    "register": "r12",
+    "value": "createElement",
+    "endPC": 45328
+  },
+  {
+    "pc": 44986,
+    "register": "r17",
+    "value": "now",
+    "endPC": 44993
+  },
+  {
+    "pc": 45334,
+    "register": "r12",
+    "value": "div",
+    "endPC": 45341
+  },
+  {
+    "pc": 45238,
+    "register": "r10",
+    "value": "ontouchstart",
+    "endPC": 45265
+  },
+  {
+    "pc": 45364,
+    "register": "r10",
+    "value": "document",
+    "endPC": 45381
+  },
+  {
+    "pc": 45432,
+    "register": "r15",
+    "value": "navigator",
+    "endPC": 45454
+  },
+  {
+    "pc": 45390,
+    "register": "r13",
+    "value": "URL",
+    "endPC": 45397
+  },
+  {
+    "pc": 39191,
+    "register": "r70",
+    "value": "moz",
+    "endPC": 39198
+  },
+  {
+    "pc": 43161,
+    "register": "r30",
+    "value": "android",
+    "endPC": 43178
+  },
+  {
+    "pc": 45606,
+    "register": "r15",
+    "value": "constructor",
+    "endPC": 45633
+  },
+  {
+    "pc": 45639,
+    "register": "r15",
+    "value": "Symbol",
+    "endPC": 45651
+  },
+  {
+    "pc": 45460,
+    "register": "r14",
+    "value": "hardwareConcurrency",
+    "endPC": 45507
+  },
+  {
+    "pc": 45686,
+    "register": "r28",
+    "value": "charAt",
+    "endPC": 45698
+  },
+  {
+    "pc": 45746,
+    "register": "r17",
+    "value": "console",
+    "endPC": 45763
+  },
+  {
+    "pc": 45811,
+    "register": "r21",
+    "value": "document",
+    "endPC": 45828
+  },
+  {
+    "pc": 45837,
+    "register": "r34",
+    "value": "getElementsByTagName",
+    "endPC": 45884
+  },
+  {
+    "pc": 45893,
+    "register": "r34",
+    "value": "body",
+    "endPC": 45900
+  },
+  {
+    "pc": 45919,
+    "register": "r27",
+    "value": "speechSynthesis",
+    "endPC": 45956
+  },
+  {
+    "pc": 45769,
+    "register": "r10",
+    "value": "log",
+    "endPC": 45776
+  },
+  {
+    "pc": 45784,
+    "register": "r20",
+    "value": "radiusX",
+    "endPC": 45801
+  },
+  {
+    "pc": 46174,
+    "register": "r14",
+    "value": "navigator",
+    "endPC": 46196
+  },
+  {
+    "pc": 46139,
+    "register": "r21",
+    "value": "__esModule",
+    "endPC": 46161
+  },
+  {
+    "pc": 46202,
+    "register": "r9",
+    "value": "plugins",
+    "endPC": 46219
+  },
+  {
+    "pc": 46225,
+    "register": "r9",
+    "value": "length",
+    "endPC": 46237
+  },
+  {
+    "pc": 46059,
+    "register": "r18",
+    "value": "get",
+    "endPC": 46069
+  },
+  {
+    "pc": 46258,
+    "register": "r21",
+    "value": "length",
+    "endPC": 46270
+  },
+  {
+    "pc": 46291,
+    "register": "r10",
+    "value": "speechSynthesis",
+    "endPC": 46328
+  },
+  {
+    "pc": 45962,
+    "register": "r11",
+    "value": "onvoiceschanged",
+    "endPC": 45999
+  },
+  {
+    "pc": 46334,
+    "register": "r27",
+    "value": "getVoices",
+    "endPC": 46356
+  },
+  {
+    "pc": 46394,
+    "register": "r16",
+    "value": "charCodeAt",
+    "endPC": 46416
+  },
+  {
+    "pc": 46382,
+    "register": "r26",
+    "value": "QRu~",
+    "endPC": 46389
+  },
+  {
+    "pc": 46463,
+    "register": "r29",
+    "value": "window",
+    "endPC": 46478
+  },
+  {
+    "pc": 37421,
+    "register": "r41",
+    "value": "channelCount",
+    "endPC": 37448
+  },
+  {
+    "pc": 46042,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 46059
+  },
+  {
+    "pc": 46580,
+    "register": "r27",
+    "value": "undefined",
+    "endPC": 46602
+  },
+  {
+    "pc": 46612,
+    "register": "r27",
+    "value": "Symbol",
+    "endPC": 46624
+  },
+  {
+    "pc": 46633,
+    "register": "r33",
+    "value": "iterator",
+    "endPC": 46650
+  },
+  {
+    "pc": 46676,
+    "register": "r13",
+    "value": "exports",
+    "endPC": 46693
+  },
+  {
+    "pc": 46787,
+    "register": "r20",
+    "value": "window",
+    "endPC": 46799
+  },
+  {
+    "pc": 46848,
+    "register": "r10",
+    "value": "getTime",
+    "endPC": 46865
+  },
+  {
+    "pc": 46094,
+    "register": "r19",
+    "value": "parentNode",
+    "endPC": 46116
+  },
+  {
+    "pc": 46891,
+    "register": "r19",
+    "value": "offsetHeight",
+    "endPC": 46918
+  },
+  {
+    "pc": 46491,
+    "register": "r39",
+    "value": "sessi",
+    "endPC": 46503
+  },
+  {
+    "pc": 46982,
+    "register": "r12",
+    "value": "data",
+    "endPC": 46992
+  },
+  {
+    "pc": 46935,
+    "register": "r19",
+    "value": "height",
+    "endPC": 46947
+  },
+  {
+    "pc": 47165,
+    "register": "r9",
+    "value": "WEBGL_debug_renderer_info",
+    "endPC": 47227
+  },
+  {
+    "pc": 47235,
+    "register": "r9",
+    "value": "UNMASKED_VENDOR_WEBGL",
+    "endPC": 47287
+  },
+  {
+    "pc": 46965,
+    "register": "r8",
+    "value": "number",
+    "endPC": 46977
+  },
+  {
+    "pc": 46693,
+    "register": "r24",
+    "value": "get",
+    "endPC": 46703
+  },
+  {
+    "pc": 46808,
+    "register": "r54",
+    "value": "AudioContext",
+    "endPC": 46835
+  },
+  {
+    "pc": 47417,
+    "register": "r26",
+    "value": "window",
+    "endPC": 47429
+  },
+  {
+    "pc": 47521,
+    "register": "r18",
+    "value": "Symbol",
+    "endPC": 47533
+  },
+  {
+    "pc": 47353,
+    "register": "r11",
+    "value": "exports",
+    "endPC": 47370
+  },
+  {
+    "pc": 47569,
+    "register": "r21",
+    "value": "Object",
+    "endPC": 47581
+  },
+  {
+    "pc": 47590,
+    "register": "r20",
+    "value": "create",
+    "endPC": 47602
+  },
+  {
+    "pc": 42062,
+    "register": "r40",
+    "value": "rgb(255, 0, 0)",
+    "endPC": 42094
+  },
+  {
+    "pc": 47638,
+    "register": "r10",
+    "value": "Object",
+    "endPC": 47650
+  },
+  {
+    "pc": 47625,
+    "register": "r20",
+    "value": "r",
+    "endPC": 47627
+  },
+  {
+    "pc": 47659,
+    "register": "r36",
+    "value": "defineProperty",
+    "endPC": 47691
+  },
+  {
+    "pc": 47717,
+    "register": "r24",
+    "value": "enumerable",
+    "endPC": 47742
+  },
+  {
+    "pc": 47873,
+    "register": "r40",
+    "value": "getComputedStyle",
+    "endPC": 47910
+  },
+  {
+    "pc": 47919,
+    "register": "r16",
+    "value": "document",
+    "endPC": 47936
+  },
+  {
+    "pc": 47757,
+    "register": "r25",
+    "value": "value",
+    "endPC": 47769
+  },
+  {
+    "pc": 47945,
+    "register": "r25",
+    "value": "getElementById",
+    "endPC": 47977
+  },
+  {
+    "pc": 47986,
+    "register": "r25",
+    "value": "secondh",
+    "endPC": 48003
+  },
+  {
+    "pc": 48018,
+    "register": "r25",
+    "value": "getPropertyValue",
+    "endPC": 48055
+  },
+  {
+    "pc": 47499,
+    "register": "r17",
+    "value": "functioncument",
+    "endPC": 48131
+  },
+  {
+    "pc": 48140,
+    "register": "r14",
+    "value": "documentElement",
+    "endPC": 48177
+  },
+  {
+    "pc": 48252,
+    "register": "r17",
+    "value": "window",
+    "endPC": 48264
+  },
+  {
+    "pc": 48273,
+    "register": "r26",
+    "value": "ChallengeEncrypt",
+    "endPC": 48310
+  },
+  {
+    "pc": 48333,
+    "register": "r26",
+    "value": "exports",
+    "endPC": 48350
+  },
+  {
+    "pc": 48223,
+    "register": "r24",
+    "value": "unknown",
+    "endPC": 48240
+  },
+  {
+    "pc": 47841,
+    "register": "r27",
+    "value": "rgb(0, 0, 0)",
+    "endPC": 47868
+  },
+  {
+    "pc": 48183,
+    "register": "r14",
+    "value": "clientWidth",
+    "endPC": 48210
+  },
+  {
+    "pc": 46729,
+    "register": "r48",
+    "value": "radiusY",
+    "endPC": 46746
+  },
+  {
+    "pc": 48408,
+    "register": "r48",
+    "value": "window",
+    "endPC": 48420
+  },
+  {
+    "pc": 47700,
+    "register": "r36",
+    "value": "default",
+    "endPC": 47717
+  },
+  {
+    "pc": 48595,
+    "register": "r52",
+    "value": "split",
+    "endPC": 48607
+  },
+  {
+    "pc": 48064,
+    "register": "r25",
+    "value": "color",
+    "endPC": 48076
+  },
+  {
+    "pc": 48645,
+    "register": "r29",
+    "value": "window",
+    "endPC": 48657
+  },
+  {
+    "pc": 48760,
+    "register": "r13",
+    "value": "window",
+    "endPC": 48772
+  },
+  {
+    "pc": 48781,
+    "register": "r21",
+    "value": "TCaptchaSid",
+    "endPC": 48808
+  },
+  {
+    "pc": 48666,
+    "register": "r48",
+    "value": "localStorage",
+    "endPC": 48693
+  },
+  {
+    "pc": 48843,
+    "register": "r89",
+    "value": "get",
+    "endPC": 48850
+  },
+  {
+    "pc": 37514,
+    "register": "r79",
+    "value": "channelCountMode",
+    "endPC": 37551
+  },
+  {
+    "pc": 48717,
+    "register": "r11",
+    "value": "length",
+    "endPC": 48729
+  },
+  {
+    "pc": 48909,
+    "register": "r13",
+    "value": "98k",
+    "endPC": 48916
+  },
+  {
+    "pc": 48966,
+    "register": "r11",
+    "value": "exports",
+    "endPC": 48983
+  },
+  {
+    "pc": 48932,
+    "register": "r17",
+    "value": "on",
+    "endPC": 48934
+  },
+  {
+    "pc": 49055,
+    "register": "r10",
+    "value": "document",
+    "endPC": 49072
+  },
+  {
+    "pc": 49081,
+    "register": "r13",
+    "value": "location",
+    "endPC": 49098
+  },
+  {
+    "pc": 48368,
+    "register": "r23",
+    "value": "_state",
+    "endPC": 48380
+  },
+  {
+    "pc": 49107,
+    "register": "r13",
+    "value": "href",
+    "endPC": 49114
+  },
+  {
+    "pc": 48743,
+    "register": "r19",
+    "value": "string",
+    "endPC": 48755
+  },
+  {
+    "pc": 49239,
+    "register": "r17",
+    "value": "charCodeAt",
+    "endPC": 49261
+  },
+  {
+    "pc": 49227,
+    "register": "r22",
+    "value": "QRu~",
+    "endPC": 49234
+  },
+  {
+    "pc": 49302,
+    "register": "r15",
+    "value": "on",
+    "endPC": 49304
+  },
+  {
+    "pc": 49325,
+    "register": "r19",
+    "value": "[]",
+    "endPC": 49327
+  },
+  {
+    "pc": 49361,
+    "register": "r11",
+    "value": "reset",
+    "endPC": 49373
+  },
+  {
+    "pc": 48429,
+    "register": "r75",
+    "value": "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+    "endPC": 48511
+  },
+  {
+    "pc": 50237,
+    "register": "r13",
+    "value": "navigator",
+    "endPC": 50259
+  },
+  {
+    "pc": 50282,
+    "register": "r79",
+    "value": "changedTouches",
+    "endPC": 50314
+  },
+  {
+    "pc": 50332,
+    "register": "r48",
+    "value": "clientX",
+    "endPC": 50349
+  },
+  {
+    "pc": 38410,
+    "register": "r78",
+    "value": "baseLatency",
+    "endPC": 38437
+  },
+  {
+    "pc": 50416,
+    "register": "r8",
+    "value": "window",
+    "endPC": 50428
+  },
+  {
+    "pc": 50437,
+    "register": "r16",
+    "value": "addEventListener",
+    "endPC": 50474
+  },
+  {
+    "pc": 49399,
+    "register": "r26",
+    "value": "ios",
+    "endPC": 49406
+  },
+  {
+    "pc": 50483,
+    "register": "r16",
+    "value": "message",
+    "endPC": 50500
+  },
+  {
+    "pc": 50528,
+    "register": "r16",
+    "value": "document",
+    "endPC": 50545
+  },
+  {
+    "pc": 50554,
+    "register": "r17",
+    "value": "documentElement",
+    "endPC": 50591
+  },
+  {
+    "pc": 50518,
+    "register": "r26",
+    "value": "*",
+    "endPC": 50518
+  },
+  {
+    "pc": 50655,
+    "register": "r26",
+    "value": "window",
+    "endPC": 50667
+  },
+  {
+    "pc": 47438,
+    "register": "r31",
+    "value": "msRTCPeerConnection",
+    "endPC": 47485
+  },
+  {
+    "pc": 50676,
+    "register": "r9",
+    "value": "OCY_Fhf",
+    "endPC": 50693
+  },
+  {
+    "pc": 50597,
+    "register": "r17",
+    "value": "clientHeight",
+    "endPC": 50624
+  },
+  {
+    "pc": 50737,
+    "register": "r8",
+    "value": "window",
+    "endPC": 50749
+  },
+  {
+    "pc": 50850,
+    "register": "r34",
+    "value": "Math",
+    "endPC": 50857
+  },
+  {
+    "pc": 48535,
+    "register": "r36",
+    "value": "-webkit- -o- -moz- -ms-",
+    "endPC": 48592
+  },
+  {
+    "pc": 50758,
+    "register": "r9",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 50840
+  },
+  {
+    "pc": 50887,
+    "register": "r9",
+    "value": "Math",
+    "endPC": 50894
+  },
+  {
+    "pc": 50937,
+    "register": "r39",
+    "value": "Math",
+    "endPC": 50944
+  },
+  {
+    "pc": 50866,
+    "register": "r13",
+    "value": "floor",
+    "endPC": 50878
+  },
+  {
+    "pc": 50957,
+    "register": "r13",
+    "value": "Math",
+    "endPC": 50964
+  },
+  {
+    "pc": 50903,
+    "register": "r44",
+    "value": "random",
+    "endPC": 50915
+  },
+  {
+    "pc": 51001,
+    "register": "r34",
+    "value": "window",
+    "endPC": 51013
+  },
+  {
+    "pc": 49134,
+    "register": "r30",
+    "value": "linux",
+    "endPC": 49146
+  },
+  {
+    "pc": 50265,
+    "register": "r23",
+    "value": "gpu",
+    "endPC": 50272
+  },
+  {
+    "pc": 51160,
+    "register": "r11",
+    "value": "setInterval",
+    "endPC": 51187
+  },
+  {
+    "pc": 51243,
+    "register": "r31",
+    "value": "navigator",
+    "endPC": 51265
+  },
+  {
+    "pc": 51271,
+    "register": "r19",
+    "value": "mimeTypes",
+    "endPC": 51293
+  },
+  {
+    "pc": 51402,
+    "register": "r20",
+    "value": "length",
+    "endPC": 51414
+  },
+  {
+    "pc": 51431,
+    "register": "r13",
+    "value": "getTime",
+    "endPC": 51448
+  },
+  {
+    "pc": 51472,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 51489
+  },
+  {
+    "pc": 51498,
+    "register": "r14",
+    "value": "document",
+    "endPC": 51515
+  },
+  {
+    "pc": 51524,
+    "register": "r16",
+    "value": "body",
+    "endPC": 51531
+  },
+  {
+    "pc": 51216,
+    "register": "r89",
+    "value": ",",
+    "endPC": 51216
+  },
+  {
+    "pc": 51579,
+    "register": "r63",
+    "value": "length",
+    "endPC": 51591
+  },
+  {
+    "pc": 51364,
+    "register": "r25",
+    "value": "limits",
+    "endPC": 51376
+  },
+  {
+    "pc": 51641,
+    "register": "r13",
+    "value": "charCodeAt",
+    "endPC": 51663
+  },
+  {
+    "pc": 51629,
+    "register": "r25",
+    "value": "jK0L",
+    "endPC": 51636
+  },
+  {
+    "pc": 51721,
+    "register": "r12",
+    "value": "document",
+    "endPC": 51738
+  },
+  {
+    "pc": 51810,
+    "register": "r23",
+    "value": "document",
+    "endPC": 51827
+  },
+  {
+    "pc": 51785,
+    "register": "r21",
+    "value": "iframe",
+    "endPC": 51797
+  },
+  {
+    "pc": 51836,
+    "register": "r21",
+    "value": "body",
+    "endPC": 51843
+  },
+  {
+    "pc": 51890,
+    "register": "r23",
+    "value": "style",
+    "endPC": 51902
+  },
+  {
+    "pc": 51852,
+    "register": "r21",
+    "value": "appendChild",
+    "endPC": 51879
+  },
+  {
+    "pc": 51928,
+    "register": "r21",
+    "value": "none",
+    "endPC": 51935
+  },
+  {
+    "pc": 51908,
+    "register": "r23",
+    "value": "display",
+    "endPC": 51925
+  },
+  {
+    "pc": 51946,
+    "register": "r21",
+    "value": "contentWindow",
+    "endPC": 51978
+  },
+  {
+    "pc": 51984,
+    "register": "r21",
+    "value": "document",
+    "endPC": 52001
+  },
+  {
+    "pc": 51747,
+    "register": "r9",
+    "value": "createElement",
+    "endPC": 51779
+  },
+  {
+    "pc": 52014,
+    "register": "r9",
+    "value": "div",
+    "endPC": 52021
+  },
+  {
+    "pc": 51713,
+    "register": "r10",
+    "value": "1",
+    "endPC": 51713
+  },
+  {
+    "pc": 51310,
+    "register": "r40",
+    "value": "test",
+    "endPC": 51317
+  },
+  {
+    "pc": 52029,
+    "register": "r9",
+    "value": "outerHTML",
+    "endPC": 52051
+  },
+  {
+    "pc": 52130,
+    "register": "r14",
+    "value": "JSON",
+    "endPC": 52137
+  },
+  {
+    "pc": 51540,
+    "register": "r16",
+    "value": "clientWidth",
+    "endPC": 51567
+  },
+  {
+    "pc": 52164,
+    "register": "r16",
+    "value": "1",
+    "endPC": 52164
+  },
+  {
+    "pc": 52212,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 52224
+  },
+  {
+    "pc": 51114,
+    "register": "r30",
+    "value": "windows",
+    "endPC": 51131
+  },
+  {
+    "pc": 52279,
+    "register": "r66",
+    "value": "ClientJS,org <canvas> 1.0",
+    "endPC": 52341
+  },
+  {
+    "pc": 52114,
+    "register": "r20",
+    "value": "----",
+    "endPC": 52121
+  },
+  {
+    "pc": 52379,
+    "register": "r20",
+    "value": "top",
+    "endPC": 52386
+  },
+  {
+    "pc": 52174,
+    "register": "r16",
+    "value": "number",
+    "endPC": 52186
+  },
+  {
+    "pc": 52407,
+    "register": "r16",
+    "value": "14px 'Arial'",
+    "endPC": 52434
+  },
+  {
+    "pc": 52445,
+    "register": "r16",
+    "value": "alphabetic",
+    "endPC": 52467
+  },
+  {
+    "pc": 52347,
+    "register": "r66",
+    "value": "textBaseline",
+    "endPC": 52374
+  },
+  {
+    "pc": 52503,
+    "register": "r66",
+    "value": "#f60",
+    "endPC": 52510
+  },
+  {
+    "pc": 52395,
+    "register": "r20",
+    "value": "font",
+    "endPC": 52402
+  },
+  {
+    "pc": 52521,
+    "register": "r66",
+    "value": "fillRect",
+    "endPC": 52538
+  },
+  {
+    "pc": 52256,
+    "register": "r26",
+    "value": "linux",
+    "endPC": 52268
+  },
+  {
+    "pc": 51022,
+    "register": "r44",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 51104
+  },
+  {
+    "pc": 52567,
+    "register": "r44",
+    "value": "#069",
+    "endPC": 52574
+  },
+  {
+    "pc": 52623,
+    "register": "r66",
+    "value": "rgba(102, 204, 0, 0.7)",
+    "endPC": 52675
+  },
+  {
+    "pc": 52585,
+    "register": "r44",
+    "value": "fillText",
+    "endPC": 52602
+  },
+  {
+    "pc": 52478,
+    "register": "r16",
+    "value": "fillStyle",
+    "endPC": 52500
+  },
+  {
+    "pc": 52702,
+    "register": "r16",
+    "value": "toDataURL",
+    "endPC": 52724
+  },
+  {
+    "pc": 52734,
+    "register": "r44",
+    "value": "replace",
+    "endPC": 52751
+  },
+  {
+    "pc": 52803,
+    "register": "r55",
+    "value": "RegExp",
+    "endPC": 52815
+  },
+  {
+    "pc": 52799,
+    "register": "r26",
+    "value": "g",
+    "endPC": 52799
+  },
+  {
+    "pc": 52757,
+    "register": "r44",
+    "value": "[\\u0000-\\u0020]+",
+    "endPC": 52794
+  },
+  {
+    "pc": 50388,
+    "register": "r48",
+    "value": "force",
+    "endPC": 50400
+  },
+  {
+    "pc": 52842,
+    "register": "r44",
+    "value": "length",
+    "endPC": 52854
+  },
+  {
+    "pc": 52878,
+    "register": "r16",
+    "value": "parentNode",
+    "endPC": 52900
+  },
+  {
+    "pc": 52909,
+    "register": "r16",
+    "value": "removeChild",
+    "endPC": 52936
+  },
+  {
+    "pc": 53193,
+    "register": "r14",
+    "value": "replace",
+    "endPC": 53210
+  },
+  {
+    "pc": 52233,
+    "register": "r8",
+    "value": "width",
+    "endPC": 52245
+  },
+  {
+    "pc": 53277,
+    "register": "r8",
+    "value": "RegExp",
+    "endPC": 53289
+  },
+  {
+    "pc": 53273,
+    "register": "r12",
+    "value": "g",
+    "endPC": 53273
+  },
+  {
+    "pc": 53216,
+    "register": "r14",
+    "value": "[^\\u0020-\\u007E]|[\"\\\\]",
+    "endPC": 53268
+  },
+  {
+    "pc": 53369,
+    "register": "r30",
+    "value": "charCodeAt",
+    "endPC": 53391
+  },
+  {
+    "pc": 53357,
+    "register": "r13",
+    "value": "'0/:",
+    "endPC": 53364
+  },
+  {
+    "pc": 53434,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 53451
+  },
+  {
+    "pc": 53502,
+    "register": "r34",
+    "value": "Math",
+    "endPC": 53509
+  },
+  {
+    "pc": 53518,
+    "register": "r20",
+    "value": "floor",
+    "endPC": 53530
+  },
+  {
+    "pc": 53539,
+    "register": "r41",
+    "value": "Math",
+    "endPC": 53546
+  },
+  {
+    "pc": 53555,
+    "register": "r18",
+    "value": "random",
+    "endPC": 53567
+  },
+  {
+    "pc": 53592,
+    "register": "r18",
+    "value": "document",
+    "endPC": 53609
+  },
+  {
+    "pc": 53618,
+    "register": "r21",
+    "value": "createElement",
+    "endPC": 53650
+  },
+  {
+    "pc": 38333,
+    "register": "r77",
+    "value": "an-channelInterpretation",
+    "endPC": 38390
+  },
+  {
+    "pc": 53451,
+    "register": "r10",
+    "value": "get",
+    "endPC": 53461
+  },
+  {
+    "pc": 53823,
+    "register": "r15",
+    "value": "getTime",
+    "endPC": 53840
+  },
+  {
+    "pc": 53875,
+    "register": "r9",
+    "value": "window",
+    "endPC": 53887
+  },
+  {
+    "pc": 53161,
+    "register": "r33",
+    "value": "push",
+    "endPC": 53168
+  },
+  {
+    "pc": 53922,
+    "register": "r33",
+    "value": "reset",
+    "endPC": 53934
+  },
+  {
+    "pc": 53732,
+    "register": "r25",
+    "value": "*",
+    "endPC": 53732
+  },
+  {
+    "pc": 54034,
+    "register": "r25",
+    "value": "limits",
+    "endPC": 54046
+  },
+  {
+    "pc": 53676,
+    "register": "r34",
+    "value": "setAttribute",
+    "endPC": 53703
+  },
+  {
+    "pc": 54080,
+    "register": "r18",
+    "value": "TypeError",
+    "endPC": 54102
+  },
+  {
+    "pc": 53748,
+    "register": "r16",
+    "value": "exports",
+    "endPC": 53765
+  },
+  {
+    "pc": 54108,
+    "register": "r17",
+    "value": "Invalid attempt to destructure non-iterable instance",
+    "endPC": 54235
+  },
+  {
+    "pc": 53791,
+    "register": "r26",
+    "value": "ipad",
+    "endPC": 53798
+  },
+  {
+    "pc": 54273,
+    "register": "r13",
+    "value": "charCodeAt",
+    "endPC": 54295
+  },
+  {
+    "pc": 54261,
+    "register": "r26",
+    "value": "B0JC",
+    "endPC": 54268
+  },
+  {
+    "pc": 53765,
+    "register": "r14",
+    "value": "get",
+    "endPC": 53775
+  },
+  {
+    "pc": 54347,
+    "register": "r15",
+    "value": "Error",
+    "endPC": 54359
+  },
+  {
+    "pc": 54385,
+    "register": "r8",
+    "value": "document",
+    "endPC": 54402
+  },
+  {
+    "pc": 53896,
+    "register": "r12",
+    "value": "name",
+    "endPC": 53903
+  },
+  {
+    "pc": 54411,
+    "register": "r10",
+    "value": "location",
+    "endPC": 54428
+  },
+  {
+    "pc": 54455,
+    "register": "r54",
+    "value": "window",
+    "endPC": 54467
+  },
+  {
+    "pc": 53656,
+    "register": "r21",
+    "value": "span",
+    "endPC": 53663
+  },
+  {
+    "pc": 54476,
+    "register": "r20",
+    "value": "webkitAudioContext",
+    "endPC": 54518
+  },
+  {
+    "pc": 54562,
+    "register": "r8",
+    "value": "undefined",
+    "endPC": 54584
+  },
+  {
+    "pc": 54365,
+    "register": "r13",
+    "value": "errr",
+    "endPC": 54372
+  },
+  {
+    "pc": 54610,
+    "register": "r15",
+    "value": "-",
+    "endPC": 54610
+  },
+  {
+    "pc": 54618,
+    "register": "r15",
+    "value": "screen",
+    "endPC": 54630
+  },
+  {
+    "pc": 54639,
+    "register": "r13",
+    "value": "logicalXDPI",
+    "endPC": 54666
+  },
+  {
+    "pc": 54672,
+    "register": "r13",
+    "value": "undefined",
+    "endPC": 54694
+  },
+  {
+    "pc": 54711,
+    "register": "r9",
+    "value": "indexOf",
+    "endPC": 54728
+  },
+  {
+    "pc": 54437,
+    "register": "r10",
+    "value": "href",
+    "endPC": 54444
+  },
+  {
+    "pc": 54766,
+    "register": "r40",
+    "value": "document",
+    "endPC": 54783
+  },
+  {
+    "pc": 54792,
+    "register": "r23",
+    "value": "createElement",
+    "endPC": 54824
+  },
+  {
+    "pc": 54830,
+    "register": "r23",
+    "value": "audio",
+    "endPC": 54842
+  },
+  {
+    "pc": 54870,
+    "register": "r40",
+    "value": "AAC",
+    "endPC": 54877
+  },
+  {
+    "pc": 54896,
+    "register": "r38",
+    "value": "audio/mp4; codecs=\"mp4a.40.2\"",
+    "endPC": 54968
+  },
+  {
+    "pc": 54981,
+    "register": "r38",
+    "value": "MP3",
+    "endPC": 54988
+  },
+  {
+    "pc": 54995,
+    "register": "r38",
+    "value": "audio/mpeg",
+    "endPC": 55017
+  },
+  {
+    "pc": 55032,
+    "register": "r38",
+    "value": "Ogg Vorbis",
+    "endPC": 55054
+  },
+  {
+    "pc": 55063,
+    "register": "r38",
+    "value": "audio/ogg; codecs=\"vorbis\"",
+    "endPC": 55125
+  },
+  {
+    "pc": 55140,
+    "register": "r38",
+    "value": "Ogg Opus",
+    "endPC": 55157
+  },
+  {
+    "pc": 55166,
+    "register": "r38",
+    "value": "audio/ogg; codecs=\"opus\"",
+    "endPC": 55223
+  },
+  {
+    "pc": 55238,
+    "register": "r38",
+    "value": "WAV",
+    "endPC": 55245
+  },
+  {
+    "pc": 55252,
+    "register": "r38",
+    "value": "audio/wav; codecs=\"1\"",
+    "endPC": 55304
+  },
+  {
+    "pc": 55317,
+    "register": "r38",
+    "value": "FLAC",
+    "endPC": 55324
+  },
+  {
+    "pc": 55333,
+    "register": "r38",
+    "value": "audio/flac",
+    "endPC": 55355
+  },
+  {
+    "pc": 55370,
+    "register": "r38",
+    "value": "WebM Vorbis",
+    "endPC": 55397
+  },
+  {
+    "pc": 55404,
+    "register": "r38",
+    "value": "audio/webm; codecs=\"vorbis\"",
+    "endPC": 55471
+  },
+  {
+    "pc": 55484,
+    "register": "r38",
+    "value": "WebM Opus",
+    "endPC": 55506
+  },
+  {
+    "pc": 55513,
+    "register": "r38",
+    "value": "audio/webm; codecs=\"opus\"",
+    "endPC": 55575
+  },
+  {
+    "pc": 55588,
+    "register": "r38",
+    "value": "M4A",
+    "endPC": 55595
+  },
+  {
+    "pc": 55665,
+    "register": "r29",
+    "value": "sessionStorage",
+    "endPC": 55697
+  },
+  {
+    "pc": 54734,
+    "register": "r9",
+    "value": "?",
+    "endPC": 54734
+  },
+  {
+    "pc": 55706,
+    "register": "r19",
+    "value": "setItem",
+    "endPC": 55723
+  },
+  {
+    "pc": 55777,
+    "register": "r18",
+    "value": "RegExp",
+    "endPC": 55789
+  },
+  {
+    "pc": 55769,
+    "register": "r19",
+    "value": "\"",
+    "endPC": 55769
+  },
+  {
+    "pc": 54858,
+    "register": "r21",
+    "value": "name",
+    "endPC": 54865
+  },
+  {
+    "pc": 55803,
+    "register": "r19",
+    "value": "\\\"",
+    "endPC": 55805
+  },
+  {
+    "pc": 55746,
+    "register": "r9",
+    "value": "replace",
+    "endPC": 55763
+  },
+  {
+    "pc": 55862,
+    "register": "r18",
+    "value": "RegExp",
+    "endPC": 55874
+  },
+  {
+    "pc": 55820,
+    "register": "r9",
+    "value": "[\\u00ff-\\uffff]+",
+    "endPC": 55857
+  },
+  {
+    "pc": 55933,
+    "register": "r39",
+    "value": "document",
+    "endPC": 55950
+  },
+  {
+    "pc": 55983,
+    "register": "r35",
+    "value": "encodeURIComponent",
+    "endPC": 56025
+  },
+  {
+    "pc": 55959,
+    "register": "r48",
+    "value": "cookie",
+    "endPC": 55971
+  },
+  {
+    "pc": 56040,
+    "register": "r48",
+    "value": "indexOf",
+    "endPC": 56057
+  },
+  {
+    "pc": 54884,
+    "register": "r40",
+    "value": "type",
+    "endPC": 54891
+  },
+  {
+    "pc": 56133,
+    "register": "r27",
+    "value": "rec2020",
+    "endPC": 56150
+  },
+  {
+    "pc": 56150,
+    "register": "r27",
+    "value": "p3",
+    "endPC": 56157
+  },
+  {
+    "pc": 56232,
+    "register": "r26",
+    "value": "window",
+    "endPC": 56244
+  },
+  {
+    "pc": 56356,
+    "register": "r18",
+    "value": "getVoices",
+    "endPC": 56378
+  },
+  {
+    "pc": 55773,
+    "register": "r13",
+    "value": "g",
+    "endPC": 55773
+  },
+  {
+    "pc": 50360,
+    "register": "r79",
+    "value": "clientY",
+    "endPC": 50377
+  },
+  {
+    "pc": 55602,
+    "register": "r38",
+    "value": "audio/x-m4a",
+    "endPC": 55629
+  },
+  {
+    "pc": 56508,
+    "register": "r31",
+    "value": "window",
+    "endPC": 56520
+  },
+  {
+    "pc": 56529,
+    "register": "r26",
+    "value": "webkitRTCPeerConne",
+    "endPC": 56578
+  },
+  {
+    "pc": 56427,
+    "register": "r10",
+    "value": "tdc",
+    "endPC": 56434
+  },
+  {
+    "pc": 56601,
+    "register": "r46",
+    "value": "number",
+    "endPC": 56613
+  },
+  {
+    "pc": 56679,
+    "register": "r12",
+    "value": "get",
+    "endPC": 56689
+  },
+  {
+    "pc": 56799,
+    "register": "r12",
+    "value": "substring",
+    "endPC": 56821
+  },
+  {
+    "pc": 56662,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 56679
+  },
+  {
+    "pc": 56931,
+    "register": "r12",
+    "value": "Object",
+    "endPC": 56943
+  },
+  {
+    "pc": 56952,
+    "register": "r11",
+    "value": "prototype",
+    "endPC": 56974
+  },
+  {
+    "pc": 56980,
+    "register": "r11",
+    "value": "toString",
+    "endPC": 56997
+  },
+  {
+    "pc": 57006,
+    "register": "r11",
+    "value": "call",
+    "endPC": 57013
+  },
+  {
+    "pc": 56898,
+    "register": "r16",
+    "value": "get",
+    "endPC": 56908
+  },
+  {
+    "pc": 57026,
+    "register": "r9",
+    "value": "[object ",
+    "endPC": 57043
+  },
+  {
+    "pc": 57056,
+    "register": "r12",
+    "value": "]",
+    "endPC": 57056
+  },
+  {
+    "pc": 57107,
+    "register": "r46",
+    "value": "undefined",
+    "endPC": 57129
+  },
+  {
+    "pc": 56881,
+    "register": "r8",
+    "value": "exports",
+    "endPC": 56898
+  },
+  {
+    "pc": 56720,
+    "register": "r18",
+    "value": "*",
+    "endPC": 56720
+  },
+  {
+    "pc": 57232,
+    "register": "r11",
+    "value": "Object",
+    "endPC": 57244
+  },
+  {
+    "pc": 57160,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 57177
+  },
+  {
+    "pc": 57253,
+    "register": "r10",
+    "value": "getOwnPropertyDescriptor",
+    "endPC": 57310
+  },
+  {
+    "pc": 57319,
+    "register": "r10",
+    "value": "navigator",
+    "endPC": 57341
+  },
+  {
+    "pc": 57347,
+    "register": "r15",
+    "value": "webdriver",
+    "endPC": 57369
+  },
+  {
+    "pc": 57378,
+    "register": "r15",
+    "value": "get",
+    "endPC": 57385
+  },
+  {
+    "pc": 56839,
+    "register": "r22",
+    "value": "*",
+    "endPC": 56839
+  },
+  {
+    "pc": 57400,
+    "register": "r12",
+    "value": "exports",
+    "endPC": 57417
+  },
+  {
+    "pc": 57417,
+    "register": "r14",
+    "value": "get",
+    "endPC": 57427
+  },
+  {
+    "pc": 56454,
+    "register": "r34",
+    "value": "removeChild",
+    "endPC": 56481
+  },
+  {
+    "pc": 57482,
+    "register": "r9",
+    "value": "window",
+    "endPC": 57494
+  },
+  {
+    "pc": 57503,
+    "register": "r36",
+    "value": "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+    "endPC": 57585
+  },
+  {
+    "pc": 57177,
+    "register": "r18",
+    "value": "get",
+    "endPC": 57187
+  },
+  {
+    "pc": 56094,
+    "register": "r57",
+    "value": "number",
+    "endPC": 56106
+  },
+  {
+    "pc": 57210,
+    "register": "r16",
+    "value": "function",
+    "endPC": 57227
+  },
+  {
+    "pc": 57673,
+    "register": "r16",
+    "value": "1",
+    "endPC": 57673
+  },
+  {
+    "pc": 57083,
+    "register": "r19",
+    "value": "iframe",
+    "endPC": 57095
+  },
+  {
+    "pc": 57769,
+    "register": "r63",
+    "value": "replace",
+    "endPC": 57786
+  },
+  {
+    "pc": 57901,
+    "register": "r57",
+    "value": "RegExp",
+    "endPC": 57913
+  },
+  {
+    "pc": 57897,
+    "register": "r89",
+    "value": "g",
+    "endPC": 57897
+  },
+  {
+    "pc": 57970,
+    "register": "r10",
+    "value": "get",
+    "endPC": 57980
+  },
+  {
+    "pc": 57683,
+    "register": "r16",
+    "value": "number",
+    "endPC": 57695
+  },
+  {
+    "pc": 57953,
+    "register": "r8",
+    "value": "exports",
+    "endPC": 57970
+  },
+  {
+    "pc": 58047,
+    "register": "r17",
+    "value": "exports",
+    "endPC": 58064
+  },
+  {
+    "pc": 57591,
+    "register": "r36",
+    "value": "now",
+    "endPC": 57598
+  },
+  {
+    "pc": 58101,
+    "register": "r12",
+    "value": "1",
+    "endPC": 58101
+  },
+  {
+    "pc": 58177,
+    "register": "r12",
+    "value": "document",
+    "endPC": 58194
+  },
+  {
+    "pc": 58203,
+    "register": "r11",
+    "value": "createElement",
+    "endPC": 58235
+  },
+  {
+    "pc": 58241,
+    "register": "r11",
+    "value": "canvas",
+    "endPC": 58253
+  },
+  {
+    "pc": 58266,
+    "register": "r8",
+    "value": "getContext",
+    "endPC": 58288
+  },
+  {
+    "pc": 58321,
+    "register": "r16",
+    "value": "document",
+    "endPC": 58338
+  },
+  {
+    "pc": 56166,
+    "register": "r27",
+    "value": "srgb",
+    "endPC": 56173
+  },
+  {
+    "pc": 58386,
+    "register": "r12",
+    "value": "charCodeAt",
+    "endPC": 58408
+  },
+  {
+    "pc": 58297,
+    "register": "r8",
+    "value": "webgl",
+    "endPC": 58309
+  },
+  {
+    "pc": 58491,
+    "register": "r27",
+    "value": "getComputedStyle",
+    "endPC": 58528
+  },
+  {
+    "pc": 58537,
+    "register": "r25",
+    "value": "document",
+    "endPC": 58554
+  },
+  {
+    "pc": 58563,
+    "register": "r11",
+    "value": "getElementById",
+    "endPC": 58595
+  },
+  {
+    "pc": 58604,
+    "register": "r11",
+    "value": "secondp",
+    "endPC": 58621
+  },
+  {
+    "pc": 58636,
+    "register": "r11",
+    "value": "getPropertyValue",
+    "endPC": 58673
+  },
+  {
+    "pc": 56630,
+    "register": "r33",
+    "value": "return",
+    "endPC": 56642
+  },
+  {
+    "pc": 58726,
+    "register": "r33",
+    "value": "replace",
+    "endPC": 58743
+  },
+  {
+    "pc": 58788,
+    "register": "r36",
+    "value": "RegExp",
+    "endPC": 58800
+  },
+  {
+    "pc": 58784,
+    "register": "r49",
+    "value": "g",
+    "endPC": 58784
+  },
+  {
+    "pc": 58749,
+    "register": "r33",
+    "value": "<|>|\\/|\\s|\"|'",
+    "endPC": 58781
+  },
+  {
+    "pc": 58825,
+    "register": "r36",
+    "value": "toLowerCase",
+    "endPC": 58852
+  },
+  {
+    "pc": 58454,
+    "register": "r40",
+    "value": "rgb(255, 0, 0)",
+    "endPC": 58486
+  },
+  {
+    "pc": 58899,
+    "register": "r15",
+    "value": "c",
+    "endPC": 58899
+  },
+  {
+    "pc": 58907,
+    "register": "r15",
+    "value": "l",
+    "endPC": 58907
+  },
+  {
+    "pc": 58915,
+    "register": "r15",
+    "value": "a",
+    "endPC": 58915
+  },
+  {
+    "pc": 58891,
+    "register": "r35",
+    "value": "v",
+    "endPC": 58891
+  },
+  {
+    "pc": 58883,
+    "register": "r14",
+    "value": "i",
+    "endPC": 58883
+  },
+  {
+    "pc": 58967,
+    "register": "r35",
+    "value": "join",
+    "endPC": 58974
+  },
+  {
+    "pc": 58995,
+    "register": "r10",
+    "value": "window",
+    "endPC": 59007
+  },
+  {
+    "pc": 58682,
+    "register": "r11",
+    "value": "color",
+    "endPC": 58694
+  },
+  {
+    "pc": 58355,
+    "register": "r38",
+    "value": "body",
+    "endPC": 58362
+  },
+  {
+    "pc": 58923,
+    "register": "r15",
+    "value": "s",
+    "endPC": 58923
+  },
+  {
+    "pc": 57715,
+    "register": "r19",
+    "value": "mozCaptureStream",
+    "endPC": 57752
+  },
+  {
+    "pc": 59168,
+    "register": "r30",
+    "value": "=",
+    "endPC": 59168
+  },
+  {
+    "pc": 59016,
+    "register": "r12",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 59098
+  },
+  {
+    "pc": 59205,
+    "register": "r77",
+    "value": "close",
+    "endPC": 59217
+  },
+  {
+    "pc": 59230,
+    "register": "r82",
+    "value": "JSON",
+    "endPC": 59237
+  },
+  {
+    "pc": 59246,
+    "register": "r78",
+    "value": "stringify",
+    "endPC": 59268
+  },
+  {
+    "pc": 59276,
+    "register": "r79",
+    "value": "nt_vc_output",
+    "endPC": 59303
+  },
+  {
+    "pc": 59312,
+    "register": "r79",
+    "value": "pxi_output",
+    "endPC": 59334
+  },
+  {
+    "pc": 59382,
+    "register": "r16",
+    "value": "parentNode",
+    "endPC": 59404
+  },
+  {
+    "pc": 59413,
+    "register": "r16",
+    "value": "removeChild",
+    "endPC": 59440
+  },
+  {
+    "pc": 59366,
+    "register": "r17",
+    "value": "tdc",
+    "endPC": 59373
+  },
+  {
+    "pc": 59498,
+    "register": "r17",
+    "value": "on",
+    "endPC": 59503
+  },
+  {
+    "pc": 59520,
+    "register": "r9",
+    "value": "get",
+    "endPC": 59527
+  },
+  {
+    "pc": 58064,
+    "register": "r23",
+    "value": "get",
+    "endPC": 58074
+  },
+  {
+    "pc": 57792,
+    "register": "r63",
+    "value": "[\\u0000-\\u001F\\u007F-\\u009F\\uD800-\\uDFFF]",
+    "endPC": 57894
+  },
+  {
+    "pc": 59611,
+    "register": "r23",
+    "value": "usageDetails",
+    "endPC": 59638
+  },
+  {
+    "pc": 58131,
+    "register": "r20",
+    "value": "height",
+    "endPC": 58143
+  },
+  {
+    "pc": 58875,
+    "register": "r36",
+    "value": "d",
+    "endPC": 58875
+  },
+  {
+    "pc": 59781,
+    "register": "r11",
+    "value": "i",
+    "endPC": 59781
+  },
+  {
+    "pc": 59844,
+    "register": "r27",
+    "value": "call",
+    "endPC": 59851
+  },
+  {
+    "pc": 59539,
+    "register": "r17",
+    "value": "reset",
+    "endPC": 59551
+  },
+  {
+    "pc": 59738,
+    "register": "r20",
+    "value": "quota",
+    "endPC": 59750
+  },
+  {
+    "pc": 59899,
+    "register": "r20",
+    "value": "window",
+    "endPC": 59911
+  },
+  {
+    "pc": 59789,
+    "register": "r11",
+    "value": "l",
+    "endPC": 59789
+  },
+  {
+    "pc": 59987,
+    "register": "r15",
+    "value": "document",
+    "endPC": 60004
+  },
+  {
+    "pc": 59579,
+    "register": "r19",
+    "value": "usageDetails",
+    "endPC": 59606
+  },
+  {
+    "pc": 60013,
+    "register": "r19",
+    "value": "documentMode",
+    "endPC": 60040
+  },
+  {
+    "pc": 59753,
+    "register": "r23",
+    "value": "quota",
+    "endPC": 59765
+  },
+  {
+    "pc": 60250,
+    "register": "r14",
+    "value": "RegExp",
+    "endPC": 60262
+  },
+  {
+    "pc": 60091,
+    "register": "r16",
+    "value": "([0-9]{1,3}(\\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})",
+    "endPC": 60243
+  },
+  {
+    "pc": 60276,
+    "register": "r11",
+    "value": "exec",
+    "endPC": 60283
+  },
+  {
+    "pc": 59714,
+    "register": "r22",
+    "value": "_state",
+    "endPC": 59726
+  },
+  {
+    "pc": 60314,
+    "register": "r14",
+    "value": "undefined",
+    "endPC": 60336
+  },
+  {
+    "pc": 59920,
+    "register": "r9",
+    "value": "OCY_Fhf",
+    "endPC": 59937
+  },
+  {
+    "pc": 60396,
+    "register": "r14",
+    "value": "Symbol",
+    "endPC": 60408
+  },
+  {
+    "pc": 60417,
+    "register": "r17",
+    "value": "toStringTag",
+    "endPC": 60444
+  },
+  {
+    "pc": 60478,
+    "register": "r16",
+    "value": "get",
+    "endPC": 60488
+  },
+  {
+    "pc": 60514,
+    "register": "r15",
+    "value": "d",
+    "endPC": 60516
+  },
+  {
+    "pc": 60566,
+    "register": "r13",
+    "value": "toUpperCase",
+    "endPC": 60593
+  },
+  {
+    "pc": 60611,
+    "register": "r12",
+    "value": "screen",
+    "endPC": 60623
+  },
+  {
+    "pc": 60522,
+    "register": "r15",
+    "value": "'0/:",
+    "endPC": 60529
+  },
+  {
+    "pc": 54012,
+    "register": "r37",
+    "value": "push",
+    "endPC": 54019
+  },
+  {
+    "pc": 60662,
+    "register": "r22",
+    "value": "on",
+    "endPC": 60664
+  },
+  {
+    "pc": 59803,
+    "register": "r33",
+    "value": "exports",
+    "endPC": 59820
+  },
+  {
+    "pc": 60673,
+    "register": "r22",
+    "value": "toString",
+    "endPC": 60690
+  },
+  {
+    "pc": 60743,
+    "register": "r8",
+    "value": "exports",
+    "endPC": 60760
+  },
+  {
+    "pc": 60760,
+    "register": "r9",
+    "value": "get",
+    "endPC": 60770
+  },
+  {
+    "pc": 59481,
+    "register": "r26",
+    "value": "exports",
+    "endPC": 59498
+  },
+  {
+    "pc": 60632,
+    "register": "r13",
+    "value": "height",
+    "endPC": 60644
+  },
+  {
+    "pc": 60801,
+    "register": "r13",
+    "value": "{\"_state\":-1}",
+    "endPC": 60833
+  },
+  {
+    "pc": 60839,
+    "register": "r13",
+    "value": "{\"_state\":-2}",
+    "endPC": 60871
+  },
+  {
+    "pc": 60916,
+    "register": "r13",
+    "value": "navigator",
+    "endPC": 60938
+  },
+  {
+    "pc": 60550,
+    "register": "r19",
+    "value": "OOM",
+    "endPC": 60557
+  },
+  {
+    "pc": 60997,
+    "register": "r12",
+    "value": "slice",
+    "endPC": 61009
+  },
+  {
+    "pc": 61026,
+    "register": "r11",
+    "value": "reverse",
+    "endPC": 61043
+  },
+  {
+    "pc": 61053,
+    "register": "r12",
+    "value": "parseInt",
+    "endPC": 61070
+  },
+  {
+    "pc": 61079,
+    "register": "r20",
+    "value": "join",
+    "endPC": 61086
+  },
+  {
+    "pc": 60461,
+    "register": "r14",
+    "value": "exports",
+    "endPC": 60478
+  },
+  {
+    "pc": 61149,
+    "register": "r21",
+    "value": "navigator",
+    "endPC": 61171
+  },
+  {
+    "pc": 61214,
+    "register": "r13",
+    "value": "exports",
+    "endPC": 61231
+  },
+  {
+    "pc": 61249,
+    "register": "r13",
+    "value": "replace",
+    "endPC": 61266
+  },
+  {
+    "pc": 60891,
+    "register": "r23",
+    "value": "undefined",
+    "endPC": 60913
+  },
+  {
+    "pc": 61177,
+    "register": "r9",
+    "value": "plugins",
+    "endPC": 61194
+  },
+  {
+    "pc": 60707,
+    "register": "r22",
+    "value": "push",
+    "endPC": 60714
+  },
+  {
+    "pc": 61336,
+    "register": "r15",
+    "value": "document",
+    "endPC": 61353
+  },
+  {
+    "pc": 61447,
+    "register": "r27",
+    "value": "encodeURIComponent",
+    "endPC": 61489
+  },
+  {
+    "pc": 61412,
+    "register": "r20",
+    "value": "touchend",
+    "endPC": 61429
+  },
+  {
+    "pc": 61362,
+    "register": "r14",
+    "value": "addEventListener",
+    "endPC": 61399
+  },
+  {
+    "pc": 61498,
+    "register": "r12",
+    "value": "Err:",
+    "endPC": 61505
+  },
+  {
+    "pc": 61657,
+    "register": "r10",
+    "value": "monospace",
+    "endPC": 61679
+  },
+  {
+    "pc": 61679,
+    "register": "r10",
+    "value": "sans-serif",
+    "endPC": 61706
+  },
+  {
+    "pc": 61715,
+    "register": "r10",
+    "value": "serif",
+    "endPC": 61727
+  },
+  {
+    "pc": 61740,
+    "register": "r10",
+    "value": "Arial",
+    "endPC": 61752
+  },
+  {
+    "pc": 61752,
+    "register": "r10",
+    "value": "Arial Black",
+    "endPC": 61784
+  },
+  {
+    "pc": 61784,
+    "register": "r10",
+    "value": "Arial Narrow",
+    "endPC": 61816
+  },
+  {
+    "pc": 61825,
+    "register": "r10",
+    "value": "Courier New",
+    "endPC": 61852
+  },
+  {
+    "pc": 61852,
+    "register": "r10",
+    "value": "Georgia",
+    "endPC": 61874
+  },
+  {
+    "pc": 61874,
+    "register": "r10",
+    "value": "Impact",
+    "endPC": 61891
+  },
+  {
+    "pc": 61900,
+    "register": "r10",
+    "value": "Times New Roman",
+    "endPC": 61937
+  },
+  {
+    "pc": 61937,
+    "register": "r10",
+    "value": "Trebuchet MS",
+    "endPC": 61969
+  },
+  {
+    "pc": 61978,
+    "register": "r10",
+    "value": "Verdana",
+    "endPC": 61995
+  },
+  {
+    "pc": 61995,
+    "register": "r10",
+    "value": "Helvetica",
+    "endPC": 62022
+  },
+  {
+    "pc": 62022,
+    "register": "r10",
+    "value": "Tahoma",
+    "endPC": 62039
+  },
+  {
+    "pc": 62048,
+    "register": "r10",
+    "value": "Gill Sans",
+    "endPC": 62070
+  },
+  {
+    "pc": 62070,
+    "register": "r10",
+    "value": "Palatino",
+    "endPC": 62092
+  },
+  {
+    "pc": 62101,
+    "register": "r10",
+    "value": "Garamond",
+    "endPC": 62118
+  },
+  {
+    "pc": 62127,
+    "register": "r10",
+    "value": "Bookman",
+    "endPC": 62144
+  },
+  {
+    "pc": 62144,
+    "register": "r10",
+    "value": "Comic Sans MS",
+    "endPC": 62181
+  },
+  {
+    "pc": 62181,
+    "register": "r10",
+    "value": "Candara",
+    "endPC": 62203
+  },
+  {
+    "pc": 62203,
+    "register": "r10",
+    "value": "Consolas",
+    "endPC": 62225
+  },
+  {
+    "pc": 62234,
+    "register": "r10",
+    "value": "Lucida Console",
+    "endPC": 62266
+  },
+  {
+    "pc": 62275,
+    "register": "r10",
+    "value": "Lucida Sans Unicode",
+    "endPC": 62322
+  },
+  {
+    "pc": 62322,
+    "register": "r10",
+    "value": "Segoe UI",
+    "endPC": 62344
+  },
+  {
+    "pc": 62353,
+    "register": "r10",
+    "value": "Roboto",
+    "endPC": 62365
+  },
+  {
+    "pc": 62374,
+    "register": "r10",
+    "value": "Open Sans",
+    "endPC": 62396
+  },
+  {
+    "pc": 62396,
+    "register": "r10",
+    "value": "Lato",
+    "endPC": 62408
+  },
+  {
+    "pc": 62417,
+    "register": "r10",
+    "value": "Fira Sans",
+    "endPC": 62439
+  },
+  {
+    "pc": 62439,
+    "register": "r10",
+    "value": "Source Code Pro",
+    "endPC": 62481
+  },
+  {
+    "pc": 62481,
+    "register": "r10",
+    "value": "Ubuntu",
+    "endPC": 62498
+  },
+  {
+    "pc": 62507,
+    "register": "r10",
+    "value": "Noto Sans",
+    "endPC": 62529
+  },
+  {
+    "pc": 62529,
+    "register": "r10",
+    "value": "PingFang SC",
+    "endPC": 62561
+  },
+  {
+    "pc": 62561,
+    "register": "r10",
+    "value": "Microsoft YaHei",
+    "endPC": 62603
+  },
+  {
+    "pc": 62603,
+    "register": "r10",
+    "value": "SimSun",
+    "endPC": 62620
+  },
+  {
+    "pc": 62629,
+    "register": "r10",
+    "value": "SimHei",
+    "endPC": 62641
+  },
+  {
+    "pc": 62650,
+    "register": "r10",
+    "value": "Noto Serif",
+    "endPC": 62672
+  },
+  {
+    "pc": 62681,
+    "register": "r10",
+    "value": "STHeiti",
+    "endPC": 62698
+  },
+  {
+    "pc": 62698,
+    "register": "r10",
+    "value": "PingFang TC",
+    "endPC": 62730
+  },
+  {
+    "pc": 62730,
+    "register": "r10",
+    "value": "Hiragino Sans GB",
+    "endPC": 62772
+  },
+  {
+    "pc": 62781,
+    "register": "r10",
+    "value": "Heiti SC",
+    "endPC": 62798
+  },
+  {
+    "pc": 62807,
+    "register": "r10",
+    "value": "Heiti TC",
+    "endPC": 62824
+  },
+  {
+    "pc": 62833,
+    "register": "r10",
+    "value": "Songti SC",
+    "endPC": 62855
+  },
+  {
+    "pc": 62855,
+    "register": "r10",
+    "value": "STSong",
+    "endPC": 62872
+  },
+  {
+    "pc": 62881,
+    "register": "r10",
+    "value": "STFangSong",
+    "endPC": 62903
+  },
+  {
+    "pc": 62912,
+    "register": "r10",
+    "value": "FangSong",
+    "endPC": 62929
+  },
+  {
+    "pc": 62938,
+    "register": "r10",
+    "value": "KaiTi",
+    "endPC": 62950
+  },
+  {
+    "pc": 62950,
+    "register": "r10",
+    "value": "SimSun-ExtB",
+    "endPC": 62982
+  },
+  {
+    "pc": 62982,
+    "register": "r10",
+    "value": "Microsoft JhengHei",
+    "endPC": 63029
+  },
+  {
+    "pc": 63038,
+    "register": "r10",
+    "value": "Noto Sans CJK SC",
+    "endPC": 63075
+  },
+  {
+    "pc": 63084,
+    "register": "r10",
+    "value": "Noto Sans CJK TC",
+    "endPC": 63121
+  },
+  {
+    "pc": 63130,
+    "register": "r10",
+    "value": "Noto Serif CJK SC",
+    "endPC": 63172
+  },
+  {
+    "pc": 63172,
+    "register": "r10",
+    "value": "Noto Serif CJK TC",
+    "endPC": 63219
+  },
+  {
+    "pc": 63219,
+    "register": "r10",
+    "value": "Source Han Sans SC",
+    "endPC": 63266
+  },
+  {
+    "pc": 63275,
+    "register": "r10",
+    "value": "Source Han Serif SC",
+    "endPC": 63322
+  },
+  {
+    "pc": 63322,
+    "register": "r10",
+    "value": "WenQuanYi Zen Hei",
+    "endPC": 63369
+  },
+  {
+    "pc": 63369,
+    "register": "r10",
+    "value": "Source Han Sans CN",
+    "endPC": 63416
+  },
+  {
+    "pc": 63425,
+    "register": "r10",
+    "value": "Source Han Serif CN",
+    "endPC": 63472
+  },
+  {
+    "pc": 63591,
+    "register": "r48",
+    "value": "localStorage",
+    "endPC": 63618
+  },
+  {
+    "pc": 63627,
+    "register": "r29",
+    "value": "getItem",
+    "endPC": 63644
+  },
+  {
+    "pc": 63538,
+    "register": "r16",
+    "value": "documentElement",
+    "endPC": 63575
+  },
+  {
+    "pc": 63680,
+    "register": "r39",
+    "value": "sessionStorage",
+    "endPC": 63712
+  },
+  {
+    "pc": 63488,
+    "register": "r14",
+    "value": "exports",
+    "endPC": 63505
+  },
+  {
+    "pc": 63790,
+    "register": "r14",
+    "value": "Symbol",
+    "endPC": 63802
+  },
+  {
+    "pc": 63505,
+    "register": "r17",
+    "value": "get",
+    "endPC": 63515
+  },
+  {
+    "pc": 63854,
+    "register": "r9",
+    "value": "apply",
+    "endPC": 63866
+  },
+  {
+    "pc": 63891,
+    "register": "r15",
+    "value": "setTimeout",
+    "endPC": 63913
+  },
+  {
+    "pc": 63814,
+    "register": "r14",
+    "value": "undefined",
+    "endPC": 63836
+  },
+  {
+    "pc": 61535,
+    "register": "r13",
+    "value": "o",
+    "endPC": 61535
+  },
+  {
+    "pc": 64018,
+    "register": "r16",
+    "value": "{\"_state\":-2}",
+    "endPC": 64050
+  },
+  {
+    "pc": 64050,
+    "register": "r16",
+    "value": "{\"_state\":-1}",
+    "endPC": 64087
+  },
+  {
+    "pc": 61605,
+    "register": "r19",
+    "value": "parentNode",
+    "endPC": 61627
+  },
+  {
+    "pc": 64177,
+    "register": "r28",
+    "value": "push",
+    "endPC": 64184
+  },
+  {
+    "pc": 64195,
+    "register": "r28",
+    "value": "codec",
+    "endPC": 64207
+  },
+  {
+    "pc": 64250,
+    "register": "r38",
+    "value": "canPlayType",
+    "endPC": 64277
+  },
+  {
+    "pc": 64210,
+    "register": "r23",
+    "value": "name",
+    "endPC": 64217
+  },
+  {
+    "pc": 64123,
+    "register": "r9",
+    "value": "get",
+    "endPC": 64133
+  },
+  {
+    "pc": 64314,
+    "register": "r10",
+    "value": "match",
+    "endPC": 64326
+  },
+  {
+    "pc": 64106,
+    "register": "r14",
+    "value": "exports",
+    "endPC": 64123
+  },
+  {
+    "pc": 64421,
+    "register": "r12",
+    "value": "RegExp",
+    "endPC": 64433
+  },
+  {
+    "pc": 64484,
+    "register": "r16",
+    "value": "document",
+    "endPC": 64501
+  },
+  {
+    "pc": 64230,
+    "register": "r24",
+    "value": "support",
+    "endPC": 64247
+  },
+  {
+    "pc": 64332,
+    "register": "r10",
+    "value": "^[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7}$",
+    "endPC": 64414
+  },
+  {
+    "pc": 64510,
+    "register": "r24",
+    "value": "mousemove",
+    "endPC": 64532
+  },
+  {
+    "pc": 64563,
+    "register": "r24",
+    "value": "document",
+    "endPC": 64580
+  },
+  {
+    "pc": 64589,
+    "register": "r16",
+    "value": "mousedown",
+    "endPC": 64611
+  },
+  {
+    "pc": 64639,
+    "register": "r16",
+    "value": "document",
+    "endPC": 64656
+  },
+  {
+    "pc": 64665,
+    "register": "r24",
+    "value": "mouseup",
+    "endPC": 64682
+  },
+  {
+    "pc": 64710,
+    "register": "r24",
+    "value": "document",
+    "endPC": 64727
+  },
+  {
+    "pc": 64736,
+    "register": "r16",
+    "value": "touchmove",
+    "endPC": 64758
+  },
+  {
+    "pc": 64786,
+    "register": "r16",
+    "value": "document",
+    "endPC": 64803
+  },
+  {
+    "pc": 64812,
+    "register": "r24",
+    "value": "touchstart",
+    "endPC": 64834
+  },
+  {
+    "pc": 64864,
+    "register": "r24",
+    "value": "document",
+    "endPC": 64881
+  },
+  {
+    "pc": 64936,
+    "register": "r14",
+    "value": "constructor",
+    "endPC": 64963
+  },
+  {
+    "pc": 64969,
+    "register": "r14",
+    "value": "Symbol",
+    "endPC": 64981
+  },
+  {
+    "pc": 65078,
+    "register": "r23",
+    "value": "window",
+    "endPC": 65090
+  },
+  {
+    "pc": 65005,
+    "register": "r13",
+    "value": "exports",
+    "endPC": 65022
+  },
+  {
+    "pc": 65099,
+    "register": "r17",
+    "value": "load",
+    "endPC": 65106
+  },
+  {
+    "pc": 65124,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 65141
+  },
+  {
+    "pc": 65175,
+    "register": "r8",
+    "value": "window",
+    "endPC": 65187
+  },
+  {
+    "pc": 65196,
+    "register": "r13",
+    "value": "matchMedia",
+    "endPC": 65218
+  },
+  {
+    "pc": 65227,
+    "register": "r13",
+    "value": "(prefers-reduced-motion: no-preference)",
+    "endPC": 65324
+  },
+  {
+    "pc": 65332,
+    "register": "r13",
+    "value": "matches",
+    "endPC": 65349
+  },
+  {
+    "pc": 65648,
+    "register": "r18",
+    "value": "document",
+    "endPC": 65665
+  },
+  {
+    "pc": 63976,
+    "register": "r33",
+    "value": "return",
+    "endPC": 63988
+  },
+  {
+    "pc": 65730,
+    "register": "r33",
+    "value": "document",
+    "endPC": 65747
+  },
+  {
+    "pc": 65712,
+    "register": "r14",
+    "value": "div",
+    "endPC": 65719
+  },
+  {
+    "pc": 65674,
+    "register": "r43",
+    "value": "createElement",
+    "endPC": 65706
+  },
+  {
+    "pc": 64890,
+    "register": "r16",
+    "value": "touchend",
+    "endPC": 64907
+  },
+  {
+    "pc": 65756,
+    "register": "r43",
+    "value": "p",
+    "endPC": 65756
+  },
+  {
+    "pc": 65809,
+    "register": "r43",
+    "value": "cloneNode",
+    "endPC": 65831
+  },
+  {
+    "pc": 65771,
+    "register": "r39",
+    "value": "appendChild",
+    "endPC": 65798
+  },
+  {
+    "pc": 64283,
+    "register": "r38",
+    "value": "type",
+    "endPC": 64290
+  },
+  {
+    "pc": 65973,
+    "register": "r30",
+    "value": "charAt",
+    "endPC": 65985
+  },
+  {
+    "pc": 65901,
+    "register": "r38",
+    "value": "divdivdivppadiv",
+    "endPC": 65938
+  },
+  {
+    "pc": 66061,
+    "register": "r38",
+    "value": "Number",
+    "endPC": 66073
+  },
+  {
+    "pc": 66136,
+    "register": "r55",
+    "value": "auto",
+    "endPC": 66143
+  },
+  {
+    "pc": 66166,
+    "register": "r70",
+    "value": "Number",
+    "endPC": 66178
+  },
+  {
+    "pc": 66208,
+    "register": "r55",
+    "value": "Number",
+    "endPC": 66220
+  },
+  {
+    "pc": 66086,
+    "register": "r67",
+    "value": "overscroll-behavior",
+    "endPC": 66133
+  },
+  {
+    "pc": 66233,
+    "register": "r70",
+    "value": "::marker",
+    "endPC": 66250
+  },
+  {
+    "pc": 66272,
+    "register": "r68",
+    "value": "Number",
+    "endPC": 66284
+  },
+  {
+    "pc": 66314,
+    "register": "r70",
+    "value": "Number",
+    "endPC": 66326
+  },
+  {
+    "pc": 66380,
+    "register": "r68",
+    "value": "navigator",
+    "endPC": 66402
+  },
+  {
+    "pc": 66425,
+    "register": "r67",
+    "value": "Number",
+    "endPC": 66437
+  },
+  {
+    "pc": 66467,
+    "register": "r68",
+    "value": "Number",
+    "endPC": 66479
+  },
+  {
+    "pc": 65859,
+    "register": "r43",
+    "value": "insertBefore",
+    "endPC": 65886
+  },
+  {
+    "pc": 63762,
+    "register": "r48",
+    "value": "length",
+    "endPC": 63774
+  },
+  {
+    "pc": 66512,
+    "register": "r48",
+    "value": "Number",
+    "endPC": 66524
+  },
+  {
+    "pc": 66038,
+    "register": "r13",
+    "value": "unshift",
+    "endPC": 66055
+  },
+  {
+    "pc": 66568,
+    "register": "r70",
+    "value": "navigator",
+    "endPC": 66590
+  },
+  {
+    "pc": 66630,
+    "register": "r12",
+    "value": "b",
+    "endPC": 66632
+  },
+  {
+    "pc": 63947,
+    "register": "r27",
+    "value": "length",
+    "endPC": 63959
+  },
+  {
+    "pc": 66698,
+    "register": "r10",
+    "value": "Object",
+    "endPC": 66710
+  },
+  {
+    "pc": 66533,
+    "register": "r13",
+    "value": "serviceWorker",
+    "endPC": 66565
+  },
+  {
+    "pc": 66768,
+    "register": "r27",
+    "value": "JSON",
+    "endPC": 66775
+  },
+  {
+    "pc": 65141,
+    "register": "r23",
+    "value": "get",
+    "endPC": 65151
+  },
+  {
+    "pc": 66784,
+    "register": "r24",
+    "value": "stringify",
+    "endPC": 66806
+  },
+  {
+    "pc": 66834,
+    "register": "r36",
+    "value": "navigator",
+    "endPC": 66856
+  },
+  {
+    "pc": 63721,
+    "register": "r29",
+    "value": "getItem",
+    "endPC": 63738
+  },
+  {
+    "pc": 66961,
+    "register": "r26",
+    "value": "document",
+    "endPC": 66978
+  },
+  {
+    "pc": 66987,
+    "register": "r11",
+    "value": "createElement",
+    "endPC": 67019
+  },
+  {
+    "pc": 67025,
+    "register": "r11",
+    "value": "iframe",
+    "endPC": 67037
+  },
+  {
+    "pc": 67050,
+    "register": "r22",
+    "value": "style",
+    "endPC": 67062
+  },
+  {
+    "pc": 66862,
+    "register": "r25",
+    "value": "userAgentData",
+    "endPC": 66894
+  },
+  {
+    "pc": 67088,
+    "register": "r15",
+    "value": "none",
+    "endPC": 67095
+  },
+  {
+    "pc": 67106,
+    "register": "r15",
+    "value": "document",
+    "endPC": 67123
+  },
+  {
+    "pc": 67068,
+    "register": "r22",
+    "value": "display",
+    "endPC": 67085
+  },
+  {
+    "pc": 67186,
+    "register": "r26",
+    "value": "contentWindow",
+    "endPC": 67218
+  },
+  {
+    "pc": 67148,
+    "register": "r15",
+    "value": "appendChild",
+    "endPC": 67175
+  },
+  {
+    "pc": 67224,
+    "register": "r26",
+    "value": "top",
+    "endPC": 67231
+  },
+  {
+    "pc": 67237,
+    "register": "r26",
+    "value": "window",
+    "endPC": 67249
+  },
+  {
+    "pc": 67265,
+    "register": "r11",
+    "value": "document",
+    "endPC": 67282
+  },
+  {
+    "pc": 67132,
+    "register": "r22",
+    "value": "body",
+    "endPC": 67139
+  },
+  {
+    "pc": 66904,
+    "register": "r19",
+    "value": "webkitCaptureStream",
+    "endPC": 66951
+  },
+  {
+    "pc": 67358,
+    "register": "r63",
+    "value": "cd",
+    "endPC": 67360
+  },
+  {
+    "pc": 67371,
+    "register": "r63",
+    "value": "{\"cd\":[",
+    "endPC": 67388
+  },
+  {
+    "pc": 66638,
+    "register": "r12",
+    "value": "QRu~",
+    "endPC": 66645
+  },
+  {
+    "pc": 66719,
+    "register": "r17",
+    "value": "defineProperty",
+    "endPC": 66751
+  },
+  {
+    "pc": 67431,
+    "register": "r10",
+    "value": ",",
+    "endPC": 67431
+  },
+  {
+    "pc": 67528,
+    "register": "r13",
+    "value": "navigator",
+    "endPC": 67550
+  },
+  {
+    "pc": 67556,
+    "register": "r28",
+    "value": "gpu",
+    "endPC": 67563
+  },
+  {
+    "pc": 67569,
+    "register": "r28",
+    "value": "requestAdapter",
+    "endPC": 67601
+  },
+  {
+    "pc": 67614,
+    "register": "r13",
+    "value": "then",
+    "endPC": 67621
+  },
+  {
+    "pc": 66007,
+    "register": "r21",
+    "value": "unknown",
+    "endPC": 66024
+  },
+  {
+    "pc": 67643,
+    "register": "r13",
+    "value": "catch",
+    "endPC": 67655
+  },
+  {
+    "pc": 67687,
+    "register": "r24",
+    "value": "String",
+    "endPC": 67699
+  },
+  {
+    "pc": 67295,
+    "register": "r11",
+    "value": "removeChild",
+    "endPC": 67322
+  },
+  {
+    "pc": 67708,
+    "register": "r11",
+    "value": "getTimezoneOffset",
+    "endPC": 67750
+  },
+  {
+    "pc": 67886,
+    "register": "r12",
+    "value": "stack",
+    "endPC": 67898
+  },
+  {
+    "pc": 67941,
+    "register": "r10",
+    "value": "RegExp",
+    "endPC": 67953
+  },
+  {
+    "pc": 67927,
+    "register": "r32",
+    "value": "\\n",
+    "endPC": 67929
+  },
+  {
+    "pc": 67975,
+    "register": "r10",
+    "value": "split",
+    "endPC": 67987
+  },
+  {
+    "pc": 68010,
+    "register": "r16",
+    "value": "RegExp",
+    "endPC": 68022
+  },
+  {
+    "pc": 67993,
+    "register": "r10",
+    "value": "\\bat\\b",
+    "endPC": 68005
+  },
+  {
+    "pc": 68041,
+    "register": "r16",
+    "value": "join",
+    "endPC": 68048
+  },
+  {
+    "pc": 68053,
+    "register": "r16",
+    "value": "\n",
+    "endPC": 68053
+  },
+  {
+    "pc": 67904,
+    "register": "r12",
+    "value": "replace",
+    "endPC": 67921
+  },
+  {
+    "pc": 68089,
+    "register": "r23",
+    "value": "RegExp",
+    "endPC": 68101
+  },
+  {
+    "pc": 68069,
+    "register": "r12",
+    "value": "\\?[^:]+",
+    "endPC": 68086
+  },
+  {
+    "pc": 65941,
+    "register": "r39",
+    "value": "outerHTML",
+    "endPC": 65963
+  },
+  {
+    "pc": 68196,
+    "register": "r39",
+    "value": "window",
+    "endPC": 68208
+  },
+  {
+    "pc": 68217,
+    "register": "r24",
+    "value": "TCaptchaIframeClientPos",
+    "endPC": 68274
+  },
+  {
+    "pc": 67934,
+    "register": "r15",
+    "value": "gi",
+    "endPC": 67936
+  },
+  {
+    "pc": 68340,
+    "register": "r20",
+    "value": "document",
+    "endPC": 68357
+  },
+  {
+    "pc": 68308,
+    "register": "r9",
+    "value": "[]",
+    "endPC": 68310
+  },
+  {
+    "pc": 68366,
+    "register": "r9",
+    "value": "createElement",
+    "endPC": 68398
+  },
+  {
+    "pc": 68404,
+    "register": "r9",
+    "value": "div",
+    "endPC": 68411
+  },
+  {
+    "pc": 68466,
+    "register": "r17",
+    "value": "split",
+    "endPC": 68478
+  },
+  {
+    "pc": 68484,
+    "register": "r17",
+    "value": " ",
+    "endPC": 68484
+  },
+  {
+    "pc": 66335,
+    "register": "r55",
+    "value": "requestMIDIAccess",
+    "endPC": 66377
+  },
+  {
+    "pc": 68611,
+    "register": "r16",
+    "value": "window",
+    "endPC": 68623
+  },
+  {
+    "pc": 68632,
+    "register": "r8",
+    "value": "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+    "endPC": 68714
+  },
+  {
+    "pc": 68783,
+    "register": "r28",
+    "value": "slice",
+    "endPC": 68795
+  },
+  {
+    "pc": 68526,
+    "register": "r9",
+    "value": "exports",
+    "endPC": 68543
+  },
+  {
+    "pc": 68984,
+    "register": "r9",
+    "value": "length",
+    "endPC": 68996
+  },
+  {
+    "pc": 69034,
+    "register": "r40",
+    "value": "getCookie",
+    "endPC": 69056
+  },
+  {
+    "pc": 68543,
+    "register": "r17",
+    "value": "get",
+    "endPC": 68553
+  },
+  {
+    "pc": 69177,
+    "register": "r8",
+    "value": "undefined",
+    "endPC": 69199
+  },
+  {
+    "pc": 69220,
+    "register": "r12",
+    "value": "window",
+    "endPC": 69232
+  },
+  {
+    "pc": 69295,
+    "register": "r12",
+    "value": "toUpperCase",
+    "endPC": 69322
+  },
+  {
+    "pc": 69151,
+    "register": "r14",
+    "value": "get",
+    "endPC": 69161
+  },
+  {
+    "pc": 69341,
+    "register": "r10",
+    "value": "exports",
+    "endPC": 69358
+  },
+  {
+    "pc": 69241,
+    "register": "r13",
+    "value": "TCaptchaReferrer",
+    "endPC": 69278
+  },
+  {
+    "pc": 69436,
+    "register": "r13",
+    "value": "stun:stun1.l.google.com:19302?transport=udp",
+    "endPC": 69543
+  },
+  {
+    "pc": 69543,
+    "register": "r13",
+    "value": "stun:stun2.l.google.com:19302?transport=udp",
+    "endPC": 69655
+  },
+  {
+    "pc": 69655,
+    "register": "r13",
+    "value": "stun:stun3.l.google.com:19302?transport=udp",
+    "endPC": 69767
+  },
+  {
+    "pc": 69389,
+    "register": "r31",
+    "value": "iceServers",
+    "endPC": 69411
+  },
+  {
+    "pc": 69920,
+    "register": "r32",
+    "value": "createOffer",
+    "endPC": 69947
+  },
+  {
+    "pc": 69957,
+    "register": "r31",
+    "value": "then",
+    "endPC": 69964
+  },
+  {
+    "pc": 48613,
+    "register": "r52",
+    "value": " ",
+    "endPC": 48613
+  },
+  {
+    "pc": 58935,
+    "register": "r42",
+    "value": "=",
+    "endPC": 58935
+  },
+  {
+    "pc": 68426,
+    "register": "r22",
+    "value": "Webkit O Moz Ms",
+    "endPC": 68463
+  },
+  {
+    "pc": 68928,
+    "register": "r33",
+    "value": "return",
+    "endPC": 68950
+  },
+  {
+    "pc": 69062,
+    "register": "r40",
+    "value": "TDC_itoken",
+    "endPC": 69084
+  },
+  {
+    "pc": 69134,
+    "register": "r16",
+    "value": "exports",
+    "endPC": 69151
+  },
+  {
+    "pc": 69421,
+    "register": "r18",
+    "value": "urls",
+    "endPC": 69428
+  },
+  {
+    "pc": 69767,
+    "register": "r13",
+    "value": "stun:stun4.l.google.com:19302?transport=udp",
+    "endPC": 69879
+  },
+  {
+    "pc": 70005,
+    "register": "r19",
+    "value": "top",
+    "endPC": 70012
+  }
+]

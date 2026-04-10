@@ -1,0 +1,498 @@
+{
+  "totalCollectors": 59,
+  "cdString": "{\"cd\":[1,\"linux\",2,800,\"Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei\",\"\",[\"en-US\"],\"\",8,[1920,1080],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],1,20,991783254,1775062183,0.8410000801086426,{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":11888.616780045351},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==\",{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},\"http://127.0.0.1:46577/?rand=1519713624347\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,20,\"+08\",0,\"srgb\",[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],0,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",\"UTF-8\",\"0;0\",{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},null,\"Google Inc. (Google)\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},\"98k\",\"unknown\",\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",\"top\",{\"_state\":-2},\"\",600,0,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"800-600-600-24-*-*-|-*\",\"Linux x86_64\",24,\"\",0,1775062186,1775062183,679647370,\"\",0,1023,\"\"]}",
+  "cdArray": [
+    1,
+    "linux",
+    2,
+    800,
+    "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
+    "",
+    [
+      "en-US"
+    ],
+    "",
+    8,
+    [
+      1920,
+      1080
+    ],
+    1,
+    0,
+    [
+      {
+        "codec": "H.264",
+        "support": "probably"
+      },
+      {
+        "codec": "H.264 High",
+        "support": "probably"
+      },
+      {
+        "codec": "H.265/HEVC",
+        "support": ""
+      },
+      {
+        "codec": "VP8",
+        "support": "probably"
+      },
+      {
+        "codec": "VP9",
+        "support": "probably"
+      },
+      {
+        "codec": "AV1",
+        "support": "probably"
+      },
+      {
+        "codec": "Theora",
+        "support": ""
+      },
+      {
+        "codec": "MPEG-4",
+        "support": ""
+      }
+    ],
+    1,
+    20,
+    991783254,
+    1775062183,
+    0.8410000801086426,
+    {
+      "nt_vc_output": {
+        "ac-baseLatency": 0.011609977324263039,
+        "ac-outputLatency": 0,
+        "ac-sampleRate": 44100,
+        "ac-maxChannelCount": 2,
+        "ac-numberOfInputs": 1,
+        "ac-numberOfOutputs": 0,
+        "ac-channelCount": 2,
+        "ac-channelCountMode": "explicit",
+        "ac-channelInterpretation": "speakers",
+        "an-fftSize": 2048,
+        "an-frequencyBinCount": 1024,
+        "an-minDecibels": -100,
+        "an-maxDecibels": -30,
+        "an-smoothingTimeConstant": 0.8,
+        "an-numberOfInputs": 1,
+        "an-numberOfOutputs": 1,
+        "an-channelCount": 2,
+        "an-channelCountMode": "max",
+        "an-channelInterpretation": "speakers"
+      },
+      "pxi_output": 11888.616780045351
+    },
+    [
+      {
+        "type": "application/pdf",
+        "suffixes": "pdf"
+      },
+      {
+        "type": "text/pdf",
+        "suffixes": "pdf"
+      }
+    ],
+    "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
+    {
+      "_state": 0,
+      "quota": 10737418240,
+      "usage": null,
+      "usageDetails": {}
+    },
+    "http://127.0.0.1:46577/?rand=1519713624347",
+    [
+      {
+        "name": "PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Chrome PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Chromium PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Microsoft Edge PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "WebKit built-in PDF",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      }
+    ],
+    0,
+    20,
+    "+08",
+    0,
+    "srgb",
+    [
+      {
+        "codec": "AAC",
+        "support": "probably"
+      },
+      {
+        "codec": "MP3",
+        "support": "probably"
+      },
+      {
+        "codec": "Ogg Vorbis",
+        "support": "probably"
+      },
+      {
+        "codec": "Ogg Opus",
+        "support": "probably"
+      },
+      {
+        "codec": "WAV",
+        "support": "probably"
+      },
+      {
+        "codec": "FLAC",
+        "support": "probably"
+      },
+      {
+        "codec": "WebM Vorbis",
+        "support": "probably"
+      },
+      {
+        "codec": "WebM Opus",
+        "support": "probably"
+      },
+      {
+        "codec": "M4A",
+        "support": "maybe"
+      }
+    ],
+    0,
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36",
+    "UTF-8",
+    "0;0",
+    {
+      "timeZone": "Asia/Shanghai",
+      "calendar": "gregory",
+      "numberingSystem": "latn",
+      "locale": "en-US"
+    },
+    null,
+    "Google Inc. (Google)",
+    {
+      "_state": 0,
+      "architecture": "x86",
+      "bitness": "64",
+      "brands": [
+        {
+          "brand": "Not-A.Brand",
+          "version": "24"
+        },
+        {
+          "brand": "Chromium",
+          "version": "146"
+        }
+      ],
+      "fullVersionList": [
+        {
+          "brand": "Not-A.Brand",
+          "version": "24.0.0.0"
+        },
+        {
+          "brand": "Chromium",
+          "version": "146.0.7680.153"
+        }
+      ],
+      "mobile": false,
+      "model": "",
+      "platform": "Linux",
+      "platformVersion": "",
+      "uaFullVersion": "146.0.7680.153",
+      "wow64": false
+    },
+    "98k",
+    "unknown",
+    "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "top",
+    {
+      "_state": -2
+    },
+    "",
+    600,
+    0,
+    {
+      "brands": [
+        {
+          "brand": "Not-A.Brand",
+          "version": "24"
+        },
+        {
+          "brand": "Chromium",
+          "version": "146"
+        }
+      ],
+      "mobile": false,
+      "platform": "Linux"
+    },
+    "800-600-600-24-*-*-|-*",
+    "Linux x86_64",
+    24,
+    "",
+    0,
+    1775062186,
+    1775062183,
+    679647370,
+    "",
+    0,
+    1023,
+    ""
+  ],
+  "collectorTypes": {
+    "0": {
+      "type": "number",
+      "sampleValue": "1"
+    },
+    "1": {
+      "type": "string",
+      "sampleValue": "linux"
+    },
+    "2": {
+      "type": "number",
+      "sampleValue": "2"
+    },
+    "3": {
+      "type": "number",
+      "sampleValue": "800"
+    },
+    "4": {
+      "type": "string",
+      "sampleValue": "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei"
+    },
+    "5": {
+      "type": "string",
+      "sampleValue": ""
+    },
+    "6": {
+      "type": "array",
+      "sampleValue": "[\"en-US\"]"
+    },
+    "7": {
+      "type": "string",
+      "sampleValue": ""
+    },
+    "8": {
+      "type": "number",
+      "sampleValue": "8"
+    },
+    "9": {
+      "type": "array",
+      "sampleValue": "[1920,1080]"
+    },
+    "10": {
+      "type": "number",
+      "sampleValue": "1"
+    },
+    "11": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "12": {
+      "type": "array",
+      "sampleValue": "[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/"
+    },
+    "13": {
+      "type": "number",
+      "sampleValue": "1"
+    },
+    "14": {
+      "type": "number",
+      "sampleValue": "20"
+    },
+    "15": {
+      "type": "number",
+      "sampleValue": "991783254"
+    },
+    "16": {
+      "type": "number",
+      "sampleValue": "1775062183"
+    },
+    "17": {
+      "type": "number",
+      "sampleValue": "0.8410000801086426"
+    },
+    "18": {
+      "type": "object",
+      "sampleValue": "{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"a"
+    },
+    "19": {
+      "type": "array",
+      "sampleValue": "[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}]"
+    },
+    "20": {
+      "type": "string",
+      "sampleValue": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg=="
+    },
+    "21": {
+      "type": "object",
+      "sampleValue": "{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}}"
+    },
+    "22": {
+      "type": "string",
+      "sampleValue": "http://127.0.0.1:46577/?rand=1519713624347"
+    },
+    "23": {
+      "type": "array",
+      "sampleValue": "[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"n"
+    },
+    "24": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "25": {
+      "type": "number",
+      "sampleValue": "20"
+    },
+    "26": {
+      "type": "string",
+      "sampleValue": "+08"
+    },
+    "27": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "28": {
+      "type": "string",
+      "sampleValue": "srgb"
+    },
+    "29": {
+      "type": "array",
+      "sampleValue": "[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"su"
+    },
+    "30": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "31": {
+      "type": "string",
+      "sampleValue": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safa..."
+    },
+    "32": {
+      "type": "string",
+      "sampleValue": "UTF-8"
+    },
+    "33": {
+      "type": "string",
+      "sampleValue": "0;0"
+    },
+    "34": {
+      "type": "object",
+      "sampleValue": "{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"}"
+    },
+    "35": {
+      "type": "null",
+      "sampleValue": "null"
+    },
+    "36": {
+      "type": "string",
+      "sampleValue": "Google Inc. (Google)"
+    },
+    "37": {
+      "type": "object",
+      "sampleValue": "{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"b"
+    },
+    "38": {
+      "type": "string",
+      "sampleValue": "98k"
+    },
+    "39": {
+      "type": "string",
+      "sampleValue": "unknown"
+    },
+    "40": {
+      "type": "string",
+      "sampleValue": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+    },
+    "41": {
+      "type": "string",
+      "sampleValue": "top"
+    },
+    "42": {
+      "type": "object",
+      "sampleValue": "{\"_state\":-2}"
+    },
+    "43": {
+      "type": "string",
+      "sampleValue": ""
+    },
+    "44": {
+      "type": "number",
+      "sampleValue": "600"
+    },
+    "45": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "46": {
+      "type": "object",
+      "sampleValue": "{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":fal"
+    },
+    "47": {
+      "type": "string",
+      "sampleValue": "800-600-600-24-*-*-|-*"
+    },
+    "48": {
+      "type": "string",
+      "sampleValue": "Linux x86_64"
+    },
+    "49": {
+      "type": "number",
+      "sampleValue": "24"
+    },
+    "50": {
+      "type": "string",
+      "sampleValue": ""
+    },
+    "51": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "52": {
+      "type": "number",
+      "sampleValue": "1775062186"
+    },
+    "53": {
+      "type": "number",
+      "sampleValue": "1775062183"
+    },
+    "54": {
+      "type": "number",
+      "sampleValue": "679647370"
+    },
+    "55": {
+      "type": "string",
+      "sampleValue": ""
+    },
+    "56": {
+      "type": "number",
+      "sampleValue": "0"
+    },
+    "57": {
+      "type": "number",
+      "sampleValue": "1023"
+    },
+    "58": {
+      "type": "string",
+      "sampleValue": ""
+    }
+  },
+  "sdObject": {
+    "od": "C",
+    "appid": "2090803262",
+    "nonce": "0.12345678",
+    "token": "test_token_123"
+  },
+  "reconstructionMethod": "fragment-join"
+}

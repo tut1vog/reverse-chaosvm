@@ -1,0 +1,52 @@
+=== Output Polish Summary ===
+
+--- Closure Resolution ---
+Total closure references:     291
+Resolved (valid functions):   269
+Resolved (invalid/artifact):  20
+Replaced with unresolved:     2
+Remaining closure(offset=):   0
+
+--- VM Register Renaming ---
+r0 → __global:    367 occurrences renamed (0 remaining)
+r2 → __captures:  217 occurrences renamed (0 remaining)
+r4 → __args:      282 occurrences renamed (0 remaining)
+r5 → __this:      76 occurrences renamed (0 remaining)
+Q  → __this_ctx:  391 occurrences renamed (0 remaining)
+
+--- Dead Store Elimination ---
+Dead string stores removed:   193
+
+--- String Variable Inlining ---
+Total variables inlined:      851
+Fixpoint iterations:          2
+Per-iteration counts:         822, 29
+
+--- Simple Variable Inlining ---
+Total variables inlined:      1208
+Fixpoint iterations:          3
+Per-iteration counts:         1144, 57, 7
+
+--- Overall ---
+Original lines:  9345
+Polished lines:  7093
+Line delta:      -2252
+acorn parse:     PASS
+Func parse:      270/270
+Remaining r0[:   0
+Remaining r2[:   0
+Remaining r4[:   0
+Remaining r5:    0
+
+--- Keyword Counts ---
+  function    273
+  var         3317
+  if          334
+  else        229
+  while       29
+  try         144
+  catch       148
+  return      434
+  throw       81
+  typeof      26
+  new         14

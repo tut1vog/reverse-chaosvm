@@ -1,0 +1,8844 @@
+{
+  "totalFunctions": 270,
+  "categoryCounts": {
+    "fingerprint": 44,
+    "crypto": 0,
+    "dom": 15,
+    "network": 0,
+    "utility": 40,
+    "data-collection": 100,
+    "string-ops": 12,
+    "math": 1,
+    "control-flow": 55,
+    "module-system": 3,
+    "unknown": 0
+  },
+  "nonUnknownCount": 270,
+  "collectorCount": 80,
+  "functions": [
+    {
+      "id": 1,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "?",
+        "substring"
+      ],
+      "methodCalls": [
+        "indexOf",
+        "substring"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_1",
+      "startLine": 4,
+      "endLine": 17,
+      "lineCount": 14,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        16
+      ]
+    },
+    {
+      "id": 2,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        72
+      ],
+      "matchedRules": [],
+      "name": "func_2",
+      "startLine": 19,
+      "endLine": 30,
+      "lineCount": 12,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 3,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "indexOf"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_3",
+      "startLine": 32,
+      "endLine": 38,
+      "lineCount": 7,
+      "arity": 1,
+      "capturedVars": [
+        "r17"
+      ],
+      "capturedBy": [
+        145
+      ]
+    },
+    {
+      "id": 4,
+      "category": "fingerprint",
+      "subcategory": "canvas",
+      "description": "Canvas fingerprinting — draws text on canvas, extracts toDataURL hash",
+      "confidence": 0.95,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "document",
+        "canvas",
+        "2d",
+        "ClientJS,org <canvas> 1.0",
+        "textBaseline",
+        "top",
+        "font",
+        "14px 'Arial'",
+        "alphabetic",
+        "fillStyle",
+        "#f60",
+        "fillRect",
+        "#069",
+        "fillText",
+        "rgba(102, 204, 0, 0.7)",
+        "replace",
+        "[\\\\u0000-\\\\u0020]+",
+        "g",
+        "",
+        "length"
+      ],
+      "methodCalls": [
+        "createElement",
+        "getContext",
+        "fillRect",
+        "fillText",
+        "call",
+        "toDataURL",
+        "RegExp",
+        "floor",
+        "slice",
+        "replace",
+        "substr"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "canvas",
+        "manipulation",
+        "computation",
+        "regex"
+      ],
+      "name": "func_4",
+      "startLine": 40,
+      "endLine": 109,
+      "lineCount": 70,
+      "arity": 0,
+      "capturedVars": [
+        "r14"
+      ],
+      "capturedBy": [
+        167
+      ]
+    },
+    {
+      "id": 5,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [
+        "OCY_Fhf"
+      ],
+      "stringRefs": [
+        "OCY_Fhf",
+        "window",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "OCY_Fhf"
+      ],
+      "funcRefs": [
+        219
+      ],
+      "matchedRules": [],
+      "name": "func_5",
+      "startLine": 111,
+      "endLine": 147,
+      "lineCount": 37,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 6,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        179
+      ],
+      "matchedRules": [],
+      "name": "func_6",
+      "startLine": 149,
+      "endLine": 158,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 7,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        84
+      ],
+      "matchedRules": [],
+      "name": "func_7",
+      "startLine": 160,
+      "endLine": 169,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 8,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "",
+        "document",
+        "createElement",
+        "div",
+        "p",
+        "span",
+        "appendChild",
+        "insertBefore",
+        "className",
+        "cll1",
+        "class",
+        "sss",
+        "divdivdivppdiv",
+        "innerHTML",
+        "replace",
+        "<|>|\\\\/|\\\\s|\\\"|'",
+        "g",
+        "d",
+        "i",
+        "v"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "cloneNode",
+        "insertBefore",
+        "setAttribute",
+        "RegExp",
+        "call",
+        "toLowerCase",
+        "join",
+        "innerHTML",
+        "replace"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation",
+        "regex"
+      ],
+      "name": "func_8",
+      "startLine": 171,
+      "endLine": 236,
+      "lineCount": 66,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        123
+      ]
+    },
+    {
+      "id": 10,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        30
+      ],
+      "matchedRules": [],
+      "name": "func_10",
+      "startLine": 238,
+      "endLine": 247,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 11,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "Child of DOM manipulation",
+      "confidence": 0.75,
+      "apiCalls": [],
+      "stringRefs": [
+        "some"
+      ],
+      "methodCalls": [
+        "call",
+        "push",
+        "some"
+      ],
+      "funcRefs": [
+        161
+      ],
+      "matchedRules": [],
+      "name": "func_11",
+      "startLine": 249,
+      "endLine": 266,
+      "lineCount": 18,
+      "arity": 1,
+      "capturedVars": [
+        "r36",
+        "r15",
+        "r14",
+        "r18",
+        "r21"
+      ],
+      "capturedBy": [
+        49
+      ]
+    },
+    {
+      "id": 12,
+      "category": "fingerprint",
+      "subcategory": "font",
+      "description": "Font fingerprinting — detects installed fonts via element measurement",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "createElement",
+        "div",
+        "body",
+        "appendChild",
+        "innerHTML",
+        "<p class=\\\"firstp\\\">firstp</p>\\n        <p id=\\\"secondp\\\">secondp</p>\\n        <p class=\\\"thirdp\\\">thirdp</p>\\n        <h2>\\n          <span class=\\\"foo\\\">foo</span>\\n          <span class=\\\"bar\\\" id=\\\"bar\\\">bar</span>\\n        </h2>",
+        "style",
+        "body :not(.firstp, .thirdp) {\\n        color: blue;\\n      }\\n      h2 :not(span.foo) {\\n        color: red;\\n      }",
+        "head",
+        "rgb(0, 0, 255)",
+        "getComputedStyle",
+        "secondp",
+        "color",
+        "rgb(255, 0, 0)",
+        "bar",
+        "removeChild",
+        "remove"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "getElementById",
+        "call",
+        "getPropertyValue",
+        "removeChild",
+        "remove",
+        "body",
+        "head"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "font",
+        "manipulation"
+      ],
+      "name": "func_12",
+      "startLine": 268,
+      "endLine": 329,
+      "lineCount": 62,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        225
+      ]
+    },
+    {
+      "id": 13,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        120
+      ],
+      "matchedRules": [],
+      "name": "func_13",
+      "startLine": 331,
+      "endLine": 337,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 14,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "Child of ES6 polyfill/utility",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "length",
+        " "
+      ],
+      "methodCalls": [
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_14",
+      "startLine": 339,
+      "endLine": 369,
+      "lineCount": 31,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 15,
+      "category": "fingerprint",
+      "subcategory": "webrtc",
+      "description": "WebRTC fingerprinting — local IP detection",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "a=candidate:"
+      ],
+      "methodCalls": [
+        "indexOf"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "webrtc"
+      ],
+      "name": "func_15",
+      "startLine": 371,
+      "endLine": 381,
+      "lineCount": 11,
+      "arity": 1,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        104
+      ]
+    },
+    {
+      "id": 16,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "object",
+        "undefined",
+        "__esModule",
+        "Object",
+        "create",
+        "r",
+        "defineProperty",
+        "default",
+        "enumerable",
+        "value",
+        "string",
+        "d",
+        "bind",
+        "s"
+      ],
+      "methodCalls": [
+        "call",
+        "create",
+        "r",
+        "shift",
+        "bind",
+        "__esModule",
+        "defineProperty",
+        "enumerable",
+        "d",
+        "s"
+      ],
+      "funcRefs": [
+        232,
+        1
+      ],
+      "matchedRules": [
+        "polyfill",
+        "exports"
+      ],
+      "name": "func_16",
+      "startLine": 383,
+      "endLine": 484,
+      "lineCount": 102,
+      "arity": 2,
+      "capturedVars": [
+        "r26",
+        "r8"
+      ],
+      "capturedBy": [
+        164
+      ]
+    },
+    {
+      "id": 17,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "characterSet",
+        "",
+        "charset"
+      ],
+      "methodCalls": [
+        "characterSet",
+        "charset"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_17",
+      "startLine": 486,
+      "endLine": 504,
+      "lineCount": 19,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        257
+      ]
+    },
+    {
+      "id": 18,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "name",
+        "",
+        "e",
+        "id",
+        "document",
+        "body",
+        "appendChild",
+        "removeChild"
+      ],
+      "methodCalls": [
+        "getElementsByTagName",
+        "appendChild",
+        "getElementById",
+        "removeChild",
+        "name",
+        "e",
+        "body"
+      ],
+      "funcRefs": [
+        229
+      ],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_18",
+      "startLine": 506,
+      "endLine": 555,
+      "lineCount": 50,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        26
+      ]
+    },
+    {
+      "id": 19,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.8,
+      "apiCalls": [
+        "Object"
+      ],
+      "stringRefs": [
+        "Array",
+        "Symbol",
+        "iterator",
+        "Object",
+        "TypeError",
+        "Invalid attempt to destructure non-iterable instance"
+      ],
+      "methodCalls": [
+        "isArray",
+        "Object",
+        "call",
+        "iterator"
+      ],
+      "funcRefs": [
+        184
+      ],
+      "matchedRules": [
+        "polyfill"
+      ],
+      "name": "func_19",
+      "startLine": 557,
+      "endLine": 578,
+      "lineCount": 22,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        95
+      ]
+    },
+    {
+      "id": 20,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_20",
+      "startLine": 580,
+      "endLine": 583,
+      "lineCount": 4,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 21,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_21",
+      "startLine": 585,
+      "endLine": 590,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        239
+      ]
+    },
+    {
+      "id": 22,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "exports",
+        "get",
+        "stack"
+      ],
+      "methodCalls": [
+        "call",
+        "stack"
+      ],
+      "funcRefs": [
+        279
+      ],
+      "matchedRules": [],
+      "name": "func_22",
+      "startLine": 592,
+      "endLine": 623,
+      "lineCount": 32,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 23,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        129
+      ],
+      "matchedRules": [],
+      "name": "func_23",
+      "startLine": 625,
+      "endLine": 644,
+      "lineCount": 20,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 24,
+      "category": "fingerprint",
+      "subcategory": "timezone",
+      "description": "Timezone fingerprinting",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "Intl",
+        "timeZone",
+        "calendar",
+        "numberingSystem",
+        "locale",
+        "JSON",
+        ""
+      ],
+      "methodCalls": [
+        "DateTimeFormat",
+        "resolvedOptions",
+        "stringify",
+        "timeZone",
+        "calendar",
+        "numberingSystem",
+        "locale"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "timezone",
+        "json"
+      ],
+      "name": "func_24",
+      "startLine": 646,
+      "endLine": 675,
+      "lineCount": 30,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        175
+      ]
+    },
+    {
+      "id": 25,
+      "category": "data-collection",
+      "subcategory": "tdc-init",
+      "description": "Child of TDC captcha API initialization",
+      "confidence": 0.75,
+      "apiCalls": [],
+      "stringRefs": [
+        "tokenid"
+      ],
+      "methodCalls": [
+        "getGuid"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_25",
+      "startLine": 677,
+      "endLine": 688,
+      "lineCount": 12,
+      "arity": 0,
+      "capturedVars": [
+        "r15",
+        "r39"
+      ],
+      "capturedBy": [
+        53
+      ]
+    },
+    {
+      "id": 26,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        18
+      ],
+      "matchedRules": [],
+      "name": "func_26",
+      "startLine": 690,
+      "endLine": 699,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 27,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "userAgentData",
+        "getHighEntropyValues",
+        "architecture",
+        "bitness",
+        "brands",
+        "mobile",
+        "model",
+        "platform",
+        "platformVersion",
+        "uaFullVersion",
+        "fullVersionList",
+        "wow64",
+        "then",
+        "catch"
+      ],
+      "methodCalls": [
+        "call",
+        "userAgentData",
+        "getHighEntropyValues",
+        "then",
+        "catch"
+      ],
+      "funcRefs": [
+        194,
+        55
+      ],
+      "matchedRules": [
+        "browser"
+      ],
+      "name": "func_27",
+      "startLine": 701,
+      "endLine": 743,
+      "lineCount": 43,
+      "arity": 0,
+      "capturedVars": [
+        "r18",
+        "r8"
+      ],
+      "capturedBy": [
+        117
+      ]
+    },
+    {
+      "id": 28,
+      "category": "fingerprint",
+      "subcategory": "language",
+      "description": "Language preference fingerprinting",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "languages",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "languages"
+      ],
+      "funcRefs": [
+        206
+      ],
+      "matchedRules": [
+        "language"
+      ],
+      "name": "func_28",
+      "startLine": 745,
+      "endLine": 757,
+      "lineCount": 13,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 29,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "TDC-related function",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "undefined",
+        "window",
+        "$",
+        "1",
+        "TCaptchaSid",
+        "string",
+        ";",
+        "0"
+      ],
+      "methodCalls": [
+        "join",
+        "TCaptchaSid"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_29",
+      "startLine": 759,
+      "endLine": 807,
+      "lineCount": 49,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        147
+      ]
+    },
+    {
+      "id": 30,
+      "category": "fingerprint",
+      "subcategory": "css",
+      "description": "CSS media query fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "matchMedia",
+        "(any-pointer: fine)",
+        "matches",
+        ""
+      ],
+      "methodCalls": [
+        "matchMedia",
+        "matches"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "css"
+      ],
+      "name": "func_30",
+      "startLine": 809,
+      "endLine": 834,
+      "lineCount": 26,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        10
+      ]
+    },
+    {
+      "id": 31,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Child of Child of Child of Encoding/utility function",
+      "confidence": 0.3,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_31",
+      "startLine": 836,
+      "endLine": 847,
+      "lineCount": 12,
+      "arity": 3,
+      "capturedVars": [
+        "r18"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 33,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_33",
+      "startLine": 849,
+      "endLine": 853,
+      "lineCount": 5,
+      "arity": 0,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        163
+      ]
+    },
+    {
+      "id": 34,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        162
+      ],
+      "matchedRules": [],
+      "name": "func_34",
+      "startLine": 855,
+      "endLine": 864,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 35,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+        "exports"
+      ],
+      "methodCalls": [
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+        "getTime",
+        "exports"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_35",
+      "startLine": 866,
+      "endLine": 879,
+      "lineCount": 14,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 36,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "function",
+        "Symbol",
+        "symbol",
+        "iterator",
+        "setErrorStack",
+        "cd",
+        "sd",
+        "od",
+        "C",
+        "RegExp",
+        "\\\\+|/|=",
+        "g",
+        "+",
+        "2B",
+        "/",
+        "2F",
+        "=",
+        "3D",
+        "mSet",
+        "mClear"
+      ],
+      "methodCalls": [
+        "call",
+        "iterator",
+        "setErrorStack",
+        "cd",
+        "od"
+      ],
+      "funcRefs": [
+        14,
+        245,
+        160,
+        60,
+        41,
+        252,
+        212,
+        201
+      ],
+      "matchedRules": [
+        "polyfill",
+        "regex"
+      ],
+      "name": "func_36",
+      "startLine": 881,
+      "endLine": 960,
+      "lineCount": 80,
+      "arity": 3,
+      "capturedVars": [
+        "r11"
+      ],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 37,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_37",
+      "startLine": 962,
+      "endLine": 969,
+      "lineCount": 8,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 40,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        261
+      ],
+      "matchedRules": [],
+      "name": "func_40",
+      "startLine": 971,
+      "endLine": 980,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 41,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "Child of ES6 polyfill/utility",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "sd"
+      ],
+      "methodCalls": [
+        "isString",
+        "isObject",
+        "shift",
+        "sd"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_41",
+      "startLine": 982,
+      "endLine": 1011,
+      "lineCount": 30,
+      "arity": 2,
+      "capturedVars": [
+        "r29",
+        "r28"
+      ],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 43,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "'0/:"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_43",
+      "startLine": 1013,
+      "endLine": 1031,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r87"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 44,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Type checking utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "",
+        "stack",
+        "replace",
+        "\\\\n",
+        "gi",
+        "split",
+        "\\\\bat\\\\b",
+        "\\n",
+        "\\\\?[^:]+",
+        "indexOf",
+        "@"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "join",
+        "toString",
+        "indexOf",
+        "stack",
+        "replace",
+        "split"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "type-check",
+        "regex"
+      ],
+      "name": "func_44",
+      "startLine": 1033,
+      "endLine": 1072,
+      "lineCount": 40,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        197
+      ]
+    },
+    {
+      "id": 45,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        138
+      ],
+      "matchedRules": [],
+      "name": "func_45",
+      "startLine": 1074,
+      "endLine": 1086,
+      "lineCount": 13,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 46,
+      "category": "data-collection",
+      "subcategory": "storage",
+      "description": "Cookie/storage data collection",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "cookieEnabled",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "cookieEnabled"
+      ],
+      "funcRefs": [
+        176
+      ],
+      "matchedRules": [
+        "storage"
+      ],
+      "name": "func_46",
+      "startLine": 1088,
+      "endLine": 1100,
+      "lineCount": 13,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 47,
+      "category": "fingerprint",
+      "subcategory": "webrtc",
+      "description": "WebRTC fingerprinting — local IP detection",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "candidate"
+      ],
+      "methodCalls": [
+        "candidate"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "webrtc"
+      ],
+      "name": "func_47",
+      "startLine": 1102,
+      "endLine": 1111,
+      "lineCount": 10,
+      "arity": 1,
+      "capturedVars": [
+        "r9"
+      ],
+      "capturedBy": []
+    },
+    {
+      "id": 48,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_48",
+      "startLine": 1113,
+      "endLine": 1121,
+      "lineCount": 9,
+      "arity": 0,
+      "capturedVars": [
+        "r10"
+      ],
+      "capturedBy": [
+        235
+      ]
+    },
+    {
+      "id": 49,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "undefined",
+        "document",
+        "body",
+        "div",
+        "style",
+        "cssText",
+        "position:absolute",
+        "left:-9999px",
+        "top:-9999px",
+        "width:auto",
+        "height:auto",
+        "visibility:hidden",
+        "white-space:nowrap",
+        ";",
+        "forEach",
+        "parentNode",
+        "appendChild",
+        "documentElement"
+      ],
+      "methodCalls": [
+        "createElement",
+        "join",
+        "appendChild",
+        "call",
+        "removeChild",
+        "body",
+        "style",
+        "forEach",
+        "parentNode",
+        "documentElement"
+      ],
+      "funcRefs": [
+        135,
+        11
+      ],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_49",
+      "startLine": 1123,
+      "endLine": 1205,
+      "lineCount": 83,
+      "arity": 0,
+      "capturedVars": [
+        "r13",
+        "r17",
+        "r11"
+      ],
+      "capturedBy": [
+        58
+      ]
+    },
+    {
+      "id": 50,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        157
+      ],
+      "matchedRules": [],
+      "name": "func_50",
+      "startLine": 1207,
+      "endLine": 1216,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 51,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "setLocalDescription"
+      ],
+      "methodCalls": [
+        "call",
+        "setLocalDescription"
+      ],
+      "funcRefs": [
+        181,
+        134
+      ],
+      "matchedRules": [],
+      "name": "func_51",
+      "startLine": 1218,
+      "endLine": 1223,
+      "lineCount": 6,
+      "arity": 1,
+      "capturedVars": [
+        "r25"
+      ],
+      "capturedBy": []
+    },
+    {
+      "id": 52,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_52",
+      "startLine": 1225,
+      "endLine": 1227,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        66
+      ]
+    },
+    {
+      "id": 53,
+      "category": "data-collection",
+      "subcategory": "tdc-init",
+      "description": "TDC captcha API initialization",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "info",
+        "window",
+        "FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk",
+        "TDC",
+        "getInfo",
+        "setData",
+        "mSet",
+        "clearTc",
+        "mClear",
+        "getData",
+        "mGetData",
+        "mInit"
+      ],
+      "methodCalls": [
+        "call",
+        "mInit",
+        "FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk",
+        "mSet",
+        "mClear",
+        "mGetData"
+      ],
+      "funcRefs": [
+        25,
+        119
+      ],
+      "matchedRules": [],
+      "name": "func_53",
+      "startLine": 1229,
+      "endLine": 1278,
+      "lineCount": 50,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 54,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "string",
+        "",
+        "replace",
+        "[^\\\\u0020-\\\\u007E]|[\\\"\\\\\\\\]",
+        "g"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "replace"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_54",
+      "startLine": 1280,
+      "endLine": 1289,
+      "lineCount": 10,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        209
+      ]
+    },
+    {
+      "id": 55,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_55",
+      "startLine": 1291,
+      "endLine": 1295,
+      "lineCount": 5,
+      "arity": 0,
+      "capturedVars": [
+        "r9",
+        "r11"
+      ],
+      "capturedBy": [
+        27
+      ]
+    },
+    {
+      "id": 56,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "__esModule",
+        "a"
+      ],
+      "methodCalls": [
+        "d",
+        "__esModule"
+      ],
+      "funcRefs": [
+        112,
+        281,
+        150
+      ],
+      "matchedRules": [
+        "polyfill",
+        "exports"
+      ],
+      "name": "func_56",
+      "startLine": 1297,
+      "endLine": 1323,
+      "lineCount": 27,
+      "arity": 1,
+      "capturedVars": [
+        "r26"
+      ],
+      "capturedBy": [
+        164
+      ]
+    },
+    {
+      "id": 57,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        216,
+        89
+      ],
+      "matchedRules": [],
+      "name": "func_57",
+      "startLine": 1325,
+      "endLine": 1339,
+      "lineCount": 15,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 58,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [
+        ","
+      ],
+      "methodCalls": [
+        "call",
+        "join"
+      ],
+      "funcRefs": [
+        49
+      ],
+      "matchedRules": [],
+      "name": "func_58",
+      "startLine": 1341,
+      "endLine": 1351,
+      "lineCount": 11,
+      "arity": 0,
+      "capturedVars": [
+        "r16",
+        "r20",
+        "r8"
+      ],
+      "capturedBy": [
+        264
+      ]
+    },
+    {
+      "id": 59,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_59",
+      "startLine": 1353,
+      "endLine": 1356,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [
+        "r22"
+      ],
+      "capturedBy": [
+        268
+      ]
+    },
+    {
+      "id": 60,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "Child of ES6 polyfill/utility",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "undefined"
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_60",
+      "startLine": 1358,
+      "endLine": 1368,
+      "lineCount": 11,
+      "arity": 1,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 61,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "TDC-related function",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "now",
+        "TCaptchaIframeClientPos"
+      ],
+      "methodCalls": [
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "TCaptchaIframeClientPos"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_61",
+      "startLine": 1370,
+      "endLine": 1424,
+      "lineCount": 55,
+      "arity": 0,
+      "capturedVars": [
+        "r30",
+        "r13",
+        "r48",
+        "r15",
+        "r37",
+        "r49",
+        "r50",
+        "r42"
+      ],
+      "capturedBy": [
+        94
+      ]
+    },
+    {
+      "id": 62,
+      "category": "fingerprint",
+      "subcategory": "font",
+      "description": "Font fingerprinting — detects installed fonts via element measurement",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "createElement",
+        "div",
+        "body",
+        "appendChild",
+        "innerHTML",
+        "<section><h3 id='firsth'>green</h3><p id='firstp'>red</p>green</section><section class='with-revert'><h3 id='secondh'>black</h3><p id='secondp'>red</p>black</section>",
+        "style",
+        "section { color: green } p { color: red } section.with-revert { color: revert }",
+        "head",
+        "rgb(0, 128, 0)",
+        "getComputedStyle",
+        "firsth",
+        "color",
+        "rgb(255, 0, 0)",
+        "firstp",
+        "rgb(0, 0, 0)",
+        "secondh",
+        "secondp",
+        "removeChild"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "getElementById",
+        "call",
+        "getPropertyValue",
+        "removeChild",
+        "remove",
+        "body",
+        "head"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "font",
+        "manipulation"
+      ],
+      "name": "func_62",
+      "startLine": 1426,
+      "endLine": 1513,
+      "lineCount": 88,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        225
+      ]
+    },
+    {
+      "id": 63,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "appVersion",
+        "",
+        "window",
+        "callPhantom",
+        "_phantom",
+        "RegExp",
+        "phantomjs",
+        "i",
+        "test",
+        "userAgent",
+        "WebPage",
+        "python",
+        "document",
+        "$cdc_asdjflasutopfhvcZLmcfl_",
+        "__webdriver_script_fn",
+        "fxdriver_id",
+        "__fxdriver_unwrapped",
+        "domAutomation",
+        "ubot"
+      ],
+      "methodCalls": [
+        "get",
+        "test",
+        "call",
+        "appVersion",
+        "callPhantom",
+        "_phantom",
+        "userAgent",
+        "WebPage",
+        "__webdriver_script_fn",
+        "fxdriver_id",
+        "__fxdriver_unwrapped",
+        "domAutomation",
+        "ubot",
+        "vendor",
+        "appName",
+        "CasperError",
+        "casper",
+        "patchRequire",
+        "webdriver",
+        "href"
+      ],
+      "funcRefs": [
+        236
+      ],
+      "matchedRules": [
+        "browser",
+        "regex"
+      ],
+      "name": "func_63",
+      "startLine": 1515,
+      "endLine": 1625,
+      "lineCount": 111,
+      "arity": 0,
+      "capturedVars": [
+        "r10",
+        "r21",
+        "r18",
+        "r14",
+        "r9",
+        "r15",
+        "r22"
+      ],
+      "capturedBy": [
+        279
+      ]
+    },
+    {
+      "id": 64,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        243
+      ],
+      "matchedRules": [],
+      "name": "func_64",
+      "startLine": 1627,
+      "endLine": 1636,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 65,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_65",
+      "startLine": 1638,
+      "endLine": 1644,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r17"
+      ],
+      "capturedBy": [
+        190
+      ]
+    },
+    {
+      "id": 66,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        52
+      ],
+      "matchedRules": [],
+      "name": "func_66",
+      "startLine": 1646,
+      "endLine": 1652,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 67,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "video",
+        "name",
+        "H.264",
+        "type",
+        "video/mp4; codecs=\\\"avc1.42E01E\\\"",
+        "H.264 High",
+        "video/mp4; codecs=\\\"avc1.64001F\\\"",
+        "H.265/HEVC",
+        "video/mp4; codecs=\\\"hev1.1.6.L93.B0\\\"",
+        "VP8",
+        "video/webm; codecs=\\\"vp8\\\"",
+        "VP9",
+        "video/webm; codecs=\\\"vp9\\\"",
+        "AV1",
+        "video/webm; codecs=\\\"av01.0.08M.08\\\"",
+        "Theora",
+        "video/ogg; codecs=\\\"theora\\\"",
+        "MPEG-4",
+        "video/mp4; codecs=\\\"mp4v.20.8\\\""
+      ],
+      "methodCalls": [
+        "createElement",
+        "call",
+        "stringify",
+        "name",
+        "type",
+        "length",
+        "push",
+        "canPlayType"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation",
+        "json"
+      ],
+      "name": "func_67",
+      "startLine": 1654,
+      "endLine": 1731,
+      "lineCount": 78,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        149
+      ]
+    },
+    {
+      "id": 68,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "storage",
+        "estimate",
+        "then",
+        "catch"
+      ],
+      "methodCalls": [
+        "estimate",
+        "call",
+        "storage",
+        "then",
+        "catch"
+      ],
+      "funcRefs": [
+        246,
+        180
+      ],
+      "matchedRules": [],
+      "name": "func_68",
+      "startLine": 1733,
+      "endLine": 1755,
+      "lineCount": 23,
+      "arity": 0,
+      "capturedVars": [
+        "r15",
+        "r8"
+      ],
+      "capturedBy": [
+        266
+      ]
+    },
+    {
+      "id": 69,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "B0JC"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_69",
+      "startLine": 1757,
+      "endLine": 1775,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r18"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 70,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "string",
+        "",
+        "replace",
+        "[^\\\\u0020-\\\\u007E]|[\\\"\\\\\\\\]",
+        "g"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "replace"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_70",
+      "startLine": 1777,
+      "endLine": 1786,
+      "lineCount": 10,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        261
+      ]
+    },
+    {
+      "id": 71,
+      "category": "fingerprint",
+      "subcategory": "media",
+      "description": "Media stream capability detection",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "div",
+        "body",
+        "appendChild",
+        "innerHTML",
+        "<div class=\\\"left\\\">\\n        <div id=\\\"startButton\\\" class=\\\"button\\\">\\n          Start\\n        </div>\\n        <h2>Preview</h2>\\n        <video id=\\\"preview\\\" width=\\\"160\\\" height=\\\"120\\\" autoplay muted></video>\\n      </div>",
+        "preview",
+        "captureStream",
+        "webkitCaptureStream",
+        "removeChild",
+        "msCaptureStream",
+        "mozCaptureStream"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "getElementById",
+        "call",
+        "body",
+        "captureStream",
+        "webkitCaptureStream",
+        "removeChild",
+        "msCaptureStream",
+        "mozCaptureStream"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "media",
+        "manipulation"
+      ],
+      "name": "func_71",
+      "startLine": 1788,
+      "endLine": 1831,
+      "lineCount": 44,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        225
+      ]
+    },
+    {
+      "id": 72,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "",
+        "\\\\bsid=(\\\\d+)",
+        "exec"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "exec"
+      ],
+      "funcRefs": [
+        200
+      ],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_72",
+      "startLine": 1833,
+      "endLine": 1860,
+      "lineCount": 28,
+      "arity": 0,
+      "capturedVars": [
+        "r15"
+      ],
+      "capturedBy": [
+        2
+      ]
+    },
+    {
+      "id": 73,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_73",
+      "startLine": 1862,
+      "endLine": 1868,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r12"
+      ],
+      "capturedBy": [
+        124
+      ]
+    },
+    {
+      "id": 74,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Safe wrapper (try/catch)",
+      "confidence": 0.5,
+      "apiCalls": [],
+      "stringRefs": [
+        "QRu~"
+      ],
+      "methodCalls": [
+        "d"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_74",
+      "startLine": 1870,
+      "endLine": 1882,
+      "lineCount": 13,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 75,
+      "category": "data-collection",
+      "subcategory": "exports",
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_75",
+      "startLine": 1884,
+      "endLine": 1893,
+      "lineCount": 10,
+      "arity": 0,
+      "capturedVars": [
+        "r21",
+        "r25"
+      ],
+      "capturedBy": [
+        83
+      ]
+    },
+    {
+      "id": 76,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        282
+      ],
+      "matchedRules": [],
+      "name": "func_76",
+      "startLine": 1895,
+      "endLine": 1904,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 77,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        218
+      ],
+      "matchedRules": [],
+      "name": "func_77",
+      "startLine": 1906,
+      "endLine": 1915,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 78,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        ""
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_78",
+      "startLine": 1917,
+      "endLine": 1922,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        98
+      ]
+    },
+    {
+      "id": 79,
+      "category": "fingerprint",
+      "subcategory": "hardware",
+      "description": "Hardware capability fingerprinting (CPU/memory)",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "deviceMemory",
+        ""
+      ],
+      "methodCalls": [
+        "deviceMemory"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "hardware"
+      ],
+      "name": "func_79",
+      "startLine": 1924,
+      "endLine": 1943,
+      "lineCount": 20,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        122
+      ]
+    },
+    {
+      "id": 80,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        278
+      ],
+      "matchedRules": [],
+      "name": "func_80",
+      "startLine": 1945,
+      "endLine": 1957,
+      "lineCount": 13,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 81,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_81",
+      "startLine": 1959,
+      "endLine": 1962,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [
+        "r22"
+      ],
+      "capturedBy": [
+        268
+      ]
+    },
+    {
+      "id": 82,
+      "category": "fingerprint",
+      "subcategory": "timezone",
+      "description": "Timezone fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+        "_ZHSgZVHWDjhEmdXcRcbPbBEVhgAmaF",
+        "String",
+        "-",
+        "0",
+        "+",
+        ""
+      ],
+      "methodCalls": [
+        "_ZHSgZVHWDjhEmdXcRcbPbBEVhgAmaF",
+        "getTimezoneOffset",
+        "call",
+        "slice",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "timezone"
+      ],
+      "name": "func_82",
+      "startLine": 1964,
+      "endLine": 2003,
+      "lineCount": 40,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        278
+      ]
+    },
+    {
+      "id": 83,
+      "category": "data-collection",
+      "subcategory": "exports",
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "console",
+        "log",
+        "Object",
+        "defineProperty",
+        "get",
+        "exports"
+      ],
+      "methodCalls": [
+        "call",
+        "log",
+        "defineProperty"
+      ],
+      "funcRefs": [
+        75,
+        203
+      ],
+      "matchedRules": [
+        "exports"
+      ],
+      "name": "func_83",
+      "startLine": 2005,
+      "endLine": 2043,
+      "lineCount": 39,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 84,
+      "category": "fingerprint",
+      "subcategory": "screen",
+      "description": "Screen fingerprinting — reads screen dimensions/pixel ratio",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "screen",
+        "colorDepth"
+      ],
+      "methodCalls": [
+        "colorDepth"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "screen"
+      ],
+      "name": "func_84",
+      "startLine": 2045,
+      "endLine": 2051,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        7
+      ]
+    },
+    {
+      "id": 85,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "setErrorStack",
+        "setError",
+        "getError"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        215,
+        221,
+        231
+      ],
+      "matchedRules": [],
+      "name": "func_85",
+      "startLine": 2053,
+      "endLine": 2074,
+      "lineCount": 22,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 86,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        131
+      ],
+      "matchedRules": [],
+      "name": "func_86",
+      "startLine": 2076,
+      "endLine": 2085,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 87,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "document",
+        "createElement",
+        "div",
+        "a",
+        "li",
+        "span",
+        "appendChild",
+        "removeChild",
+        "adivdiva",
+        "outerHTML",
+        "",
+        "replace",
+        "<|>|\\\\/|\\\\s|\\\"|'",
+        "g",
+        "toLowerCase",
+        "divdivdivppdiv",
+        "innerHTML"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "removeChild",
+        "RegExp",
+        "call",
+        "toLowerCase",
+        "outerHTML",
+        "replace",
+        "innerHTML"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation",
+        "regex"
+      ],
+      "name": "func_87",
+      "startLine": 2087,
+      "endLine": 2163,
+      "lineCount": 77,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        289
+      ]
+    },
+    {
+      "id": 88,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Type checking utility",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "0",
+        "toString",
+        "exports"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        20,
+        97,
+        213,
+        238,
+        208,
+        205,
+        259
+      ],
+      "matchedRules": [
+        "type-check"
+      ],
+      "name": "func_88",
+      "startLine": 2165,
+      "endLine": 2199,
+      "lineCount": 35,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 89,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [
+        "call"
+      ],
+      "stringRefs": [
+        "speechSynthesis",
+        "length"
+      ],
+      "methodCalls": [
+        "getVoices",
+        "call",
+        "length"
+      ],
+      "funcRefs": [
+        121
+      ],
+      "matchedRules": [],
+      "name": "func_89",
+      "startLine": 2201,
+      "endLine": 2243,
+      "lineCount": 43,
+      "arity": 0,
+      "capturedVars": [
+        "r9"
+      ],
+      "capturedBy": [
+        57
+      ]
+    },
+    {
+      "id": 90,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Safe wrapper (try/catch)",
+      "confidence": 0.5,
+      "apiCalls": [],
+      "stringRefs": [
+        "'0/:"
+      ],
+      "methodCalls": [
+        "f"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_90",
+      "startLine": 2245,
+      "endLine": 2257,
+      "lineCount": 13,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 91,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [
+        121
+      ],
+      "matchedRules": [],
+      "name": "func_91",
+      "startLine": 2259,
+      "endLine": 2269,
+      "lineCount": 11,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        94
+      ]
+    },
+    {
+      "id": 92,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Safe wrapper (try/catch)",
+      "confidence": 0.5,
+      "apiCalls": [],
+      "stringRefs": [
+        "jK0L"
+      ],
+      "methodCalls": [
+        "a"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_92",
+      "startLine": 2271,
+      "endLine": 2285,
+      "lineCount": 15,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 93,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [
+        234
+      ],
+      "matchedRules": [],
+      "name": "func_93",
+      "startLine": 2287,
+      "endLine": 2293,
+      "lineCount": 7,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": []
+    },
+    {
+      "id": 94,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "now",
+        "TCaptchaIframeClientPos",
+        "exports",
+        "on",
+        "get",
+        "reset"
+      ],
+      "methodCalls": [
+        "call",
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "TCaptchaIframeClientPos"
+      ],
+      "funcRefs": [
+        91,
+        244,
+        95,
+        268,
+        106,
+        61
+      ],
+      "matchedRules": [],
+      "name": "func_94",
+      "startLine": 2295,
+      "endLine": 2363,
+      "lineCount": 69,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 95,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [
+        19
+      ],
+      "matchedRules": [],
+      "name": "func_95",
+      "startLine": 2365,
+      "endLine": 2367,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        94
+      ]
+    },
+    {
+      "id": 97,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_97",
+      "startLine": 2369,
+      "endLine": 2372,
+      "lineCount": 4,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 98,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        78
+      ],
+      "matchedRules": [],
+      "name": "func_98",
+      "startLine": 2374,
+      "endLine": 2383,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 99,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "length",
+        "exports"
+      ],
+      "methodCalls": [
+        "call",
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_99",
+      "startLine": 2385,
+      "endLine": 2629,
+      "lineCount": 245,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 100,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "B0JC"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_100",
+      "startLine": 2631,
+      "endLine": 2652,
+      "lineCount": 22,
+      "arity": 3,
+      "capturedVars": [
+        "r87"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 101,
+      "category": "fingerprint",
+      "subcategory": "screen",
+      "description": "Screen fingerprinting — reads screen dimensions/pixel ratio",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "devicePixelRatio"
+      ],
+      "methodCalls": [
+        "devicePixelRatio"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "screen"
+      ],
+      "name": "func_101",
+      "startLine": 2654,
+      "endLine": 2673,
+      "lineCount": 20,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        116
+      ]
+    },
+    {
+      "id": 102,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "replace",
+        "\\\"",
+        "g",
+        "\\\\\\\"",
+        "[\\\\u00ff-\\\\uffff]+",
+        ""
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "replace"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_102",
+      "startLine": 2675,
+      "endLine": 2692,
+      "lineCount": 18,
+      "arity": 0,
+      "capturedVars": [
+        "r8"
+      ],
+      "capturedBy": [
+        108
+      ]
+    },
+    {
+      "id": 103,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "style",
+        "innerHTML",
+        "{}",
+        "head",
+        "appendChild",
+        "length",
+        "remove"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "remove",
+        "head",
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_103",
+      "startLine": 2694,
+      "endLine": 2723,
+      "lineCount": 30,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        280
+      ]
+    },
+    {
+      "id": 104,
+      "category": "fingerprint",
+      "subcategory": "webrtc",
+      "description": "WebRTC fingerprinting — local IP detection",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "sdp",
+        "\\n",
+        "forEach",
+        "console",
+        "log"
+      ],
+      "methodCalls": [
+        "split",
+        "call",
+        "log",
+        "sdp",
+        "forEach"
+      ],
+      "funcRefs": [
+        15
+      ],
+      "matchedRules": [
+        "webrtc"
+      ],
+      "name": "func_104",
+      "startLine": 2725,
+      "endLine": 2743,
+      "lineCount": 19,
+      "arity": 0,
+      "capturedVars": [
+        "r25",
+        "r9"
+      ],
+      "capturedBy": []
+    },
+    {
+      "id": 105,
+      "category": "fingerprint",
+      "subcategory": "gpu",
+      "description": "WebGPU fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "gpu"
+      ],
+      "methodCalls": [
+        "gpu"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "gpu"
+      ],
+      "name": "func_105",
+      "startLine": 2745,
+      "endLine": 2774,
+      "lineCount": 30,
+      "arity": 0,
+      "capturedVars": [
+        "r10",
+        "r9"
+      ],
+      "capturedBy": [
+        258,
+        276
+      ]
+    },
+    {
+      "id": 106,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "[",
+        "length",
+        ",",
+        "]",
+        "!",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+        "",
+        "charAt",
+        "charCodeAt",
+        "OOM",
+        "=",
+        "substr",
+        " "
+      ],
+      "methodCalls": [
+        "charAt",
+        "charCodeAt",
+        "substr",
+        "length"
+      ],
+      "funcRefs": [
+        32
+      ],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_106",
+      "startLine": 2776,
+      "endLine": 2856,
+      "lineCount": 81,
+      "arity": 0,
+      "capturedVars": [
+        "r42",
+        "r43"
+      ],
+      "capturedBy": [
+        94
+      ]
+    },
+    {
+      "id": 107,
+      "category": "fingerprint",
+      "subcategory": "gpu",
+      "description": "Child of WebGPU fingerprinting",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_107",
+      "startLine": 2858,
+      "endLine": 2868,
+      "lineCount": 11,
+      "arity": 0,
+      "capturedVars": [
+        "r9",
+        "r10",
+        "r26"
+      ],
+      "capturedBy": [
+        258,
+        276
+      ]
+    },
+    {
+      "id": 108,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "userAgent",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "userAgent"
+      ],
+      "funcRefs": [
+        102
+      ],
+      "matchedRules": [
+        "browser"
+      ],
+      "name": "func_108",
+      "startLine": 2870,
+      "endLine": 2882,
+      "lineCount": 13,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 109,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_109",
+      "startLine": 2884,
+      "endLine": 2892,
+      "lineCount": 9,
+      "arity": 0,
+      "capturedVars": [
+        "r15"
+      ],
+      "capturedBy": [
+        266
+      ]
+    },
+    {
+      "id": 110,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "Symbol",
+        "undefined",
+        "constructor",
+        "symbol"
+      ],
+      "methodCalls": [
+        "constructor"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "polyfill"
+      ],
+      "name": "func_110",
+      "startLine": 2894,
+      "endLine": 2918,
+      "lineCount": 25,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 111,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_111",
+      "startLine": 2920,
+      "endLine": 2923,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [
+        "r22"
+      ],
+      "capturedBy": [
+        268
+      ]
+    },
+    {
+      "id": 112,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "default"
+      ],
+      "methodCalls": [
+        "default"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_112",
+      "startLine": 2925,
+      "endLine": 2929,
+      "lineCount": 5,
+      "arity": 0,
+      "capturedVars": [
+        "r9"
+      ],
+      "capturedBy": [
+        56
+      ]
+    },
+    {
+      "id": 113,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "jK0L"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_113",
+      "startLine": 2931,
+      "endLine": 2949,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r18"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 114,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Child of Encoding/utility function",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        271
+      ],
+      "matchedRules": [],
+      "name": "func_114",
+      "startLine": 2951,
+      "endLine": 2961,
+      "lineCount": 11,
+      "arity": 1,
+      "capturedVars": [
+        "r8",
+        "r16",
+        "r24",
+        "r14",
+        "r12",
+        "r15"
+      ],
+      "capturedBy": [
+        139
+      ]
+    },
+    {
+      "id": 115,
+      "category": "fingerprint",
+      "subcategory": "webgl",
+      "description": "WebGL fingerprinting — queries GPU renderer info",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "JSON",
+        "parse",
+        "data",
+        "message",
+        "type",
+        "number",
+        "\\f",
+        "WEBGL_debug_renderer_info",
+        "UNMASKED_VENDOR_WEBGL",
+        "1"
+      ],
+      "methodCalls": [
+        "call",
+        "parse",
+        "data",
+        "message",
+        "UNMASKED_VENDOR_WEBGL"
+      ],
+      "funcRefs": [
+        188,
+        189
+      ],
+      "matchedRules": [
+        "webgl",
+        "json"
+      ],
+      "name": "func_115",
+      "startLine": 2963,
+      "endLine": 3003,
+      "lineCount": 41,
+      "arity": 1,
+      "capturedVars": [
+        "r15"
+      ],
+      "capturedBy": [
+        205
+      ]
+    },
+    {
+      "id": 116,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        101
+      ],
+      "matchedRules": [],
+      "name": "func_116",
+      "startLine": 3005,
+      "endLine": 3014,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 117,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "{\\\"_state\\\":-2}",
+        "{\\\"_state\\\":-1}",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        27,
+        159
+      ],
+      "matchedRules": [],
+      "name": "func_117",
+      "startLine": 3016,
+      "endLine": 3032,
+      "lineCount": 17,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 118,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "Object",
+        "String",
+        "Array",
+        "Boolean",
+        "exports",
+        "isObject",
+        "isString",
+        "isArray",
+        "isBoolean"
+      ],
+      "methodCalls": [
+        "call",
+        "isObject",
+        "isString",
+        "isArray",
+        "isBoolean"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_118",
+      "startLine": 3034,
+      "endLine": 3049,
+      "lineCount": 16,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 119,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Encoding/utility function",
+      "confidence": 0.65,
+      "apiCalls": [
+        "encodeURIComponent"
+      ],
+      "stringRefs": [
+        "encodeURIComponent",
+        "Err:"
+      ],
+      "methodCalls": [
+        "encodeURIComponent"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "encoding"
+      ],
+      "name": "func_119",
+      "startLine": 3051,
+      "endLine": 3058,
+      "lineCount": 8,
+      "arity": 0,
+      "capturedVars": [
+        "r40"
+      ],
+      "capturedBy": [
+        53
+      ]
+    },
+    {
+      "id": 120,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "script",
+        "src",
+        "https://captcha.gtimg.com/1/json2.js",
+        "head",
+        "item",
+        "appendChild"
+      ],
+      "methodCalls": [
+        "createElement",
+        "getElementsByTagName",
+        "item",
+        "appendChild"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_120",
+      "startLine": 3060,
+      "endLine": 3074,
+      "lineCount": 15,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        13
+      ]
+    },
+    {
+      "id": 121,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Child of Collector module (exports data)",
+      "confidence": 0.4000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "setTimeout"
+      ],
+      "methodCalls": [
+        "apply",
+        "call"
+      ],
+      "funcRefs": [
+        247
+      ],
+      "matchedRules": [],
+      "name": "func_121",
+      "startLine": 3076,
+      "endLine": 3093,
+      "lineCount": 18,
+      "arity": 0,
+      "capturedVars": [
+        "r13",
+        "r14",
+        "r11"
+      ],
+      "capturedBy": [
+        89,
+        91
+      ]
+    },
+    {
+      "id": 122,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        79
+      ],
+      "matchedRules": [],
+      "name": "func_122",
+      "startLine": 3095,
+      "endLine": 3104,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 123,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        8
+      ],
+      "matchedRules": [],
+      "name": "func_123",
+      "startLine": 3106,
+      "endLine": 3112,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 124,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "?rand=1519713624347",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        222,
+        73
+      ],
+      "matchedRules": [],
+      "name": "func_124",
+      "startLine": 3114,
+      "endLine": 3137,
+      "lineCount": 24,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 125,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        145
+      ],
+      "matchedRules": [],
+      "name": "func_125",
+      "startLine": 3139,
+      "endLine": 3148,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 126,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "setLocalDescription"
+      ],
+      "methodCalls": [
+        "setLocalDescription"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_126",
+      "startLine": 3150,
+      "endLine": 3156,
+      "lineCount": 7,
+      "arity": 1,
+      "capturedVars": [
+        "r25"
+      ],
+      "capturedBy": []
+    },
+    {
+      "id": 127,
+      "category": "fingerprint",
+      "subcategory": "touch",
+      "description": "Touch capability fingerprinting",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "type",
+        "mousemove",
+        "clientX",
+        "clientY",
+        "pressure",
+        "width",
+        "height",
+        "x",
+        "Math",
+        "floor",
+        "y",
+        "radiusX",
+        "radiusY",
+        "touchmove",
+        "changedTouches",
+        "length",
+        "force",
+        "touchend",
+        "touchstart",
+        "mouseup"
+      ],
+      "methodCalls": [
+        "floor",
+        "type",
+        "clientX",
+        "clientY",
+        "pressure",
+        "width",
+        "height",
+        "radiusY",
+        "radiusX",
+        "changedTouches",
+        "length",
+        "force"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "touch",
+        "computation"
+      ],
+      "name": "func_127",
+      "startLine": 3158,
+      "endLine": 3277,
+      "lineCount": 120,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        244,
+        250
+      ]
+    },
+    {
+      "id": 128,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "replace",
+        "\\\"",
+        "g",
+        "\\\\\\\"",
+        "[\\\\u00ff-\\\\uffff]+",
+        ""
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "replace"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_128",
+      "startLine": 3279,
+      "endLine": 3287,
+      "lineCount": 9,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        269
+      ]
+    },
+    {
+      "id": 129,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        182
+      ],
+      "matchedRules": [],
+      "name": "func_129",
+      "startLine": 3289,
+      "endLine": 3305,
+      "lineCount": 17,
+      "arity": 0,
+      "capturedVars": [
+        "r18",
+        "r19",
+        "r23"
+      ],
+      "capturedBy": [
+        23
+      ]
+    },
+    {
+      "id": 130,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "Object",
+        "hasOwnProperty"
+      ],
+      "methodCalls": [
+        "call",
+        "hasOwnProperty"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_130",
+      "startLine": 3307,
+      "endLine": 3313,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        164
+      ]
+    },
+    {
+      "id": 131,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "platform"
+      ],
+      "methodCalls": [
+        "platform"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "browser"
+      ],
+      "name": "func_131",
+      "startLine": 3315,
+      "endLine": 3321,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        86
+      ]
+    },
+    {
+      "id": 132,
+      "category": "fingerprint",
+      "subcategory": "css",
+      "description": "CSS media query fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "(prefers-reduced-motion: reduce)",
+        "matches",
+        "(prefers-reduced-motion: no-preference)"
+      ],
+      "methodCalls": [
+        "matchMedia",
+        "matches"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "css"
+      ],
+      "name": "func_132",
+      "startLine": 3323,
+      "endLine": 3340,
+      "lineCount": 18,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        225
+      ]
+    },
+    {
+      "id": 133,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_133",
+      "startLine": 3342,
+      "endLine": 3357,
+      "lineCount": 16,
+      "arity": 0,
+      "capturedVars": [
+        "r14",
+        "r11"
+      ],
+      "capturedBy": [
+        167
+      ]
+    },
+    {
+      "id": 134,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_134",
+      "startLine": 3359,
+      "endLine": 3361,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        51
+      ]
+    },
+    {
+      "id": 135,
+      "category": "fingerprint",
+      "subcategory": "font",
+      "description": "Font fingerprinting — detects installed fonts via element measurement",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "span",
+        "textContent",
+        "mmmmmmmmmmmmmwwwwwwwwwww",
+        "style",
+        "fontSize",
+        "72px",
+        "fontFamily",
+        "appendChild",
+        "width",
+        "offsetWidth",
+        "height",
+        "offsetHeight",
+        "removeChild"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "removeChild",
+        "style",
+        "offsetWidth",
+        "offsetHeight"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "font",
+        "manipulation"
+      ],
+      "name": "func_135",
+      "startLine": 3363,
+      "endLine": 3396,
+      "lineCount": 34,
+      "arity": 1,
+      "capturedVars": [
+        "r15",
+        "r14",
+        "r18"
+      ],
+      "capturedBy": [
+        49
+      ]
+    },
+    {
+      "id": 136,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_136",
+      "startLine": 3398,
+      "endLine": 3411,
+      "lineCount": 14,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        139
+      ]
+    },
+    {
+      "id": 137,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Encoding/utility function",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "encodeURIComponent"
+      ],
+      "methodCalls": [
+        "slice",
+        "call"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "encoding"
+      ],
+      "name": "func_137",
+      "startLine": 3413,
+      "endLine": 3434,
+      "lineCount": 22,
+      "arity": 1,
+      "capturedVars": [
+        "r8",
+        "r11"
+      ],
+      "capturedBy": [
+        221
+      ]
+    },
+    {
+      "id": 138,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_138",
+      "startLine": 3436,
+      "endLine": 3443,
+      "lineCount": 8,
+      "arity": 0,
+      "capturedVars": [
+        "r17"
+      ],
+      "capturedBy": [
+        45
+      ]
+    },
+    {
+      "id": 139,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Encoding/utility function",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "btoa",
+        "ChallengeEncrypt",
+        "exports"
+      ],
+      "methodCalls": [
+        "btoa",
+        "ChallengeEncrypt",
+        "exports"
+      ],
+      "funcRefs": [
+        114,
+        140,
+        136,
+        204
+      ],
+      "matchedRules": [
+        "encoding"
+      ],
+      "name": "func_139",
+      "startLine": 3445,
+      "endLine": 3467,
+      "lineCount": 23,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 140,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "String",
+        "fromCharCode"
+      ],
+      "methodCalls": [
+        "fromCharCode"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_140",
+      "startLine": 3469,
+      "endLine": 3476,
+      "lineCount": 8,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        139
+      ]
+    },
+    {
+      "id": 141,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Safe wrapper (try/catch)",
+      "confidence": 0.5,
+      "apiCalls": [],
+      "stringRefs": [
+        "B0JC"
+      ],
+      "methodCalls": [
+        "e"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_141",
+      "startLine": 3478,
+      "endLine": 3490,
+      "lineCount": 13,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 143,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        224
+      ],
+      "matchedRules": [],
+      "name": "func_143",
+      "startLine": 3492,
+      "endLine": 3501,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 144,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "t"
+      ],
+      "methodCalls": [
+        "call",
+        "t"
+      ],
+      "funcRefs": [
+        186
+      ],
+      "matchedRules": [],
+      "name": "func_144",
+      "startLine": 3503,
+      "endLine": 3513,
+      "lineCount": 11,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 145,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "userAgent",
+        "unknown",
+        "windows",
+        "mac",
+        "macos",
+        "linux",
+        "android",
+        "ios",
+        "ipad",
+        "iphone"
+      ],
+      "methodCalls": [
+        "toLowerCase",
+        "call",
+        "userAgent"
+      ],
+      "funcRefs": [
+        3
+      ],
+      "matchedRules": [
+        "browser"
+      ],
+      "name": "func_145",
+      "startLine": 3515,
+      "endLine": 3581,
+      "lineCount": 67,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        125
+      ]
+    },
+    {
+      "id": 146,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "undefined",
+        "Symbol",
+        "toStringTag",
+        "Object",
+        "defineProperty",
+        "value",
+        "Module",
+        "__esModule"
+      ],
+      "methodCalls": [
+        "call",
+        "toStringTag",
+        "defineProperty",
+        "value"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "polyfill",
+        "type-check",
+        "exports"
+      ],
+      "name": "func_146",
+      "startLine": 3583,
+      "endLine": 3610,
+      "lineCount": 28,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        164
+      ]
+    },
+    {
+      "id": 147,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        29
+      ],
+      "matchedRules": [],
+      "name": "func_147",
+      "startLine": 3612,
+      "endLine": 3621,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 148,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        192
+      ],
+      "matchedRules": [],
+      "name": "func_148",
+      "startLine": 3623,
+      "endLine": 3632,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 149,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        67
+      ],
+      "matchedRules": [],
+      "name": "func_149",
+      "startLine": 3634,
+      "endLine": 3643,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 151,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        272
+      ],
+      "matchedRules": [],
+      "name": "func_151",
+      "startLine": 3645,
+      "endLine": 3651,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 152,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "style",
+        "replace",
+        "^[a-z]",
+        ""
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "style",
+        "replace"
+      ],
+      "funcRefs": [
+        288
+      ],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_152",
+      "startLine": 3653,
+      "endLine": 3679,
+      "lineCount": 27,
+      "arity": 1,
+      "capturedVars": [
+        "r24",
+        "r10"
+      ],
+      "capturedBy": [
+        280
+      ]
+    },
+    {
+      "id": 153,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        274
+      ],
+      "matchedRules": [],
+      "name": "func_153",
+      "startLine": 3681,
+      "endLine": 3690,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 154,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_154",
+      "startLine": 3692,
+      "endLine": 3698,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r16"
+      ],
+      "capturedBy": [
+        183
+      ]
+    },
+    {
+      "id": 155,
+      "category": "fingerprint",
+      "subcategory": "css",
+      "description": "CSS media query fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "(prefers-color-scheme: dark)",
+        "matches",
+        "(prefers-color-scheme: no-preference)",
+        "(prefers-color-scheme: light)",
+        "ma"
+      ],
+      "methodCalls": [
+        "matchMedia",
+        "matches"
+      ],
+      "funcRefs": [
+        193
+      ],
+      "matchedRules": [
+        "css"
+      ],
+      "name": "func_155",
+      "startLine": 3700,
+      "endLine": 3727,
+      "lineCount": 28,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        225
+      ]
+    },
+    {
+      "id": 156,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        251
+      ],
+      "matchedRules": [],
+      "name": "func_156",
+      "startLine": 3729,
+      "endLine": 3738,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 157,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        173
+      ],
+      "matchedRules": [],
+      "name": "func_157",
+      "startLine": 3740,
+      "endLine": 3746,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        50
+      ]
+    },
+    {
+      "id": 158,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp",
+        "parseInt"
+      ],
+      "stringRefs": [
+        "navigator",
+        "userAgent",
+        "match",
+        "chrome\\\\/([0-9.]+)",
+        "i",
+        "parseInt"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "parseInt",
+        "userAgent",
+        "match"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "browser",
+        "regex"
+      ],
+      "name": "func_158",
+      "startLine": 3748,
+      "endLine": 3764,
+      "lineCount": 17,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        248
+      ]
+    },
+    {
+      "id": 161,
+      "category": "fingerprint",
+      "subcategory": "font",
+      "description": "Font fingerprinting — detects installed fonts via element measurement",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "span",
+        "textContent",
+        "mmmmmmmmmmmmmwwwwwwwwwww",
+        "style",
+        "fontSize",
+        "72px",
+        "fontFamily",
+        ",",
+        "appendChild",
+        "offsetWidth",
+        "width",
+        "offsetHeight",
+        "height"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "removeChild",
+        "style",
+        "offsetWidth",
+        "width",
+        "offsetHeight",
+        "height"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "font",
+        "manipulation"
+      ],
+      "name": "func_161",
+      "startLine": 3766,
+      "endLine": 3796,
+      "lineCount": 31,
+      "arity": 1,
+      "capturedVars": [
+        "r17",
+        "r9",
+        "r8",
+        "r16"
+      ],
+      "capturedBy": [
+        11
+      ]
+    },
+    {
+      "id": 162,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "[",
+        "window",
+        "innerWidth",
+        "document",
+        "clientWidth",
+        ",",
+        "innerHeight",
+        "clientHeight",
+        "]"
+      ],
+      "methodCalls": [
+        "innerWidth",
+        "clientWidth",
+        "innerHeight",
+        "clientHeight"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_162",
+      "startLine": 3798,
+      "endLine": 3823,
+      "lineCount": 26,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        34
+      ]
+    },
+    {
+      "id": 163,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "RegExp",
+        "^\\\\d+:\\\\d+$",
+        "on",
+        "get",
+        "getGuid",
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        285,
+        277,
+        33
+      ],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_163",
+      "startLine": 3825,
+      "endLine": 3849,
+      "lineCount": 25,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 164,
+      "category": "module-system",
+      "subcategory": "orchestrator",
+      "description": "Module orchestrator — sets up webpack-like module system",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "m",
+        "c",
+        "d",
+        "r",
+        "t",
+        "n",
+        "o",
+        "p",
+        "",
+        "s"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        198,
+        171,
+        146,
+        16,
+        56,
+        130
+      ],
+      "matchedRules": [],
+      "name": "func_164",
+      "startLine": 3851,
+      "endLine": 3898,
+      "lineCount": 48,
+      "arity": 1,
+      "capturedVars": [
+        "r11"
+      ],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 165,
+      "category": "fingerprint",
+      "subcategory": "css",
+      "description": "CSS media query fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "matchMedia",
+        "(any-ho",
+        "matches",
+        "",
+        "clientWidth",
+        ",",
+        "innerHeight",
+        "document",
+        "clientHeight",
+        "]",
+        "body"
+      ],
+      "methodCalls": [
+        "call",
+        "matchMedia",
+        "matches",
+        "clientWidth",
+        "innerHeight",
+        "clientHeight",
+        "body"
+      ],
+      "funcRefs": [
+        9,
+        193
+      ],
+      "matchedRules": [
+        "css"
+      ],
+      "name": "func_165",
+      "startLine": 3900,
+      "endLine": 3953,
+      "lineCount": 54,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        253
+      ]
+    },
+    {
+      "id": 166,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_166",
+      "startLine": 3955,
+      "endLine": 3961,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r20"
+      ],
+      "capturedBy": [
+        270
+      ]
+    },
+    {
+      "id": 167,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        4,
+        133
+      ],
+      "matchedRules": [],
+      "name": "func_167",
+      "startLine": 3963,
+      "endLine": 3976,
+      "lineCount": 14,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 168,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        196
+      ],
+      "matchedRules": [],
+      "name": "func_168",
+      "startLine": 3978,
+      "endLine": 3987,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 169,
+      "category": "data-collection",
+      "subcategory": "storage",
+      "description": "Cookie/storage data collection",
+      "confidence": 0.95,
+      "apiCalls": [
+        "encodeURIComponent"
+      ],
+      "stringRefs": [
+        "encodeURIComponent",
+        "; expires=Tue, 31 Dec 2030 00:00:00 UTC",
+        "; path=/",
+        "document",
+        "cookie",
+        "window",
+        "localStorage",
+        "setItem",
+        "sessionStorage"
+      ],
+      "methodCalls": [
+        "encodeURIComponent",
+        "call",
+        "setItem",
+        "localStorage",
+        "sessionStorage"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "storage",
+        "encoding"
+      ],
+      "name": "func_169",
+      "startLine": 3989,
+      "endLine": 4033,
+      "lineCount": 45,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        174
+      ]
+    },
+    {
+      "id": 170,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_170",
+      "startLine": 4035,
+      "endLine": 4038,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [
+        "r22"
+      ],
+      "capturedBy": [
+        268
+      ]
+    },
+    {
+      "id": 171,
+      "category": "module-system",
+      "subcategory": "exports",
+      "description": "Module exports setup",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "o",
+        "Object",
+        "defineProperty",
+        "enumerable",
+        "get"
+      ],
+      "methodCalls": [
+        "o",
+        "call",
+        "defineProperty",
+        "enumerable",
+        "get"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "exports"
+      ],
+      "name": "func_171",
+      "startLine": 4040,
+      "endLine": 4058,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r26"
+      ],
+      "capturedBy": [
+        164
+      ]
+    },
+    {
+      "id": 172,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        263
+      ],
+      "matchedRules": [],
+      "name": "func_172",
+      "startLine": 4060,
+      "endLine": 4066,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 173,
+      "category": "fingerprint",
+      "subcategory": "screen",
+      "description": "Screen fingerprinting — reads screen dimensions/pixel ratio",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "screen",
+        "width",
+        "-",
+        "height",
+        "availHeight",
+        "colorDepth",
+        "deviceXDPI",
+        "undefined",
+        "logicalXDPI",
+        "pixelDepth",
+        "|",
+        "fontSmoothingEnabled",
+        "*"
+      ],
+      "methodCalls": [
+        "width",
+        "height",
+        "availHeight",
+        "colorDepth",
+        "deviceXDPI",
+        "logicalXDPI",
+        "pixelDepth",
+        "fontSmoothingEnabled"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "screen"
+      ],
+      "name": "func_173",
+      "startLine": 4068,
+      "endLine": 4124,
+      "lineCount": 57,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        157
+      ]
+    },
+    {
+      "id": 174,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "getCookie",
+        "setCookie"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        225,
+        169
+      ],
+      "matchedRules": [],
+      "name": "func_174",
+      "startLine": 4126,
+      "endLine": 4137,
+      "lineCount": 12,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 175,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        24
+      ],
+      "matchedRules": [],
+      "name": "func_175",
+      "startLine": 4139,
+      "endLine": 4148,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 176,
+      "category": "data-collection",
+      "subcategory": "storage",
+      "description": "Child of Cookie/storage data collection",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [
+        "1",
+        "2"
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_176",
+      "startLine": 4150,
+      "endLine": 4162,
+      "lineCount": 13,
+      "arity": 0,
+      "capturedVars": [
+        "r18"
+      ],
+      "capturedBy": [
+        46
+      ]
+    },
+    {
+      "id": 177,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "%"
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_177",
+      "startLine": 4164,
+      "endLine": 4169,
+      "lineCount": 6,
+      "arity": 1,
+      "capturedVars": [
+        "r42"
+      ],
+      "capturedBy": [
+        212
+      ]
+    },
+    {
+      "id": 178,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        256
+      ],
+      "matchedRules": [],
+      "name": "func_178",
+      "startLine": 4171,
+      "endLine": 4180,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 179,
+      "category": "fingerprint",
+      "subcategory": "touch",
+      "description": "Touch capability fingerprinting",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "ontouchstart",
+        "document",
+        "div"
+      ],
+      "methodCalls": [
+        "createElement"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "touch",
+        "manipulation"
+      ],
+      "name": "func_179",
+      "startLine": 4182,
+      "endLine": 4195,
+      "lineCount": 14,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        6
+      ]
+    },
+    {
+      "id": 180,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_180",
+      "startLine": 4197,
+      "endLine": 4201,
+      "lineCount": 5,
+      "arity": 0,
+      "capturedVars": [
+        "r13",
+        "r12"
+      ],
+      "capturedBy": [
+        68
+      ]
+    },
+    {
+      "id": 181,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_181",
+      "startLine": 4203,
+      "endLine": 4205,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        51
+      ]
+    },
+    {
+      "id": 182,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        ""
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_182",
+      "startLine": 4207,
+      "endLine": 4213,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r15",
+        "r19"
+      ],
+      "capturedBy": [
+        129
+      ]
+    },
+    {
+      "id": 183,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        154
+      ],
+      "matchedRules": [],
+      "name": "func_183",
+      "startLine": 4215,
+      "endLine": 4227,
+      "lineCount": 13,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 186,
+      "category": "fingerprint",
+      "subcategory": "audio",
+      "description": "Audio fingerprinting — uses AudioContext/OscillatorNode",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "AudioContext",
+        "fftSize",
+        "smoothingTimeConstant",
+        "minDecibels",
+        "maxDecibels",
+        "ac-baseLatency",
+        "baseLatency",
+        "ac-outputLatency",
+        "outputLatency",
+        "ac-sampleRate",
+        "sampleRate",
+        "ac-maxChannelCount",
+        "maxChannelCount",
+        "ac-numberOfInputs",
+        "numberOfInputs",
+        "ac-numberOfOutputs",
+        "numberOfOutputs",
+        "ac-channelCount",
+        "channelCount"
+      ],
+      "methodCalls": [
+        "createAnalyser",
+        "close",
+        "call",
+        "AudioContext",
+        "baseLatency",
+        "outputLatency",
+        "sampleRate",
+        "maxChannelCount",
+        "numberOfInputs",
+        "numberOfOutputs",
+        "channelCount",
+        "channelCountMode",
+        "channelInterpretation",
+        "fftSize",
+        "frequencyBinCount",
+        "minDecibels",
+        "maxDecibels",
+        "smoothingTimeConstant",
+        "stringify",
+        "nt_vc_output"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "audio",
+        "json"
+      ],
+      "name": "func_186",
+      "startLine": 4229,
+      "endLine": 4328,
+      "lineCount": 100,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        144
+      ]
+    },
+    {
+      "id": 190,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        227,
+        267,
+        65
+      ],
+      "matchedRules": [],
+      "name": "func_190",
+      "startLine": 4330,
+      "endLine": 4347,
+      "lineCount": 18,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 191,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        242
+      ],
+      "matchedRules": [],
+      "name": "func_191",
+      "startLine": 4349,
+      "endLine": 4355,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 192,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        275
+      ],
+      "matchedRules": [],
+      "name": "func_192",
+      "startLine": 4357,
+      "endLine": 4363,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        148
+      ]
+    },
+    {
+      "id": 194,
+      "category": "utility",
+      "subcategory": "json",
+      "description": "JSON serialization/parsing",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "_state",
+        "hasOwnProperty",
+        "JSON"
+      ],
+      "methodCalls": [
+        "shift",
+        "hasOwnProperty",
+        "stringify",
+        "_state"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "json"
+      ],
+      "name": "func_194",
+      "startLine": 4365,
+      "endLine": 4394,
+      "lineCount": 30,
+      "arity": 1,
+      "capturedVars": [
+        "r9"
+      ],
+      "capturedBy": [
+        27
+      ]
+    },
+    {
+      "id": 195,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "Child of DOM manipulation",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [
+        "-webkit- -o- -moz- -ms-",
+        " ",
+        "length",
+        "window",
+        "CSS",
+        "supports"
+      ],
+      "methodCalls": [
+        "split",
+        "push",
+        "call",
+        "supports",
+        "length",
+        "CSS"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_195",
+      "startLine": 4396,
+      "endLine": 4456,
+      "lineCount": 61,
+      "arity": 2,
+      "capturedVars": [
+        "r8"
+      ],
+      "capturedBy": [
+        280
+      ]
+    },
+    {
+      "id": 196,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "98k"
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_196",
+      "startLine": 4458,
+      "endLine": 4463,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        168
+      ]
+    },
+    {
+      "id": 197,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        44
+      ],
+      "matchedRules": [],
+      "name": "func_197",
+      "startLine": 4465,
+      "endLine": 4471,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 198,
+      "category": "module-system",
+      "subcategory": "require",
+      "description": "Module require function (webpack-like __webpack_require__)",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "i",
+        "l"
+      ],
+      "methodCalls": [
+        "call",
+        "exports",
+        "i",
+        "l"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_198",
+      "startLine": 4473,
+      "endLine": 4495,
+      "lineCount": 23,
+      "arity": 1,
+      "capturedVars": [
+        "r12",
+        "r17",
+        "r26"
+      ],
+      "capturedBy": [
+        164
+      ]
+    },
+    {
+      "id": 199,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "jK0L"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_199",
+      "startLine": 4497,
+      "endLine": 4515,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r87"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 200,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Child of Regular expression utility",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "href",
+        "URL",
+        ""
+      ],
+      "methodCalls": [
+        "href",
+        "URL"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_200",
+      "startLine": 4517,
+      "endLine": 4539,
+      "lineCount": 23,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        72
+      ]
+    },
+    {
+      "id": 201,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "ES6 polyfill/utility",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "function",
+        "Symbol",
+        "constructor",
+        "prototype",
+        "symbol",
+        "undefined"
+      ],
+      "methodCalls": [
+        "constructor",
+        "prototype"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "polyfill"
+      ],
+      "name": "func_201",
+      "startLine": 4541,
+      "endLine": 4579,
+      "lineCount": 39,
+      "arity": 1,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 202,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_202",
+      "startLine": 4581,
+      "endLine": 4584,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [
+        "r22"
+      ],
+      "capturedBy": [
+        268
+      ]
+    },
+    {
+      "id": 203,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_203",
+      "startLine": 4586,
+      "endLine": 4592,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r21"
+      ],
+      "capturedBy": [
+        83
+      ]
+    },
+    {
+      "id": 204,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Child of Encoding/utility function",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_204",
+      "startLine": 4594,
+      "endLine": 4641,
+      "lineCount": 48,
+      "arity": 2,
+      "capturedVars": [
+        "r8"
+      ],
+      "capturedBy": [
+        139
+      ]
+    },
+    {
+      "id": 205,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Child of Type checking utility",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "addEventListener",
+        "message"
+      ],
+      "methodCalls": [
+        "call",
+        "addEventListener"
+      ],
+      "funcRefs": [
+        115
+      ],
+      "matchedRules": [],
+      "name": "func_205",
+      "startLine": 4643,
+      "endLine": 4659,
+      "lineCount": 17,
+      "arity": 0,
+      "capturedVars": [
+        "r21"
+      ],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 206,
+      "category": "fingerprint",
+      "subcategory": "language",
+      "description": "Child of Language preference fingerprinting",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "length",
+        "\\\",",
+        "substr",
+        "]"
+      ],
+      "methodCalls": [
+        "substr",
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_206",
+      "startLine": 4661,
+      "endLine": 4689,
+      "lineCount": 29,
+      "arity": 0,
+      "capturedVars": [
+        "r17"
+      ],
+      "capturedBy": [
+        28
+      ]
+    },
+    {
+      "id": 207,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "TDC-related function",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF"
+      ],
+      "methodCalls": [
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+        "getTime"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_207",
+      "startLine": 4691,
+      "endLine": 4704,
+      "lineCount": 14,
+      "arity": 0,
+      "capturedVars": [
+        "r20",
+        "r14"
+      ],
+      "capturedBy": [
+        270
+      ]
+    },
+    {
+      "id": 208,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Child of Type checking utility",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [
+        "setInterval"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        248
+      ],
+      "matchedRules": [],
+      "name": "func_208",
+      "startLine": 4706,
+      "endLine": 4723,
+      "lineCount": 18,
+      "arity": 0,
+      "capturedVars": [
+        "r30",
+        "r8",
+        "r32"
+      ],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 209,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "mimeTypes",
+        "[]",
+        "length",
+        "push",
+        "type",
+        "suffixes",
+        "JSON",
+        ""
+      ],
+      "methodCalls": [
+        "call",
+        "stringify",
+        "mimeTypes",
+        "length",
+        "push",
+        "type",
+        "suffixes"
+      ],
+      "funcRefs": [
+        54
+      ],
+      "matchedRules": [
+        "browser",
+        "json"
+      ],
+      "name": "func_209",
+      "startLine": 4725,
+      "endLine": 4774,
+      "lineCount": 50,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        230
+      ]
+    },
+    {
+      "id": 210,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "QRu~"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_210",
+      "startLine": 4776,
+      "endLine": 4794,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r18"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 211,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.8,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "document",
+        "createElement",
+        "iframe",
+        "body",
+        "appendChild",
+        "style",
+        "display",
+        "none",
+        "div",
+        "outerHTML",
+        "divdiv",
+        "replace",
+        "<|>|\\\\/|\\\\s|\\\"|'",
+        "g",
+        ""
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "RegExp",
+        "call",
+        "toLowerCase",
+        "body",
+        "style",
+        "document",
+        "outerHTML",
+        "replace"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation",
+        "regex"
+      ],
+      "name": "func_211",
+      "startLine": 4796,
+      "endLine": 4830,
+      "lineCount": 35,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        262
+      ]
+    },
+    {
+      "id": 212,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Encoding/utility function",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "----",
+        "JSON",
+        "stringify",
+        "cd",
+        "undefined",
+        "substr",
+        "length",
+        "replace",
+        "encodeURIComponent",
+        "Err:"
+      ],
+      "methodCalls": [
+        "call",
+        "stringify",
+        "substr",
+        "cd",
+        "length",
+        "replace"
+      ],
+      "funcRefs": [
+        276,
+        177
+      ],
+      "matchedRules": [
+        "encoding",
+        "json"
+      ],
+      "name": "func_212",
+      "startLine": 4832,
+      "endLine": 4890,
+      "lineCount": 59,
+      "arity": 0,
+      "capturedVars": [
+        "r11",
+        "r14",
+        "r28",
+        "r18",
+        "r20",
+        "r27",
+        "r8",
+        "r21",
+        "r17",
+        "r37",
+        "r24"
+      ],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 213,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "TDC-related function",
+      "confidence": 0.6,
+      "apiCalls": [
+        "clearInterval"
+      ],
+      "stringRefs": [
+        "1",
+        "number",
+        "clearInterval",
+        "tdc"
+      ],
+      "methodCalls": [
+        "clearInterval"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_213",
+      "startLine": 4892,
+      "endLine": 4906,
+      "lineCount": 15,
+      "arity": 0,
+      "capturedVars": [
+        "r21",
+        "r30"
+      ],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 214,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "screen",
+        "width"
+      ],
+      "methodCalls": [
+        "width"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_214",
+      "startLine": 4908,
+      "endLine": 4914,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        220
+      ]
+    },
+    {
+      "id": 215,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [
+        "\\f",
+        "i",
+        "s",
+        "speechSynthesis",
+        "length",
+        "onvoiceschanged"
+      ],
+      "methodCalls": [
+        "getVoices",
+        "s",
+        "length"
+      ],
+      "funcRefs": [
+        217,
+        228
+      ],
+      "matchedRules": [],
+      "name": "func_215",
+      "startLine": 4916,
+      "endLine": 4950,
+      "lineCount": 35,
+      "arity": 1,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        85
+      ]
+    },
+    {
+      "id": 218,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_218",
+      "startLine": 4952,
+      "endLine": 4957,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        77
+      ]
+    },
+    {
+      "id": 219,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "Math",
+        "floor",
+        "document",
+        "span",
+        "setAttribute",
+        "removeAttribute",
+        "removeChild"
+      ],
+      "methodCalls": [
+        "random",
+        "call",
+        "createElement",
+        "floor",
+        "removeAttribute",
+        "removeChild"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation",
+        "computation"
+      ],
+      "name": "func_219",
+      "startLine": 4959,
+      "endLine": 4999,
+      "lineCount": 41,
+      "arity": 0,
+      "capturedVars": [
+        "r10"
+      ],
+      "capturedBy": [
+        5
+      ]
+    },
+    {
+      "id": 220,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        214
+      ],
+      "matchedRules": [],
+      "name": "func_220",
+      "startLine": 5001,
+      "endLine": 5010,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 221,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [
+        "Error",
+        "errr"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        137
+      ],
+      "matchedRules": [],
+      "name": "func_221",
+      "startLine": 5012,
+      "endLine": 5028,
+      "lineCount": 17,
+      "arity": 0,
+      "capturedVars": [
+        "r15",
+        "r22"
+      ],
+      "capturedBy": [
+        85
+      ]
+    },
+    {
+      "id": 222,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "href",
+        "URL",
+        ""
+      ],
+      "methodCalls": [
+        "href",
+        "URL"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_222",
+      "startLine": 5030,
+      "endLine": 5048,
+      "lineCount": 19,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        124
+      ]
+    },
+    {
+      "id": 223,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_223",
+      "startLine": 5050,
+      "endLine": 5052,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": []
+    },
+    {
+      "id": 224,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "audio",
+        "name",
+        "AAC",
+        "type",
+        "audio/mp4; codecs=\\\"mp4a.40.2\\\"",
+        "MP3",
+        "audio/mpeg",
+        "Ogg Vorbis",
+        "audio/ogg; codecs=\\\"vorbis\\\"",
+        "Ogg Opus",
+        "audio/ogg; codecs=\\\"opus\\\"",
+        "WAV",
+        "audio/wav; codecs=\\\"1\\\"",
+        "FLAC",
+        "audio/flac",
+        "WebM Vorbis",
+        "audio/webm; codecs=\\\"vorbis\\\"",
+        "WebM Opus",
+        "audio/webm; codecs=\\\"opus\\\""
+      ],
+      "methodCalls": [
+        "createElement",
+        "call",
+        "stringify",
+        "name",
+        "type",
+        "length",
+        "push",
+        "canPlayType"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation",
+        "json"
+      ],
+      "name": "func_224",
+      "startLine": 5054,
+      "endLine": 5135,
+      "lineCount": 82,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        143
+      ]
+    },
+    {
+      "id": 225,
+      "category": "data-collection",
+      "subcategory": "storage",
+      "description": "Cookie/storage data collection",
+      "confidence": 0.95,
+      "apiCalls": [
+        "encodeURIComponent",
+        "RegExp",
+        "Number",
+        "parseInt"
+      ],
+      "stringRefs": [
+        "document",
+        "cookie",
+        "encodeURIComponent",
+        "indexOf",
+        ";",
+        "length",
+        "decodeURIComponent",
+        "window",
+        "localStorage",
+        "sessi",
+        "undefined",
+        "Symbol",
+        "iterator",
+        "done",
+        "return",
+        "value",
+        "\\u0000",
+        "\\u0002",
+        "unshift",
+        "Number"
+      ],
+      "methodCalls": [
+        "encodeURIComponent",
+        "indexOf",
+        "substring",
+        "call",
+        "getItem",
+        "next",
+        "return",
+        "push",
+        "RegExp",
+        "Number",
+        "join",
+        "parseInt",
+        "charAt",
+        "charCodeAt",
+        "cookie",
+        "length",
+        "localStorage",
+        "iterator",
+        "done",
+        "value"
+      ],
+      "funcRefs": [
+        185,
+        255,
+        71,
+        62,
+        155,
+        132,
+        12
+      ],
+      "matchedRules": [
+        "storage",
+        "manipulation",
+        "polyfill",
+        "encoding",
+        "regex"
+      ],
+      "name": "func_225",
+      "startLine": 5137,
+      "endLine": 5392,
+      "lineCount": 256,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        174
+      ]
+    },
+    {
+      "id": 226,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "rec2020",
+        "p3",
+        "srgb",
+        "length",
+        "unknown",
+        ""
+      ],
+      "methodCalls": [
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_226",
+      "startLine": 5394,
+      "endLine": 5416,
+      "lineCount": 23,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        233
+      ]
+    },
+    {
+      "id": 227,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [
+        "s"
+      ],
+      "stringRefs": [
+        "window",
+        "s",
+        "length"
+      ],
+      "methodCalls": [
+        "getVoices",
+        "s",
+        "length"
+      ],
+      "funcRefs": [
+        250,
+        229
+      ],
+      "matchedRules": [],
+      "name": "func_227",
+      "startLine": 5418,
+      "endLine": 5439,
+      "lineCount": 22,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        190
+      ]
+    },
+    {
+      "id": 230,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        209
+      ],
+      "matchedRules": [],
+      "name": "func_230",
+      "startLine": 5441,
+      "endLine": 5450,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 231,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_231",
+      "startLine": 5452,
+      "endLine": 5454,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        85
+      ]
+    },
+    {
+      "id": 232,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_232",
+      "startLine": 5456,
+      "endLine": 5458,
+      "lineCount": 3,
+      "arity": 1,
+      "capturedVars": [
+        "r48"
+      ],
+      "capturedBy": [
+        16
+      ]
+    },
+    {
+      "id": 233,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        226
+      ],
+      "matchedRules": [],
+      "name": "func_233",
+      "startLine": 5460,
+      "endLine": 5469,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 234,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Type checking utility",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "Object",
+        "toString",
+        "[object ",
+        "]"
+      ],
+      "methodCalls": [
+        "call",
+        "toString"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "type-check"
+      ],
+      "name": "func_234",
+      "startLine": 5471,
+      "endLine": 5480,
+      "lineCount": 10,
+      "arity": 1,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        93
+      ]
+    },
+    {
+      "id": 235,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        48
+      ],
+      "matchedRules": [],
+      "name": "func_235",
+      "startLine": 5482,
+      "endLine": 5493,
+      "lineCount": 12,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 236,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Child of Browser fingerprinting — reads navigator properties",
+      "confidence": 0.75,
+      "apiCalls": [],
+      "stringRefs": [
+        "function",
+        "Object",
+        "navigator",
+        "webdriver",
+        "get"
+      ],
+      "methodCalls": [
+        "getOwnPropertyDescriptor",
+        "get"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_236",
+      "startLine": 5495,
+      "endLine": 5511,
+      "lineCount": 17,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        63
+      ]
+    },
+    {
+      "id": 237,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_237",
+      "startLine": 5513,
+      "endLine": 5519,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [
+        "r17"
+      ],
+      "capturedBy": [
+        287
+      ]
+    },
+    {
+      "id": 238,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "TDC-related function",
+      "confidence": 0.6,
+      "apiCalls": [
+        "clearInterval"
+      ],
+      "stringRefs": [
+        "1",
+        "number",
+        "clearInterval",
+        "tdc"
+      ],
+      "methodCalls": [
+        "clearInterval"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_238",
+      "startLine": 5521,
+      "endLine": 5535,
+      "lineCount": 15,
+      "arity": 0,
+      "capturedVars": [
+        "r21",
+        "r30"
+      ],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 239,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        21
+      ],
+      "matchedRules": [],
+      "name": "func_239",
+      "startLine": 5537,
+      "endLine": 5546,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 240,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        260
+      ],
+      "matchedRules": [],
+      "name": "func_240",
+      "startLine": 5548,
+      "endLine": 5567,
+      "lineCount": 20,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 241,
+      "category": "fingerprint",
+      "subcategory": "webgl",
+      "description": "WebGL fingerprinting — queries GPU renderer info",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "getParameter",
+        "WEBGL_debug_renderer_info",
+        "UNMASKED_RENDERER_WEBGL",
+        "Not supported",
+        ""
+      ],
+      "methodCalls": [
+        "getExtension",
+        "call",
+        "getParameter",
+        "UNMASKED_RENDERER_WEBGL"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "webgl"
+      ],
+      "name": "func_241",
+      "startLine": 5569,
+      "endLine": 5592,
+      "lineCount": 24,
+      "arity": 0,
+      "capturedVars": [
+        "r10",
+        "r16"
+      ],
+      "capturedBy": [
+        260
+      ]
+    },
+    {
+      "id": 242,
+      "category": "fingerprint",
+      "subcategory": "webgl",
+      "description": "WebGL fingerprinting — queries GPU renderer info",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "canvas",
+        "webgl",
+        "WEBGL_debug_renderer_info",
+        "experimental-webgl"
+      ],
+      "methodCalls": [
+        "createElement",
+        "getContext",
+        "getSupportedExtensions",
+        "indexOf"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "webgl",
+        "manipulation"
+      ],
+      "name": "func_242",
+      "startLine": 5594,
+      "endLine": 5615,
+      "lineCount": 22,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        191
+      ]
+    },
+    {
+      "id": 243,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_243",
+      "startLine": 5617,
+      "endLine": 5620,
+      "lineCount": 4,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        64
+      ]
+    },
+    {
+      "id": 244,
+      "category": "fingerprint",
+      "subcategory": "touch",
+      "description": "Touch capability fingerprinting",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "now",
+        "x",
+        "y",
+        "pressure",
+        "radiusX",
+        "radiusY",
+        "isTrusted",
+        "undefined",
+        "push",
+        "event"
+      ],
+      "methodCalls": [
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "call",
+        "x",
+        "y",
+        "pressure",
+        "radiusX",
+        "radiusY",
+        "isTrusted",
+        "push",
+        "event"
+      ],
+      "funcRefs": [
+        127
+      ],
+      "matchedRules": [
+        "touch"
+      ],
+      "name": "func_244",
+      "startLine": 5622,
+      "endLine": 5719,
+      "lineCount": 98,
+      "arity": 2,
+      "capturedVars": [
+        "r30",
+        "r51",
+        "r13",
+        "r25",
+        "r48",
+        "r15",
+        "r37",
+        "r42"
+      ],
+      "capturedBy": [
+        94
+      ]
+    },
+    {
+      "id": 245,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "Child of ES6 polyfill/utility",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "length",
+        "reset"
+      ],
+      "methodCalls": [
+        "reset",
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_245",
+      "startLine": 5721,
+      "endLine": 5731,
+      "lineCount": 11,
+      "arity": 0,
+      "capturedVars": [
+        "r9"
+      ],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 246,
+      "category": "utility",
+      "subcategory": "json",
+      "description": "JSON serialization/parsing",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "_state",
+        "quota",
+        "usage",
+        "usageDetails",
+        "JSON"
+      ],
+      "methodCalls": [
+        "stringify",
+        "quota",
+        "usage",
+        "usageDetails"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "json"
+      ],
+      "name": "func_246",
+      "startLine": 5733,
+      "endLine": 5754,
+      "lineCount": 22,
+      "arity": 1,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        68
+      ]
+    },
+    {
+      "id": 247,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_247",
+      "startLine": 5756,
+      "endLine": 5761,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [
+        "r13"
+      ],
+      "capturedBy": [
+        121
+      ]
+    },
+    {
+      "id": 248,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Child of Child of Type checking utility",
+      "confidence": 0.3,
+      "apiCalls": [
+        "clearInterval"
+      ],
+      "stringRefs": [
+        "document",
+        "documentMode",
+        "console",
+        "clearInterval"
+      ],
+      "methodCalls": [
+        "profile",
+        "call",
+        "profileEnd",
+        "clearInterval",
+        "documentMode"
+      ],
+      "funcRefs": [
+        158
+      ],
+      "matchedRules": [],
+      "name": "func_248",
+      "startLine": 5763,
+      "endLine": 5795,
+      "lineCount": 33,
+      "arity": 0,
+      "capturedVars": [
+        "r17",
+        "r10",
+        "r8"
+      ],
+      "capturedBy": [
+        208
+      ]
+    },
+    {
+      "id": 249,
+      "category": "utility",
+      "subcategory": "json",
+      "description": "JSON serialization/parsing",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "limits",
+        "_state",
+        "maxTextureDimension1D",
+        "maxTextureDimension2D",
+        "maxTextureDimension3D",
+        "maxTextureArrayLayers",
+        "maxBindGroups",
+        "maxBindGroupsPlusVertexBuffers",
+        "maxBindingsPerBindGroup",
+        "maxBufferSize",
+        "maxColorAttachmentBytesPerSample",
+        "maxColorAttachments",
+        "maxComputeInvocationsPerWorkgroup",
+        "maxComputeWorkgroupSizeX",
+        "maxComputeWorkgroupSizeY",
+        "maxComputeWorkgroupSizeZ",
+        "maxComputeWorkgroupStorageSize",
+        "maxComputeWorkgroupsPerDimension",
+        "maxDynamicStorageBuffersPerPipelineLayout",
+        "maxDynamicUniformBuffersPerPipelineLayout"
+      ],
+      "methodCalls": [
+        "stringify",
+        "limits",
+        "length"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "json"
+      ],
+      "name": "func_249",
+      "startLine": 5797,
+      "endLine": 5870,
+      "lineCount": 74,
+      "arity": 1,
+      "capturedVars": [
+        "r9",
+        "r10",
+        "r26"
+      ],
+      "capturedBy": [
+        258,
+        276
+      ]
+    },
+    {
+      "id": 250,
+      "category": "fingerprint",
+      "subcategory": "touch",
+      "description": "Touch capability fingerprinting",
+      "confidence": 0.8,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "([0-9]{1,3}(\\\\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})",
+        "",
+        "undefined",
+        "window",
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "now",
+        "x",
+        "y",
+        "pressure",
+        "radiusX",
+        "radiusY",
+        "isTrusted",
+        "push"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "exec",
+        "_fUEknVNjDgPBHgEDnYfdUdiiEgRkdemO",
+        "call",
+        "x",
+        "y",
+        "pressure",
+        "radiusX",
+        "radiusY",
+        "isTrusted",
+        "push"
+      ],
+      "funcRefs": [
+        127
+      ],
+      "matchedRules": [
+        "touch",
+        "regex"
+      ],
+      "name": "func_250",
+      "startLine": 5872,
+      "endLine": 5963,
+      "lineCount": 92,
+      "arity": 1,
+      "capturedVars": [
+        "r24",
+        "r28"
+      ],
+      "capturedBy": [
+        227
+      ]
+    },
+    {
+      "id": 251,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        ""
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_251",
+      "startLine": 5965,
+      "endLine": 5970,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        156
+      ]
+    },
+    {
+      "id": 252,
+      "category": "utility",
+      "subcategory": "polyfill",
+      "description": "Child of ES6 polyfill/utility",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [
+        "length",
+        "on",
+        "t",
+        ""
+      ],
+      "methodCalls": [
+        "on",
+        "length"
+      ],
+      "funcRefs": [
+        96
+      ],
+      "matchedRules": [],
+      "name": "func_252",
+      "startLine": 5972,
+      "endLine": 6006,
+      "lineCount": 35,
+      "arity": 0,
+      "capturedVars": [
+        "r32",
+        "r31",
+        "r9",
+        "r18"
+      ],
+      "capturedBy": [
+        36
+      ]
+    },
+    {
+      "id": 253,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        165
+      ],
+      "matchedRules": [],
+      "name": "func_253",
+      "startLine": 6008,
+      "endLine": 6017,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 254,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Safe wrapper (try/catch)",
+      "confidence": 0.5,
+      "apiCalls": [],
+      "stringRefs": [
+        "'0/:"
+      ],
+      "methodCalls": [
+        "d"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_254",
+      "startLine": 6019,
+      "endLine": 6031,
+      "lineCount": 13,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 255,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "toUpperCase"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_255",
+      "startLine": 6033,
+      "endLine": 6036,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        225
+      ]
+    },
+    {
+      "id": 256,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "screen",
+        "height"
+      ],
+      "methodCalls": [
+        "height"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_256",
+      "startLine": 6038,
+      "endLine": 6044,
+      "lineCount": 7,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        178
+      ]
+    },
+    {
+      "id": 257,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        17
+      ],
+      "matchedRules": [],
+      "name": "func_257",
+      "startLine": 6046,
+      "endLine": 6055,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 258,
+      "category": "fingerprint",
+      "subcategory": "gpu",
+      "description": "WebGPU fingerprinting",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "{\\\"_state\\\":-2}",
+        "undefined",
+        "navigator",
+        "gpu",
+        "then",
+        "catch",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "requestAdapter",
+        "call",
+        "gpu",
+        "then",
+        "catch"
+      ],
+      "funcRefs": [
+        249,
+        107,
+        105
+      ],
+      "matchedRules": [
+        "gpu"
+      ],
+      "name": "func_258",
+      "startLine": 6057,
+      "endLine": 6108,
+      "lineCount": 52,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 259,
+      "category": "utility",
+      "subcategory": "type-check",
+      "description": "Child of Type checking utility",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [
+        "slice",
+        "parseInt",
+        "join",
+        ""
+      ],
+      "methodCalls": [
+        "slice",
+        "reverse",
+        "join",
+        "call"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_259",
+      "startLine": 6110,
+      "endLine": 6130,
+      "lineCount": 21,
+      "arity": 0,
+      "capturedVars": [
+        "r21"
+      ],
+      "capturedBy": [
+        88
+      ]
+    },
+    {
+      "id": 260,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        241
+      ],
+      "matchedRules": [],
+      "name": "func_260",
+      "startLine": 6132,
+      "endLine": 6148,
+      "lineCount": 17,
+      "arity": 0,
+      "capturedVars": [
+        "r18",
+        "r9",
+        "r11"
+      ],
+      "capturedBy": [
+        240
+      ]
+    },
+    {
+      "id": 261,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "plugins",
+        "[]",
+        "length",
+        "push",
+        "name",
+        "description",
+        "filename",
+        "JSON",
+        ""
+      ],
+      "methodCalls": [
+        "call",
+        "stringify",
+        "plugins",
+        "length",
+        "push",
+        "name",
+        "description",
+        "filename"
+      ],
+      "funcRefs": [
+        70
+      ],
+      "matchedRules": [
+        "browser",
+        "json"
+      ],
+      "name": "func_261",
+      "startLine": 6150,
+      "endLine": 6201,
+      "lineCount": 52,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        40
+      ]
+    },
+    {
+      "id": 262,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        211
+      ],
+      "matchedRules": [],
+      "name": "func_262",
+      "startLine": 6203,
+      "endLine": 6209,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 263,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "addEventListener",
+        "on"
+      ],
+      "methodCalls": [
+        "addEventListener"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_263",
+      "startLine": 6211,
+      "endLine": 6226,
+      "lineCount": 16,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        172
+      ]
+    },
+    {
+      "id": 264,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "monospace",
+        "sans-serif",
+        "serif",
+        "Arial",
+        "Arial Black",
+        "Arial Narrow",
+        "Courier New",
+        "Georgia",
+        "Impact",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana",
+        "Helvetica",
+        "Tahoma",
+        "Gill Sans",
+        "Palatino",
+        "Garamond",
+        "Bookman",
+        "Comic Sans MS",
+        "Candara"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        58
+      ],
+      "matchedRules": [],
+      "name": "func_264",
+      "startLine": 6228,
+      "endLine": 6302,
+      "lineCount": 75,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 265,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        ""
+      ],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_265",
+      "startLine": 6304,
+      "endLine": 6309,
+      "lineCount": 6,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        286
+      ]
+    },
+    {
+      "id": 266,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "{\\\"_state\\\":-2}",
+        "{\\\"_state\\\":-1}",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        68,
+        109
+      ],
+      "matchedRules": [],
+      "name": "func_266",
+      "startLine": 6311,
+      "endLine": 6327,
+      "lineCount": 17,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 267,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Regular expression utility",
+      "confidence": 0.65,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "match",
+        "^[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7}$",
+        ""
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "match"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "regex"
+      ],
+      "name": "func_267",
+      "startLine": 6329,
+      "endLine": 6337,
+      "lineCount": 9,
+      "arity": 1,
+      "capturedVars": [
+        "r17"
+      ],
+      "capturedBy": [
+        190
+      ]
+    },
+    {
+      "id": 268,
+      "category": "fingerprint",
+      "subcategory": "touch",
+      "description": "Touch capability fingerprinting",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "mousemove",
+        "mousedown",
+        "mouseup",
+        "touchmove",
+        "touchstart",
+        "touchend"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        202,
+        111,
+        59,
+        283,
+        81,
+        170
+      ],
+      "matchedRules": [
+        "touch"
+      ],
+      "name": "func_268",
+      "startLine": 6339,
+      "endLine": 6381,
+      "lineCount": 43,
+      "arity": 0,
+      "capturedVars": [
+        "r46",
+        "r34",
+        "r24"
+      ],
+      "capturedBy": [
+        94
+      ]
+    },
+    {
+      "id": 269,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        128
+      ],
+      "matchedRules": [],
+      "name": "func_269",
+      "startLine": 6383,
+      "endLine": 6389,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 270,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module with exports",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "load",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        207,
+        166
+      ],
+      "matchedRules": [],
+      "name": "func_270",
+      "startLine": 6391,
+      "endLine": 6412,
+      "lineCount": 22,
+      "arity": 3,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 271,
+      "category": "utility",
+      "subcategory": "encoding",
+      "description": "Child of Child of Encoding/utility function",
+      "confidence": 0.3,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "length"
+      ],
+      "methodCalls": [
+        "call",
+        "length"
+      ],
+      "funcRefs": [
+        100,
+        141,
+        69,
+        210,
+        31,
+        90,
+        43,
+        199,
+        254,
+        74,
+        284,
+        273,
+        113,
+        92
+      ],
+      "matchedRules": [],
+      "name": "func_271",
+      "startLine": 6414,
+      "endLine": 6463,
+      "lineCount": 50,
+      "arity": 2,
+      "capturedVars": [
+        "r9",
+        "r11",
+        "r13",
+        "r16",
+        "r8",
+        "r15"
+      ],
+      "capturedBy": [
+        114
+      ]
+    },
+    {
+      "id": 272,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "",
+        "document",
+        "createElement",
+        "div",
+        "p",
+        "appendChild",
+        "insertBefore",
+        "divdivdivppadiv",
+        "outerHTML",
+        "innerHTML"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "cloneNode",
+        "insertBefore",
+        "outerHTML",
+        "innerHTML"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_272",
+      "startLine": 6465,
+      "endLine": 6496,
+      "lineCount": 32,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        151
+      ]
+    },
+    {
+      "id": 273,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Safe wrapper (try/catch)",
+      "confidence": 0.5,
+      "apiCalls": [],
+      "stringRefs": [
+        "QRu~"
+      ],
+      "methodCalls": [
+        "b"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_273",
+      "startLine": 6498,
+      "endLine": 6510,
+      "lineCount": 13,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 274,
+      "category": "fingerprint",
+      "subcategory": "browser",
+      "description": "Browser fingerprinting — reads navigator properties",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "navigator",
+        "userAgentData",
+        "brands",
+        "length",
+        "push",
+        "brand",
+        "version",
+        "mobile",
+        "platform",
+        "JSON",
+        ""
+      ],
+      "methodCalls": [
+        "call",
+        "stringify",
+        "userAgentData",
+        "brands",
+        "length",
+        "push",
+        "brand",
+        "version"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "browser",
+        "json"
+      ],
+      "name": "func_274",
+      "startLine": 6512,
+      "endLine": 6562,
+      "lineCount": 51,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        153
+      ]
+    },
+    {
+      "id": 275,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.95,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "iframe",
+        "style",
+        "display",
+        "none",
+        "body",
+        "appendChild",
+        "contentWindow",
+        "top",
+        "window",
+        "removeChild"
+      ],
+      "methodCalls": [
+        "createElement",
+        "appendChild",
+        "removeChild",
+        "style",
+        "body",
+        "contentWindow",
+        "top"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_275",
+      "startLine": 6564,
+      "endLine": 6593,
+      "lineCount": 30,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        192
+      ]
+    },
+    {
+      "id": 276,
+      "category": "fingerprint",
+      "subcategory": "gpu",
+      "description": "WebGPU fingerprinting",
+      "confidence": 0.8,
+      "apiCalls": [
+        "RegExp"
+      ],
+      "stringRefs": [
+        "cd",
+        "",
+        "{\\\"cd\\\":[",
+        "length",
+        "number",
+        ",",
+        "\\\"",
+        "replace",
+        "[\\\\u0000-\\\\u001F\\\\u007F-\\\\u009F\\\\uD800-\\\\uDFFF]",
+        "g",
+        "string",
+        "null",
+        "undefined",
+        "navigator",
+        "gpu",
+        "then",
+        "catch",
+        "exports",
+        "get",
+        "],"
+      ],
+      "methodCalls": [
+        "RegExp",
+        "call",
+        "requestAdapter",
+        "get",
+        "cd",
+        "length",
+        "replace",
+        "gpu",
+        "then",
+        "catch"
+      ],
+      "funcRefs": [
+        249,
+        107,
+        105
+      ],
+      "matchedRules": [
+        "gpu",
+        "regex"
+      ],
+      "name": "func_276",
+      "startLine": 6595,
+      "endLine": 6752,
+      "lineCount": 158,
+      "arity": 0,
+      "capturedVars": [
+        "r15",
+        "r40",
+        "r38",
+        "r33",
+        "r50"
+      ],
+      "capturedBy": [
+        212
+      ]
+    },
+    {
+      "id": 277,
+      "category": "utility",
+      "subcategory": "regex",
+      "description": "Child of Regular expression utility",
+      "confidence": 0.45,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_277",
+      "startLine": 6754,
+      "endLine": 6765,
+      "lineCount": 12,
+      "arity": 0,
+      "capturedVars": [
+        "r13",
+        "r23"
+      ],
+      "capturedBy": [
+        163
+      ]
+    },
+    {
+      "id": 278,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module (exports data)",
+      "confidence": 0.6000000000000001,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        82
+      ],
+      "matchedRules": [],
+      "name": "func_278",
+      "startLine": 6767,
+      "endLine": 6781,
+      "lineCount": 15,
+      "arity": 0,
+      "capturedVars": [
+        "r8"
+      ],
+      "capturedBy": [
+        80
+      ]
+    },
+    {
+      "id": 279,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Child of Collector module with exports",
+      "confidence": 0.39999999999999997,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        63
+      ],
+      "matchedRules": [],
+      "name": "func_279",
+      "startLine": 6783,
+      "endLine": 6807,
+      "lineCount": 25,
+      "arity": 0,
+      "capturedVars": [
+        "r22",
+        "r15",
+        "r24",
+        "r18",
+        "r21",
+        "r29",
+        "r11"
+      ],
+      "capturedBy": [
+        22
+      ]
+    },
+    {
+      "id": 280,
+      "category": "dom",
+      "subcategory": "manipulation",
+      "description": "DOM manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "document",
+        "div",
+        "Webkit O Moz Ms",
+        " ",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "createElement",
+        "split"
+      ],
+      "funcRefs": [
+        152,
+        195,
+        103,
+        39
+      ],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_280",
+      "startLine": 6809,
+      "endLine": 6833,
+      "lineCount": 25,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 281,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_281",
+      "startLine": 6835,
+      "endLine": 6837,
+      "lineCount": 3,
+      "arity": 0,
+      "capturedVars": [
+        "r9"
+      ],
+      "capturedBy": [
+        56
+      ]
+    },
+    {
+      "id": 282,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "TDC-related function",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF"
+      ],
+      "methodCalls": [
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+        "getTime"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_282",
+      "startLine": 6839,
+      "endLine": 6852,
+      "lineCount": 14,
+      "arity": 0,
+      "capturedVars": [],
+      "capturedBy": [
+        76
+      ]
+    },
+    {
+      "id": 283,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_283",
+      "startLine": 6854,
+      "endLine": 6857,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [
+        "r22"
+      ],
+      "capturedBy": [
+        268
+      ]
+    },
+    {
+      "id": 284,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "QRu~"
+      ],
+      "methodCalls": [
+        "charCodeAt"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_284",
+      "startLine": 6859,
+      "endLine": 6877,
+      "lineCount": 19,
+      "arity": 3,
+      "capturedVars": [
+        "r87"
+      ],
+      "capturedBy": [
+        271
+      ]
+    },
+    {
+      "id": 285,
+      "category": "math",
+      "subcategory": "computation",
+      "description": "Mathematical computation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "TDC_itoken",
+        "test",
+        ":",
+        "length",
+        "Math",
+        "floor",
+        "random",
+        "window",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF"
+      ],
+      "methodCalls": [
+        "getCookie",
+        "test",
+        "split",
+        "random",
+        "call",
+        "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF",
+        "getTime",
+        "setCookie",
+        "length",
+        "floor"
+      ],
+      "funcRefs": [],
+      "matchedRules": [
+        "computation"
+      ],
+      "name": "func_285",
+      "startLine": 6879,
+      "endLine": 6947,
+      "lineCount": 69,
+      "arity": 0,
+      "capturedVars": [
+        "r20",
+        "r24",
+        "r13",
+        "r23"
+      ],
+      "capturedBy": [
+        163
+      ]
+    },
+    {
+      "id": 286,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module (exports data)",
+      "confidence": 0.8,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports",
+        "get"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        265
+      ],
+      "matchedRules": [],
+      "name": "func_286",
+      "startLine": 6949,
+      "endLine": 6958,
+      "lineCount": 10,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 287,
+      "category": "string-ops",
+      "subcategory": "manipulation",
+      "description": "String manipulation",
+      "confidence": 0.65,
+      "apiCalls": [],
+      "stringRefs": [
+        "window",
+        "TCaptchaReferrer",
+        "unknown",
+        "length",
+        "substring",
+        "*",
+        "exports",
+        "get"
+      ],
+      "methodCalls": [
+        "substring",
+        "TCaptchaReferrer",
+        "length"
+      ],
+      "funcRefs": [
+        237
+      ],
+      "matchedRules": [
+        "manipulation"
+      ],
+      "name": "func_287",
+      "startLine": 6960,
+      "endLine": 6983,
+      "lineCount": 24,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 288,
+      "category": "control-flow",
+      "subcategory": null,
+      "description": "Wrapper/dispatcher",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "toUpperCase"
+      ],
+      "funcRefs": [],
+      "matchedRules": [],
+      "name": "func_288",
+      "startLine": 6985,
+      "endLine": 6988,
+      "lineCount": 4,
+      "arity": 1,
+      "capturedVars": [],
+      "capturedBy": [
+        152
+      ]
+    },
+    {
+      "id": 289,
+      "category": "data-collection",
+      "subcategory": null,
+      "description": "Collector module",
+      "confidence": 0.6,
+      "apiCalls": [],
+      "stringRefs": [
+        "exports"
+      ],
+      "methodCalls": [],
+      "funcRefs": [
+        87
+      ],
+      "matchedRules": [],
+      "name": "func_289",
+      "startLine": 6990,
+      "endLine": 6996,
+      "lineCount": 7,
+      "arity": 2,
+      "capturedVars": [],
+      "capturedBy": [
+        0
+      ]
+    },
+    {
+      "id": 0,
+      "category": "control-flow",
+      "subcategory": "entry-point",
+      "description": "Main entry point — creates collector array and invokes orchestrator",
+      "confidence": 1,
+      "apiCalls": [],
+      "stringRefs": [],
+      "methodCalls": [
+        "call"
+      ],
+      "funcRefs": [
+        110,
+        164,
+        53,
+        163,
+        174,
+        36,
+        118,
+        37,
+        139,
+        99,
+        235,
+        125,
+        6,
+        220,
+        264,
+        190,
+        28,
+        26,
+        122,
+        34,
+        46,
+        94,
+        172,
+        57,
+        149,
+        116,
+        22,
+        151,
+        123,
+        262,
+        66,
+        289,
+        83,
+        270,
+        35,
+        144,
+        230,
+        167,
+        266,
+        124,
+        42,
+        40,
+        10,
+        187,
+        80,
+        253,
+        233,
+        143,
+        108,
+        257,
+        147,
+        175,
+        64,
+        23,
+        191,
+        269,
+        117,
+        168,
+        287,
+        240,
+        148,
+        258,
+        2,
+        178,
+        239,
+        153,
+        50,
+        86,
+        7,
+        156,
+        45,
+        88,
+        76,
+        183,
+        77,
+        286,
+        5,
+        280,
+        98,
+        85,
+        197,
+        13
+      ],
+      "matchedRules": [],
+      "name": "func_0",
+      "startLine": 6999,
+      "endLine": 7090,
+      "lineCount": 92,
+      "arity": null,
+      "capturedVars": [],
+      "capturedBy": []
+    }
+  ]
+}

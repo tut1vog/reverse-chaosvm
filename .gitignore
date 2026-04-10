@@ -1,0 +1,6 @@
+node_modules/
+.venv/
+output/dynamic/session-*.json
+*.pyc
+__pycache__/
+.claude/settings.local.json

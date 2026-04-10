@@ -1,0 +1,872 @@
+======================================================================
+Example 1: Compound opcodes + control flow (ARRAY, CATCH_PUSH, FUNC_CREATE, PROP_SET, TRY_POP, JMP)
+Function 0, Block b0 (6 instructions → 5 statements)
+
+BEFORE (original disassembly):
+  [36579]  ARRAY  r11, 0  ; r11 = Array(0)
+  [36582]  CATCH_PUSH  -20769  ; F.push(C+-20769)
+  [36584]  FUNC_CREATE_C  0, r10, -7616, 1  ; r10 = closure(offset=-7616, [], arity=1)
+  [36589]  PROP_SET_K  r11, 0, r10  ; r11[0] = r10
+  [36593]  TRY_POP    ; F.pop()
+  [36594]  JMP  12822  ; C += 12822
+
+AFTER (folded):
+  [36582] catch_push(offset=-20769)
+  [36584] r10 = closure(offset=-7616, arity=1)
+  [36589] Array(0)[0] = r10
+  [36593] try_pop()
+  [36594] jmp 12822
+
+liveOut: [r11, r10]
+
+======================================================================
+Example 2: String build "substring" + call + return
+Function 1, Block b2 (10 instructions → 5 statements)
+
+BEFORE (original disassembly):
+  [22642]  STR_EMPTY  r19  ; r19 = ""
+  [22644]  STR_APPEND_2  r19, 115, r19, 117  ; r19 += 's'; r19 += 'u'
+  [22649]  STR_APPEND_2  r19, 98, r19, 115  ; r19 += 'b'; r19 += 's'
+  [22654]  STR_APPEND_2  r19, 116, r19, 114  ; r19 += 't'; r19 += 'r'
+  [22659]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [22664]  STR_PROP  r19, 103, r9, r18, r19  ; r19 += 'g'; r9 = r18[r19]
+  [22670]  LOAD_K  r19, 0  ; r19 = 0
+  [22673]  CALL_2  r20, r9, r18, r19, r21  ; r20 = r9.call(r18, r19, r21)
+  [22679]  MOV_2  r23, r20, r18, r20  ; r23 = r20; r18 = r20
+  [22684]  RET_BARE  r18  ; return r18
+
+AFTER (folded):
+  [22642] r19 = "substring"
+  [22664] r9 = r18[r19]
+  [22673] r20 = r9.call(r18, 0, r21)
+  [22679] r23 = r20
+  [22684] return r20
+
+String literals:
+  r19 = "substring" (PC 22642–22664)
+
+liveOut: [r19, r9, r20, r23, r18]
+
+======================================================================
+Example 3: Arithmetic/load folding
+Function 14, Block b7 (13 instructions → 8 statements)
+
+BEFORE (original disassembly):
+  [39568]  MOV  r9, r31  ; r9 = r31
+  [39571]  STR_EMPTY  r14  ; r14 = ""
+  [39573]  LOAD_K  r22, 38  ; r22 = 38
+  [39576]  PROP_SET_K  r6, 39590, r22  ; r6[39590] = r22
+  [39580]  STR_APPEND  r14, 32  ; r14 += ' '
+  [39583]  ADD  r9, r9, r14  ; r9 = r9 + r14
+  [39587]  MOV  r31, r9  ; r31 = r9
+  [39590]  FUNC_CREATE_C  -30121  ; INVALID: bad closure count (likely data region)
+  [39592]  EXC_TRY  r67, r66, r67, -535  ; r67 = G; r66 = r67; F.push(C+-535)
+  [39597]  TRY_POP    ; F.pop()
+  [39598]  ARRAY  r67, 1  ; r67 = Array(1)
+  [39601]  LOAD_K  r13, 0  ; r13 = 0
+  [39604]  SET_RET  r67, 0, r13, r67  ; r67[0] = r13; return r67
+
+AFTER (folded):
+  [39576] r6[39590] = 38
+  [39571] r14 = " "
+  [39587] r31 = (r31 + r14)
+  [39590] null = closure(offset=undefined, arity=undefined)
+  [39592] r66 = caught_exception; try_push(offset=-535)
+  [39597] try_pop()
+  [39598] r67 = Array(1)
+  [39604] r67[0] = 0; return r67
+
+String literals:
+  r14 = " " (PC 39571–39580)
+
+liveOut: [r9, r22, r14, r31, r67, r66, r13]
+
+======================================================================
+Example 4: Multi-use register preservation
+Function 1, Block b3 (10 instructions → 5 statements)
+
+BEFORE (original disassembly):
+  [54711]  STR_EMPTY  r9  ; r9 = ""
+  [54713]  STR_APPEND_2  r9, 105, r9, 110  ; r9 += 'i'; r9 += 'n'
+  [54718]  STR_APPEND_2  r9, 100, r9, 101  ; r9 += 'd'; r9 += 'e'
+  [54723]  STR_APPEND_2  r9, 120, r9, 79  ; r9 += 'x'; r9 += 'O'
+  [54728]  STR_PROP  r9, 102, r20, r18, r9  ; r9 += 'f'; r20 = r18[r9]
+  [54734]  STR_INIT  r9, r9, 63  ; r9 = ""; r9 += '?'
+  [54738]  CALL_1  r19, r20, r18, r9  ; r19 = r20.call(r18, r9)
+  [54743]  MOV  r21, r19  ; r21 = r19
+  [54746]  GT_K  r23, r21, 0  ; r23 = r21 > 0
+  [54750]  CJMP  r23, -32109, -42379  ; C += r23 ? -32109 : -42379
+
+AFTER (folded):
+  [54711] r9 = "indexOf"
+  [54728] r20 = r18[r9]
+  [54734] r9 = "?"
+  [54738] r19 = r20.call(r18, r9)
+  [54750] cjmp (r19 > 0) ? -32109 : -42379
+
+String literals:
+  r9 = "indexOf" (PC 54711–54728)
+  r9 = "?" (PC 54734–54734)
+
+liveOut: [r9, r20, r19, r21, r23]
+
+======================================================================
+Example 5: Property get → method call
+Function 1, Block b3 (10 instructions → 5 statements)
+
+BEFORE (original disassembly):
+  [54711]  STR_EMPTY  r9  ; r9 = ""
+  [54713]  STR_APPEND_2  r9, 105, r9, 110  ; r9 += 'i'; r9 += 'n'
+  [54718]  STR_APPEND_2  r9, 100, r9, 101  ; r9 += 'd'; r9 += 'e'
+  [54723]  STR_APPEND_2  r9, 120, r9, 79  ; r9 += 'x'; r9 += 'O'
+  [54728]  STR_PROP  r9, 102, r20, r18, r9  ; r9 += 'f'; r20 = r18[r9]
+  [54734]  STR_INIT  r9, r9, 63  ; r9 = ""; r9 += '?'
+  [54738]  CALL_1  r19, r20, r18, r9  ; r19 = r20.call(r18, r9)
+  [54743]  MOV  r21, r19  ; r21 = r19
+  [54746]  GT_K  r23, r21, 0  ; r23 = r21 > 0
+  [54750]  CJMP  r23, -32109, -42379  ; C += r23 ? -32109 : -42379
+
+AFTER (folded):
+  [54711] r9 = "indexOf"
+  [54728] r20 = r18[r9]
+  [54734] r9 = "?"
+  [54738] r19 = r20.call(r18, r9)
+  [54750] cjmp (r19 > 0) ? -32109 : -42379
+
+String literals:
+  r9 = "indexOf" (PC 54711–54728)
+  r9 = "?" (PC 54734–54734)
+
+liveOut: [r9, r20, r19, r21, r23]
+
+======================================================================
+Example 6: Largest block (455 instructions)
+Function 249, Block b3 (455 instructions → 70 statements)
+
+BEFORE (original disassembly):
+  [20397]  OBJ_NEW  r25  ; r25 = {}
+  [20399]  STR_EMPTY  r19  ; r19 = ""
+  [20401]  STR_APPEND_2  r19, 95, r19, 115  ; r19 += '_'; r19 += 's'
+  [20406]  STR_APPEND_2  r19, 116, r19, 97  ; r19 += 't'; r19 += 'a'
+  [20411]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [20416]  LOAD_K  r27, 0  ; r27 = 0
+  [20419]  PROP_SET  r25, r19, r27  ; r25[r19] = r27
+  [20423]  MOV  r39, r25  ; r39 = r25
+  [20426]  ARRAY  r25, 31  ; r25 = Array(31)
+  [20429]  STR_EMPTY  r19  ; r19 = ""
+  [20431]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20436]  STR_APPEND_2  r19, 120, r19, 84  ; r19 += 'x'; r19 += 'T'
+  [20441]  STR_APPEND_2  r19, 101, r19, 120  ; r19 += 'e'; r19 += 'x'
+  [20446]  STR_APPEND_2  r19, 116, r19, 117  ; r19 += 't'; r19 += 'u'
+  [20451]  STR_APPEND_2  r19, 114, r19, 101  ; r19 += 'r'; r19 += 'e'
+  [20456]  STR_APPEND_2  r19, 68, r19, 105  ; r19 += 'D'; r19 += 'i'
+  [20461]  STR_APPEND_2  r19, 109, r19, 101  ; r19 += 'm'; r19 += 'e'
+  [20466]  STR_APPEND_2  r19, 110, r19, 115  ; r19 += 'n'; r19 += 's'
+  [20471]  STR_APPEND_2  r19, 105, r19, 111  ; r19 += 'i'; r19 += 'o'
+  [20476]  STR_APPEND_2  r19, 110, r19, 49  ; r19 += 'n'; r19 += '1'
+  [20481]  STR_SET_STR  r19, 68, r25, 0, r19, r19  ; r19 += 'D'; r25[0] = r19; r19 = ""
+  [20488]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20493]  STR_APPEND_2  r19, 120, r19, 84  ; r19 += 'x'; r19 += 'T'
+  [20498]  STR_APPEND_2  r19, 101, r19, 120  ; r19 += 'e'; r19 += 'x'
+  [20503]  STR_APPEND_2  r19, 116, r19, 117  ; r19 += 't'; r19 += 'u'
+  [20508]  STR_APPEND_2  r19, 114, r19, 101  ; r19 += 'r'; r19 += 'e'
+  [20513]  STR_APPEND_2  r19, 68, r19, 105  ; r19 += 'D'; r19 += 'i'
+  [20518]  STR_APPEND_2  r19, 109, r19, 101  ; r19 += 'm'; r19 += 'e'
+  [20523]  STR_APPEND_2  r19, 110, r19, 115  ; r19 += 'n'; r19 += 's'
+  [20528]  STR_APPEND_2  r19, 105, r19, 111  ; r19 += 'i'; r19 += 'o'
+  [20533]  STR_APPEND_2  r19, 110, r19, 50  ; r19 += 'n'; r19 += '2'
+  [20538]  STR_SET_STR  r19, 68, r25, 1, r19, r19  ; r19 += 'D'; r25[1] = r19; r19 = ""
+  [20545]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20550]  STR_APPEND_2  r19, 120, r19, 84  ; r19 += 'x'; r19 += 'T'
+  [20555]  STR_APPEND_2  r19, 101, r19, 120  ; r19 += 'e'; r19 += 'x'
+  [20560]  STR_APPEND_2  r19, 116, r19, 117  ; r19 += 't'; r19 += 'u'
+  [20565]  STR_APPEND_2  r19, 114, r19, 101  ; r19 += 'r'; r19 += 'e'
+  [20570]  STR_APPEND_2  r19, 68, r19, 105  ; r19 += 'D'; r19 += 'i'
+  [20575]  STR_APPEND_2  r19, 109, r19, 101  ; r19 += 'm'; r19 += 'e'
+  [20580]  STR_APPEND_2  r19, 110, r19, 115  ; r19 += 'n'; r19 += 's'
+  [20585]  STR_APPEND_2  r19, 105, r19, 111  ; r19 += 'i'; r19 += 'o'
+  [20590]  STR_APPEND_2  r19, 110, r19, 51  ; r19 += 'n'; r19 += '3'
+  [20595]  STR_SET_STR  r19, 68, r25, 2, r19, r19  ; r19 += 'D'; r25[2] = r19; r19 = ""
+  [20602]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20607]  STR_APPEND_2  r19, 120, r19, 84  ; r19 += 'x'; r19 += 'T'
+  [20612]  STR_APPEND_2  r19, 101, r19, 120  ; r19 += 'e'; r19 += 'x'
+  [20617]  STR_APPEND_2  r19, 116, r19, 117  ; r19 += 't'; r19 += 'u'
+  [20622]  STR_APPEND_2  r19, 114, r19, 101  ; r19 += 'r'; r19 += 'e'
+  [20627]  STR_APPEND_2  r19, 65, r19, 114  ; r19 += 'A'; r19 += 'r'
+  [20632]  STR_APPEND_2  r19, 114, r19, 97  ; r19 += 'r'; r19 += 'a'
+  [20637]  STR_APPEND_2  r19, 121, r19, 76  ; r19 += 'y'; r19 += 'L'
+  [20642]  STR_APPEND_2  r19, 97, r19, 121  ; r19 += 'a'; r19 += 'y'
+  [20647]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [20652]  STR_SET_STR  r19, 115, r25, 3, r19, r19  ; r19 += 's'; r25[3] = r19; r19 = ""
+  [20659]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20664]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [20669]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [20674]  STR_APPEND_2  r19, 100, r19, 71  ; r19 += 'd'; r19 += 'G'
+  [20679]  STR_APPEND_2  r19, 114, r19, 111  ; r19 += 'r'; r19 += 'o'
+  [20684]  STR_APPEND_2  r19, 117, r19, 112  ; r19 += 'u'; r19 += 'p'
+  [20689]  STR_SET_STR  r19, 115, r25, 4, r19, r19  ; r19 += 's'; r25[4] = r19; r19 = ""
+  [20696]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20701]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [20706]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [20711]  STR_APPEND_2  r19, 100, r19, 71  ; r19 += 'd'; r19 += 'G'
+  [20716]  STR_APPEND_2  r19, 114, r19, 111  ; r19 += 'r'; r19 += 'o'
+  [20721]  STR_APPEND_2  r19, 117, r19, 112  ; r19 += 'u'; r19 += 'p'
+  [20726]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [20731]  STR_APPEND_2  r19, 108, r19, 117  ; r19 += 'l'; r19 += 'u'
+  [20736]  STR_APPEND_2  r19, 115, r19, 86  ; r19 += 's'; r19 += 'V'
+  [20741]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [20746]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [20751]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [20756]  STR_APPEND_2  r19, 117, r19, 102  ; r19 += 'u'; r19 += 'f'
+  [20761]  STR_APPEND_2  r19, 102, r19, 101  ; r19 += 'f'; r19 += 'e'
+  [20766]  STR_APPEND_2  r19, 114, r19, 115  ; r19 += 'r'; r19 += 's'
+  [20771]  PROP_SET_K  r25, 5, r19  ; r25[5] = r19
+  [20775]  STR_EMPTY  r19  ; r19 = ""
+  [20777]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20782]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [20787]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [20792]  STR_APPEND_2  r19, 100, r19, 105  ; r19 += 'd'; r19 += 'i'
+  [20797]  STR_APPEND_2  r19, 110, r19, 103  ; r19 += 'n'; r19 += 'g'
+  [20802]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [20807]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [20812]  STR_APPEND_2  r19, 66, r19, 105  ; r19 += 'B'; r19 += 'i'
+  [20817]  STR_APPEND_2  r19, 110, r19, 100  ; r19 += 'n'; r19 += 'd'
+  [20822]  STR_APPEND_2  r19, 71, r19, 114  ; r19 += 'G'; r19 += 'r'
+  [20827]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [20832]  STR_SET_STR  r19, 112, r25, 6, r19, r19  ; r19 += 'p'; r25[6] = r19; r19 = ""
+  [20839]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20844]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [20849]  STR_APPEND_2  r19, 117, r19, 102  ; r19 += 'u'; r19 += 'f'
+  [20854]  STR_APPEND_2  r19, 102, r19, 101  ; r19 += 'f'; r19 += 'e'
+  [20859]  STR_APPEND_2  r19, 114, r19, 83  ; r19 += 'r'; r19 += 'S'
+  [20864]  STR_APPEND_2  r19, 105, r19, 122  ; r19 += 'i'; r19 += 'z'
+  [20869]  STR_SET_STR  r19, 101, r25, 7, r19, r19  ; r19 += 'e'; r25[7] = r19; r19 = ""
+  [20876]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20881]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [20886]  STR_APPEND_2  r19, 111, r19, 108  ; r19 += 'o'; r19 += 'l'
+  [20891]  STR_APPEND_2  r19, 111, r19, 114  ; r19 += 'o'; r19 += 'r'
+  [20896]  STR_APPEND_2  r19, 65, r19, 116  ; r19 += 'A'; r19 += 't'
+  [20901]  STR_APPEND_2  r19, 116, r19, 97  ; r19 += 't'; r19 += 'a'
+  [20906]  STR_APPEND_2  r19, 99, r19, 104  ; r19 += 'c'; r19 += 'h'
+  [20911]  STR_APPEND_2  r19, 109, r19, 101  ; r19 += 'm'; r19 += 'e'
+  [20916]  STR_APPEND_2  r19, 110, r19, 116  ; r19 += 'n'; r19 += 't'
+  [20921]  STR_APPEND_2  r19, 66, r19, 121  ; r19 += 'B'; r19 += 'y'
+  [20926]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [20931]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [20936]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [20941]  STR_APPEND_2  r19, 83, r19, 97  ; r19 += 'S'; r19 += 'a'
+  [20946]  STR_APPEND_2  r19, 109, r19, 112  ; r19 += 'm'; r19 += 'p'
+  [20951]  STR_APPEND_2  r19, 108, r19, 101  ; r19 += 'l'; r19 += 'e'
+  [20956]  PROP_SET_K  r25, 8, r19  ; r25[8] = r19
+  [20960]  STR_EMPTY  r19  ; r19 = ""
+  [20962]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [20967]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [20972]  STR_APPEND_2  r19, 111, r19, 108  ; r19 += 'o'; r19 += 'l'
+  [20977]  STR_APPEND_2  r19, 111, r19, 114  ; r19 += 'o'; r19 += 'r'
+  [20982]  STR_APPEND_2  r19, 65, r19, 116  ; r19 += 'A'; r19 += 't'
+  [20987]  STR_APPEND_2  r19, 116, r19, 97  ; r19 += 't'; r19 += 'a'
+  [20992]  STR_APPEND_2  r19, 99, r19, 104  ; r19 += 'c'; r19 += 'h'
+  [20997]  STR_APPEND_2  r19, 109, r19, 101  ; r19 += 'm'; r19 += 'e'
+  [21002]  STR_APPEND_2  r19, 110, r19, 116  ; r19 += 'n'; r19 += 't'
+  [21007]  STR_SET_STR  r19, 115, r25, 9, r19, r19  ; r19 += 's'; r25[9] = r19; r19 = ""
+  [21014]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21019]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [21024]  STR_APPEND_2  r19, 111, r19, 109  ; r19 += 'o'; r19 += 'm'
+  [21029]  STR_APPEND_2  r19, 112, r19, 117  ; r19 += 'p'; r19 += 'u'
+  [21034]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [21039]  STR_APPEND_2  r19, 73, r19, 110  ; r19 += 'I'; r19 += 'n'
+  [21044]  STR_APPEND_2  r19, 118, r19, 111  ; r19 += 'v'; r19 += 'o'
+  [21049]  STR_APPEND_2  r19, 99, r19, 97  ; r19 += 'c'; r19 += 'a'
+  [21054]  STR_APPEND_2  r19, 116, r19, 105  ; r19 += 't'; r19 += 'i'
+  [21059]  STR_APPEND_2  r19, 111, r19, 110  ; r19 += 'o'; r19 += 'n'
+  [21064]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [21069]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [21074]  STR_APPEND_2  r19, 87, r19, 111  ; r19 += 'W'; r19 += 'o'
+  [21079]  STR_APPEND_2  r19, 114, r19, 107  ; r19 += 'r'; r19 += 'k'
+  [21084]  STR_APPEND_2  r19, 103, r19, 114  ; r19 += 'g'; r19 += 'r'
+  [21089]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21094]  STR_SET_STR  r19, 112, r25, 10, r19, r19  ; r19 += 'p'; r25[10] = r19; r19 = ""
+  [21101]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21106]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [21111]  STR_APPEND_2  r19, 111, r19, 109  ; r19 += 'o'; r19 += 'm'
+  [21116]  STR_APPEND_2  r19, 112, r19, 117  ; r19 += 'p'; r19 += 'u'
+  [21121]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [21126]  STR_APPEND_2  r19, 87, r19, 111  ; r19 += 'W'; r19 += 'o'
+  [21131]  STR_APPEND_2  r19, 114, r19, 107  ; r19 += 'r'; r19 += 'k'
+  [21136]  STR_APPEND_2  r19, 103, r19, 114  ; r19 += 'g'; r19 += 'r'
+  [21141]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21146]  STR_APPEND_2  r19, 112, r19, 83  ; r19 += 'p'; r19 += 'S'
+  [21151]  STR_APPEND_2  r19, 105, r19, 122  ; r19 += 'i'; r19 += 'z'
+  [21156]  STR_APPEND_2  r19, 101, r19, 88  ; r19 += 'e'; r19 += 'X'
+  [21161]  PROP_SET_K  r25, 11, r19  ; r25[11] = r19
+  [21165]  STR_EMPTY  r19  ; r19 = ""
+  [21167]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21172]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [21177]  STR_APPEND_2  r19, 111, r19, 109  ; r19 += 'o'; r19 += 'm'
+  [21182]  STR_APPEND_2  r19, 112, r19, 117  ; r19 += 'p'; r19 += 'u'
+  [21187]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [21192]  STR_APPEND_2  r19, 87, r19, 111  ; r19 += 'W'; r19 += 'o'
+  [21197]  STR_APPEND_2  r19, 114, r19, 107  ; r19 += 'r'; r19 += 'k'
+  [21202]  STR_APPEND_2  r19, 103, r19, 114  ; r19 += 'g'; r19 += 'r'
+  [21207]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21212]  STR_APPEND_2  r19, 112, r19, 83  ; r19 += 'p'; r19 += 'S'
+  [21217]  STR_APPEND_2  r19, 105, r19, 122  ; r19 += 'i'; r19 += 'z'
+  [21222]  STR_APPEND_2  r19, 101, r19, 89  ; r19 += 'e'; r19 += 'Y'
+  [21227]  PROP_SET_K  r25, 12, r19  ; r25[12] = r19
+  [21231]  STR_EMPTY  r19  ; r19 = ""
+  [21233]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21238]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [21243]  STR_APPEND_2  r19, 111, r19, 109  ; r19 += 'o'; r19 += 'm'
+  [21248]  STR_APPEND_2  r19, 112, r19, 117  ; r19 += 'p'; r19 += 'u'
+  [21253]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [21258]  STR_APPEND_2  r19, 87, r19, 111  ; r19 += 'W'; r19 += 'o'
+  [21263]  STR_APPEND_2  r19, 114, r19, 107  ; r19 += 'r'; r19 += 'k'
+  [21268]  STR_APPEND_2  r19, 103, r19, 114  ; r19 += 'g'; r19 += 'r'
+  [21273]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21278]  STR_APPEND_2  r19, 112, r19, 83  ; r19 += 'p'; r19 += 'S'
+  [21283]  STR_APPEND_2  r19, 105, r19, 122  ; r19 += 'i'; r19 += 'z'
+  [21288]  STR_APPEND_2  r19, 101, r19, 90  ; r19 += 'e'; r19 += 'Z'
+  [21293]  PROP_SET_K  r25, 13, r19  ; r25[13] = r19
+  [21297]  STR_EMPTY  r19  ; r19 = ""
+  [21299]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21304]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [21309]  STR_APPEND_2  r19, 111, r19, 109  ; r19 += 'o'; r19 += 'm'
+  [21314]  STR_APPEND_2  r19, 112, r19, 117  ; r19 += 'p'; r19 += 'u'
+  [21319]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [21324]  STR_APPEND_2  r19, 87, r19, 111  ; r19 += 'W'; r19 += 'o'
+  [21329]  STR_APPEND_2  r19, 114, r19, 107  ; r19 += 'r'; r19 += 'k'
+  [21334]  STR_APPEND_2  r19, 103, r19, 114  ; r19 += 'g'; r19 += 'r'
+  [21339]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21344]  STR_APPEND_2  r19, 112, r19, 83  ; r19 += 'p'; r19 += 'S'
+  [21349]  STR_APPEND_2  r19, 116, r19, 111  ; r19 += 't'; r19 += 'o'
+  [21354]  STR_APPEND_2  r19, 114, r19, 97  ; r19 += 'r'; r19 += 'a'
+  [21359]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [21364]  STR_APPEND_2  r19, 83, r19, 105  ; r19 += 'S'; r19 += 'i'
+  [21369]  STR_APPEND_2  r19, 122, r19, 101  ; r19 += 'z'; r19 += 'e'
+  [21374]  PROP_SET_K  r25, 14, r19  ; r25[14] = r19
+  [21378]  STR_EMPTY  r19  ; r19 = ""
+  [21380]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21385]  STR_APPEND_2  r19, 120, r19, 67  ; r19 += 'x'; r19 += 'C'
+  [21390]  STR_APPEND_2  r19, 111, r19, 109  ; r19 += 'o'; r19 += 'm'
+  [21395]  STR_APPEND_2  r19, 112, r19, 117  ; r19 += 'p'; r19 += 'u'
+  [21400]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [21405]  STR_APPEND_2  r19, 87, r19, 111  ; r19 += 'W'; r19 += 'o'
+  [21410]  STR_APPEND_2  r19, 114, r19, 107  ; r19 += 'r'; r19 += 'k'
+  [21415]  STR_APPEND_2  r19, 103, r19, 114  ; r19 += 'g'; r19 += 'r'
+  [21420]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21425]  STR_APPEND_2  r19, 112, r19, 115  ; r19 += 'p'; r19 += 's'
+  [21430]  STR_APPEND_2  r19, 80, r19, 101  ; r19 += 'P'; r19 += 'e'
+  [21435]  STR_APPEND_2  r19, 114, r19, 68  ; r19 += 'r'; r19 += 'D'
+  [21440]  STR_APPEND_2  r19, 105, r19, 109  ; r19 += 'i'; r19 += 'm'
+  [21445]  STR_APPEND_2  r19, 101, r19, 110  ; r19 += 'e'; r19 += 'n'
+  [21450]  STR_APPEND_2  r19, 115, r19, 105  ; r19 += 's'; r19 += 'i'
+  [21455]  STR_APPEND_2  r19, 111, r19, 110  ; r19 += 'o'; r19 += 'n'
+  [21460]  PROP_SET_K  r25, 15, r19  ; r25[15] = r19
+  [21464]  STR_EMPTY  r19  ; r19 = ""
+  [21466]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21471]  STR_APPEND_2  r19, 120, r19, 68  ; r19 += 'x'; r19 += 'D'
+  [21476]  STR_APPEND_2  r19, 121, r19, 110  ; r19 += 'y'; r19 += 'n'
+  [21481]  STR_APPEND_2  r19, 97, r19, 109  ; r19 += 'a'; r19 += 'm'
+  [21486]  STR_APPEND_2  r19, 105, r19, 99  ; r19 += 'i'; r19 += 'c'
+  [21491]  STR_APPEND_2  r19, 83, r19, 116  ; r19 += 'S'; r19 += 't'
+  [21496]  STR_APPEND_2  r19, 111, r19, 114  ; r19 += 'o'; r19 += 'r'
+  [21501]  STR_APPEND_2  r19, 97, r19, 103  ; r19 += 'a'; r19 += 'g'
+  [21506]  STR_APPEND_2  r19, 101, r19, 66  ; r19 += 'e'; r19 += 'B'
+  [21511]  STR_APPEND_2  r19, 117, r19, 102  ; r19 += 'u'; r19 += 'f'
+  [21516]  STR_APPEND_2  r19, 102, r19, 101  ; r19 += 'f'; r19 += 'e'
+  [21521]  STR_APPEND_2  r19, 114, r19, 115  ; r19 += 'r'; r19 += 's'
+  [21526]  STR_APPEND_2  r19, 80, r19, 101  ; r19 += 'P'; r19 += 'e'
+  [21531]  STR_APPEND_2  r19, 114, r19, 80  ; r19 += 'r'; r19 += 'P'
+  [21536]  STR_APPEND_2  r19, 105, r19, 112  ; r19 += 'i'; r19 += 'p'
+  [21541]  STR_APPEND_2  r19, 101, r19, 108  ; r19 += 'e'; r19 += 'l'
+  [21546]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [21551]  STR_APPEND_2  r19, 101, r19, 76  ; r19 += 'e'; r19 += 'L'
+  [21556]  STR_APPEND_2  r19, 97, r19, 121  ; r19 += 'a'; r19 += 'y'
+  [21561]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21566]  STR_SET_STR  r19, 116, r25, 16, r19, r19  ; r19 += 't'; r25[16] = r19; r19 = ""
+  [21573]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21578]  STR_APPEND_2  r19, 120, r19, 68  ; r19 += 'x'; r19 += 'D'
+  [21583]  STR_APPEND_2  r19, 121, r19, 110  ; r19 += 'y'; r19 += 'n'
+  [21588]  STR_APPEND_2  r19, 97, r19, 109  ; r19 += 'a'; r19 += 'm'
+  [21593]  STR_APPEND_2  r19, 105, r19, 99  ; r19 += 'i'; r19 += 'c'
+  [21598]  STR_APPEND_2  r19, 85, r19, 110  ; r19 += 'U'; r19 += 'n'
+  [21603]  STR_APPEND_2  r19, 105, r19, 102  ; r19 += 'i'; r19 += 'f'
+  [21608]  STR_APPEND_2  r19, 111, r19, 114  ; r19 += 'o'; r19 += 'r'
+  [21613]  STR_APPEND_2  r19, 109, r19, 66  ; r19 += 'm'; r19 += 'B'
+  [21618]  STR_APPEND_2  r19, 117, r19, 102  ; r19 += 'u'; r19 += 'f'
+  [21623]  STR_APPEND_2  r19, 102, r19, 101  ; r19 += 'f'; r19 += 'e'
+  [21628]  STR_APPEND_2  r19, 114, r19, 115  ; r19 += 'r'; r19 += 's'
+  [21633]  STR_APPEND_2  r19, 80, r19, 101  ; r19 += 'P'; r19 += 'e'
+  [21638]  STR_APPEND_2  r19, 114, r19, 80  ; r19 += 'r'; r19 += 'P'
+  [21643]  STR_APPEND_2  r19, 105, r19, 112  ; r19 += 'i'; r19 += 'p'
+  [21648]  STR_APPEND_2  r19, 101, r19, 108  ; r19 += 'e'; r19 += 'l'
+  [21653]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [21658]  STR_APPEND_2  r19, 101, r19, 76  ; r19 += 'e'; r19 += 'L'
+  [21663]  STR_APPEND_2  r19, 97, r19, 121  ; r19 += 'a'; r19 += 'y'
+  [21668]  STR_APPEND_2  r19, 111, r19, 117  ; r19 += 'o'; r19 += 'u'
+  [21673]  STR_SET_STR  r19, 116, r25, 17, r19, r19  ; r19 += 't'; r25[17] = r19; r19 = ""
+  [21680]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21685]  STR_APPEND_2  r19, 120, r19, 73  ; r19 += 'x'; r19 += 'I'
+  [21690]  STR_APPEND_2  r19, 110, r19, 116  ; r19 += 'n'; r19 += 't'
+  [21695]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [21700]  STR_APPEND_2  r19, 83, r19, 116  ; r19 += 'S'; r19 += 't'
+  [21705]  STR_APPEND_2  r19, 97, r19, 103  ; r19 += 'a'; r19 += 'g'
+  [21710]  STR_APPEND_2  r19, 101, r19, 83  ; r19 += 'e'; r19 += 'S'
+  [21715]  STR_APPEND_2  r19, 104, r19, 97  ; r19 += 'h'; r19 += 'a'
+  [21720]  STR_APPEND_2  r19, 100, r19, 101  ; r19 += 'd'; r19 += 'e'
+  [21725]  STR_APPEND_2  r19, 114, r19, 86  ; r19 += 'r'; r19 += 'V'
+  [21730]  STR_APPEND_2  r19, 97, r19, 114  ; r19 += 'a'; r19 += 'r'
+  [21735]  STR_APPEND_2  r19, 105, r19, 97  ; r19 += 'i'; r19 += 'a'
+  [21740]  STR_APPEND_2  r19, 98, r19, 108  ; r19 += 'b'; r19 += 'l'
+  [21745]  STR_APPEND_2  r19, 101, r19, 115  ; r19 += 'e'; r19 += 's'
+  [21750]  PROP_SET_K  r25, 18, r19  ; r25[18] = r19
+  [21754]  STR_EMPTY  r19  ; r19 = ""
+  [21756]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21761]  STR_APPEND_2  r19, 120, r19, 83  ; r19 += 'x'; r19 += 'S'
+  [21766]  STR_APPEND_2  r19, 97, r19, 109  ; r19 += 'a'; r19 += 'm'
+  [21771]  STR_APPEND_2  r19, 112, r19, 108  ; r19 += 'p'; r19 += 'l'
+  [21776]  STR_APPEND_2  r19, 101, r19, 100  ; r19 += 'e'; r19 += 'd'
+  [21781]  STR_APPEND_2  r19, 84, r19, 101  ; r19 += 'T'; r19 += 'e'
+  [21786]  STR_APPEND_2  r19, 120, r19, 116  ; r19 += 'x'; r19 += 't'
+  [21791]  STR_APPEND_2  r19, 117, r19, 114  ; r19 += 'u'; r19 += 'r'
+  [21796]  STR_APPEND_2  r19, 101, r19, 115  ; r19 += 'e'; r19 += 's'
+  [21801]  STR_APPEND_2  r19, 80, r19, 101  ; r19 += 'P'; r19 += 'e'
+  [21806]  STR_APPEND_2  r19, 114, r19, 83  ; r19 += 'r'; r19 += 'S'
+  [21811]  STR_APPEND_2  r19, 104, r19, 97  ; r19 += 'h'; r19 += 'a'
+  [21816]  STR_APPEND_2  r19, 100, r19, 101  ; r19 += 'd'; r19 += 'e'
+  [21821]  STR_APPEND_2  r19, 114, r19, 83  ; r19 += 'r'; r19 += 'S'
+  [21826]  STR_APPEND_2  r19, 116, r19, 97  ; r19 += 't'; r19 += 'a'
+  [21831]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [21836]  PROP_SET_K  r25, 19, r19  ; r25[19] = r19
+  [21840]  STR_EMPTY  r19  ; r19 = ""
+  [21842]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21847]  STR_APPEND_2  r19, 120, r19, 83  ; r19 += 'x'; r19 += 'S'
+  [21852]  STR_APPEND_2  r19, 97, r19, 109  ; r19 += 'a'; r19 += 'm'
+  [21857]  STR_APPEND_2  r19, 112, r19, 108  ; r19 += 'p'; r19 += 'l'
+  [21862]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [21867]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [21872]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [21877]  STR_APPEND_2  r19, 83, r19, 104  ; r19 += 'S'; r19 += 'h'
+  [21882]  STR_APPEND_2  r19, 97, r19, 100  ; r19 += 'a'; r19 += 'd'
+  [21887]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [21892]  STR_APPEND_2  r19, 83, r19, 116  ; r19 += 'S'; r19 += 't'
+  [21897]  STR_APPEND_2  r19, 97, r19, 103  ; r19 += 'a'; r19 += 'g'
+  [21902]  STR_SET_STR  r19, 101, r25, 20, r19, r19  ; r19 += 'e'; r25[20] = r19; r19 = ""
+  [21909]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21914]  STR_APPEND_2  r19, 120, r19, 83  ; r19 += 'x'; r19 += 'S'
+  [21919]  STR_APPEND_2  r19, 116, r19, 111  ; r19 += 't'; r19 += 'o'
+  [21924]  STR_APPEND_2  r19, 114, r19, 97  ; r19 += 'r'; r19 += 'a'
+  [21929]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [21934]  STR_APPEND_2  r19, 66, r19, 117  ; r19 += 'B'; r19 += 'u'
+  [21939]  STR_APPEND_2  r19, 102, r19, 102  ; r19 += 'f'; r19 += 'f'
+  [21944]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [21949]  STR_APPEND_2  r19, 66, r19, 105  ; r19 += 'B'; r19 += 'i'
+  [21954]  STR_APPEND_2  r19, 110, r19, 100  ; r19 += 'n'; r19 += 'd'
+  [21959]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [21964]  STR_APPEND_2  r19, 103, r19, 83  ; r19 += 'g'; r19 += 'S'
+  [21969]  STR_APPEND_2  r19, 105, r19, 122  ; r19 += 'i'; r19 += 'z'
+  [21974]  STR_SET_STR  r19, 101, r25, 21, r19, r19  ; r19 += 'e'; r25[21] = r19; r19 = ""
+  [21981]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [21986]  STR_APPEND_2  r19, 120, r19, 83  ; r19 += 'x'; r19 += 'S'
+  [21991]  STR_APPEND_2  r19, 116, r19, 111  ; r19 += 't'; r19 += 'o'
+  [21996]  STR_APPEND_2  r19, 114, r19, 97  ; r19 += 'r'; r19 += 'a'
+  [22001]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [22006]  STR_APPEND_2  r19, 66, r19, 117  ; r19 += 'B'; r19 += 'u'
+  [22011]  STR_APPEND_2  r19, 102, r19, 102  ; r19 += 'f'; r19 += 'f'
+  [22016]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22021]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [22026]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22031]  STR_APPEND_2  r19, 83, r19, 104  ; r19 += 'S'; r19 += 'h'
+  [22036]  STR_APPEND_2  r19, 97, r19, 100  ; r19 += 'a'; r19 += 'd'
+  [22041]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22046]  STR_APPEND_2  r19, 83, r19, 116  ; r19 += 'S'; r19 += 't'
+  [22051]  STR_APPEND_2  r19, 97, r19, 103  ; r19 += 'a'; r19 += 'g'
+  [22056]  STR_SET_STR  r19, 101, r25, 22, r19, r19  ; r19 += 'e'; r25[22] = r19; r19 = ""
+  [22063]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [22068]  STR_APPEND_2  r19, 120, r19, 83  ; r19 += 'x'; r19 += 'S'
+  [22073]  STR_APPEND_2  r19, 116, r19, 111  ; r19 += 't'; r19 += 'o'
+  [22078]  STR_APPEND_2  r19, 114, r19, 97  ; r19 += 'r'; r19 += 'a'
+  [22083]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [22088]  STR_APPEND_2  r19, 84, r19, 101  ; r19 += 'T'; r19 += 'e'
+  [22093]  STR_APPEND_2  r19, 120, r19, 116  ; r19 += 'x'; r19 += 't'
+  [22098]  STR_APPEND_2  r19, 117, r19, 114  ; r19 += 'u'; r19 += 'r'
+  [22103]  STR_APPEND_2  r19, 101, r19, 115  ; r19 += 'e'; r19 += 's'
+  [22108]  STR_APPEND_2  r19, 80, r19, 101  ; r19 += 'P'; r19 += 'e'
+  [22113]  STR_APPEND_2  r19, 114, r19, 83  ; r19 += 'r'; r19 += 'S'
+  [22118]  STR_APPEND_2  r19, 104, r19, 97  ; r19 += 'h'; r19 += 'a'
+  [22123]  STR_APPEND_2  r19, 100, r19, 101  ; r19 += 'd'; r19 += 'e'
+  [22128]  STR_APPEND_2  r19, 114, r19, 83  ; r19 += 'r'; r19 += 'S'
+  [22133]  STR_APPEND_2  r19, 116, r19, 97  ; r19 += 't'; r19 += 'a'
+  [22138]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [22143]  PROP_SET_K  r25, 23, r19  ; r25[23] = r19
+  [22147]  STR_EMPTY  r19  ; r19 = ""
+  [22149]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [22154]  STR_APPEND_2  r19, 120, r19, 85  ; r19 += 'x'; r19 += 'U'
+  [22159]  STR_APPEND_2  r19, 110, r19, 105  ; r19 += 'n'; r19 += 'i'
+  [22164]  STR_APPEND_2  r19, 102, r19, 111  ; r19 += 'f'; r19 += 'o'
+  [22169]  STR_APPEND_2  r19, 114, r19, 109  ; r19 += 'r'; r19 += 'm'
+  [22174]  STR_APPEND_2  r19, 66, r19, 117  ; r19 += 'B'; r19 += 'u'
+  [22179]  STR_APPEND_2  r19, 102, r19, 102  ; r19 += 'f'; r19 += 'f'
+  [22184]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22189]  STR_APPEND_2  r19, 66, r19, 105  ; r19 += 'B'; r19 += 'i'
+  [22194]  STR_APPEND_2  r19, 110, r19, 100  ; r19 += 'n'; r19 += 'd'
+  [22199]  STR_APPEND_2  r19, 105, r19, 110  ; r19 += 'i'; r19 += 'n'
+  [22204]  STR_APPEND_2  r19, 103, r19, 83  ; r19 += 'g'; r19 += 'S'
+  [22209]  STR_APPEND_2  r19, 105, r19, 122  ; r19 += 'i'; r19 += 'z'
+  [22214]  STR_SET_STR  r19, 101, r25, 24, r19, r19  ; r19 += 'e'; r25[24] = r19; r19 = ""
+  [22221]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [22226]  STR_APPEND_2  r19, 120, r19, 85  ; r19 += 'x'; r19 += 'U'
+  [22231]  STR_APPEND_2  r19, 110, r19, 105  ; r19 += 'n'; r19 += 'i'
+  [22236]  STR_APPEND_2  r19, 102, r19, 111  ; r19 += 'f'; r19 += 'o'
+  [22241]  STR_APPEND_2  r19, 114, r19, 109  ; r19 += 'r'; r19 += 'm'
+  [22246]  STR_APPEND_2  r19, 66, r19, 117  ; r19 += 'B'; r19 += 'u'
+  [22251]  STR_APPEND_2  r19, 102, r19, 102  ; r19 += 'f'; r19 += 'f'
+  [22256]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22261]  STR_APPEND_2  r19, 115, r19, 80  ; r19 += 's'; r19 += 'P'
+  [22266]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22271]  STR_APPEND_2  r19, 83, r19, 104  ; r19 += 'S'; r19 += 'h'
+  [22276]  STR_APPEND_2  r19, 97, r19, 100  ; r19 += 'a'; r19 += 'd'
+  [22281]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22286]  STR_APPEND_2  r19, 83, r19, 116  ; r19 += 'S'; r19 += 't'
+  [22291]  STR_APPEND_2  r19, 97, r19, 103  ; r19 += 'a'; r19 += 'g'
+  [22296]  STR_SET_STR  r19, 101, r25, 25, r19, r19  ; r19 += 'e'; r25[25] = r19; r19 = ""
+  [22303]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [22308]  STR_APPEND_2  r19, 120, r19, 86  ; r19 += 'x'; r19 += 'V'
+  [22313]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22318]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [22323]  STR_APPEND_2  r19, 120, r19, 65  ; r19 += 'x'; r19 += 'A'
+  [22328]  STR_APPEND_2  r19, 116, r19, 116  ; r19 += 't'; r19 += 't'
+  [22333]  STR_APPEND_2  r19, 114, r19, 105  ; r19 += 'r'; r19 += 'i'
+  [22338]  STR_APPEND_2  r19, 98, r19, 117  ; r19 += 'b'; r19 += 'u'
+  [22343]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [22348]  STR_SET_STR  r19, 115, r25, 26, r19, r19  ; r19 += 's'; r25[26] = r19; r19 = ""
+  [22355]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [22360]  STR_APPEND_2  r19, 120, r19, 86  ; r19 += 'x'; r19 += 'V'
+  [22365]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22370]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [22375]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [22380]  STR_APPEND_2  r19, 117, r19, 102  ; r19 += 'u'; r19 += 'f'
+  [22385]  STR_APPEND_2  r19, 102, r19, 101  ; r19 += 'f'; r19 += 'e'
+  [22390]  STR_APPEND_2  r19, 114, r19, 65  ; r19 += 'r'; r19 += 'A'
+  [22395]  STR_APPEND_2  r19, 114, r19, 114  ; r19 += 'r'; r19 += 'r'
+  [22400]  STR_APPEND_2  r19, 97, r19, 121  ; r19 += 'a'; r19 += 'y'
+  [22405]  STR_APPEND_2  r19, 83, r19, 116  ; r19 += 'S'; r19 += 't'
+  [22410]  STR_APPEND_2  r19, 114, r19, 105  ; r19 += 'r'; r19 += 'i'
+  [22415]  STR_APPEND_2  r19, 100, r19, 101  ; r19 += 'd'; r19 += 'e'
+  [22420]  PROP_SET_K  r25, 27, r19  ; r25[27] = r19
+  [22424]  STR_EMPTY  r19  ; r19 = ""
+  [22426]  STR_APPEND_2  r19, 109, r19, 97  ; r19 += 'm'; r19 += 'a'
+  [22431]  STR_APPEND_2  r19, 120, r19, 86  ; r19 += 'x'; r19 += 'V'
+  [22436]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22441]  STR_APPEND_2  r19, 116, r19, 101  ; r19 += 't'; r19 += 'e'
+  [22446]  STR_APPEND_2  r19, 120, r19, 66  ; r19 += 'x'; r19 += 'B'
+  [22451]  STR_APPEND_2  r19, 117, r19, 102  ; r19 += 'u'; r19 += 'f'
+  [22456]  STR_APPEND_2  r19, 102, r19, 101  ; r19 += 'f'; r19 += 'e'
+  [22461]  STR_APPEND_2  r19, 114, r19, 115  ; r19 += 'r'; r19 += 's'
+  [22466]  PROP_SET_K  r25, 28, r19  ; r25[28] = r19
+  [22470]  STR_EMPTY  r19  ; r19 = ""
+  [22472]  STR_APPEND_2  r19, 109, r19, 105  ; r19 += 'm'; r19 += 'i'
+  [22477]  STR_APPEND_2  r19, 110, r19, 83  ; r19 += 'n'; r19 += 'S'
+  [22482]  STR_APPEND_2  r19, 116, r19, 111  ; r19 += 't'; r19 += 'o'
+  [22487]  STR_APPEND_2  r19, 114, r19, 97  ; r19 += 'r'; r19 += 'a'
+  [22492]  STR_APPEND_2  r19, 103, r19, 101  ; r19 += 'g'; r19 += 'e'
+  [22497]  STR_APPEND_2  r19, 66, r19, 117  ; r19 += 'B'; r19 += 'u'
+  [22502]  STR_APPEND_2  r19, 102, r19, 102  ; r19 += 'f'; r19 += 'f'
+  [22507]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22512]  STR_APPEND_2  r19, 79, r19, 102  ; r19 += 'O'; r19 += 'f'
+  [22517]  STR_APPEND_2  r19, 102, r19, 115  ; r19 += 'f'; r19 += 's'
+  [22522]  STR_APPEND_2  r19, 101, r19, 116  ; r19 += 'e'; r19 += 't'
+  [22527]  STR_APPEND_2  r19, 65, r19, 108  ; r19 += 'A'; r19 += 'l'
+  [22532]  STR_APPEND_2  r19, 105, r19, 103  ; r19 += 'i'; r19 += 'g'
+  [22537]  STR_APPEND_2  r19, 110, r19, 109  ; r19 += 'n'; r19 += 'm'
+  [22542]  STR_APPEND_2  r19, 101, r19, 110  ; r19 += 'e'; r19 += 'n'
+  [22547]  STR_SET_STR  r19, 116, r25, 29, r19, r19  ; r19 += 't'; r25[29] = r19; r19 = ""
+  [22554]  STR_APPEND_2  r19, 109, r19, 105  ; r19 += 'm'; r19 += 'i'
+  [22559]  STR_APPEND_2  r19, 110, r19, 85  ; r19 += 'n'; r19 += 'U'
+  [22564]  STR_APPEND_2  r19, 110, r19, 105  ; r19 += 'n'; r19 += 'i'
+  [22569]  STR_APPEND_2  r19, 102, r19, 111  ; r19 += 'f'; r19 += 'o'
+  [22574]  STR_APPEND_2  r19, 114, r19, 109  ; r19 += 'r'; r19 += 'm'
+  [22579]  STR_APPEND_2  r19, 66, r19, 117  ; r19 += 'B'; r19 += 'u'
+  [22584]  STR_APPEND_2  r19, 102, r19, 102  ; r19 += 'f'; r19 += 'f'
+  [22589]  STR_APPEND_2  r19, 101, r19, 114  ; r19 += 'e'; r19 += 'r'
+  [22594]  STR_APPEND_2  r19, 79, r19, 102  ; r19 += 'O'; r19 += 'f'
+  [22599]  STR_APPEND_2  r19, 102, r19, 115  ; r19 += 'f'; r19 += 's'
+  [22604]  STR_APPEND_2  r19, 101, r19, 116  ; r19 += 'e'; r19 += 't'
+  [22609]  STR_APPEND_2  r19, 65, r19, 108  ; r19 += 'A'; r19 += 'l'
+  [22614]  STR_APPEND_2  r19, 105, r19, 103  ; r19 += 'i'; r19 += 'g'
+  [22619]  STR_APPEND_2  r19, 110, r19, 109  ; r19 += 'n'; r19 += 'm'
+  [22624]  STR_APPEND_2  r19, 101, r19, 110  ; r19 += 'e'; r19 += 'n'
+  [22629]  STR_SET_K  r19, 116, r25, 30, r19  ; r19 += 't'; r25[30] = r19
+  [22635]  MOV_2  r42, r25, r33, r27  ; r42 = r25; r33 = r27
+  [22640]  JMP  21869  ; C += 21869
+
+AFTER (folded):
+  [20397] r25 = {}
+  [20399] r19 = "_state"
+  [20416] r27 = 0
+  [20419] r25[r19] = r27
+  [20423] r39 = r25
+  [20426] r25 = Array(31)
+  [20429] r19 = "maxTextureDimension1D"
+  [20481] r25[0] = r19
+  [20481] r19 = "maxTextureDimension2D"
+  [20538] r25[1] = r19
+  [20538] r19 = "maxTextureDimension3D"
+  [20595] r25[2] = r19
+  [20595] r19 = "maxTextureArrayLayers"
+  [20652] r25[3] = r19
+  [20652] r19 = "maxBindGroups"
+  [20689] r25[4] = r19
+  [20689] r19 = "maxBindGroupsPlusVertexBuffers"
+  [20771] r25[5] = r19
+  [20775] r19 = "maxBindingsPerBindGroup"
+  [20832] r25[6] = r19
+  [20832] r19 = "maxBufferSize"
+  [20869] r25[7] = r19
+  [20869] r19 = "maxColorAttachmentBytesPerSample"
+  [20956] r25[8] = r19
+  [20960] r19 = "maxColorAttachments"
+  [21007] r25[9] = r19
+  [21007] r19 = "maxComputeInvocationsPerWorkgroup"
+  [21094] r25[10] = r19
+  [21094] r19 = "maxComputeWorkgroupSizeX"
+  [21161] r25[11] = r19
+  [21165] r19 = "maxComputeWorkgroupSizeY"
+  [21227] r25[12] = r19
+  [21231] r19 = "maxComputeWorkgroupSizeZ"
+  [21293] r25[13] = r19
+  [21297] r19 = "maxComputeWorkgroupStorageSize"
+  [21374] r25[14] = r19
+  [21378] r19 = "maxComputeWorkgroupsPerDimension"
+  [21460] r25[15] = r19
+  [21464] r19 = "maxDynamicStorageBuffersPerPipelineLayout"
+  [21566] r25[16] = r19
+  [21566] r19 = "maxDynamicUniformBuffersPerPipelineLayout"
+  [21673] r25[17] = r19
+  [21673] r19 = "maxInterStageShaderVariables"
+  [21750] r25[18] = r19
+  [21754] r19 = "maxSampledTexturesPerShaderStage"
+  [21836] r25[19] = r19
+  [21840] r19 = "maxSamplersPerShaderStage"
+  [21902] r25[20] = r19
+  [21902] r19 = "maxStorageBufferBindingSize"
+  [21974] r25[21] = r19
+  [21974] r19 = "maxStorageBuffersPerShaderStage"
+  [22056] r25[22] = r19
+  [22056] r19 = "maxStorageTexturesPerShaderStage"
+  [22143] r25[23] = r19
+  [22147] r19 = "maxUniformBufferBindingSize"
+  [22214] r25[24] = r19
+  [22214] r19 = "maxUniformBuffersPerShaderStage"
+  [22296] r25[25] = r19
+  [22296] r19 = "maxVertexAttributes"
+  [22348] r25[26] = r19
+  [22348] r19 = "maxVertexBufferArrayStride"
+  [22420] r25[27] = r19
+  [22424] r19 = "maxVertexBuffers"
+  [22466] r25[28] = r19
+  [22470] r19 = "minStorageBufferOffsetAlignment"
+  [22547] r25[29] = r19
+  [22547] r19 = "minUniformBufferOffsetAlignment"
+  [22629] r25[30] = r19
+  [22635] r42 = r25; r33 = r27
+  [22640] jmp 21869
+
+String literals:
+  r19 = "_state" (PC 20399–20411)
+  r19 = "maxTextureDimension1D" (PC 20429–20481)
+  r19 = "maxTextureDimension2D" (PC 20481–20538)
+  r19 = "maxTextureDimension3D" (PC 20538–20595)
+  r19 = "maxTextureArrayLayers" (PC 20595–20652)
+  r19 = "maxBindGroups" (PC 20652–20689)
+  r19 = "maxBindGroupsPlusVertexBuffers" (PC 20689–20766)
+  r19 = "maxBindingsPerBindGroup" (PC 20775–20832)
+  r19 = "maxBufferSize" (PC 20832–20869)
+  r19 = "maxColorAttachmentBytesPerSample" (PC 20869–20951)
+  r19 = "maxColorAttachments" (PC 20960–21007)
+  r19 = "maxComputeInvocationsPerWorkgroup" (PC 21007–21094)
+  r19 = "maxComputeWorkgroupSizeX" (PC 21094–21156)
+  r19 = "maxComputeWorkgroupSizeY" (PC 21165–21222)
+  r19 = "maxComputeWorkgroupSizeZ" (PC 21231–21288)
+  r19 = "maxComputeWorkgroupStorageSize" (PC 21297–21369)
+  r19 = "maxComputeWorkgroupsPerDimension" (PC 21378–21455)
+  r19 = "maxDynamicStorageBuffersPerPipelineLayout" (PC 21464–21566)
+  r19 = "maxDynamicUniformBuffersPerPipelineLayout" (PC 21566–21673)
+  r19 = "maxInterStageShaderVariables" (PC 21673–21745)
+  r19 = "maxSampledTexturesPerShaderStage" (PC 21754–21831)
+  r19 = "maxSamplersPerShaderStage" (PC 21840–21902)
+  r19 = "maxStorageBufferBindingSize" (PC 21902–21974)
+  r19 = "maxStorageBuffersPerShaderStage" (PC 21974–22056)
+  r19 = "maxStorageTexturesPerShaderStage" (PC 22056–22138)
+  r19 = "maxUniformBufferBindingSize" (PC 22147–22214)
+  r19 = "maxUniformBuffersPerShaderStage" (PC 22214–22296)
+  r19 = "maxVertexAttributes" (PC 22296–22348)
+  r19 = "maxVertexBufferArrayStride" (PC 22348–22415)
+  r19 = "maxVertexBuffers" (PC 22424–22461)
+  r19 = "minStorageBufferOffsetAlignment" (PC 22470–22547)
+  r19 = "minUniformBufferOffsetAlignment" (PC 22547–22629)
+
+liveOut: [r25, r19, r27, r39, r42, r33]
+
+======================================================================
+Example 7: Try/catch block
+Function 4, Block b0 (37 instructions → 17 statements)
+
+BEFORE (original disassembly):
+  [350]  PROP_GET_K  r34, r2, 0  ; r34 = r2[0]
+  [354]  CATCH_PUSH  38728  ; F.push(C+38728)
+  [356]  STR_EMPTY  r26  ; r26 = ""
+  [358]  STR_APPEND_2  r26, 100, r26, 111  ; r26 += 'd'; r26 += 'o'
+  [363]  STR_APPEND_2  r26, 99, r26, 117  ; r26 += 'c'; r26 += 'u'
+  [368]  STR_APPEND_2  r26, 109, r26, 101  ; r26 += 'm'; r26 += 'e'
+  [373]  STR_APPEND_2  r26, 110, r26, 116  ; r26 += 'n'; r26 += 't'
+  [378]  PROP_GET  r26, r0, r26  ; r26 = r0[r26]
+  [382]  STR_EMPTY  r16  ; r16 = ""
+  [384]  STR_APPEND_2  r16, 99, r16, 114  ; r16 += 'c'; r16 += 'r'
+  [389]  STR_APPEND_2  r16, 101, r16, 97  ; r16 += 'e'; r16 += 'a'
+  [394]  STR_APPEND_2  r16, 116, r16, 101  ; r16 += 't'; r16 += 'e'
+  [399]  STR_APPEND_2  r16, 69, r16, 108  ; r16 += 'E'; r16 += 'l'
+  [404]  STR_APPEND_2  r16, 101, r16, 109  ; r16 += 'e'; r16 += 'm'
+  [409]  STR_APPEND_2  r16, 101, r16, 110  ; r16 += 'e'; r16 += 'n'
+  [414]  STR_PROP  r16, 116, r66, r26, r16  ; r16 += 't'; r66 = r26[r16]
+  [420]  STR_EMPTY  r16  ; r16 = ""
+  [422]  STR_APPEND_2  r16, 99, r16, 97  ; r16 += 'c'; r16 += 'a'
+  [427]  STR_APPEND_2  r16, 110, r16, 118  ; r16 += 'n'; r16 += 'v'
+  [432]  STR_APPEND_2  r16, 97, r16, 115  ; r16 += 'a'; r16 += 's'
+  [437]  CALL_1  r20, r66, r26, r16  ; r20 = r66.call(r26, r16)
+  [442]  MOV  r17, r20  ; r17 = r20
+  [445]  LOAD_THIS  r20  ; r20 = Q
+  [447]  TRY_PUSH  r38, r20, 33167  ; r38 = r20; F.push(C+33167)
+  [451]  STR_EMPTY  r20  ; r20 = ""
+  [453]  STR_APPEND_2  r20, 103, r20, 101  ; r20 += 'g'; r20 += 'e'
+  [458]  STR_APPEND_2  r20, 116, r20, 67  ; r20 += 't'; r20 += 'C'
+  [463]  STR_APPEND_2  r20, 111, r20, 110  ; r20 += 'o'; r20 += 'n'
+  [468]  STR_APPEND_2  r20, 116, r20, 101  ; r20 += 't'; r20 += 'e'
+  [473]  STR_APPEND_2  r20, 120, r20, 116  ; r20 += 'x'; r20 += 't'
+  [478]  PROP_GET  r16, r17, r20  ; r16 = r17[r20]
+  [482]  STR_EMPTY  r20  ; r20 = ""
+  [484]  STR_APPEND_2  r20, 50, r20, 100  ; r20 += '2'; r20 += 'd'
+  [489]  CALL_1  r66, r16, r17, r20  ; r66 = r16.call(r17, r20)
+  [494]  MOV  r38, r66  ; r38 = r66
+  [497]  TRY_POP    ; F.pop()
+  [498]  JMP  51780  ; C += 51780
+
+AFTER (folded):
+  [350] r34 = r2[0]
+  [354] catch_push(offset=38728)
+  [356] r26 = "document"
+  [378] r26 = r0[r26]
+  [382] r16 = "createElement"
+  [414] r66 = r26[r16]
+  [420] r16 = "canvas"
+  [437] r20 = r66.call(r26, r16)
+  [442] r17 = r20
+  [447] r38 = Q; try_push(offset=33167)
+  [451] r20 = "getContext"
+  [478] r16 = r17[r20]
+  [482] r20 = "2d"
+  [489] r66 = r16.call(r17, r20)
+  [494] r38 = r66
+  [497] try_pop()
+  [498] jmp 51780
+
+String literals:
+  r26 = "document" (PC 356–373)
+  r16 = "createElement" (PC 382–414)
+  r16 = "canvas" (PC 420–432)
+  r20 = "getContext" (PC 451–473)
+  r20 = "2d" (PC 482–484)
+
+liveOut: [r34, r26, r16, r66, r20, r17, r38]
+
+======================================================================
+Example 8: Conditional jump block
+Function 1, Block b3 (10 instructions → 5 statements)
+
+BEFORE (original disassembly):
+  [54711]  STR_EMPTY  r9  ; r9 = ""
+  [54713]  STR_APPEND_2  r9, 105, r9, 110  ; r9 += 'i'; r9 += 'n'
+  [54718]  STR_APPEND_2  r9, 100, r9, 101  ; r9 += 'd'; r9 += 'e'
+  [54723]  STR_APPEND_2  r9, 120, r9, 79  ; r9 += 'x'; r9 += 'O'
+  [54728]  STR_PROP  r9, 102, r20, r18, r9  ; r9 += 'f'; r20 = r18[r9]
+  [54734]  STR_INIT  r9, r9, 63  ; r9 = ""; r9 += '?'
+  [54738]  CALL_1  r19, r20, r18, r9  ; r19 = r20.call(r18, r9)
+  [54743]  MOV  r21, r19  ; r21 = r19
+  [54746]  GT_K  r23, r21, 0  ; r23 = r21 > 0
+  [54750]  CJMP  r23, -32109, -42379  ; C += r23 ? -32109 : -42379
+
+AFTER (folded):
+  [54711] r9 = "indexOf"
+  [54728] r20 = r18[r9]
+  [54734] r9 = "?"
+  [54738] r19 = r20.call(r18, r9)
+  [54750] cjmp (r19 > 0) ? -32109 : -42379
+
+String literals:
+  r9 = "indexOf" (PC 54711–54728)
+  r9 = "?" (PC 54734–54734)
+
+liveOut: [r9, r20, r19, r21, r23]
+
+======================================================================
+Example 9: String build block
+Function 2, Block b0 (12 instructions → 8 statements)
+
+BEFORE (original disassembly):
+  [198]  PROP_GET_K_2  r9, r4, 0, r14, r4, 1  ; r9 = r4[0]; r14 = r4[1]
+  [205]  ARRAY  r15, 0  ; r15 = Array(0)
+  [208]  STR_EMPTY  r17  ; r17 = ""
+  [210]  PROP_SET_K  r15, 0, r17  ; r15[0] = r17
+  [214]  STR_EMPTY  r17  ; r17 = ""
+  [216]  STR_APPEND_2  r17, 101, r17, 120  ; r17 += 'e'; r17 += 'x'
+  [221]  STR_APPEND_2  r17, 112, r17, 111  ; r17 += 'p'; r17 += 'o'
+  [226]  STR_APPEND_2  r17, 114, r17, 116  ; r17 += 'r'; r17 += 't'
+  [231]  STR_OBJ_STR  r17, 115, r18, r13  ; r17 += 's'; r18 = {}; r13 = ""
+  [236]  STR_APPEND_2  r13, 103, r13, 101  ; r13 += 'g'; r13 += 'e'
+  [241]  FUNC_CREATE_A  r13, 116, 1, r15, r10, 18192, 0, r18, r13, r10  ; r13 += 't'; r10 = closure(offset=18192, [r15], arity=0); r18[r13] = r10
+  [252]  SET_RET_Q  r9, r17, r18, r18, r18  ; r9[r17] = r18; r18 = Q; return r18
+
+AFTER (folded):
+  [198] r9 = r4[0]; r14 = r4[1]
+  [205] r15 = Array(0)
+  [210] r15[0] = ""
+  [214] r17 = "exports"
+  [231] r18 = {}
+  [231] r13 = "get"
+  [241] r10 = closure(offset=18192, arity=0); r18[r13] = r10
+  [252] r9[r17] = r18; return Q
+
+String literals:
+  r17 = "exports" (PC 214–231)
+  r13 = "get" (PC 231–241)
+
+liveOut: [r9, r14, r15, r17, r18, r13, r10]
+
+======================================================================
+Example 10: Typical medium block
+Function 1, Block b3 (10 instructions → 5 statements)
+
+BEFORE (original disassembly):
+  [54711]  STR_EMPTY  r9  ; r9 = ""
+  [54713]  STR_APPEND_2  r9, 105, r9, 110  ; r9 += 'i'; r9 += 'n'
+  [54718]  STR_APPEND_2  r9, 100, r9, 101  ; r9 += 'd'; r9 += 'e'
+  [54723]  STR_APPEND_2  r9, 120, r9, 79  ; r9 += 'x'; r9 += 'O'
+  [54728]  STR_PROP  r9, 102, r20, r18, r9  ; r9 += 'f'; r20 = r18[r9]
+  [54734]  STR_INIT  r9, r9, 63  ; r9 = ""; r9 += '?'
+  [54738]  CALL_1  r19, r20, r18, r9  ; r19 = r20.call(r18, r9)
+  [54743]  MOV  r21, r19  ; r21 = r19
+  [54746]  GT_K  r23, r21, 0  ; r23 = r21 > 0
+  [54750]  CJMP  r23, -32109, -42379  ; C += r23 ? -32109 : -42379
+
+AFTER (folded):
+  [54711] r9 = "indexOf"
+  [54728] r20 = r18[r9]
+  [54734] r9 = "?"
+  [54738] r19 = r20.call(r18, r9)
+  [54750] cjmp (r19 > 0) ? -32109 : -42379
+
+String literals:
+  r9 = "indexOf" (PC 54711–54728)
+  r9 = "?" (PC 54734–54734)
+
+liveOut: [r9, r20, r19, r21, r23]

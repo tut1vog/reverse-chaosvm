@@ -1,0 +1,130 @@
+{
+  "tests": [
+    {
+      "name": "chunk_hash",
+      "pass": true,
+      "generatedLength": 48,
+      "expectedLength": 48,
+      "hexFirst16": "5b 5b 34 2c 2d 31 2c 2d 31 2c 31 37 30 30 30 30"
+    },
+    {
+      "name": "chunk_header",
+      "pass": true,
+      "generatedLength": 144,
+      "expectedLength": 144,
+      "hexFirst16": "7b 22 63 64 22 3a 5b 31 2c 22 6c 69 6e 75 78 22"
+    },
+    {
+      "name": "chunk_cdBody",
+      "pass": true,
+      "generatedLength": 3024,
+      "expectedLength": 3024,
+      "hexFirst16": "2c 30 2c 5b 7b 22 63 6f 64 65 63 22 3a 22 48 2e"
+    },
+    {
+      "name": "chunk_sig",
+      "pass": true,
+      "generatedLength": 83,
+      "expectedLength": 83,
+      "hexFirst16": "22 73 64 22 3a 7b 22 6f 64 22 3a 22 43 22 2c 22"
+    },
+    {
+      "name": "btoa_segment_0",
+      "pass": true,
+      "generatedLength": 64,
+      "expectedLength": 64
+    },
+    {
+      "name": "btoa_segment_1",
+      "pass": true,
+      "generatedLength": 192,
+      "expectedLength": 192
+    },
+    {
+      "name": "btoa_segment_2",
+      "pass": true,
+      "generatedLength": 4032,
+      "expectedLength": 4032
+    },
+    {
+      "name": "btoa_segment_3",
+      "pass": true,
+      "generatedLength": 120,
+      "expectedLength": 120
+    },
+    {
+      "name": "full_pipeline_token",
+      "pass": true,
+      "generatedLength": 4674,
+      "expectedLength": 4674
+    },
+    {
+      "name": "assembly_order",
+      "pass": true,
+      "order": [
+        1,
+        0,
+        2,
+        3
+      ],
+      "segmentSizes": [
+        64,
+        192,
+        4032,
+        120
+      ]
+    }
+  ],
+  "intermediates": {
+    "buildInputChunks": {
+      "pass": true,
+      "chunkSizes": [
+        48,
+        144,
+        3024,
+        83
+      ]
+    },
+    "encryptSegments": {
+      "pass": true,
+      "segmentLengths": [
+        64,
+        192,
+        4032,
+        120
+      ]
+    },
+    "fullPipeline": {
+      "pass": true,
+      "tokenLength": 4674
+    },
+    "cdString": {
+      "length": 3166,
+      "first40": "{\"cd\":[1,\"linux\",2,800,\"Arial,Courier Ne",
+      "last20": "47370,\"\",0,1023,\"\"]}"
+    },
+    "sdString": {
+      "length": 83,
+      "value": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}"
+    }
+  },
+  "summary": {
+    "totalTests": 10,
+    "passedTests": 10,
+    "allPass": true,
+    "tokenLength": 4674,
+    "chunkSizes": [
+      48,
+      144,
+      3024,
+      83
+    ],
+    "btoaSegmentLengths": [
+      64,
+      192,
+      4032,
+      120
+    ]
+  },
+  "generatedToken": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO%2BlIwz6aVKNocOzG90HTGdfx%2FO7rOdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm%2BEniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6A0XmaUa7DpK0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q%2BGbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu%2Fo0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa%2BW5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG%2BhadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz%2FseQCltiSoDXzstgW8w15jT%2BzLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c%2FJcGgu07WWfm0WJjHyDSsq4PytRejQwG36IPhMJ2zo5m9dr96J%2FKIU0%2BMPcTtu%2FnbKIn%2BNXYbPsHU5oH2uwAXZeUNj4xINHEr3hv0C%2Bx%2BJ%2Bmgb02qH3VJSPEZ%2BUc2WXFTF%2F4UTNSjjLXlDY%2BMSDRxK8tVU0Xo%2B%2BLLlYRc30j6rd7cbIvIh9pdRWv9BS7QiIy3LuC1BtuYgE23nbvdIpb%2Fz09tD5y8gUXpEvxXam4ZkKsHtQpSlOiSAmYRHDBOfCl0JxXIRh6KUu5KCjTJ4x2VistIJic3JXjwb60OOIPzzPU4l4FrKm11%2FkYko8dXCdQ4cG6jFEZLIXCxdDcwqe%2BQFG9shTzBxpCjmbDR2qhx7OrjlJKzjgH4zUKQ12TIgvCegfBWMur0UHiy4cGkcvGZf683WSKs%2Bkve1bWMCboTb7zr9lV2BguGGT8DCZ3k2lxopPmww5AeqNk1JhGEMItRSqtZ4B0Mhi0%2BfOJLzVdxIsjAA%2FiNHMzLsNsodobnVEsl0UsVgPDCQAVxvfQIFFRo%2Fp5ybiciVaEHcMNgzbxh4FA2fTG6K7v0aRL8V2puGZCrB7UKUpTokgKPfmb7InBs6ScVyEYeilLuYjXdHR%2Fvk5vLSCYnNyV48G%2BtDjiD88z1uMBNV%2FjD9UVGJKPHVwnUOHBuoxRGSyFwQEwTqMiBrlvLSCYnNyV48GviiWI5LmycvrHowqvsrqbjxlre2yo9xc4I2PEIJClpVmi%2F9E9%2FUCAY3yWQ2301PDsTNrim4%2FAYV0%2B4GYRm0A6hTAgU4np6vMpXCtiuXEIrlUY8q6MZS5ovQg2K4zFGJGcmGJ1Eb2V93I1FnKBcq9WztcPJmUDI1UJoe%2BAXel3RuVn6hLjAUQTGhlhk3CZjSnTRQygtiTYzc7tPq0FmNRFgaOZ3bAoxbaPnGv0%2FHzLJvHClhOJTK032szIXZ%2FlN4rictianlazgiBXg2iB62fzg0dA8jANbUKyyOs5a3PDa6yC1vKMoHz%2FJQI3WnsuMhXALMIzNjGWBEv%2B6BFfkgOHvHe%2FMjhKbg8b5f9PxtLgBAA8rjbubool%2BAC%2FZnFNNu4iyNnBBUrMYzv6nby%2B1jdl%2BxW2QQCoQKQf4o33NcwlFIOl%2FWxcINWzRMmD5OKqFWeh9bjU%2B232JQM24E6eORPwKhWOTghrhBPN6ai1ANgiCeEFDULMs6ifHMSPsqYHPo6OeRaY97JKUJvBj6BzTlXhz0zZo8Vp%2BvXk9L609NjQ1KHV9JYeeXVnRtE%2FlaoMI%2B3MzTMKNTABB6IeM1iSztQkaa15xzIAt6nBYLv%2F3aseQhARA5fW%2FVJwVQg7I9NpRML1hv7BwlXEZS9sce0hpTwcO0IOxGxE3%2BkuZbqRjTbjdy2N4NJsIMPGCn71sAikWERkpD7yQmuyfpslBdySrODFxvGeI%2B7JAFEJMN8hiaTjF4PKTeK2gM9fzemotQDYIgnhBQ1CzLOonxzEj7KmBz6OjnkWmPeySlCbwY%2Bgc05V4c9M2aPFafr15PS%2BtPTY0NSh1fSWHnl1Z0bRP5WqDCPtzM0zCjUwAQeiHjNYks7UJH5hQRLMClRp2FWgjpi9QNCwFBBnpJpiKhARA5fW%2FVJwVQg7I9NpRML1hv7BwlXEZS9sce0hpTwcO0IOxGxE3%2BkuZbqRjTbjdy2N4NJsIMPGCn71sAikWERkpD7yQmuyfpslBdySrODFxvGeI%2B7JAFMNqtxqiKrJqsMn%2BnwbCENnIFxJyH65VkXhBQ1CzLOonxzEj7KmBz6OjnkWmPeySlCbwY%2Bgc05V4c9M2aPFafr15PS%2BtPTY0NSh1fSWHnl1Z0bRP5WqDCPtzM0zCjUwAQTu%2FC%2FVkjJ9c9oqRhK0nrREZrgi8IcqH6IMzkAqI1CioeSjb1QBohl6g0442%2F%2FLrpByco8UsBWWlhotQBQfS7AcsjYmtEO%2F8AzQcwMM5Qh5TbZU9q53jKDpnZxK62jam2KMpQztkaMsrR0uY58c6rOt2e%2B%2FCyJ3Ymo4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1Mbwv6HfoxYF8htwwCxb2dVn8Ft9wKFEH6mHwsABvqY3Cm3hCzVQVN0BiFV6AgFrAbbwjoNOONv%2Fy66QcnKPFLAVlpYaLUAUH0uwHLI2JrRDv%2FAN%2BBxJUQvzI7u9nkMkxEBEY8HCFKSuM31JFa9vYYni0wI8pWj6V6Ti%2FOkmarZY6PWAwCxb2dVn8Ft9wKFEH6mHwsABvqY3Cm3hCzVQVN0BiFTwPhjkLiij2OQVrh%2BxAdnbvZ5DJMRARGPBwhSkrjN9SRWvb2GJ4tMCwBXxtwL%2FdpBi7NqMzjvUfXGGdkcqKi9MXoHcCgk5%2BrWOsZtGgvHQ4i5V1%2BXSG7LDVUP%2BfRZYcnKJq2a9QsuSf07ZshZGqd77er0Guxuh4GcLnqxzOIoc%2Bd85q1oDM2mv5iPg6gh0sPsxBh%2BYoYagfk3u9NyjNoPTjAbFp%2BSNb9rt4pCXpHbO9JaV%2B1T46PAnpTyVK7YJjqPAL5iPKFv28Mhb4Lt9S4qC36GgNYiKd5h0%2BUxqegKoepKVpvoeQKJ20Jygdgyu67ZO3VHmepZ%2FhFOciedPxhzVkPw7xhb5WEKSkDk6kf5bmXpKNDFeRiHgqIeI%2BXbXAYm%2BmH3PJbAQYgPBuMKK5GND6x7VNuCTUG1ZhOrASave8P6pXLgaPdXkWFS76ipwnZwiDmTdJEDck6ZHT5GozD0l5sNCU3Dsj8o5C%2BhhMXrEiihO97N%2FocV6wZd48jHg18hw5z0%2FbtGPpej73nujCIQ4QdBAZQ5yx3lrexhubj9m0d4UsGSyhQB%2BsaNVIo7j69%2Bxfq7s7HfTF817i0hCOi52tgiyBGs6BYti9ienxia5H6QqBcuhTcj2wZd48jHg18hw5z0%2FbtGPpej73nujCIQ4QdBAZQ5yx3nHqYK%2FPQvieSg08SnuUk%2FYdUU7FPYNz74acOIR367afTU75Lk%2FaG7c20ML0sHwt%2BvhsO0sVL91MYM67l2Cxlx4PWL2IYzCGhfQ0wH%2F0rmXj8Au2d1Ehkur%2BL3MliT0X31z5I0Y47cVUprjtN2wHoll5ESeC2XyZyaE3Oc%2FTYMCMK3YHWwQd%2FNcKDdI1iA8P8LIz1grw8JSEfiV2QsOrMzb%2FzHP9R0QfXii7a2j5NI%2FoPtHDhnWuehKUa8uEkH6kHfAZ3Xz2rJcQ034NmFFNndgE8MKFAjoI7F0mLgNrllFITfNm%2BLrtcY%2FbhCdED2UViIzeV3l1bhpsPwBzWHRTwDP7XtBXX%2BU1wcSZ400H%2FF22O3583NGgLkqcRe6yYuYLSCPiJT71gekQ0QMmS65Zge5fpsv5R%2BKIUbI1AhVzhFeCTC0I%2Bi39IUh3hSwZLKFAH%2Bj5QUTc%2Fpe%2Bz6mKgeZuHvIIkofFdcDVhoxYxhVqGXNJCuG0zYFIKm9B78DqdUTl5mlAJDT%2Bb5ZDCW%2Fa6qmMtsJqpf%2FIwaIQjy1suxl4LmT8haPrk6cuS7TT9AE%2BlLeyz%2FTJj9KBGCBT0aAtG8R0%2Beh4or74olsdcC3OtJyvgrV%2FxWDWQj%2Bqag6alwGGbpa1HQEiOwsS89mH6Ikx9chAoFhX3APRU%2Fu5ezpLFTOUjIxwDnqIqMbLjs3v7AFppx0xVR2GTw%2BdkxnNF7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+}

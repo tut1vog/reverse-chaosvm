@@ -1,0 +1,323 @@
+{
+  "timestamp": "2026-04-07T13:31:12.568Z",
+  "summary": {
+    "passed": 54,
+    "failed": 0,
+    "total": 54
+  },
+  "tests": [
+    {
+      "test": "buildSdString length is 83",
+      "status": "PASS",
+      "actual": 83,
+      "expected": 83
+    },
+    {
+      "test": "buildSdString matches trace substr_result",
+      "status": "PASS",
+      "actual": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+      "expected": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}"
+    },
+    {
+      "test": "buildSdString does not start with {",
+      "status": "PASS"
+    },
+    {
+      "test": "buildSdString starts with \"sd\":",
+      "status": "PASS"
+    },
+    {
+      "test": "JSON.stringify matches trace output",
+      "status": "PASS",
+      "actual": "{\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+      "expected": "{\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}"
+    },
+    {
+      "test": "JSON.stringify output is 84 chars",
+      "status": "PASS",
+      "actual": 84,
+      "expected": 84
+    },
+    {
+      "test": "buildSdString = JSON.stringify.substring(1)",
+      "status": "PASS",
+      "actual": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+      "expected": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}"
+    },
+    {
+      "test": "buildCdString produces valid JSON",
+      "status": "PASS"
+    },
+    {
+      "test": "buildCdString starts with {\"cd\":[",
+      "status": "PASS"
+    },
+    {
+      "test": "buildCdString ends with ]}",
+      "status": "PASS"
+    },
+    {
+      "test": "buildCdString has 59 entries",
+      "status": "PASS",
+      "actual": 59,
+      "expected": 59
+    },
+    {
+      "test": "buildCdString matches collector-map.json cdString",
+      "status": "PASS",
+      "actual": "{\"cd\":[1,\"linux\",2,800,\"Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei\",\"\",[\"en-US\"],\"\",8,[1920,1080],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],1,20,991783254,1775062183,0.8410000801086426,{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":11888.616780045351},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==\",{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},\"http://127.0.0.1:46577/?rand=1519713624347\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,20,\"+08\",0,\"srgb\",[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],0,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",\"UTF-8\",\"0;0\",{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},null,\"Google Inc. (Google)\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},\"98k\",\"unknown\",\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",\"top\",{\"_state\":-2},\"\",600,0,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"800-600-600-24-*-*-|-*\",\"Linux x86_64\",24,\"\",0,1775062186,1775062183,679647370,\"\",0,1023,\"\"]}",
+      "expected": "{\"cd\":[1,\"linux\",2,800,\"Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei\",\"\",[\"en-US\"],\"\",8,[1920,1080],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],1,20,991783254,1775062183,0.8410000801086426,{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":11888.616780045351},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==\",{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},\"http://127.0.0.1:46577/?rand=1519713624347\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,20,\"+08\",0,\"srgb\",[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],0,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",\"UTF-8\",\"0;0\",{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},null,\"Google Inc. (Google)\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},\"98k\",\"unknown\",\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",\"top\",{\"_state\":-2},\"\",600,0,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"800-600-600-24-*-*-|-*\",\"Linux x86_64\",24,\"\",0,1775062186,1775062183,679647370,\"\",0,1023,\"\"]}"
+    },
+    {
+      "test": "buildCdString length matches (3164)",
+      "status": "PASS",
+      "actual": 3164,
+      "expected": 3164
+    },
+    {
+      "test": "cd[0] = 1 (number)",
+      "status": "PASS",
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "test": "cd[1] = \"linux\" (string)",
+      "status": "PASS",
+      "actual": "linux",
+      "expected": "linux"
+    },
+    {
+      "test": "cd[35] = null",
+      "status": "PASS",
+      "actual": null,
+      "expected": null
+    },
+    {
+      "test": "cd[58] = \"\" (empty string, last entry)",
+      "status": "PASS",
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "test": "assembleToken starts with btoa[1] (header)",
+      "status": "PASS"
+    },
+    {
+      "test": "assembleToken ends with btoa[3] (signature)",
+      "status": "PASS"
+    },
+    {
+      "test": "assembleToken order is [1,0,2,3]",
+      "status": "PASS",
+      "actual": "V5OYLxrEF0DY++7Kr1A07k84OCzJSmXcx0+oUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO+lIwz6RI4yIuayaY1EhVAuJczFJWdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm+EniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6B7XS2SKiBwG0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q+GbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu/o0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa+W5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG+hadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz/seQCltiSoDXzstgW8w15jT+zLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c/JcGgu07WWfm0WJjHyDSsq+HAatHULRsMKNGa1OSKWFwMexokcEjiShAJpH10h2YrqzPWom891bSv1uHXFTuljh6bg+ab/6WJ277ZSrzfCgtTe8QHh6Gy...F7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2/zvXSwkK5TXrAUpCuqF+NqWTQ+E/XVWK/M3yY6MPsbdJJE14+jqg==",
+      "expected": "V5OYLxrEF0DY++7Kr1A07k84OCzJSmXcx0+oUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO+lIwz6RI4yIuayaY1EhVAuJczFJWdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm+EniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6B7XS2SKiBwG0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q+GbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu/o0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa+W5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG+hadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz/seQCltiSoDXzstgW8w15jT+zLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c/JcGgu07WWfm0WJjHyDSsq+HAatHULRsMKNGa1OSKWFwMexokcEjiShAJpH10h2YrqzPWom891bSv1uHXFTuljh6bg+ab/6WJ277ZSrzfCgtTe8QHh6Gy...F7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2/zvXSwkK5TXrAUpCuqF+NqWTQ+E/XVWK/M3yY6MPsbdJJE14+jqg=="
+    },
+    {
+      "test": "segment lengths sum to 4280",
+      "status": "PASS",
+      "actual": 4280,
+      "expected": 4280
+    },
+    {
+      "test": "btoa[0] declared length = 64",
+      "status": "PASS",
+      "actual": 64,
+      "expected": 64
+    },
+    {
+      "test": "btoa[1] declared length = 192",
+      "status": "PASS",
+      "actual": 192,
+      "expected": 192
+    },
+    {
+      "test": "btoa[2] declared length = 3904",
+      "status": "PASS",
+      "actual": 3904,
+      "expected": 3904
+    },
+    {
+      "test": "btoa[3] declared length = 120",
+      "status": "PASS",
+      "actual": 120,
+      "expected": 120
+    },
+    {
+      "test": "assembleToken synthetic order check: [1,0,2,3]",
+      "status": "PASS",
+      "actual": "BBBAAACCCDDD",
+      "expected": "BBBAAACCCDDD"
+    },
+    {
+      "test": "trace pre_url_replace starts with btoa[1] prefix",
+      "status": "PASS"
+    },
+    {
+      "test": "urlEncode replaces +",
+      "status": "PASS",
+      "actual": "abc%2Bdef",
+      "expected": "abc%2Bdef"
+    },
+    {
+      "test": "urlEncode replaces /",
+      "status": "PASS",
+      "actual": "abc%2Fdef",
+      "expected": "abc%2Fdef"
+    },
+    {
+      "test": "urlEncode replaces =",
+      "status": "PASS",
+      "actual": "abc%3Ddef",
+      "expected": "abc%3Ddef"
+    },
+    {
+      "test": "urlEncode replaces all three chars",
+      "status": "PASS",
+      "actual": "a%2Bb%2Fc%3Dd",
+      "expected": "a%2Bb%2Fc%3Dd"
+    },
+    {
+      "test": "urlEncode no-op on clean string",
+      "status": "PASS",
+      "actual": "abcdef",
+      "expected": "abcdef"
+    },
+    {
+      "test": "urlEncode is idempotent",
+      "status": "PASS",
+      "actual": "a%2Bb%2Fc%3D",
+      "expected": "a%2Bb%2Fc%3D"
+    },
+    {
+      "test": "trace has 61 plus replacements",
+      "status": "PASS",
+      "actual": 61,
+      "expected": 61
+    },
+    {
+      "test": "trace has 54 slash replacements",
+      "status": "PASS",
+      "actual": 54,
+      "expected": 54
+    },
+    {
+      "test": "trace has 2 equals replacements",
+      "status": "PASS",
+      "actual": 2,
+      "expected": 2
+    },
+    {
+      "test": "length arithmetic: 4280 + 234 = 4514",
+      "status": "PASS",
+      "actual": 4514,
+      "expected": 4514
+    },
+    {
+      "test": "urlEncode(pre_url_replace) matches final_token prefix",
+      "status": "PASS"
+    },
+    {
+      "test": "urlEncode handles multiple occurrences",
+      "status": "PASS",
+      "actual": "%2B%2B%2F%2F%3D%3D",
+      "expected": "%2B%2B%2F%2F%3D%3D"
+    },
+    {
+      "test": "buildToken returns a string",
+      "status": "PASS"
+    },
+    {
+      "test": "buildToken result has no raw +",
+      "status": "PASS"
+    },
+    {
+      "test": "buildToken result has no raw /",
+      "status": "PASS"
+    },
+    {
+      "test": "buildToken result has no raw =",
+      "status": "PASS"
+    },
+    {
+      "test": "buildToken result has URL-encoded chars",
+      "status": "PASS"
+    },
+    {
+      "test": "buildToken matches urlEncode(assembled re-encoded segments)",
+      "status": "PASS",
+      "actual": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO%2BlIwz6RI4yIuayaY1EhVAuJczFJWdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm%2BEniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6B7XS2SKiBwG0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q%2BGbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu%2Fo0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa%2BW5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG%2BhadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz%2FseQCltiSoDXzstgW8w15jT%2BzLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c%2FJcGgu07WWfm0WJjHyDSsq%2BHAatHULRsMKNGa1OSKWFwMexokcEjiShAJpH10h2YrqzPWom891bSv1uHXFTuljh6bg%2Bab%2F6WJ277ZSrzfCgtTe8QHh6GyF7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D",
+      "expected": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO%2BlIwz6RI4yIuayaY1EhVAuJczFJWdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm%2BEniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6B7XS2SKiBwG0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q%2BGbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu%2Fo0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa%2BW5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG%2BhadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz%2FseQCltiSoDXzstgW8w15jT%2BzLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c%2FJcGgu07WWfm0WJjHyDSsq%2BHAatHULRsMKNGa1OSKWFwMexokcEjiShAJpH10h2YrqzPWom891bSv1uHXFTuljh6bg%2Bab%2F6WJ277ZSrzfCgtTe8QHh6GyF7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+    },
+    {
+      "test": "encryptFn receives correct cdString",
+      "status": "PASS",
+      "actual": "{\"cd\":[1,\"linux\",2,800,\"Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei\",\"\",[\"en-US\"],\"\",8,[1920,1080],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],1,20,991783254,1775062183,0.8410000801086426,{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":11888.616780045351},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==\",{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},\"http://127.0.0.1:46577/?rand=1519713624347\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,20,\"+08\",0,\"srgb\",[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],0,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",\"UTF-8\",\"0;0\",{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},null,\"Google Inc. (Google)\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},\"98k\",\"unknown\",\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",\"top\",{\"_state\":-2},\"\",600,0,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"800-600-600-24-*-*-|-*\",\"Linux x86_64\",24,\"\",0,1775062186,1775062183,679647370,\"\",0,1023,\"\"]}",
+      "expected": "{\"cd\":[1,\"linux\",2,800,\"Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei\",\"\",[\"en-US\"],\"\",8,[1920,1080],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],1,20,991783254,1775062183,0.8410000801086426,{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":11888.616780045351},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==\",{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},\"http://127.0.0.1:46577/?rand=1519713624347\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,20,\"+08\",0,\"srgb\",[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],0,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",\"UTF-8\",\"0;0\",{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},null,\"Google Inc. (Google)\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},\"98k\",\"unknown\",\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",\"top\",{\"_state\":-2},\"\",600,0,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"800-600-600-24-*-*-|-*\",\"Linux x86_64\",24,\"\",0,1775062186,1775062183,679647370,\"\",0,1023,\"\"]}"
+    },
+    {
+      "test": "encryptFn receives correct sdString",
+      "status": "PASS",
+      "actual": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+      "expected": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}"
+    },
+    {
+      "test": "buildToken output starts with trace final_token prefix",
+      "status": "PASS"
+    },
+    {
+      "test": "Uint8Array inputs produce same token as Buffer",
+      "status": "PASS",
+      "actual": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO%2BlIwz6RI4yIuayaY1EhVAuJczFJWdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm%2BEniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6B7XS2SKiBwG0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q%2BGbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu%2Fo0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa%2BW5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG%2BhadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz%2FseQCltiSoDXzstgW8w15jT%2BzLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c%2FJcGgu07WWfm0WJjHyDSsq%2BHAatHULRsMKNGa1OSKWFwMexokcEjiShAJpH10h2YrqzPWom891bSv1uHXFTuljh6bg%2Bab%2F6WJ277ZSrzfCgtTe8QHh6GyF7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D",
+      "expected": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ6LilldQyybopcRkV361K4wA4IHBfJkr3ioLL2i1RtrSvNDsCO%2BlIwz6RI4yIuayaY1EhVAuJczFJWdo9dsTT80ep2j12xNPzR6tIqO9uZ3DqzHdFxdzMOs28235t0Tm%2BEniX6t3ddbyPjq6X76YvONeJ2j12xNPzR6B7XS2SKiBwG0HlhrvXyLwSW3xY31w0YnbZU9q53jKDpnZxK62jam2KMpQztkaMsrIws2MakN2Q%2BGbDryGaYsBY4WBTn9eaPPB03bIrBoOpu6Ua59OnjA3IUqqUE1MbwvuKqItrG5zu%2Fo0avTGodUMG2VPaud4yg6oylDO2RoyyuRlxNUxNADHIfhMHACAe7uuMa%2BW5tDq1SjtlOIa05hsa4G6wHGvPINnFPnv4Z9Q99eGCG%2BhadpN5mxEXHgrBiqnZBB8AbNBCdGCMiSVJYUKtNz%2FseQCltiSoDXzstgW8w15jT%2BzLkugwfKjQZahk9u1gYTZge7t2MsWE8h7eSs9iXBoLtO1ln5B8qNBlqGT25frt1w9wQ3WMHv4kZE72c%2FJcGgu07WWfm0WJjHyDSsq%2BHAatHULRsMKNGa1OSKWFwMexokcEjiShAJpH10h2YrqzPWom891bSv1uHXFTuljh6bg%2Bab%2F6WJ277ZSrzfCgtTe8QHh6GyF7e0MonOUlbuNUmLhRzbvzGHFUiOaqqJAdgOikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+    },
+    {
+      "test": "buildCdString with empty array",
+      "status": "PASS",
+      "actual": "{\"cd\":[]}",
+      "expected": "{\"cd\":[]}"
+    },
+    {
+      "test": "buildCdString single number entry",
+      "status": "PASS",
+      "actual": "{\"cd\":[42]}",
+      "expected": "{\"cd\":[42]}"
+    },
+    {
+      "test": "buildCdString single string entry",
+      "status": "PASS",
+      "actual": "{\"cd\":[\"hello\"]}",
+      "expected": "{\"cd\":[\"hello\"]}"
+    },
+    {
+      "test": "buildCdString single null entry",
+      "status": "PASS",
+      "actual": "{\"cd\":[null]}",
+      "expected": "{\"cd\":[null]}"
+    },
+    {
+      "test": "buildSdString minimal object",
+      "status": "PASS",
+      "actual": "\"sd\":{\"od\":\"C\"}}",
+      "expected": "\"sd\":{\"od\":\"C\"}}"
+    }
+  ],
+  "traceFile": "/home/ubun/workspace/reverse-chaosvm-contv2/output/dynamic/encoding-trace.json",
+  "collectorFile": "/home/ubun/workspace/reverse-chaosvm-contv2/output/dynamic/collector-map.json",
+  "groundTruth": {
+    "sdSubstrResult": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+    "sdSubstrLength": 83,
+    "cdStringLength": 3164,
+    "cdEntryCount": 59,
+    "btoa0Length": 64,
+    "btoa1Length": 192,
+    "btoa2Length": 3904,
+    "btoa3Length": 120,
+    "preUrlLength": 4280,
+    "finalTokenLength": 4514,
+    "urlReplacements": {
+      "plus": 61,
+      "slash": 54,
+      "equals": 2
+    }
+  }
+}

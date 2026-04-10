@@ -1,0 +1,155 @@
+ChaosVM Opcode Semantics — Spot Check
+============================================================
+
+[arithmetic/binop] ADD (opcode 0)
+  Disasm: [1288]  ADD  r70, r35, r97  ; r70 = r35 + r97
+  Operands: [r70, r35, r97]
+  Effects (1):
+    [0] dest=r70, reads=[r35, r97]
+        expr: {"type":"binop","op":"+","left":{"type":"register","reg":"r35"},"right":{"type":"register","reg":"r97"}}
+
+[arithmetic/unop] NEG (opcode 53)
+  Disasm: [306]  NEG  r9, r13  ; r9 = -r13
+  Operands: [r9, r13]
+  Effects (1):
+    [0] dest=r9, reads=[r13]
+        expr: {"type":"unop","op":"-","operand":{"type":"register","reg":"r13"}}
+
+[arithmetic/imm] ADD_K (opcode 92)
+  Disasm: [5286]  ADD_K  r35, r59, 2368517  ; r35 = r59 + 2368517
+  Operands: [r35, r59, 2368517]
+  Effects (1):
+    [0] dest=r35, reads=[r59]
+        expr: {"type":"binop","op":"+","left":{"type":"register","reg":"r59"},"right":{"type":"literal","value":2368517}}
+
+[bitwise/reg] XOR (opcode 3)
+  Disasm: [1284]  XOR  r35, r59, r70  ; r35 = r59 ^ r70
+  Operands: [r35, r59, r70]
+  Effects (1):
+    [0] dest=r35, reads=[r59, r70]
+        expr: {"type":"binop","op":"^","left":{"type":"register","reg":"r59"},"right":{"type":"register","reg":"r70"}}
+
+[bitwise/imm] AND_K (opcode 8)
+  Disasm: [1300]  AND_K  r101, r59, 3  ; r101 = r59 & 3
+  Operands: [r101, r59, 3]
+  Effects (1):
+    [0] dest=r101, reads=[r59]
+        expr: {"type":"binop","op":"&","left":{"type":"register","reg":"r59"},"right":{"type":"literal","value":3}}
+
+[compare/reg] SEQ (opcode 22)
+  Disasm: [89]  SEQ  r108, r22, r77  ; r108 = r22 === r77
+  Operands: [r108, r22, r77]
+  Effects (1):
+    [0] dest=r108, reads=[r22, r77]
+        expr: {"type":"binop","op":"===","left":{"type":"register","reg":"r22"},"right":{"type":"register","reg":"r77"}}
+
+[compare/imm] GE_K (opcode 43)
+  Disasm: [2240]  GE_K  r11, r12, 0  ; r11 = r12 >= 0
+  Operands: [r11, r12, 0]
+  Effects (1):
+    [0] dest=r11, reads=[r12]
+        expr: {"type":"binop","op":">=","left":{"type":"register","reg":"r12"},"right":{"type":"literal","value":0}}
+
+[logic] NOT (opcode 68)
+  Disasm: [345]  NOT  r10, r10  ; r10 = !r10
+  Operands: [r10, r10]
+  Effects (1):
+    [0] dest=r10, reads=[r10]
+        expr: {"type":"unop","op":"!","operand":{"type":"register","reg":"r10"}}
+
+[type] TYPEOF (opcode 34)
+  Disasm: [5846]  TYPEOF  r46, r85  ; r46 = typeof r85
+  Operands: [r46, r85]
+  Effects (1):
+    [0] dest=r46, reads=[r85]
+        expr: {"type":"unop","op":"typeof","operand":{"type":"register","reg":"r85"}}
+
+[object/get] PROP_GET (opcode 17)
+  Disasm: [33]  PROP_GET  r11, r0, r11  ; r11 = r0[r11]
+  Operands: [r11, r0, r11]
+  Effects (1):
+    [0] dest=r11, reads=[r0, r11]
+        expr: {"type":"prop_get","object":{"type":"register","reg":"r0"},"property":{"type":"register","reg":"r11"}}
+
+[object/set] PROP_SET (opcode 14)
+  Disasm: [611]  PROP_SET  r29, r30, r19  ; r29[r30] = r19
+  Operands: [r29, r30, r19]
+  Effects (1):
+    [0] dest=none, reads=[r29, r30, r19]
+        expr: {"type":"prop_set","object":{"type":"register","reg":"r29"},"property":{"type":"register","reg":"r30"},"value":{"type":"register","reg":"r19"}}
+
+[object/new] OBJ_NEW (opcode 18)
+  Disasm: [1601]  OBJ_NEW  r41  ; r41 = {}
+  Operands: [r41]
+  Effects (1):
+    [0] dest=r41, reads=[]
+        expr: {"type":"object"}
+
+[call/simple] CALL_1 (opcode 52)
+  Disasm: [336]  CALL_1  r14, r10, r13, r12  ; r14 = r10.call(r13, r12)
+  Operands: [r14, r10, r13, r12]
+  Effects (1):
+    [0] dest=r14, reads=[r10, r13, r12]
+        expr: {"type":"call","fn":{"type":"register","reg":"r10"},"thisArg":{"type":"register","reg":"r13"},"args":[{"type":"register","reg":"r12"}]}
+
+[call/method] CALLQ_1 (opcode 77)
+  Disasm: [1929]  CALLQ_1  r27, r32, r26  ; r27 = r32.call(Q, r26)
+  Operands: [r27, r32, r26]
+  Effects (1):
+    [0] dest=r27, reads=[r32, Q, r26]
+        expr: {"type":"method_call","fn":{"type":"register","reg":"r32"},"thisArg":{"type":"register","reg":"Q"},"args":[{"type":"register","reg":"r26"}]}
+
+[string/init] STR_INIT (opcode 31)
+  Disasm: [3810]  STR_INIT  r15, r15, 45  ; r15 = ""; r15 += '-'
+  Operands: [r15, r15, 45]
+  Effects (2):
+    [0] dest=r15, reads=[]
+        expr: {"type":"string_init","value":""}
+    [1] dest=r15, reads=[r15]
+        expr: {"type":"string_append","char":"-","charCode":45}
+
+[string/append] STR_APPEND_2 (opcode 19)
+  Disasm: [18]  STR_APPEND_2  r11, 119, r11, 105  ; r11 += 'w'; r11 += 'i'
+  Operands: [r11, 119, r11, 105]
+  Effects (2):
+    [0] dest=r11, reads=[r11]
+        expr: {"type":"string_append","char":"w","charCode":119}
+    [1] dest=r11, reads=[r11]
+        expr: {"type":"string_append","char":"i","charCode":105}
+
+[control/jmp] JMP (opcode 38)
+  Disasm: [136]  JMP  67542  ; C += 67542
+  Operands: [67542]
+  Effects (1):
+    [0] dest=none, reads=[]
+        expr: {"type":"jmp","offset":67542}
+
+[control/cjmp] CJMP (opcode 87)
+  Disasm: [0]  CJMP  r10, 64935, 66676  ; C += r10 ? 64935 : 66676
+  Operands: [r10, 64935, 66676]
+  Effects (1):
+    [0] dest=none, reads=[r10]
+        expr: {"type":"cjmp","condition":{"type":"register","reg":"r10"},"trueOffset":64935,"falseOffset":66676}
+
+[control/ret] RET_BARE (opcode 60)
+  Disasm: [151]  RET_BARE  r8  ; return r8
+  Operands: [r8]
+  Effects (1):
+    [0] dest=none, reads=[r8]
+        expr: {"type":"return","value":{"type":"register","reg":"r8"}}
+
+[compound] COPY_SET (opcode 10)
+  Disasm: [1122]  COPY_SET  r34, r49, r29, r36, r49  ; r34 = r49; r29[r36] = r49
+  Operands: [r34, r49, r29, r36, r49]
+  Effects (2):
+    [0] dest=r34, reads=[r49]
+        expr: {"type":"register","reg":"r49"}
+    [1] dest=none, reads=[r29, r36, r49]
+        expr: {"type":"prop_set","object":{"type":"register","reg":"r29"},"property":{"type":"register","reg":"r36"},"value":{"type":"register","reg":"r49"}}
+
+[function/create] FUNC_CREATE_C (opcode 55)
+  Disasm: [754]  FUNC_CREATE_C  2, r25, r9, r31, 27169, 0  ; r31 = closure(offset=27169, [r25, r9], arity=0)
+  Operands: [2, r25, r9, r31, 27169, 0]
+  Effects (1):
+    [0] dest=r31, reads=[r25, r9]
+        expr: {"type":"func_create","offset":27169,"arity":0,"closureVars":[{"type":"register","reg":"r25"},{"type":"register","reg":"r9"}]}

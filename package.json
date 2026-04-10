@@ -1,0 +1,18 @@
+{
+  "name": "reverse-chaosvm",
+  "description": "Tencent ChaosVM (JSVMP) decompiler, token generator, and CAPTCHA solver",
+  "private": true,
+  "scripts": {
+    "decompile": "node decompiler/run.js --input targets/tdc.js --output output/tdc",
+    "token:standalone": "node token/cli.js",
+    "solve:puppeteer": "node puppeteer/cli.js",
+    "test": "node --test tests/test-decoder.js tests/test-disasm.js tests/test-strings.js tests/test-cfg.js tests/test-patterns.js tests/test-semantics.js tests/test-fold.js tests/test-reconstruct.js tests/test-emit.js tests/test-collector-schema.js tests/outer-pipeline.test.js"
+  },
+  "dependencies": {
+    "acorn": "^8.16.0",
+    "canvas": "^3.2.3",
+    "puppeteer": "^24.40.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

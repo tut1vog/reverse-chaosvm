@@ -1,0 +1,14 @@
+_aq_72726({
+    "state": 1,
+    "ticket": "",
+    "capclass": "1",
+    "subcapclass": "15",
+    "src_1": "cap_union_new_show",
+    "src_2": "template/new_placeholder.html",
+    "src_3": "template/new_slide_placeholder.html",
+    "sess": "s1cHKVTsdNoIA5JvwTE-396ZiIsggTD4EIwpmpDuBzyg-ZJd9-xs3rZP7ZUnCULdHONhFxLBuGih7SwmnLM_SJDTpgDVnSSCc9FPc-Jcdn9jKPBcBkcA0HrHIut0gth_0i5apKFt9PsGu6XnMTu0HaK86yl7llZr9SCKkpogq4-1ebeu4fx5jpxS2W9iYXAjoTaylyPpId3Wte1zAPTp_Of2Gfjmhj9N6zAroJYrDQ1pMKT4Yzu07FcHhDXBd3morROL6uC-scL-gaDaECFkj7yQ**",
+    "randstr": "",
+    "sid": "7445801204464881664",
+    "log_js": "",
+    "extra": "{\"rainbow\":\"{\\n  \\\"samplingRate\\\":0.1,\\n  \\\"apiReportThrottle\\\":200,\\n  \\\"sourceReportThrottle\\\":300,\\n  \\\"loadReportThrottle\\\":1000,\\n  \\\"sampleAppidList\\\":[\\\"2053860784\\\",\\\"2091569087\\\"]\\n}\"}"
+})

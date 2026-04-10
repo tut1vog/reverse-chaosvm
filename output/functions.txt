@@ -1,0 +1,301 @@
+ChaosVM Function Table — 270 valid functions, 22 invalid
+================================================================================
+
+  ID  | Entry PC | Creator PC | Opcode          | Arity | Captured Vars          | Valid
+------+----------+------------+-----------------+-------+------------------------+------
+   0  |    36579 |       main | (main entry)    |     — | []                     |   ✓
+   1  |        4 |       9459 | FUNC_CREATE_C   |     1 | []                     |   ✓
+   2  |      198 |      49907 | FUNC_CREATE_C   |     2 | []                     |   ✓
+   3  |      293 |      36428 | FUNC_CREATE_C   |     1 | [r17]                  |   ✓
+   4  |      350 |      42644 | FUNC_CREATE_C   |     0 | [r14]                  |   ✓
+   5  |      558 |      50019 | FUNC_CREATE_C   |     2 | []                     |   ✓
+   6  |      623 |      49507 | FUNC_CREATE_C   |     2 | []                     |   ✓
+   7  |      673 |      49955 | FUNC_CREATE_C   |     2 | []                     |   ✓
+   8  |      772 |      32493 | FUNC_CREATE_C   |     0 | []                     |   ✓
+   9  |     1614 |       1573 | FUNC_CREATE_A   |   101 | [r118, r19, r18, r1... |   ✗
+  10  |     2029 |      49747 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  11  |     2250 |      15796 | FUNC_CREATE_C   |     1 | [r36, r15, r14, r18... |   ✓
+  12  |     2326 |      27789 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  13  |     4049 |      50056 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  14  |     4266 |       7930 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  15  |     4434 |      28050 | FUNC_CREATE_C   |     1 | [r13]                  |   ✓
+  16  |     4954 |      41969 | FUNC_CREATE_C   |     2 | [r26, r8]              |   ✓
+  17  |     4992 |      60770 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  18  |     5086 |       6561 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  19  |     5140 |      25928 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  20  |     5197 |      25181 | FUNC_CREATE_B   |     0 | []                     |   ✓
+  21  |     5221 |      57980 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  22  |     5356 |      49619 | FUNC_CREATE_C   |     3 | []                     |   ✓
+  23  |     5930 |      49832 | FUNC_CREATE_B   |     3 | []                     |   ✓
+  24  |     6114 |      44145 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  25  |     6436 |      11755 | FUNC_CREATE_C   |     0 | [r15, r39]             |   ✓
+  26  |     6527 |      49544 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  27  |     6577 |      31483 | FUNC_CREATE_C   |     0 | [r18, r8]              |   ✓
+  28  |     6719 |      49539 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  29  |     6941 |      36634 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  30  |     7009 |       2063 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  31  |     7084 |      65487 | FUNC_CREATE_C   |     3 | [r18]                  |   ✓
+  32  |     7408 |       7342 | FUNC_CREATE_A   |    70 | [r43, r11, r32, r33... |   ✗
+  33  |     7568 |      41385 | FUNC_CREATE_A   |     0 | [r13]                  |   ✓
+  34  |     7585 |      49560 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  35  |     7635 |      49683 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  36  |     7873 |      49447 | FUNC_CREATE_B   |     3 | [r11]                  |   ✓
+  37  |     8005 |      49464 | FUNC_CREATE_B   |     3 | []                     |   ✓
+  38  |     8390 |       8353 | FUNC_CREATE_A   | 24893 | [r116, r19, r15, r9... |   ✗
+  39  |     8398 |      68553 | FUNC_CREATE_A   |     0 | [r23, r15]             |   ✗
+  40  |     9247 |      49736 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  41  |     9341 |       4811 | FUNC_CREATE_C   |     2 | [r29, r28]             |   ✓
+  42  |     9432 |      49731 | FUNC_CREATE_C   |     2 | []                     |   ✗
+  43  |     9568 |      65516 | FUNC_CREATE_C   |     3 | [r87]                  |   ✓
+  44  |     9741 |      48986 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  45  |     9760 |      49971 | FUNC_CREATE_C   |     3 | []                     |   ✓
+  46  |    10721 |      49571 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  47  |    10866 |       1676 | FUNC_CREATE_C   |     1 | [r9]                   |   ✓
+  48  |    10905 |      57187 | FUNC_CREATE_A   |     0 | [r10]                  |   ✓
+  49  |    10936 |      12686 | FUNC_CREATE_C   |     0 | [r13, r17, r11]        |   ✓
+  50  |    11312 |      49939 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  51  |    11370 |      69973 | FUNC_CREATE_C   |     1 | [r25]                  |   ✓
+  52  |    11473 |      15951 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  53  |    11540 |      49426 | FUNC_CREATE_C   |     3 | []                     |   ✓
+  54  |    11946 |      51234 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  55  |    11981 |      20378 | FUNC_CREATE_C   |     0 | [r9, r11]              |   ✓
+  56  |    11999 |      41990 | FUNC_CREATE_C   |     1 | [r26]                  |   ✓
+  57  |    12484 |      49592 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  58  |    12669 |      63515 | FUNC_CREATE_A   |     0 | [r16, r20, r8]         |   ✓
+  59  |    13013 |      64689 | FUNC_CREATE_C   |     1 | [r22]                  |   ✓
+  60  |    13085 |      23768 | FUNC_CREATE_C   |     1 | [r13]                  |   ✓
+  61  |    13417 |      59551 | FUNC_CREATE_A   |     0 | [r30, r13, r48, r15... |   ✓
+  62  |    13628 |      66293 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  63  |    14962 |      67852 | FUNC_CREATE_C   |     0 | [r10, r21, r18, r14... |   ✓
+  64  |    15083 |      49827 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  65  |    15236 |       9324 | FUNC_CREATE_A   |     0 | [r17]                  |   ✓
+  66  |    15924 |      49651 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  67  |    15990 |      36859 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  68  |    16973 |      64093 | FUNC_CREATE_C   |     0 | [r15, r8]              |   ✓
+  69  |    17247 |      65444 | FUNC_CREATE_C   |     3 | [r18]                  |   ✓
+  70  |    17291 |      61140 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  71  |    17526 |      66187 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  72  |    18439 |        241 | FUNC_CREATE_A   |     0 | [r15]                  |   ✓
+  73  |    18739 |      36015 | FUNC_CREATE_A   |     0 | [r12]                  |   ✓
+  74  |    18787 |      65559 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  75  |    18853 |      18703 | FUNC_CREATE_A   |     0 | [r21, r25]             |   ✓
+  76  |    19800 |      49987 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  77  |    19863 |      50003 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  78  |    22686 |      26084 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  79  |    23322 |      32450 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  80  |    23416 |      49763 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  81  |    23476 |      64843 | FUNC_CREATE_C   |     1 | [r22]                  |   ✓
+  82  |    23649 |      46756 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  83  |    23780 |      49667 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  84  |    23835 |        707 | FUNC_CREATE_A   |     0 | []                     |   ✓
+  85  |    24115 |      50040 | FUNC_CREATE_B   |     3 | []                     |   ✓
+  86  |    24278 |      49944 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  87  |    24382 |      69361 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  88  |    25125 |      49976 | FUNC_CREATE_B   |     2 | []                     |   ✓
+  89  |    25318 |      12540 | FUNC_CREATE_A   |     0 | [r9]                   |   ✓
+  90  |    25454 |      65507 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  91  |    25521 |      25727 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  92  |    25562 |      65611 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  93  |    25659 |      31573 | FUNC_CREATE_C   |     1 | []                     |   ✓
+  94  |    25681 |      49576 | FUNC_CREATE_B   |     3 | []                     |   ✓
+  95  |    25928 |      25751 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  96  |    25999 |      25956 | FUNC_CREATE_A   |   114 | [r11, r22, r87, r30... |   ✗
+  97  |    26044 |      25192 | FUNC_CREATE_C   |     0 | []                     |   ✓
+  98  |    26050 |      50035 | FUNC_CREATE_C   |     2 | []                     |   ✓
+  99  |    26174 |      49480 | FUNC_CREATE_B   |     3 | []                     |   ✓
+ 100  |    27181 |      65409 | FUNC_CREATE_C   |     3 | [r87]                  |   ✓
+ 101  |    27211 |      31376 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 102  |    27334 |      28369 | FUNC_CREATE_A   |     0 | [r8]                   |   ✓
+ 103  |    27400 |      68515 | FUNC_CREATE_B   |     1 | []                     |   ✓
+ 104  |    27928 |        754 | FUNC_CREATE_C   |     0 | [r25, r9]              |   ✓
+ 105  |    28089 |      46703 | FUNC_CREATE_A   |     0 | [r10, r9]              |   ✓
+ 106  |    28204 |      59527 | FUNC_CREATE_A   |     0 | [r42, r43]             |   ✓
+ 107  |    28229 |      67661 | FUNC_CREATE_C   |     0 | [r9, r10, r26]         |   ✓
+ 108  |    28272 |      49795 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 109  |    28405 |      64133 | FUNC_CREATE_A   |     0 | [r15]                  |   ✓
+ 110  |    28971 |      36584 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 111  |    28982 |      64618 | FUNC_CREATE_C   |     1 | [r22]                  |   ✓
+ 112  |    29014 |      57612 | FUNC_CREATE_C   |     0 | [r9]                   |   ✓
+ 113  |    30949 |      65594 | FUNC_CREATE_C   |     3 | [r18]                  |   ✓
+ 114  |    30979 |      35251 | FUNC_CREATE_C   |     1 | [r8, r16, r24, r14,... |   ✓
+ 115  |    31222 |      50503 | FUNC_CREATE_C   |     1 | [r15]                  |   ✓
+ 116  |    31342 |      49608 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 117  |    31396 |      49859 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 118  |    31566 |      49459 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 119  |    31805 |       7796 | FUNC_CREATE_A   |     0 | [r40]                  |   ✓
+ 120  |    32031 |       4076 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 121  |    32391 |      25552 | FUNC_CREATE_C   |     0 | [r13, r14, r11]        |   ✓
+ 122  |    32416 |      49555 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 123  |    32466 |      49635 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 124  |    32521 |      49720 | FUNC_CREATE_B   |     3 | []                     |   ✓
+ 125  |    32624 |      49496 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 126  |    32730 |       1811 | FUNC_CREATE_C   |     1 | [r25]                  |   ✓
+ 127  |    32802 |      10400 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 128  |    32896 |      65025 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 129  |    33079 |       6008 | FUNC_CREATE_A   |     0 | [r18, r19, r23]        |   ✓
+ 130  |    33104 |      42010 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 131  |    33284 |      24312 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 132  |    33630 |      66488 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 133  |    33828 |      42687 | FUNC_CREATE_A   |     0 | [r14, r11]             |   ✓
+ 134  |    33908 |      11439 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 135  |    33934 |      15775 | FUNC_CREATE_C   |     1 | [r15, r14, r18]        |   ✓
+ 136  |    34415 |      35270 | FUNC_CREATE_B   |     1 | []                     |   ✓
+ 137  |    34452 |      23071 | FUNC_CREATE_C   |     1 | [r8, r11]              |   ✓
+ 138  |    34764 |       9812 | FUNC_CREATE_A   |     0 | [r17]                  |   ✓
+ 139  |    35229 |      49475 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 140  |    35472 |      35265 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 141  |    35836 |      65432 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 142  |    35911 |      35881 | FUNC_CREATE_C   |    34 | [r17990, r-9718, r9... |   ✗
+ 143  |    36032 |      49784 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 144  |    36223 |      49688 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 145  |    36302 |      32658 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 146  |    36515 |      41950 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 147  |    36600 |      49811 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 148  |    36672 |      49891 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 149  |    36825 |      49603 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 150  |    37047 |      36888 | FUNC_CREATE_B   |    27 | [r15, r17, r24, r25... |   ✗
+ 151  |    38447 |      49624 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 152  |    38734 |      68496 | FUNC_CREATE_B   |     1 | [r24, r10]             |   ✓
+ 153  |    38778 |      49928 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 154  |    38918 |      46069 | FUNC_CREATE_A   |     0 | [r16]                  |   ✓
+ 155  |    39980 |      66446 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 156  |    40365 |      49960 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 157  |    40423 |      11346 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 158  |    40467 |      54246 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 159  |    40715 |      31523 | FUNC_CREATE_A   |     0 | [r18]                  |   ✗
+ 160  |    40738 |      40707 | FUNC_CREATE_A   |    11 | [r87, r38, r-16944,... |   ✗
+ 161  |    40750 |       2298 | FUNC_CREATE_C   |     1 | [r17, r9, r8, r16]     |   ✓
+ 162  |    41150 |       7619 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 163  |    41231 |      49431 | FUNC_CREATE_B   |     3 | []                     |   ✓
+ 164  |    41848 |      49417 | FUNC_CREATE_C   |     1 | [r11]                  |   ✓
+ 165  |    42408 |      60488 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 166  |    42468 |      65151 | FUNC_CREATE_A   |     0 | [r20]                  |   ✓
+ 167  |    42632 |      49704 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 168  |    42711 |      49864 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 169  |    42761 |      44095 | FUNC_CREATE_A   |     2 | []                     |   ✓
+ 170  |    43324 |      64916 | FUNC_CREATE_C   |     1 | [r22]                  |   ✓
+ 171  |    43356 |      41930 | FUNC_CREATE_C   |     3 | [r26]                  |   ✓
+ 172  |    43648 |      49587 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 173  |    43698 |      40429 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 174  |    44014 |      49442 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 175  |    44111 |      49816 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 176  |    44436 |      10849 | FUNC_CREATE_A   |     0 | [r18]                  |   ✓
+ 177  |    44707 |      61276 | FUNC_CREATE_C   |     1 | [r42]                  |   ✓
+ 178  |    44740 |      49912 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 179  |    45232 |        657 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 180  |    45405 |      36208 | FUNC_CREATE_C   |     0 | [r13, r12]             |   ✓
+ 181  |    45423 |      11434 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 182  |    45668 |      49166 | FUNC_CREATE_C   |     0 | [r15, r19]             |   ✓
+ 183  |    46017 |      49992 | FUNC_CREATE_B   |     3 | []                     |   ✓
+ 184  |    46549 |      43686 | FUNC_CREATE_C   |     2 | []                     |   ✗
+ 185  |    46585 |      46503 | FUNC_CREATE_A   |   128 | [r111, r19, r39, r1... |   ✗
+ 186  |    46783 |      36265 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 187  |    47016 |      49752 | FUNC_CREATE_B   |     2 | []                     |   ✗
+ 188  |    47145 |      47012 | FUNC_CREATE_C   |    19 | [r-22050, r17140, r... |   ✗
+ 189  |    47166 |      47036 | FUNC_CREATE_A   |   111 | [r54, r12, r115, r1... |   ✗
+ 190  |    47307 |      49528 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 191  |    47346 |      49843 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 192  |    47807 |      36706 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 193  |    48136 |      48107 | FUNC_CREATE_C   |   111 | [r46, r18, r0, r9, ... |   ✗
+ 194  |    48359 |      20349 | FUNC_CREATE_C   |     1 | [r9]                   |   ✓
+ 195  |    48521 |      68509 | FUNC_CREATE_C   |     2 | [r8]                   |   ✓
+ 196  |    48903 |      42745 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 197  |    48959 |      50051 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 198  |    48997 |      41868 | FUNC_CREATE_C   |     1 | [r12, r17, r26]        |   ✓
+ 199  |    49023 |      65533 | FUNC_CREATE_C   |     3 | [r87]                  |   ✓
+ 200  |    49053 |      18526 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 201  |    50081 |       6697 | FUNC_CREATE_C   |     1 | [r13]                  |   ✓
+ 202  |    50113 |      64539 | FUNC_CREATE_C   |     1 | [r22]                  |   ✓
+ 203  |    50135 |      53461 | FUNC_CREATE_A   |     0 | [r21]                  |   ✓
+ 204  |    50162 |      35281 | FUNC_CREATE_C   |     2 | [r8]                   |   ✓
+ 205  |    50410 |      25274 | FUNC_CREATE_C   |     0 | [r21]                  |   ✓
+ 206  |    50710 |       6816 | FUNC_CREATE_A   |     0 | [r17]                  |   ✓
+ 207  |    50730 |      65111 | FUNC_CREATE_C   |     0 | [r20, r14]             |   ✓
+ 208  |    51147 |      25263 | FUNC_CREATE_C   |     0 | [r30, r8, r32]         |   ✓
+ 209  |    51231 |      56689 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 210  |    51334 |      65464 | FUNC_CREATE_C   |     3 | [r18]                  |   ✓
+ 211  |    51719 |      61234 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 212  |    52065 |       4895 | FUNC_CREATE_C   |     0 | [r11, r14, r28, r18... |   ✓
+ 213  |    52150 |      25233 | FUNC_CREATE_C   |     0 | [r21, r30]             |   ✓
+ 214  |    52206 |      53775 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 215  |    52953 |      24134 | FUNC_CREATE_C   |     1 | [r13]                  |   ✓
+ 216  |    53036 |      12501 | FUNC_CREATE_C   |     0 | [r9]                   |   ✗
+ 217  |    53091 |      52971 | FUNC_CREATE_A   |    19 | [r18, r16, r18, r-1... |   ✗
+ 218  |    53332 |      19897 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 219  |    53494 |       4122 | FUNC_CREATE_A   |     0 | [r10]                  |   ✓
+ 220  |    53741 |      49512 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 221  |    54338 |      24196 | FUNC_CREATE_C   |     0 | [r15, r22]             |   ✓
+ 222  |    54383 |      32551 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 223  |    54603 |      69979 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 224  |    54762 |      36066 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 225  |    55926 |      44063 | FUNC_CREATE_A   |     1 | []                     |   ✓
+ 226  |    56126 |      56908 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 227  |    56193 |      47325 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 228  |    56309 |      46002 | FUNC_CREATE_C   |     0 | [r18]                  |   ✗
+ 229  |    56364 |      56257 | FUNC_CREATE_B   |    11 | [r31, r84, r19, r31... |   ✗
+ 230  |    56655 |      49699 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 231  |    56705 |      24263 | FUNC_CREATE_C   |     0 | [r13]                  |   ✓
+ 232  |    56726 |      12439 | FUNC_CREATE_C   |     1 | [r48]                  |   ✓
+ 233  |    56874 |      49779 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 234  |    56924 |      25673 | FUNC_CREATE_C   |     1 | [r13]                  |   ✓
+ 235  |    57143 |      49491 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 236  |    57208 |      30422 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 237  |    57447 |      57427 | FUNC_CREATE_A   |     0 | [r17]                  |   ✓
+ 238  |    57659 |      25250 | FUNC_CREATE_C   |     0 | [r21, r30]             |   ✓
+ 239  |    57946 |      49923 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 240  |    57996 |      49880 | FUNC_CREATE_B   |     3 | []                     |   ✓
+ 241  |    58160 |      61572 | FUNC_CREATE_C   |     0 | [r10, r16]             |   ✓
+ 242  |    58175 |      47373 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 243  |    59130 |      15117 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 244  |    59651 |      25732 | FUNC_CREATE_B   |     2 | [r30, r51, r13, r25... |   ✓
+ 245  |    59693 |       7935 | FUNC_CREATE_B   |     0 | [r9]                   |   ✓
+ 246  |    59705 |      36179 | FUNC_CREATE_C   |     1 | [r13]                  |   ✓
+ 247  |    59947 |      63922 | FUNC_CREATE_C   |     0 | [r13]                  |   ✓
+ 248  |    59974 |      51193 | FUNC_CREATE_C   |     0 | [r17, r10, r8]         |   ✓
+ 249  |    60057 |      67630 | FUNC_CREATE_C   |     1 | [r9, r10, r26]         |   ✓
+ 250  |    60078 |      56212 | FUNC_CREATE_C   |     1 | [r24, r28]             |   ✓
+ 251  |    60358 |      40399 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 252  |    60371 |       4859 | FUNC_CREATE_A   |     0 | [r32, r31, r9, r18]    |   ✓
+ 253  |    60454 |      49768 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 254  |    60508 |      65550 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 255  |    60562 |       8590 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 256  |    60605 |      44774 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 257  |    60736 |      49800 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 258  |    60786 |      49896 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 259  |    60987 |      25303 | FUNC_CREATE_C   |     0 | [r21]                  |   ✓
+ 260  |    61112 |      58074 | FUNC_CREATE_A   |     0 | [r18, r9, r11]         |   ✓
+ 261  |    61137 |       9281 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 262  |    61207 |      49640 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 263  |    61325 |      43675 | FUNC_CREATE_C   |     3 | []                     |   ✓
+ 264  |    61640 |      49523 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 265  |    63667 |      69161 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 266  |    64006 |      49715 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 267  |    64307 |      47330 | FUNC_CREATE_C   |     1 | [r17]                  |   ✓
+ 268  |    64466 |      59508 | FUNC_CREATE_C   |     0 | [r46, r34, r24]        |   ✓
+ 269  |    64998 |      49848 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 270  |    65036 |      49672 | FUNC_CREATE_B   |     3 | []                     |   ✓
+ 271  |    65361 |      31004 | FUNC_CREATE_C   |     2 | [r9, r11, r13, r16,... |   ✓
+ 272  |    65641 |      38474 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 273  |    66624 |      65585 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 274  |    66830 |      38812 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 275  |    66959 |      47813 | FUNC_CREATE_C   |     0 | []                     |   ✓
+ 276  |    67337 |      19317 | FUNC_CREATE_C   |     0 | [r15, r40, r38, r33... |   ✓
+ 277  |    67414 |      41356 | FUNC_CREATE_A   |     0 | [r13, r23]             |   ✓
+ 278  |    67784 |      23459 | FUNC_CREATE_A   |     0 | [r8]                   |   ✓
+ 279  |    67820 |      23295 | FUNC_CREATE_A   |     0 | [r22, r15, r24, r18... |   ✓
+ 280  |    68320 |      50024 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 281  |    68575 |      36875 | FUNC_CREATE_C   |     0 | [r9]                   |   ✓
+ 282  |    68605 |      19834 | FUNC_CREATE_A   |     0 | []                     |   ✓
+ 283  |    68724 |      64765 | FUNC_CREATE_C   |     1 | [r22]                  |   ✓
+ 284  |    68746 |      65568 | FUNC_CREATE_C   |     3 | [r87]                  |   ✓
+ 285  |    69013 |      41336 | FUNC_CREATE_C   |     0 | [r20, r24, r13, r23]   |   ✓
+ 286  |    69127 |      50008 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 287  |    69210 |      49875 | FUNC_CREATE_C   |     2 | []                     |   ✓
+ 288  |    69291 |      17461 | FUNC_CREATE_C   |     1 | []                     |   ✓
+ 289  |    69334 |      49656 | FUNC_CREATE_B   |     2 | []                     |   ✓
+ 290  |      N/A |      39590 | FUNC_CREATE_C   |     — | []                     |   ✗
+ 291  |      N/A |      68960 | FUNC_CREATE_A   |     — | []                     |   ✗
+
+Total FUNC_CREATE instructions: 291
+Valid functions (including main entry): 270
+Invalid (data region artifacts): 22

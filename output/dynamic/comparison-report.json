@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-04-03T04:12:19.112Z",
+  "numRuns": 2,
+  "runs": [
+    {
+      "liveToken": {
+        "length": 4670,
+        "first100": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ",
+        "last100": "ikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+      },
+      "standaloneToken": {
+        "length": 4670,
+        "first100": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ",
+        "last100": "ikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+      },
+      "match": true,
+      "diffIndex": -1,
+      "diffDetails": null,
+      "btoaComparison": [
+        {
+          "index": 0,
+          "name": "hash",
+          "liveLength": 64,
+          "standaloneLength": 64,
+          "match": true,
+          "liveInputLength": 48,
+          "standaloneInputLength": 48
+        },
+        {
+          "index": 1,
+          "name": "header",
+          "liveLength": 192,
+          "standaloneLength": 192,
+          "match": true,
+          "liveInputLength": 144,
+          "standaloneInputLength": 144
+        },
+        {
+          "index": 2,
+          "name": "cdBody",
+          "liveLength": 4032,
+          "standaloneLength": 4032,
+          "match": true,
+          "liveInputLength": 3024,
+          "standaloneInputLength": 3024
+        },
+        {
+          "index": 3,
+          "name": "sig",
+          "liveLength": 120,
+          "standaloneLength": 120,
+          "match": true,
+          "liveInputLength": 88,
+          "standaloneInputLength": 83
+        }
+      ],
+      "liveDecoded": {
+        "segments": 4,
+        "segmentLengths": [
+          64,
+          192,
+          4032,
+          120
+        ]
+      },
+      "standaloneDecoded": {
+        "segments": 4,
+        "segmentLengths": [
+          64,
+          192,
+          4032,
+          120
+        ]
+      },
+      "frozenTimestamp": 1700000000000,
+      "frozenRandom": 0.42,
+      "frozenPerfNow": 100.5,
+      "frozenTimestampConfirmed": true,
+      "frozenRandomConfirmed": true,
+      "dateNowCalls": 2,
+      "capturedCdStringLength": 3166,
+      "capturedSdString": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+      "capturedSdObject": {
+        "od": "C",
+        "appid": "2090803262",
+        "nonce": "0.12345678",
+        "token": "test_token_123"
+      },
+      "pageErrors": [],
+      "captureErrors": [],
+      "environment": {
+        "browser": "Headless Chrome (Puppeteer)",
+        "nodeVersion": "v22.17.0",
+        "puppeteerVersion": "24.40.0"
+      },
+      "runNumber": 1
+    },
+    {
+      "liveToken": {
+        "length": 4672,
+        "first100": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ",
+        "last100": "ikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+      },
+      "standaloneToken": {
+        "length": 4672,
+        "first100": "V5OYLxrEF0DY%2B%2B7Kr1A07k84OCzJSmXcx0%2BoUZyWTXHzmh7G7TlsAjHMWJ9qRPKjDH2AcQYwwRNcQsUJ0E9v3KbjFVWwNJ",
+        "last100": "ikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MPsbdJJE14%2Bjqg%3D%3D"
+      },
+      "match": true,
+      "diffIndex": -1,
+      "diffDetails": null,
+      "btoaComparison": [
+        {
+          "index": 0,
+          "name": "hash",
+          "liveLength": 64,
+          "standaloneLength": 64,
+          "match": true,
+          "liveInputLength": 48,
+          "standaloneInputLength": 48
+        },
+        {
+          "index": 1,
+          "name": "header",
+          "liveLength": 192,
+          "standaloneLength": 192,
+          "match": true,
+          "liveInputLength": 144,
+          "standaloneInputLength": 144
+        },
+        {
+          "index": 2,
+          "name": "cdBody",
+          "liveLength": 4032,
+          "standaloneLength": 4032,
+          "match": true,
+          "liveInputLength": 3024,
+          "standaloneInputLength": 3024
+        },
+        {
+          "index": 3,
+          "name": "sig",
+          "liveLength": 120,
+          "standaloneLength": 120,
+          "match": true,
+          "liveInputLength": 88,
+          "standaloneInputLength": 83
+        }
+      ],
+      "liveDecoded": {
+        "segments": 4,
+        "segmentLengths": [
+          64,
+          192,
+          4032,
+          120
+        ]
+      },
+      "standaloneDecoded": {
+        "segments": 4,
+        "segmentLengths": [
+          64,
+          192,
+          4032,
+          120
+        ]
+      },
+      "frozenTimestamp": 1700000000000,
+      "frozenRandom": 0.42,
+      "frozenPerfNow": 100.5,
+      "frozenTimestampConfirmed": true,
+      "frozenRandomConfirmed": true,
+      "dateNowCalls": 2,
+      "capturedCdStringLength": 3166,
+      "capturedSdString": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+      "capturedSdObject": {
+        "od": "C",
+        "appid": "2090803262",
+        "nonce": "0.12345678",
+        "token": "test_token_123"
+      },
+      "pageErrors": [],
+      "captureErrors": [],
+      "environment": {
+        "browser": "Headless Chrome (Puppeteer)",
+        "nodeVersion": "v22.17.0",
+        "puppeteerVersion": "24.40.0"
+      },
+      "runNumber": 2
+    }
+  ],
+  "repeatability": {
+    "allRunsProducedTokens": true,
+    "allTokensIdentical": true,
+    "tokenCount": 2
+  }
+}

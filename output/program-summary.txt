@@ -1,0 +1,59 @@
+=== TDC (Tencent Defense Captcha) — Program Analysis Summary ===
+
+This program is Tencent's TDC (Tencent Defense Captcha), a browser fingerprinting
+library used by Tencent's captcha system. It collects extensive device and browser
+information to generate a unique fingerprint for bot detection and fraud prevention.
+
+--- Architecture ---
+
+The program uses a webpack-like module system:
+  - func_0 (entry point) creates an array of 80 collector modules
+  - func_164 (orchestrator) sets up the module loader (m, c, d, r, t, n, o, p, s properties)
+  - func_198 (__webpack_require__) handles module loading with caching
+  - func_53 (TDC init) exposes the public API: TDC.getInfo(), TDC.setData(), TDC.clearTc(), TDC.getData()
+
+--- Fingerprinting Capabilities ---
+
+  - canvas: func_4
+  - font: func_12, func_62, func_135, func_161
+  - webrtc: func_15, func_47, func_104
+  - timezone: func_24, func_82
+  - browser: func_27, func_63, func_108, func_131, func_145, func_158, func_209, func_236, func_261, func_274
+  - language: func_28, func_206
+  - css: func_30, func_132, func_155, func_165
+  - media: func_71
+  - hardware: func_79
+  - screen: func_84, func_101, func_173
+  - gpu: func_105, func_107, func_258, func_276
+  - webgl: func_115, func_241, func_242
+  - touch: func_127, func_179, func_244, func_250, func_268
+  - audio: func_186
+
+--- Data Collection ---
+
+  100 data collection functions (including 80 collector modules)
+
+--- Function Category Distribution ---
+
+  fingerprint           44  (16.3%)
+  dom                   15  (5.6%)
+  utility               40  (14.8%)
+  data-collection      100  (37.0%)
+  string-ops            12  (4.4%)
+  math                   1  (0.4%)
+  control-flow          55  (20.4%)
+  module-system          3  (1.1%)
+
+--- Coverage ---
+
+  Total functions:     270
+  Classified:          270/270 (100.0%)
+  Unknown:             0
+
+--- Key Identifiers ---
+
+  - "TDC" — The public API namespace (window.TDC)
+  - "FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk" — Obfuscated configuration key
+  - "_ZHSgZVHWDjhEmdXclMRcbPbBEVhgAmaF" — Internal namespace identifier
+  - "ClientJS,org <canvas> 1.0" — Borrowed from ClientJS library for canvas fingerprinting
+  - "captcha.gtimg.com" — Tencent captcha service endpoint

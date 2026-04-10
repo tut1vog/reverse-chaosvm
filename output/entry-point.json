@@ -1,0 +1,15 @@
+{
+  "comment": "Entry point metadata extracted from tdc.js line 586",
+  "call_chain": "__TENCENT_CHAOS_VM(bytecode, false)(startPC, closureVars, outerScope, moduleRef, errorHandler)()",
+  "startPC": 36578,
+  "closureVars": [],
+  "outerScope": "window",
+  "moduleRef": [null, null, 2654435769, 84941944608, 0.75, 0.8, 0.005],
+  "moduleRef_hex": ["void 0", "null", "0x9e3779b9", "0x13c6ef3720", "0.75", "0.8", "0.005"],
+  "errorHandler": null,
+  "notes": {
+    "0x9e3779b9": "Golden ratio constant (TEA/XTEA cipher)",
+    "0x13c6ef3720": "Unknown constant (possibly related to encryption)",
+    "startPC_36578": "Execution begins at bytecode[36579] (++C from 36578)"
+  }
+}

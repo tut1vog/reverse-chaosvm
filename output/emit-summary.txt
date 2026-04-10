@@ -1,0 +1,46 @@
+=== ChaosVM Code Emission Summary ===
+
+Functions emitted: 270
+Total lines of code: 9069
+Program lines (decompiled.js): 9345
+
+--- Syntax Validation ---
+Valid JS functions: 270 / 270 (100.0%)
+Parse errors: 0
+  None
+
+--- Keyword Counts ---
+  if:       334     (expected ≥374)
+  else:     229
+  while:    29      (expected ≥29)
+  try:      144     (expected ≥144)
+  catch:    144
+  return:   434     (expected ≥600)
+  throw:    81      (expected ≥40)
+  function: 273     (expected =270)
+
+--- Coverage ---
+Rendered statements: 7142 (expected ≥6610 of 6958)
+Blocks in CFG: 1066
+Blocks emitted: 1066
+Unreached blocks: 0
+
+--- Per-Function Stats ---
+Top 10 largest functions:
+  func_225: 307 lines
+  func_99: 247 lines
+  func_63: 204 lines
+  func_276: 200 lines
+  func_0: 173 lines
+  func_127: 171 lines
+  func_186: 160 lines
+  func_49: 133 lines
+  func_244: 133 lines
+  func_264: 133 lines
+
+Bottom 5 smallest functions:
+  func_243: 4 lines
+  func_52: 3 lines
+  func_134: 3 lines
+  func_181: 3 lines
+  func_223: 3 lines

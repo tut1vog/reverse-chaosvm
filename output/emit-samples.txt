@@ -1,0 +1,831 @@
+======================================================================
+Function 2: 13 lines, 1 patterns
+  Patterns: loops=0, if=0, try=0, seq=1
+======================================================================
+function func_2(arg0, arg1) {
+  var r9 = r4[0];
+  var r14 = r4[1];
+  var r15 = Array(0);
+  r15[0] = "";
+  var r17 = "exports";
+  var r18 = {};
+  var r13 = "get";
+  var r10 = closure(offset=18192, arity=0);
+  r18[r13] = r10;
+  r9[r17] = r18;
+  return Q;
+}
+
+======================================================================
+Function 1: 17 lines, 2 patterns
+  Patterns: loops=0, if=2, try=0, seq=0
+======================================================================
+function func_1(arg0) {
+  var r18 = r4[0];
+  if (r18) {
+    var r9 = "indexOf";
+    var r9 = "?";
+    var r19 = r18.indexOf(r9);
+    if ((r19 > 0)) {
+      var r19 = "substring";
+      var r20 = r18.substring(0, r21);
+      var r23 = r20;
+      return r20;
+    } else {
+      return r18;
+    }
+  } else {
+  }
+}
+
+======================================================================
+Function 4: 93 lines, 5 patterns
+  Patterns: loops=0, if=1, try=4, seq=0
+======================================================================
+function func_4() {
+  try {
+    try {
+      var r34 = r2[0];
+      var r26 = "document";
+      var r26 = r0[r26];
+      var r16 = "createElement";
+      var r16 = "canvas";
+      var r20 = r26.createElement(r16);
+      var r17 = r20;
+      var r38 = Q;
+      var r20 = "getContext";
+      var r20 = "2d";
+      var r66 = r17.getContext(r20);
+      var r38 = r66;
+      var r66 = "ClientJS,org <canvas> 1.0";
+      var r21 = r66;
+      var r66 = "textBaseline";
+      var r20 = "top";
+      var r46 = r20;
+      r38[r66] = r20;
+      var r20 = "font";
+      var r16 = "14px 'Arial'";
+      var r46 = r16;
+      r38[r20] = r16;
+      var r16 = "alphabetic";
+      var r46 = r16;
+      r38[r66] = r16;
+      var r16 = "fillStyle";
+      var r66 = "#f60";
+      var r46 = r66;
+      r38[r16] = r66;
+      var r66 = "fillRect";
+      var r46 = r38.fillRect(125, 1, 62, 20);
+      var r44 = "#069";
+      var r46 = r44;
+      r38[r16] = r44;
+      var r44 = "fillText";
+      var r46 = r38.fillText(r21, 2, 15);
+      var r66 = "rgba(102, 204, 0, 0.7)";
+      var r46 = r66;
+      r38[r16] = r66;
+      var r66 = r38[r44];
+      var r46 = r66.call(r38, r21, 4, 17);
+      var r16 = "toDataURL";
+      var r16 = r17.toDataURL();
+      var r44 = "replace";
+      var r66 = r16[r44];
+      var r44 = "[\\u0000-\\u0020]+";
+      var r26 = "g";
+      var r55 = "RegExp";
+      var r55 = r0.RegExp(r44, r26);
+      var r44 = r66.call(r16, r55, "");
+      var r46 = r44;
+      var r44 = "length";
+      var r26 = r44[r44];
+      var r64 = r26;
+      if ((r26 <= 100)) {
+        return r48;
+      } else {
+        var r26 = "substr";
+        var r55 = r48[r26];
+        var r66 = 30;
+        var r16 = r55.call(r48, r66, r66);
+        var r16 = r48[r26];
+        var r26 = "Math";
+        var r26 = r0[r26];
+        var r44 = "floor";
+        var r44 = r26.floor((r64 / 3));
+        var r23 = r16.call(r48, r44, r66);
+        var r23 = "slice";
+        var r66 = r48.slice(-r66);
+        return ((("" + r16) + r23) + r66);
+      }
+    } catch (e) {
+      try {
+        var r32 = caught_exception;
+        return "";
+      } catch (e) {
+        throw caught_exception;
+      }
+    }
+  } catch (e) {
+    try {
+      var r51 = caught_exception;
+      var r66 = "not supported";
+      r34[0] = r66;
+      return Q;
+    } catch (e) {
+      throw caught_exception;
+    }
+  }
+}
+
+======================================================================
+Function 16: 122 lines, 16 patterns
+  Patterns: loops=1, if=15, try=0, seq=0
+======================================================================
+function func_16(arg0, arg1) {
+  var r21 = r4[0];
+  Array(0)[0] = r21;
+  var r41 = r4[1];
+  var r32 = r2[0];
+  var r45 = r2[1];
+  if ((r41 & 1)) {
+    var r21 = r32[0];
+    var r10 = r48[0];
+    var r20 = r21.call(Q, r10);
+    var r9 = r20;
+    r48[0] = r20;
+    if ((r41 & 8)) {
+      var r20 = r48[0];
+      return r20;
+    } else {
+      if ((r41 & 4)) {
+        var r29 = "object";
+        var r20 = r48[0];
+        var r20 = "undefined";
+        if ((typeof r20 === r20)) {
+          var r8 = "undefined";
+          if ((r29 == r8)) {
+            var r35 = r48[0];
+            if (r35) {
+              var r20 = r48[0];
+              var r21 = "__esModule";
+              var r35 = r20[r21];
+              if (r35) {
+                var r21 = r48[0];
+                return r21;
+              } else {
+                var r21 = "Object";
+                var r21 = r0[r21];
+                var r20 = "create";
+                var r36 = r21.create(null);
+                var r40 = r36;
+                var r36 = r32[0];
+                var r20 = "r";
+                var r47 = r36.r(r40);
+                var r10 = "Object";
+                var r10 = r0[r10];
+                var r36 = "defineProperty";
+                var r20 = r10[r36];
+                var r36 = "default";
+                var r21 = {};
+                var r24 = "enumerable";
+                r21[r24] = !0;
+                var r25 = "value";
+                var r24 = r48[0];
+                r21[r25] = r24;
+                var r47 = r20.call(r10, r40, r36, r21);
+                if ((r41 & 2)) {
+                  var r21 = "string";
+                  var r36 = r48[0];
+                  if (!(r21 == typeof r36)) {
+                    var r30 = r48[0];
+                    var r30 = keys(r30);
+                    var r42 = !!r30.length;
+                    var r31 = r30.shift();
+                    if (r42) {
+                      var r23 = r31;
+                      var r20 = r32[0];
+                      var r21 = "d";
+                      var r36 = r20[r21];
+                      var r21 = closure(offset=44283, arity=1);
+                      var r10 = "bind";
+                      var r25 = r21.bind(null, r23);
+                      var r39 = r36.call(r20, r40, r23, r25);
+                      var r42 = !!r30.length;
+                      var r31 = r30.shift();
+                      while (r42) {
+                      }
+                      return r40;
+                    }
+                  }
+                } else {
+                  if (r47) {
+                  }
+                }
+              }
+            } else {
+              r6[9428] = 87;
+              var r35 = r47285.call(Q, r38140);
+              var r86 = r15;
+              var r0 = (r12 * r4);
+              var r93 = (r11 in r19);
+              var r101 = toNumber(r11);
+              var r120 = ++r19;
+              var r11 = r112;
+              var r111 = toNumber(r19);
+              var r11 = ++r114;
+              var r11 = r116;
+              var r9 = closure(offset=-9458, arity=1);
+              r15["s"] = r9;
+              return Q;
+            }
+          } else {
+            if (r35) {
+            } else {
+            }
+          }
+        } else {
+          var r21 = r45[0];
+          var r20 = r48[0];
+          var r8 = r21.call(Q, r20);
+          if ((r29 == r8)) {
+          } else {
+          }
+        }
+      } else {
+        if (r35) {
+        } else {
+        }
+      }
+    }
+  } else {
+    if ((r41 & 8)) {
+    } else {
+    }
+  }
+}
+
+======================================================================
+Function 225: 307 lines, 32 patterns
+  Patterns: loops=1, if=25, try=6, seq=0
+======================================================================
+function func_225(arg0) {
+  var r9 = r4[0];
+  var r25 = r5;
+  var r39 = "document";
+  var r39 = r0[r39];
+  var r48 = "cookie";
+  var r35 = r39[r48];
+  var r22 = r35;
+  var r35 = "encodeURIComponent";
+  var r48 = r0.encodeURIComponent(r9);
+  var r48 = "indexOf";
+  var r48 = r22.indexOf(r48);
+  var r18 = null;
+  if ((r48 > -1)) {
+    var r48 = "indexOf";
+    var r48 = ";";
+    var r39 = r22.indexOf(r48, r40);
+    if ((-1 == r39)) {
+      var r48 = "length";
+      var r39 = r22[r48];
+      var r36 = r39;
+      var r38 = r39;
+      var r39 = "decodeURIComponent";
+      var r39 = r0[r39];
+      var r48 = "substring";
+      var r48 = "length";
+      var r29 = r41[r48];
+      var r48 = r22.substring(((r40 + r29) + 1), r38);
+      var r29 = r39.call(Q, r48);
+      var r36 = r29;
+      var r18 = r29;
+      try {
+        var r29 = "window";
+        var r29 = r0[r29];
+        var r48 = "localStorage";
+        var r30 = r29[r48];
+        var r48 = "localStorage";
+        var r48 = r0[r48];
+        var r29 = "getItem";
+        var r29 = r48.getItem(r9);
+        var r30 = r29;
+        var r16 = r29;
+        try {
+          var r29 = "window";
+          var r29 = r0[r29];
+          r6[46503] = 19;
+          var r39 = "sessi";
+          var r13 = closure(offset=38, arity=128);
+          r86[r12] = r4;
+          var r28 = (r4 + r1);
+          var r22 = Array(0);
+          var r41 = !0;
+          var r17 = !1;
+          var r27 = "undefined";
+          var r27 = r0[r27];
+          var r56 = r27;
+          var r27 = "Symbol";
+          var r27 = r0[r27];
+          var r33 = "iterator";
+          var r26 = r27[r33];
+          var r26 = r12[r26]();
+          var r51 = r26;
+          var r33 = "next";
+          var r33 = r51.next();
+          var r10 = r33;
+          var r26 = "done";
+          var r27 = r33[r26];
+          var r41 = r27;
+          while (true) {
+            var r41 = !0;
+            if (r8) {
+            } else {
+              try {
+                var r33 = "return";
+                var r35 = r51[r33];
+                if (r35) {
+                  var r33 = "return";
+                  var r35 = r51.return();
+                  if (r17) {
+                    throw r56;
+                  } else {
+                    return r22;
+                  }
+                } else {
+                  if (r17) {
+                  } else {
+                  }
+                }
+                if (r35) {
+                } else {
+                }
+              } catch (e) {
+                var r34 = caught_exception;
+                if (r17) {
+                  throw r56;
+                } else {
+                  throw r34;
+                }
+              }
+            }
+            var r26 = "length";
+            var r33 = r22[r26];
+            if (!(r33 === r28)) {
+            } else {
+            }
+            var r27 = "push";
+            var r27 = "value";
+            var r26 = r10[r27];
+            var r15 = r22.push(r26);
+            if (!r28) {
+              var r8 = r15;
+              r6[8390] = 87;
+              var r8 = r60526.call(r45553, r93);
+              r60[r14] = r86;
+              var r2 = "\u0000";
+              var r15 = "\u0002";
+              var r33 = (r60 in r5);
+              var r13 = "unshift";
+              var r27 = Array(0)[r13];
+              var r57 = "Number";
+              var r57 = r0[r57];
+              var r13 = "customElements";
+              var r33 = r13;
+              var r52 = r13;
+              var r13 = "window";
+              var r13 = r0[r13];
+              var r33 = r13;
+              var r13 = "replace";
+              var r51 = r52[r13];
+              var r13 = "^\\S";
+              var r38 = "RegExp";
+              var r38 = r0.RegExp(r13, "");
+              var r70 = closure(offset=51969, arity=1);
+              var r13 = r51.call(r52, r38, r70);
+              var r33 = r13;
+              var r69 = r13;
+              if ((r52 in r13)) {
+                var r13 = r57.call(Q, r33);
+                var r35 = r27.call(r14, r13);
+                var r13 = "unshift";
+                var r70 = r45[r13];
+                var r38 = "Number";
+                var r38 = r0[r38];
+                var r67 = "overscroll-behavior";
+                var r55 = "auto";
+                var r68 = r19[0](r67, r55);
+                var r55 = r38.call(Q, r68);
+                var r35 = r70.call(r45, r55);
+                var r55 = r45[r13];
+                var r70 = "Number";
+                var r70 = r0[r70];
+                var r68 = closure(offset=-48664, arity=0);
+                var r38 = r68.call(Q, );
+                var r68 = r70.call(Q, r38);
+                var r35 = r55.call(r45, r68);
+                var r68 = r45[r13];
+                var r55 = "Number";
+                var r55 = r0[r55];
+                var r70 = "::marker";
+                var r67 = r15[0](r70);
+                var r70 = r55.call(Q, r67);
+                var r35 = r68.call(r45, r70);
+                var r70 = r45[r13];
+                var r68 = "Number";
+                var r68 = r0[r68];
+                var r67 = closure(offset=-52668, arity=0);
+                var r55 = r67.call(Q, );
+                var r67 = r68.call(Q, r55);
+                var r35 = r70.call(r45, r67);
+                var r67 = r45[r13];
+                var r70 = "Number";
+                var r55 = "requestMIDIAccess";
+                var r68 = "navigator";
+                var r68 = r0[r68];
+                var r68 = r0.Number((r55 in r68));
+                var r35 = r67.call(r45, r68);
+                var r68 = r45[r13];
+                var r67 = "Number";
+                var r67 = r0[r67];
+                var r38 = closure(offset=-26469, arity=0);
+                var r70 = r38.call(Q, );
+                var r38 = r67.call(Q, r70);
+                var r35 = r68.call(r45, r38);
+                var r38 = r45[r13];
+                var r68 = "Number";
+                var r68 = r0[r68];
+                var r70 = closure(offset=-32861, arity=0);
+                var r67 = r70.call(Q, );
+                var r70 = r68.call(Q, r67);
+                var r35 = r38.call(r45, r70);
+                var r43 = r45[r13];
+                var r48 = "Number";
+                var r48 = r0[r48];
+                var r13 = "serviceWorker";
+                var r70 = "navigator";
+                var r70 = r0[r70];
+                if ((r13 in r70)) {
+                  var r70 = "SyncManager";
+                  var r13 = "window";
+                  var r13 = r0[r13];
+                  var r34 = (r70 in r13);
+                  var r13 = r48.call(Q, r34);
+                  var r35 = r43.call(r12, r13);
+                  var r13 = "unshift";
+                  var r70 = r45[r13];
+                  var r13 = "Number";
+                  var r13 = r0[r13];
+                  var r38 = closure(offset=-25466, arity=0);
+                  var r67 = r38.call(Q, );
+                  var r38 = r13.call(Q, r67);
+                  var r35 = r70.call(r45, r38);
+                  var r38 = "join";
+                  var r67 = r45.join("");
+                  var r67 = Array(1);
+                  var r38 = "parseInt";
+                  var r13 = r0.parseInt(r67, 2);
+                  r67[0] = r13;
+                  return r67;
+                }
+              }
+            } else {
+            }
+          }
+        } catch (e) {
+          try {
+            try {
+              var r11 = caught_exception;
+              var r33 = !0;
+              var r23 = r33;
+              var r17 = r33;
+              var r23 = r11;
+              var r56 = r11;
+            } catch (e) {
+            }
+          } catch (e) {
+            try {
+              var r21 = caught_exception;
+              var r33 = "return";
+              var r13 = r51[r33];
+              if (r13) {
+                r6[68960] = 74;
+                var r33 = "return";
+                var r13 = r51.return();
+                var r87 = "\u0011";
+                closure(offset=undefined, arity=undefined);
+                null[null] = null;
+                var r38 = ((r38 << 8) | r34);
+                var r28 = "charAt";
+                var r19 = r35.charAt(((r38 >> (8 - ((r22 % 1) * 8))) & 63));
+                var r32 = (r32 + r19);
+                var r30 = "charAt";
+                var r12 = r26.charAt((r22 | 0));
+                if (r12) {
+                  if (r12) {
+                    var r19 = "charCodeAt";
+                    var r28 = r1[4];
+                    var r19 = (r22 + r28);
+                    var r22 = r19;
+                    var r28 = r26.charCodeAt(r19);
+                    var r34 = r28;
+                    if ((r28 > 255)) {
+                      var r19 = "OOM";
+                      return r19;
+                    } else {
+                    }
+                  } else {
+                    return r32;
+                  }
+                } else {
+                  var r30 = "=";
+                  var r19 = r30;
+                  var r35 = r30;
+                  if ((r22 % 1)) {
+                  } else {
+                  }
+                }
+              } else {
+                if (r17) {
+                  throw r56;
+                } else {
+                  throw r21;
+                }
+              }
+              if (r13) {
+              } else {
+              }
+            } catch (e) {
+              var r48 = caught_exception;
+              if (r17) {
+                throw r56;
+              } else {
+                throw r48;
+              }
+            }
+          }
+        }
+      } catch (e) {
+        var r14 = caught_exception;
+        if (r16) {
+          return r43;
+        } else {
+          return r18;
+        }
+      }
+    }
+  }
+}
+
+======================================================================
+Function 0: 173 lines, 1 patterns
+  Patterns: loops=0, if=0, try=1, seq=0
+======================================================================
+function func_0() {
+  try {
+    var r10 = closure(offset=-7616, arity=1);
+    Array(0)[0] = r10;
+    var r10 = closure(offset=-7573, arity=1);
+    var r8 = Array(80);
+    var r12 = closure(offset=-37889, arity=3);
+    r8[0] = r12;
+    var r12 = closure(offset=-8206, arity=3);
+    r8[1] = r12;
+    var r12 = closure(offset=-5431, arity=2);
+    r8[2] = r12;
+    var r12 = closure(offset=-41581, arity=3);
+    r8[3] = r12;
+    var r12 = closure(offset=-17896, arity=2);
+    r8[4] = r12;
+    var r12 = closure(offset=-41465, arity=3);
+    r8[5] = r12;
+    var r12 = closure(offset=-14249, arity=2);
+    r8[6] = r12;
+    var r12 = closure(offset=-23312, arity=3);
+    r8[7] = r12;
+    var r12 = closure(offset=7649, arity=2);
+    r8[8] = r12;
+    var r12 = closure(offset=-16878, arity=2);
+    r8[9] = r12;
+    var r12 = closure(offset=-48887, arity=2);
+    r8[10] = r12;
+    var r12 = closure(offset=4223, arity=2);
+    r8[11] = r12;
+    var r12 = closure(offset=12114, arity=2);
+    r8[12] = r12;
+    var r12 = closure(offset=-2227, arity=2);
+    r8[13] = r12;
+    var r12 = closure(offset=-42823, arity=2);
+    r8[14] = r12;
+    var r12 = closure(offset=-43023, arity=2);
+    r8[15] = r12;
+    var r12 = closure(offset=-17142, arity=2);
+    r8[16] = r12;
+    var r12 = closure(offset=-41981, arity=2);
+    r8[17] = r12;
+    var r12 = closure(offset=-38853, arity=2);
+    r8[18] = r12;
+    var r12 = closure(offset=-23901, arity=3);
+    r8[19] = r12;
+    var r12 = closure(offset=-5942, arity=2);
+    r8[20] = r12;
+    var r12 = closure(offset=-37114, arity=2);
+    r8[21] = r12;
+    var r12 = closure(offset=-12781, arity=2);
+    r8[22] = r12;
+    var r12 = closure(offset=-18272, arity=2);
+    r8[23] = r12;
+    var r12 = closure(offset=-44266, arity=3);
+    r8[24] = r12;
+    var r12 = closure(offset=-11183, arity=2);
+    r8[25] = r12;
+    var r12 = closure(offset=-17172, arity=2);
+    r8[26] = r12;
+    var r12 = closure(offset=11561, arity=2);
+    r8[27] = r12;
+    var r12 = closure(offset=-33730, arity=2);
+    r8[28] = r12;
+    var r12 = closure(offset=19672, arity=2);
+    r8[29] = r12;
+    var r12 = closure(offset=-25890, arity=2);
+    r8[30] = r12;
+    var r12 = closure(offset=15358, arity=3);
+    r8[31] = r12;
+    var r12 = closure(offset=-42051, arity=2);
+    r8[32] = r12;
+    var r12 = closure(offset=-13471, arity=2);
+    r8[33] = r12;
+    var r12 = closure(offset=6953, arity=2);
+    r8[34] = r12;
+    var r12 = closure(offset=-7078, arity=2);
+    r8[35] = r12;
+    var r12 = closure(offset=14288, arity=2);
+    r8[36] = r12;
+    var r12 = closure(offset=-17205, arity=3);
+    r8[37] = r12;
+    var r12 = closure(offset=-40302, arity=2);
+    r8[38] = r12;
+    var r12 = closure(offset=-40495, arity=2);
+    r8[39] = r12;
+    var r12 = closure(offset=-47721, arity=2);
+    r8[40] = r12;
+    var r12 = closure(offset=-2742, arity=2);
+    r8[41] = r12;
+    var r12 = closure(offset=-26350, arity=2);
+    r8[42] = r12;
+    var r12 = closure(offset=10680, arity=2);
+    r8[43] = r12;
+    var r12 = closure(offset=7092, arity=2);
+    r8[44] = r12;
+    var r12 = closure(offset=-13758, arity=2);
+    r8[45] = r12;
+    var r12 = closure(offset=-21526, arity=2);
+    r8[46] = r12;
+    var r12 = closure(offset=10930, arity=2);
+    r8[47] = r12;
+    var r12 = closure(offset=-13214, arity=2);
+    r8[48] = r12;
+    var r12 = closure(offset=-5711, arity=2);
+    r8[49] = r12;
+    var r12 = closure(offset=-34747, arity=2);
+    r8[50] = r12;
+    var r12 = closure(offset=-43908, arity=3);
+    r8[51] = r12;
+    var r12 = closure(offset=-2500, arity=2);
+    r8[52] = r12;
+    var r12 = closure(offset=15144, arity=2);
+    r8[53] = r12;
+    var r12 = closure(offset=-18466, arity=2);
+    r8[54] = r12;
+    var r12 = closure(offset=-7159, arity=2);
+    r8[55] = r12;
+    var r12 = closure(offset=19332, arity=2);
+    r8[56] = r12;
+    var r12 = closure(offset=8110, arity=3);
+    r8[57] = r12;
+    var r12 = closure(offset=-13222, arity=2);
+    r8[58] = r12;
+    var r12 = closure(offset=10884, arity=2);
+    r8[59] = r12;
+    var r12 = closure(offset=-49712, arity=2);
+    r8[60] = r12;
+    var r12 = closure(offset=-5178, arity=2);
+    r8[61] = r12;
+    var r12 = closure(offset=8020, arity=2);
+    r8[62] = r12;
+    var r12 = closure(offset=-11156, arity=2);
+    r8[63] = r12;
+    var r12 = closure(offset=-38630, arity=2);
+    r8[64] = r12;
+    var r12 = closure(offset=-25672, arity=2);
+    r8[65] = r12;
+    var r12 = closure(offset=-49285, arity=2);
+    r8[66] = r12;
+    var r12 = closure(offset=-9601, arity=2);
+    r8[67] = r12;
+    var r12 = closure(offset=-40214, arity=3);
+    r8[68] = r12;
+    var r12 = closure(offset=-24857, arity=2);
+    r8[69] = r12;
+    var r12 = closure(offset=-30190, arity=2);
+    r8[70] = r12;
+    var r12 = closure(offset=-3981, arity=3);
+    r8[71] = r12;
+    var r12 = closure(offset=-30143, arity=2);
+    r8[72] = r12;
+    var r12 = closure(offset=19113, arity=2);
+    r8[73] = r12;
+    var r12 = closure(offset=-49464, arity=2);
+    r8[74] = r12;
+    var r12 = closure(offset=18290, arity=2);
+    r8[75] = r12;
+    var r12 = closure(offset=-23988, arity=2);
+    r8[76] = r12;
+    var r12 = closure(offset=-25931, arity=3);
+    r8[77] = r12;
+    var r12 = closure(offset=-1095, arity=2);
+    r8[78] = r12;
+    var r12 = closure(offset=-46013, arity=2);
+    r8[79] = r12;
+    var r12 = r10.call(Q, r8);
+    var r9 = !r12;
+    return Q;
+  } catch (e) {
+    throw caught_exception;
+  }
+}
+
+======================================================================
+Function 3: 9 lines, 1 patterns
+  Patterns: loops=0, if=0, try=0, seq=1
+======================================================================
+function func_3(arg0) {
+  var r12 = r4[0];
+  var r8 = r2[0];
+  var r15 = r5;
+  var r13 = r8[0];
+  var r14 = "indexOf";
+  var r14 = r13.indexOf(r12);
+  return !(-1 === r14);
+}
+
+======================================================================
+Function 10: 11 lines, 1 patterns
+  Patterns: loops=0, if=0, try=0, seq=1
+======================================================================
+function func_10(arg0, arg1) {
+  var r9 = r4[0];
+  var r15 = r4[1];
+  var r11 = "exports";
+  var r8 = {};
+  var r13 = "get";
+  var r17 = closure(offset=4941, arity=0);
+  r8[r13] = r17;
+  r9[r11] = r8;
+  return Q;
+}
+
+======================================================================
+Function 50: 11 lines, 1 patterns
+  Patterns: loops=0, if=0, try=0, seq=1
+======================================================================
+function func_50(arg0, arg1) {
+  var r11 = r4[0];
+  var r8 = r4[1];
+  var r10 = "exports";
+  var r15 = {};
+  var r13 = "get";
+  var r17 = closure(offset=29072, arity=0);
+  r15[r13] = r17;
+  r11[r10] = r15;
+  return Q;
+}
+
+======================================================================
+Function 100: 26 lines, 3 patterns
+  Patterns: loops=1, if=2, try=0, seq=0
+======================================================================
+function func_100(arg0, arg1, arg2) {
+  var r9 = r4[0];
+  var r24 = r4[1];
+  var r27 = r4[2];
+  var r10 = r2[0];
+  var r17 = 0;
+  var r14 = r17;
+  if ((r17 < 4)) {
+    var r26 = "B0JC";
+    var r13 = "charCodeAt";
+    var r13 = r26.charCodeAt(r24);
+    var r14 = (r14 | (((8 * r24) - -32) << (8 * r24)));
+    while (true) {
+      var r17 = r24;
+      var r23 = toNumber(r17);
+      var r17 = ++r17;
+      r6[8069] = 73;
+      var r17 = keys(r24);
+      if ((r24 < 4)) {
+      }
+      var r17 = r10[0];
+      r17[2] = r14;
+      return Q;
+    }
+  }
+}

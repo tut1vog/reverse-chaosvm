@@ -1,0 +1,48 @@
+{
+  "success": true,
+  "tokenLength": 4572,
+  "segmentCount": 4,
+  "segmentLengths": [
+    64,
+    1216,
+    2880,
+    120
+  ],
+  "decrypted": [
+    {
+      "name": "hash",
+      "rawLength": 48,
+      "strippedLength": 48,
+      "preview": "a\u0016\u0012\u0016\u000bf$\\ë¥Ð¦í.n@´]oÒg\u000fiRMpó\u000e0+)Þ\u0003;\"p¯\nIÚ¹",
+      "hasNulls": false
+    },
+    {
+      "name": "header",
+      "rawLength": 912,
+      "strippedLength": 912,
+      "preview": "*úH[\u0017\u0000V\u001b¶T?éÀgI\u001a_(É1¡¿D©¹ª\u0016¸u\u001559 ¾½cí¡^\u0013zOp5\u0000Cí×b}¤ô:aÅ\u0005sW$¶Á\r\f¾1Ei×kÓ=LÊôz\"\u0014\u0003:Tg#úÉpr^xÛJ\u001cæóq2±FX%\u0011g\u001açíAvc-Ú\u0010Ä&\u001aèÛ\fÒ(orØ¬t_SöbJsÑZ~¨R¦¸Æ.\u0003N(\u000e]4\u0005ëºÌc\u001fV¬\"Ó+m#%@8£6Tn\u0005î³f\f­À ÿ¤\u001b\u0011î",
+      "hasNulls": true
+    },
+    {
+      "name": "cdBody",
+      "rawLength": 2160,
+      "strippedLength": 2160,
+      "preview": "áTM.P\u0017¹\f7t\u001dÊ&p\u0012ÁÄéjr\u000fáºw\u001ahÞ\u0014$ñ]¯í5\u0001-\u0003æë»Ïòébïè¾,`\u0010kô¡ù|ñ@|oYô22è¨R¦¸Æ.\u0003N(\u000e]4\u0005ëºÌc\u001fV¬\"Ó+måhvMù Ü\u0013Àò:GYw\u001ahÞ\u0014$ñ&ÝVWA\u0018bïè¾,`\u0010jEMC=øÔ¿Ê¸.þúp\u0007¦É(W *ôÕ|X\u001b¬VgÜ×l¦^´Sm¤¡¼j\n­x5Aÿû¦qà´ø\u0000",
+      "hasNulls": true
+    },
+    {
+      "name": "sig",
+      "rawLength": 88,
+      "strippedLength": 88,
+      "preview": "\u0012BéøG¸õQ\u0013PL}6^ÿNó\u0003\u0013Ø¥\u000f®W\u0016R\u001a//o±ÿµCD¸åÅ\u0000µ¸¢yÕj\u0016´änÅ$µ\u001a£¹\u001a9ÈGP\u001bPËÉÞ1i[ÏWÏ'Fü",
+      "hasNulls": true
+    }
+  ],
+  "payloadValid": false,
+  "payloadKeys": null,
+  "cdFieldCount": null,
+  "sdValid": false,
+  "sdKeys": null,
+  "sdObject": null,
+  "compatibility": "INCOMPATIBLE — Decryption does not produce valid JSON"
+}

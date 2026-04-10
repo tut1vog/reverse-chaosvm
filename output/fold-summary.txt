@@ -1,0 +1,16 @@
+# Expression Folding Summary (Task 3.2)
+
+Total functions processed: 270
+Total blocks processed: 1066
+Total instructions (input): 15753
+Total statements (output): 7253
+Folding ratio: 54.0% (8500 instructions eliminated)
+String literals reconstructed: 1738
+String match rate: 99.9% (1736/1738)
+Zero-statement blocks: 0
+Blocks with errors (stmts > instrs): 0
+
+## Distribution
+  Mean instructions/block: 14.8
+  Mean statements/block: 6.8
+  Mean folding per block: 8.0 instructions eliminated

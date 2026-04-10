@@ -1,0 +1,982 @@
+======================================================================
+Example 1: Func 1 b2: substring method call (PROP_GET + CALL_2)
+Function 1, Block b2
+Statements: 5 → 4 (1 method calls reconstructed)
+
+BEFORE (folded):
+  [22642] r19 = "substring"
+  [22664] r9 = r18[r19]
+  [22673] r20 = r18.substring(0, r21)
+  [22679] r23 = r20
+  [22684] return r20
+
+AFTER (reconstructed):
+  [22642] r19 = "substring"
+  [22673] r20 = r18.substring(0, r21)
+  [22679] r23 = r20
+  [22684] return r20
+
+Method calls:
+  r18.substring(2 args) at PC 22673
+
+======================================================================
+Example 2: Func 1 b3: indexOf method call (PROP_GET + CALL_1)
+Function 1, Block b3
+Statements: 5 → 4 (1 method calls reconstructed)
+
+BEFORE (folded):
+  [54711] r9 = "indexOf"
+  [54728] r20 = r18[r9]
+  [54734] r9 = "?"
+  [54738] r19 = r18.indexOf(r9)
+  [54750] cjmp (r19 > 0) ? -32109 : -42379
+
+AFTER (reconstructed):
+  [54711] r9 = "indexOf"
+  [54734] r9 = "?"
+  [54738] r19 = r18.indexOf(r9)
+  [54750] cjmp (r19 > 0) ? -32109 : -42379
+
+Method calls:
+  r18.indexOf(1 args) at PC 54738
+
+======================================================================
+Example 3: Compound PROP_CALL normalization
+Function 87, Block b0
+Statements: 59 → 53 (18 method calls reconstructed)
+
+BEFORE (folded):
+  [24382] catch_push(offset=27006)
+  [24384] r12 = "document"
+  [24406] r12 = r0[r12]
+  [24410] r60 = "createElement"
+  [24442] r46 = r12[r60]
+  [24448] r50 = "div"
+  [24458] r63 = r12.createElement(r50)
+  [24463] r59 = r63
+  [24466] r63 = "document"
+  [24488] r63 = r0[r63]
+  [24492] r50 = r63[r60]
+  [24492] r46 = "a"
+  [24499] r12 = r63.createElement(r46)
+  [24504] r65 = r12
+  [24507] r12 = "document"
+  [24529] r12 = r0[r12]
+  [24533] r50 = r12[r60]
+  [24537] r63 = "li"
+  [24544] r57 = r12.createElement(r63)
+  [24552] r57 = "document"
+  [24574] r57 = r0[r57]
+  [24578] r63 = r57[r60]; r50 = r63.call(r57, r46)
+  [24586] r25 = r50
+  [24589] r50 = "document"
+  [24611] r50 = r0[r50]
+  [24615] r63 = r50[r60]
+  [24619] r57 = "span"
+  [24631] r12 = r50.createElement(r57)
+  [24636] r51 = r12
+  [24639] r12 = "document"
+  [24661] r12 = r0[r12]
+  [24665] r63 = r12[r60]; r50 = r63.call(r12, r46)
+  [24673] r54 = r50; r65 = r50
+  [24678] r50 = "document"
+  [24700] r50 = r0[r50]
+  [24704] r63 = r50[r60]; r12 = r63.call(r50, r57)
+  [24712] r54 = r12; r51 = r12
+  [24717] r12 = "document"
+  [24739] r12 = r0[r12]
+  [24743] r63 = r12[r60]; r60 = r63.call(r12, r46)
+  [24751] r25 = r60
+  [24754] r63 = "appendChild"
+  [24781] r12 = r60[r63]
+  [24787] r54 = r60.appendChild(r65)
+  [24792] r60 = r59[r63]; r54 = r60.call(r59, r65)
+  [24800] r60 = r65[r63]; r54 = r60.call(r65, r25)
+  [24808] r60 = r25[r63]; r54 = r60.call(r25, r51)
+  [24816] r60 = "removeChild"
+  [24843] r12 = r59[r60]
+  [24849] r54 = r59.removeChild(r65)
+  [24854] r12 = r25[r60]; r54 = r12.call(r25, r51)
+  [24862] r12 = r59[r63]; r54 = r12.call(r59, r25)
+  [24870] r12 = r25[r63]; r54 = r12.call(r25, r57)
+  [24878] r12 = r59[r60]; r54 = r12.call(r59, r25)
+  [24886] r12 = r65[r63]; r54 = r12.call(r65, r59)
+  [24894] r28 = "adivdiva"
+  [24916] r12 = "outerHTML"
+  [24938] r13 = r65[r12]
+  [24944] cjmp r13 ? -16896 : -12571
+
+AFTER (reconstructed):
+  [24382] catch_push(offset=27006)
+  [24384] r12 = "document"
+  [24406] r12 = r0[r12]
+  [24410] r60 = "createElement"
+  [24448] r50 = "div"
+  [24458] r63 = r12.createElement(r50)
+  [24463] r59 = r63
+  [24466] r63 = "document"
+  [24488] r63 = r0[r63]
+  [24492] r46 = "a"
+  [24499] r12 = r63.createElement(r46)
+  [24504] r65 = r12
+  [24507] r12 = "document"
+  [24529] r12 = r0[r12]
+  [24537] r63 = "li"
+  [24544] r57 = r12.createElement(r63)
+  [24552] r57 = "document"
+  [24574] r57 = r0[r57]
+  [24578] r50 = r57.createElement(r46)
+  [24586] r25 = r50
+  [24589] r50 = "document"
+  [24611] r50 = r0[r50]
+  [24619] r57 = "span"
+  [24631] r12 = r50.createElement(r57)
+  [24636] r51 = r12
+  [24639] r12 = "document"
+  [24661] r12 = r0[r12]
+  [24665] r50 = r12.createElement(r46)
+  [24673] r54 = r50; r65 = r50
+  [24678] r50 = "document"
+  [24700] r50 = r0[r50]
+  [24704] r12 = r50.createElement(r57)
+  [24712] r54 = r12; r51 = r12
+  [24717] r12 = "document"
+  [24739] r12 = r0[r12]
+  [24743] r60 = r12.createElement(r46)
+  [24751] r25 = r60
+  [24754] r63 = "appendChild"
+  [24787] r54 = r60.appendChild(r65)
+  [24792] r54 = r59.appendChild(r65)
+  [24800] r54 = r65.appendChild(r25)
+  [24808] r54 = r25.appendChild(r51)
+  [24816] r60 = "removeChild"
+  [24849] r54 = r59.removeChild(r65)
+  [24854] r54 = r25.removeChild(r51)
+  [24862] r54 = r59.appendChild(r25)
+  [24870] r54 = r25.appendChild(r57)
+  [24878] r54 = r59.removeChild(r25)
+  [24886] r54 = r65.appendChild(r59)
+  [24894] r28 = "adivdiva"
+  [24916] r12 = "outerHTML"
+  [24938] r13 = r65[r12]
+  [24944] cjmp r13 ? -16896 : -12571
+
+Method calls:
+  r12.createElement(1 args) at PC 24458
+  r63.createElement(1 args) at PC 24499
+  r12.createElement(1 args) at PC 24544
+  r50.createElement(1 args) at PC 24631
+  r60.appendChild(1 args) at PC 24787
+  r59.removeChild(1 args) at PC 24849
+  r57.createElement(1 args) at PC 24578 [compound]
+  r12.createElement(1 args) at PC 24665 [compound]
+  r50.createElement(1 args) at PC 24704 [compound]
+  r12.createElement(1 args) at PC 24743 [compound]
+  r59.appendChild(1 args) at PC 24792 [compound]
+  r65.appendChild(1 args) at PC 24800 [compound]
+  r25.appendChild(1 args) at PC 24808 [compound]
+  r25.removeChild(1 args) at PC 24854 [compound]
+  r59.appendChild(1 args) at PC 24862 [compound]
+  r25.appendChild(1 args) at PC 24870 [compound]
+  r59.removeChild(1 args) at PC 24878 [compound]
+  r65.appendChild(1 args) at PC 24886 [compound]
+
+======================================================================
+Example 4: High density: 11 method calls
+Function 63, Block b4
+Statements: 174 → 166 (11 method calls reconstructed)
+
+BEFORE (folded):
+  [29050] r38 = r55
+  [29053] r20 = Array(30)
+  [29056] r33 = "window"
+  [29073] r33 = r0[r33]
+  [29077] r8 = "callPhantom"
+  [29104] r42 = r33[r8]
+  [29110] r20[0] = r42
+  [29114] r42 = "window"
+  [29131] r42 = r0[r42]
+  [29135] r8 = "_phantom"
+  [29157] r33 = r42[r8]
+  [29161] r20[1] = r33
+  [29165] r33 = "RegExp"
+  [29182] r33 = r0[r33]
+  [29186] r8 = "phantomjs"
+  [29211] r42 = "i"
+  [29215] r22 = new r33(r8, r42)
+  [29220] r33 = "test"
+  [29232] r58 = r22[r33]
+  [29236] r60 = "navigator"
+  [29258] r60 = r0[r60]
+  [29264] r41 = "userAgent"
+  [29286] r50 = r60[r41]
+  [29292] r41 = r22.test(r50)
+  [29297] r20[2] = r41
+  [29301] r41 = "RegExp"
+  [29318] r41 = r0[r41]
+  [29322] r50 = new r41(r8, r42)
+  [29327] r41 = r50[r33]; r58 = r41.call(r50, r38)
+  [29335] r20[3] = r58
+  [29339] r58 = "RegExp"
+  [29356] r58 = r0[r58]
+  [29360] r41 = new r58(r8, r42)
+  [29365] r58 = r41[r33]
+  [29369] r8 = r28[0]
+  [29373] r50 = r41.test(r8)
+  [29378] r20[4] = r50
+  [29382] r50 = "window"
+  [29399] r50 = r0[r50]
+  [29403] r8 = "WebPage"
+  [29420] r58 = r50[r8]
+  [29426] r20[5] = r58
+  [29430] r58 = "RegExp"
+  [29447] r58 = r0[r58]
+  [29451] r8 = "python"
+  [29468] r50 = new r58(r8, r42)
+  [29473] r8 = r50[r33]; r58 = r8.call(r50, r38)
+  [29481] r20[6] = r58
+  [29485] r58 = "document"
+  [29507] r58 = r0[r58]
+  [29511] r8 = "$cdc_asdjflasutopfhvcZLmcfl_"
+  [29583] r50 = r58[r8]
+  [29587] r20[7] = r50
+  [29591] r50 = "document"
+  [29613] r50 = r0[r50]
+  [29617] r8 = "__webdriver_script_fn"
+  [29669] r58 = r50[r8]
+  [29675] r20[8] = r58
+  [29679] r58 = "window"
+  [29696] r58 = r0[r58]
+  [29700] r8 = "fxdriver_id"
+  [29727] r50 = r58[r8]
+  [29733] r20[9] = r50
+  [29737] r50 = "window"
+  [29754] r50 = r0[r50]
+  [29758] r8 = "__fxdriver_unwrapped"
+  [29810] r58 = r50[r8]
+  [29814] r20[10] = r58
+  [29818] r58 = "window"
+  [29835] r58 = r0[r58]
+  [29839] r8 = "domAutomation"
+  [29871] r50 = r58[r8]
+  [29877] r20[11] = r50
+  [29881] r50 = "window"
+  [29898] r50 = r0[r50]
+  [29902] r8 = "ubot"
+  [29914] r58 = r50[r8]
+  [29918] r20[12] = r58
+  [29922] r58 = "RegExp"
+  [29939] r58 = r0[r58]
+  [29943] r8 = "Zombie"
+  [29960] r50 = new r58(r8, r42)
+  [29965] r58 = r50[r33]
+  [29969] r41 = "navigator"
+  [29991] r41 = r0[r41]
+  [29997] r22 = "vendor"
+  [30014] r60 = r41[r22]; r22 = r58.call(r50, r60)
+  [30022] r20[13] = r22
+  [30026] r22 = "RegExp"
+  [30043] r22 = r0[r22]
+  [30047] r60 = new r22(r8, r42)
+  [30052] r22 = r60[r33]
+  [30056] r8 = "navigator"
+  [30078] r8 = r0[r8]
+  [30084] r58 = "appName"
+  [30101] r50 = r8[r58]
+  [30107] r58 = r60.test(r50)
+  [30112] r20[14] = r58
+  [30116] r58 = "RegExp"
+  [30133] r58 = r0[r58]
+  [30137] r50 = "CasperJS"
+  [30159] r22 = new r58(r50, r42)
+  [30164] r50 = r22[r33]; r58 = r50.call(r22, r38)
+  [30172] r20[15] = r58
+  [30176] r58 = "window"
+  [30193] r58 = r0[r58]
+  [30197] r50 = "CasperError"
+  [30224] r22 = r58[r50]
+  [30230] r20[16] = r22
+  [30234] r22 = "window"
+  [30251] r22 = r0[r22]
+  [30255] r50 = "casper"
+  [30272] r58 = r22[r50]
+  [30276] r20[17] = r58
+  [30280] r58 = "window"
+  [30297] r58 = r0[r58]
+  [30301] r50 = "patchRequire"
+  [30333] r22 = r58[r50]
+  [30337] r20[18] = r22
+  [30341] r22 = "window"
+  [30358] r22 = r0[r22]
+  [30362] r50 = "navigator"
+  [30384] r58 = r22[r50]
+  [30390] r50 = "webdriver"
+  [30412] r22 = r58[r50]
+  [30418] r20[19] = r22
+  [30422] r22 = closure(offset=26783, arity=0)
+  [30427] r50 = r22.call(Q, )
+  [30430] r20[20] = r50
+  [30434] r50 = r25[0]
+  [30438] r22 = r25[0]()
+  [30444] r20[21] = !r22
+  [30448] r50 = r13[0]
+  [30452] r22 = r13[0]()
+  [30458] r20[22] = !r22
+  [30462] r50 = r34[0]
+  [30466] r22 = r34[0]()
+  [30472] r20[23] = !r22
+  [30476] r50 = r57[0]
+  [30480] r22 = r57[0]()
+  [30486] r20[24] = !r22
+  [30490] r50 = r31[0]
+  [30494] r22 = r31[0]()
+  [30500] r20[25] = !r22
+  [30504] r50 = "RegExp"
+  [30521] r50 = r0[r50]
+  [30525] r22 = "^file"
+  [30540] r58 = new r50(r22, r42)
+  [30545] r22 = r58[r33]
+  [30549] r33 = "window"
+  [30566] r33 = r0[r33]
+  [30570] r50 = "location"
+  [30592] r42 = r33[r50]
+  [30596] r50 = "href"
+  [30608] r33 = r42[r50]; r50 = r22.call(r58, r33)
+  [30616] r20[26] = r50
+  [30620] r50 = "window"
+  [30637] r50 = r0[r50]
+  [30641] r33 = "__playwright"
+  [30673] r22 = r50[r33]
+  [30683] r20[27] = !!r22
+  [30687] r22 = "window"
+  [30704] r22 = r0[r22]
+  [30708] r33 = "__playwright__"
+  [30745] r50 = r22[r33]
+  [30755] r20[28] = !!r50
+  [30759] r50 = "window"
+  [30776] r50 = r0[r50]
+  [30780] r33 = "__nightmare"
+  [30807] r22 = r50[r33]
+  [30819] r20[29] = !!r22
+  [30823] r29 = r20
+  [30829] r12 = 0
+  [30832] jmp 20569
+
+AFTER (reconstructed):
+  [29050] r38 = r55
+  [29053] r20 = Array(30)
+  [29056] r33 = "window"
+  [29073] r33 = r0[r33]
+  [29077] r8 = "callPhantom"
+  [29104] r42 = r33[r8]
+  [29110] r20[0] = r42
+  [29114] r42 = "window"
+  [29131] r42 = r0[r42]
+  [29135] r8 = "_phantom"
+  [29157] r33 = r42[r8]
+  [29161] r20[1] = r33
+  [29165] r33 = "RegExp"
+  [29182] r33 = r0[r33]
+  [29186] r8 = "phantomjs"
+  [29211] r42 = "i"
+  [29215] r22 = new r33(r8, r42)
+  [29220] r33 = "test"
+  [29236] r60 = "navigator"
+  [29258] r60 = r0[r60]
+  [29264] r41 = "userAgent"
+  [29286] r50 = r60[r41]
+  [29292] r41 = r22.test(r50)
+  [29297] r20[2] = r41
+  [29301] r41 = "RegExp"
+  [29318] r41 = r0[r41]
+  [29322] r50 = new r41(r8, r42)
+  [29327] r58 = r50.test(r38)
+  [29335] r20[3] = r58
+  [29339] r58 = "RegExp"
+  [29356] r58 = r0[r58]
+  [29360] r41 = new r58(r8, r42)
+  [29369] r8 = r28[0]
+  [29373] r50 = r41.test(r8)
+  [29378] r20[4] = r50
+  [29382] r50 = "window"
+  [29399] r50 = r0[r50]
+  [29403] r8 = "WebPage"
+  [29420] r58 = r50[r8]
+  [29426] r20[5] = r58
+  [29430] r58 = "RegExp"
+  [29447] r58 = r0[r58]
+  [29451] r8 = "python"
+  [29468] r50 = new r58(r8, r42)
+  [29473] r58 = r50.test(r38)
+  [29481] r20[6] = r58
+  [29485] r58 = "document"
+  [29507] r58 = r0[r58]
+  [29511] r8 = "$cdc_asdjflasutopfhvcZLmcfl_"
+  [29583] r50 = r58[r8]
+  [29587] r20[7] = r50
+  [29591] r50 = "document"
+  [29613] r50 = r0[r50]
+  [29617] r8 = "__webdriver_script_fn"
+  [29669] r58 = r50[r8]
+  [29675] r20[8] = r58
+  [29679] r58 = "window"
+  [29696] r58 = r0[r58]
+  [29700] r8 = "fxdriver_id"
+  [29727] r50 = r58[r8]
+  [29733] r20[9] = r50
+  [29737] r50 = "window"
+  [29754] r50 = r0[r50]
+  [29758] r8 = "__fxdriver_unwrapped"
+  [29810] r58 = r50[r8]
+  [29814] r20[10] = r58
+  [29818] r58 = "window"
+  [29835] r58 = r0[r58]
+  [29839] r8 = "domAutomation"
+  [29871] r50 = r58[r8]
+  [29877] r20[11] = r50
+  [29881] r50 = "window"
+  [29898] r50 = r0[r50]
+  [29902] r8 = "ubot"
+  [29914] r58 = r50[r8]
+  [29918] r20[12] = r58
+  [29922] r58 = "RegExp"
+  [29939] r58 = r0[r58]
+  [29943] r8 = "Zombie"
+  [29960] r50 = new r58(r8, r42)
+  [29965] r58 = r50[r33]
+  [29969] r41 = "navigator"
+  [29991] r41 = r0[r41]
+  [29997] r22 = "vendor"
+  [30014] r60 = r41[r22]; r22 = r58.call(r50, r60)
+  [30022] r20[13] = r22
+  [30026] r22 = "RegExp"
+  [30043] r22 = r0[r22]
+  [30047] r60 = new r22(r8, r42)
+  [30056] r8 = "navigator"
+  [30078] r8 = r0[r8]
+  [30084] r58 = "appName"
+  [30101] r50 = r8[r58]
+  [30107] r58 = r60.test(r50)
+  [30112] r20[14] = r58
+  [30116] r58 = "RegExp"
+  [30133] r58 = r0[r58]
+  [30137] r50 = "CasperJS"
+  [30159] r22 = new r58(r50, r42)
+  [30164] r58 = r22.test(r38)
+  [30172] r20[15] = r58
+  [30176] r58 = "window"
+  [30193] r58 = r0[r58]
+  [30197] r50 = "CasperError"
+  [30224] r22 = r58[r50]
+  [30230] r20[16] = r22
+  [30234] r22 = "window"
+  [30251] r22 = r0[r22]
+  [30255] r50 = "casper"
+  [30272] r58 = r22[r50]
+  [30276] r20[17] = r58
+  [30280] r58 = "window"
+  [30297] r58 = r0[r58]
+  [30301] r50 = "patchRequire"
+  [30333] r22 = r58[r50]
+  [30337] r20[18] = r22
+  [30341] r22 = "window"
+  [30358] r22 = r0[r22]
+  [30362] r50 = "navigator"
+  [30384] r58 = r22[r50]
+  [30390] r50 = "webdriver"
+  [30412] r22 = r58[r50]
+  [30418] r20[19] = r22
+  [30422] r22 = closure(offset=26783, arity=0)
+  [30427] r50 = r22.call(Q, )
+  [30430] r20[20] = r50
+  [30438] r22 = r25[0]()
+  [30444] r20[21] = !r22
+  [30452] r22 = r13[0]()
+  [30458] r20[22] = !r22
+  [30466] r22 = r34[0]()
+  [30472] r20[23] = !r22
+  [30480] r22 = r57[0]()
+  [30486] r20[24] = !r22
+  [30494] r22 = r31[0]()
+  [30500] r20[25] = !r22
+  [30504] r50 = "RegExp"
+  [30521] r50 = r0[r50]
+  [30525] r22 = "^file"
+  [30540] r58 = new r50(r22, r42)
+  [30545] r22 = r58[r33]
+  [30549] r33 = "window"
+  [30566] r33 = r0[r33]
+  [30570] r50 = "location"
+  [30592] r42 = r33[r50]
+  [30596] r50 = "href"
+  [30608] r33 = r42[r50]; r50 = r22.call(r58, r33)
+  [30616] r20[26] = r50
+  [30620] r50 = "window"
+  [30637] r50 = r0[r50]
+  [30641] r33 = "__playwright"
+  [30673] r22 = r50[r33]
+  [30683] r20[27] = !!r22
+  [30687] r22 = "window"
+  [30704] r22 = r0[r22]
+  [30708] r33 = "__playwright__"
+  [30745] r50 = r22[r33]
+  [30755] r20[28] = !!r50
+  [30759] r50 = "window"
+  [30776] r50 = r0[r50]
+  [30780] r33 = "__nightmare"
+  [30807] r22 = r50[r33]
+  [30819] r20[29] = !!r22
+  [30823] r29 = r20
+  [30829] r12 = 0
+  [30832] jmp 20569
+
+Method calls:
+  r22.test(1 args) at PC 29292
+  r41.test(1 args) at PC 29373
+  r60.test(1 args) at PC 30107
+  r25.0(0 args) at PC 30438
+  r13.0(0 args) at PC 30452
+  r34.0(0 args) at PC 30466
+  r57.0(0 args) at PC 30480
+  r31.0(0 args) at PC 30494
+  r50.test(1 args) at PC 29327 [compound]
+  r50.test(1 args) at PC 29473 [compound]
+  r22.test(1 args) at PC 30164 [compound]
+
+======================================================================
+Example 5: High density: 9 method calls
+Function 8, Block b0
+Statements: 47 → 39 (9 method calls reconstructed)
+
+BEFORE (folded):
+  [772] catch_push(offset=19077)
+  [776] r48 = ""
+  [779] r36 = "document"
+  [801] r36 = r0[r36]
+  [805] r33 = "createElement"
+  [837] r14 = r36[r33]
+  [843] r49 = "div"
+  [853] r35 = r36.createElement(r49)
+  [858] r62 = r35
+  [861] r35 = "document"
+  [883] r35 = r0[r35]
+  [887] r49 = r35[r33]
+  [887] r14 = "p"
+  [894] r36 = r35.createElement(r14)
+  [899] r10 = r36
+  [902] r36 = "document"
+  [924] r36 = r0[r36]
+  [928] r14 = r36[r33]
+  [932] r33 = "span"
+  [944] r49 = r36.createElement(r33)
+  [949] r53 = r49
+  [952] r49 = "appendChild"
+  [979] r33 = r62[r49]
+  [985] r50 = r62.appendChild(r10)
+  [990] r33 = "cloneNode"
+  [1012] r14 = r62[r33]
+  [1024] r33 = r62.cloneNode(!1)
+  [1029] r59 = r33
+  [1032] r33 = r62[r49]; r30 = r33.call(r62, r59)
+  [1040] r33 = "insertBefore"
+  [1072] r49 = r62[r33]
+  [1076] r36 = r62.insertBefore(r59, r10)
+  [1082] r29 = r36
+  [1085] r36 = "className"
+  [1110] r49 = "cll1"
+  [1122] r34 = r49; r29[r36] = r49
+  [1128] r49 = "setAttribute"
+  [1160] r36 = r29[r49]
+  [1164] r49 = "class"
+  [1179] r14 = "sss"
+  [1189] r34 = r29.setAttribute(r49, r14)
+  [1195] r14 = r53[r33]
+  [1201] r34 = r53.insertBefore(r29, null)
+  [1207] r31 = "divdivdivppdiv"
+  [1244] r33 = "innerHTML"
+  [1266] r46 = r53[r33]
+  [1272] cjmp r46 ? 57450 : 35377
+
+AFTER (reconstructed):
+  [772] catch_push(offset=19077)
+  [776] r48 = ""
+  [779] r36 = "document"
+  [801] r36 = r0[r36]
+  [805] r33 = "createElement"
+  [843] r49 = "div"
+  [853] r35 = r36.createElement(r49)
+  [858] r62 = r35
+  [861] r35 = "document"
+  [883] r35 = r0[r35]
+  [887] r14 = "p"
+  [894] r36 = r35.createElement(r14)
+  [899] r10 = r36
+  [902] r36 = "document"
+  [924] r36 = r0[r36]
+  [932] r33 = "span"
+  [944] r49 = r36.createElement(r33)
+  [949] r53 = r49
+  [952] r49 = "appendChild"
+  [985] r50 = r62.appendChild(r10)
+  [990] r33 = "cloneNode"
+  [1024] r33 = r62.cloneNode(!1)
+  [1029] r59 = r33
+  [1032] r30 = r62.appendChild(r59)
+  [1040] r33 = "insertBefore"
+  [1076] r36 = r62.insertBefore(r59, r10)
+  [1082] r29 = r36
+  [1085] r36 = "className"
+  [1110] r49 = "cll1"
+  [1122] r34 = r49; r29[r36] = r49
+  [1128] r49 = "setAttribute"
+  [1164] r49 = "class"
+  [1179] r14 = "sss"
+  [1189] r34 = r29.setAttribute(r49, r14)
+  [1201] r34 = r53.insertBefore(r29, null)
+  [1207] r31 = "divdivdivppdiv"
+  [1244] r33 = "innerHTML"
+  [1266] r46 = r53[r33]
+  [1272] cjmp r46 ? 57450 : 35377
+
+Method calls:
+  r36.createElement(1 args) at PC 853
+  r35.createElement(1 args) at PC 894
+  r36.createElement(1 args) at PC 944
+  r62.appendChild(1 args) at PC 985
+  r62.cloneNode(1 args) at PC 1024
+  r62.insertBefore(2 args) at PC 1076
+  r29.setAttribute(2 args) at PC 1189
+  r53.insertBefore(2 args) at PC 1201
+  r62.appendChild(1 args) at PC 1032 [compound]
+
+======================================================================
+Example 6: String method name: createElement
+Function 12, Block b0
+Statements: 47 → 42 (6 method calls reconstructed)
+
+BEFORE (folded):
+  [2332] r13 = !1; try_push(offset=26055)
+  [2336] r34 = "document"
+  [2358] r34 = r0[r34]
+  [2362] r17 = "createElement"
+  [2394] r37 = r34[r17]
+  [2400] r22 = "div"
+  [2410] r12 = r34.createElement(r22)
+  [2415] r8 = r12
+  [2418] r12 = "document"
+  [2440] r12 = r0[r12]
+  [2444] r22 = "body"
+  [2456] r37 = r12[r22]
+  [2460] r22 = "appendChild"
+  [2487] r12 = r37[r22]
+  [2493] r33 = r37.appendChild(r8)
+  [2498] r12 = "innerHTML"
+  [2523] r37 = "<p class=\"firstp\">firstp</p>\n        <p id=\"secondp\">secondp</p>\n        <p class=\"thirdp\">thirdp</p>\n        <h2>\n          <span class=\"foo\">foo</span>\n          <span class=\"bar\" id=\"bar\">bar</span>\n        </h2>"
+  [3063] r33 = r37; r8[r12] = r37
+  [3069] r37 = "document"
+  [3091] r37 = r0[r37]
+  [3095] r34 = r37[r17]
+  [3099] r17 = "style"
+  [3114] r14 = r37.createElement(r17)
+  [3119] r11 = r14
+  [3122] r14 = "body :not(.firstp, .thirdp) {\n        color: blue;\n      }\n      h2 :not(span.foo) {\n        color: red;\n      }"
+  [3404] r16 = r14; r11[r12] = r14
+  [3410] r14 = "document"
+  [3432] r14 = r0[r14]
+  [3436] r12 = "head"
+  [3448] r17 = r14[r12]
+  [3452] r12 = r17[r22]; r16 = r12.call(r17, r11)
+  [3460] catch_push(offset=66536)
+  [3462] r12 = "rgb(0, 0, 255)"
+  [3499] r17 = "getComputedStyle"
+  [3541] r17 = r0[r17]
+  [3545] r22 = "document"
+  [3567] r22 = r0[r22]
+  [3571] r14 = "getElementById"
+  [3608] r34 = r22[r14]
+  [3612] r14 = "secondp"
+  [3632] r37 = r22.getElementById(r14)
+  [3639] r34 = r17.call(Q, r37, null)
+  [3644] r14 = "getPropertyValue"
+  [3686] r37 = r34[r14]
+  [3690] r14 = "color"
+  [3705] r17 = r34.getPropertyValue(r14)
+  [3714] cjmp (r12 === r17) ? 19053 : 36200
+
+AFTER (reconstructed):
+  [2332] r13 = !1; try_push(offset=26055)
+  [2336] r34 = "document"
+  [2358] r34 = r0[r34]
+  [2362] r17 = "createElement"
+  [2400] r22 = "div"
+  [2410] r12 = r34.createElement(r22)
+  [2415] r8 = r12
+  [2418] r12 = "document"
+  [2440] r12 = r0[r12]
+  [2444] r22 = "body"
+  [2456] r37 = r12[r22]
+  [2460] r22 = "appendChild"
+  [2493] r33 = r37.appendChild(r8)
+  [2498] r12 = "innerHTML"
+  [2523] r37 = "<p class=\"firstp\">firstp</p>\n        <p id=\"secondp\">secondp</p>\n        <p class=\"thirdp\">thirdp</p>\n        <h2>\n          <span class=\"foo\">foo</span>\n          <span class=\"bar\" id=\"bar\">bar</span>\n        </h2>"
+  [3063] r33 = r37; r8[r12] = r37
+  [3069] r37 = "document"
+  [3091] r37 = r0[r37]
+  [3099] r17 = "style"
+  [3114] r14 = r37.createElement(r17)
+  [3119] r11 = r14
+  [3122] r14 = "body :not(.firstp, .thirdp) {\n        color: blue;\n      }\n      h2 :not(span.foo) {\n        color: red;\n      }"
+  [3404] r16 = r14; r11[r12] = r14
+  [3410] r14 = "document"
+  [3432] r14 = r0[r14]
+  [3436] r12 = "head"
+  [3448] r17 = r14[r12]
+  [3452] r16 = r17.appendChild(r11)
+  [3460] catch_push(offset=66536)
+  [3462] r12 = "rgb(0, 0, 255)"
+  [3499] r17 = "getComputedStyle"
+  [3541] r17 = r0[r17]
+  [3545] r22 = "document"
+  [3567] r22 = r0[r22]
+  [3571] r14 = "getElementById"
+  [3612] r14 = "secondp"
+  [3632] r37 = r22.getElementById(r14)
+  [3639] r34 = r17.call(Q, r37, null)
+  [3644] r14 = "getPropertyValue"
+  [3690] r14 = "color"
+  [3705] r17 = r34.getPropertyValue(r14)
+  [3714] cjmp (r12 === r17) ? 19053 : 36200
+
+Method calls:
+  r34.createElement(1 args) at PC 2410
+  r37.appendChild(1 args) at PC 2493
+  r37.createElement(1 args) at PC 3114
+  r22.getElementById(1 args) at PC 3632
+  r34.getPropertyValue(1 args) at PC 3705
+  r17.appendChild(1 args) at PC 3452 [compound]
+
+======================================================================
+Example 7: String method name: createElement
+Function 62, Block b0
+Statements: 47 → 42 (6 method calls reconstructed)
+
+BEFORE (folded):
+  [13634] r36 = !1; try_push(offset=5888)
+  [13638] r26 = "document"
+  [13660] r26 = r0[r26]
+  [13664] r40 = "createElement"
+  [13696] r16 = r26[r40]
+  [13702] r25 = "div"
+  [13712] r27 = r26.createElement(r25)
+  [13717] r23 = r27
+  [13720] r27 = "document"
+  [13742] r27 = r0[r27]
+  [13746] r25 = "body"
+  [13758] r16 = r27[r25]
+  [13762] r25 = "appendChild"
+  [13789] r27 = r16[r25]
+  [13795] r28 = r16.appendChild(r23)
+  [13800] r27 = "innerHTML"
+  [13825] r16 = "<section><h3 id='firsth'>green</h3><p id='firstp'>red</p>green</section><section class='with-revert'><h3 id='secondh'>black</h3><p id='secondp'>red</p>black</section>"
+  [14242] r28 = r16; r23[r27] = r16
+  [14248] r16 = "document"
+  [14270] r16 = r0[r16]
+  [14274] r26 = r16[r40]
+  [14278] r40 = "style"
+  [14293] r11 = r16.createElement(r40)
+  [14298] r20 = r11
+  [14301] r11 = "section { color: green } p { color: red } section.with-revert { color: revert }"
+  [14501] r24 = r11; r20[r27] = r11
+  [14507] r11 = "document"
+  [14529] r11 = r0[r11]
+  [14533] r27 = "head"
+  [14545] r40 = r11[r27]
+  [14549] r27 = r40[r25]; r24 = r27.call(r40, r20)
+  [14557] catch_push(offset=43817)
+  [14559] r27 = "rgb(0, 128, 0)"
+  [14596] r40 = "getComputedStyle"
+  [14638] r40 = r0[r40]
+  [14642] r25 = "document"
+  [14664] r25 = r0[r25]
+  [14668] r11 = "getElementById"
+  [14705] r26 = r25[r11]
+  [14709] r11 = "firsth"
+  [14726] r16 = r25.getElementById(r11)
+  [14733] r26 = r40.call(Q, r16, null)
+  [14738] r11 = "getPropertyValue"
+  [14780] r16 = r26[r11]
+  [14784] r11 = "color"
+  [14799] r40 = r26.getPropertyValue(r11)
+  [14808] cjmp (r27 === r40) ? 27253 : 55184
+
+AFTER (reconstructed):
+  [13634] r36 = !1; try_push(offset=5888)
+  [13638] r26 = "document"
+  [13660] r26 = r0[r26]
+  [13664] r40 = "createElement"
+  [13702] r25 = "div"
+  [13712] r27 = r26.createElement(r25)
+  [13717] r23 = r27
+  [13720] r27 = "document"
+  [13742] r27 = r0[r27]
+  [13746] r25 = "body"
+  [13758] r16 = r27[r25]
+  [13762] r25 = "appendChild"
+  [13795] r28 = r16.appendChild(r23)
+  [13800] r27 = "innerHTML"
+  [13825] r16 = "<section><h3 id='firsth'>green</h3><p id='firstp'>red</p>green</section><section class='with-revert'><h3 id='secondh'>black</h3><p id='secondp'>red</p>black</section>"
+  [14242] r28 = r16; r23[r27] = r16
+  [14248] r16 = "document"
+  [14270] r16 = r0[r16]
+  [14278] r40 = "style"
+  [14293] r11 = r16.createElement(r40)
+  [14298] r20 = r11
+  [14301] r11 = "section { color: green } p { color: red } section.with-revert { color: revert }"
+  [14501] r24 = r11; r20[r27] = r11
+  [14507] r11 = "document"
+  [14529] r11 = r0[r11]
+  [14533] r27 = "head"
+  [14545] r40 = r11[r27]
+  [14549] r24 = r40.appendChild(r20)
+  [14557] catch_push(offset=43817)
+  [14559] r27 = "rgb(0, 128, 0)"
+  [14596] r40 = "getComputedStyle"
+  [14638] r40 = r0[r40]
+  [14642] r25 = "document"
+  [14664] r25 = r0[r25]
+  [14668] r11 = "getElementById"
+  [14709] r11 = "firsth"
+  [14726] r16 = r25.getElementById(r11)
+  [14733] r26 = r40.call(Q, r16, null)
+  [14738] r11 = "getPropertyValue"
+  [14784] r11 = "color"
+  [14799] r40 = r26.getPropertyValue(r11)
+  [14808] cjmp (r27 === r40) ? 27253 : 55184
+
+Method calls:
+  r26.createElement(1 args) at PC 13712
+  r16.appendChild(1 args) at PC 13795
+  r16.createElement(1 args) at PC 14293
+  r25.getElementById(1 args) at PC 14726
+  r26.getPropertyValue(1 args) at PC 14799
+  r40.appendChild(1 args) at PC 14549 [compound]
+
+======================================================================
+Example 8: Single method call: indexOf
+Function 3, Block b0
+Statements: 7 → 6 (1 method calls reconstructed)
+
+BEFORE (folded):
+  [293] r12 = r4[0]; r8 = r2[0]
+  [300] r15 = r5
+  [309] r13 = r8[0]
+  [313] r14 = "indexOf"
+  [330] r10 = r13[r14]
+  [336] r14 = r13.indexOf(r12)
+  [348] return !(-1 === r14)
+
+AFTER (reconstructed):
+  [293] r12 = r4[0]; r8 = r2[0]
+  [300] r15 = r5
+  [309] r13 = r8[0]
+  [313] r14 = "indexOf"
+  [336] r14 = r13.indexOf(r12)
+  [348] return !(-1 === r14)
+
+Method calls:
+  r13.indexOf(1 args) at PC 336
+
+======================================================================
+Example 9: Single method call: push
+Function 11, Block b1
+Statements: 6 → 5 (1 method calls reconstructed)
+
+BEFORE (folded):
+  [23898] r19 = r11[0]
+  [23902] r18 = "push"
+  [23914] r13 = r19[r18]
+  [23918] r18 = r9[0]
+  [23922] r12 = r19.push(r18)
+  [23927] return Q
+
+AFTER (reconstructed):
+  [23898] r19 = r11[0]
+  [23902] r18 = "push"
+  [23918] r18 = r9[0]
+  [23922] r12 = r19.push(r18)
+  [23927] return Q
+
+Method calls:
+  r19.push(1 args) at PC 23922
+
+======================================================================
+Example 10: Method reconstruction
+Function 272, Block b0
+Statements: 30 → 25 (6 method calls reconstructed)
+
+BEFORE (folded):
+  [65641] catch_push(offset=-60524)
+  [65645] r8 = ""
+  [65648] r18 = "document"
+  [65670] r18 = r0[r18]
+  [65674] r43 = "createElement"
+  [65706] r39 = r18[r43]
+  [65712] r14 = "div"
+  [65722] r33 = r18.createElement(r14)
+  [65727] r41 = r33
+  [65730] r33 = "document"
+  [65752] r33 = r0[r33]
+  [65756] r14 = r33[r43]
+  [65756] r43 = "p"
+  [65763] r39 = r33.createElement(r43)
+  [65768] r16 = r39
+  [65771] r39 = "appendChild"
+  [65798] r43 = r41[r39]
+  [65804] r34 = r41.appendChild(r16)
+  [65809] r43 = "cloneNode"
+  [65831] r14 = r41[r43]
+  [65843] r43 = r41.cloneNode(!1)
+  [65848] r22 = r43
+  [65851] r43 = r41[r39]; r12 = r43.call(r41, r22)
+  [65859] r43 = "insertBefore"
+  [65891] r39 = r41[r43]
+  [65895] r12 = r41.insertBefore(r22, r16)
+  [65901] r38 = "divdivdivppadiv"
+  [65941] r39 = "outerHTML"
+  [65963] r36 = r41[r39]
+  [65969] cjmp r36 ? -9179 : -54998
+
+AFTER (reconstructed):
+  [65641] catch_push(offset=-60524)
+  [65645] r8 = ""
+  [65648] r18 = "document"
+  [65670] r18 = r0[r18]
+  [65674] r43 = "createElement"
+  [65712] r14 = "div"
+  [65722] r33 = r18.createElement(r14)
+  [65727] r41 = r33
+  [65730] r33 = "document"
+  [65752] r33 = r0[r33]
+  [65756] r43 = "p"
+  [65763] r39 = r33.createElement(r43)
+  [65768] r16 = r39
+  [65771] r39 = "appendChild"
+  [65804] r34 = r41.appendChild(r16)
+  [65809] r43 = "cloneNode"
+  [65843] r43 = r41.cloneNode(!1)
+  [65848] r22 = r43
+  [65851] r12 = r41.appendChild(r22)
+  [65859] r43 = "insertBefore"
+  [65895] r12 = r41.insertBefore(r22, r16)
+  [65901] r38 = "divdivdivppadiv"
+  [65941] r39 = "outerHTML"
+  [65963] r36 = r41[r39]
+  [65969] cjmp r36 ? -9179 : -54998
+
+Method calls:
+  r18.createElement(1 args) at PC 65722
+  r33.createElement(1 args) at PC 65763
+  r41.appendChild(1 args) at PC 65804
+  r41.cloneNode(1 args) at PC 65843
+  r41.insertBefore(2 args) at PC 65895
+  r41.appendChild(1 args) at PC 65851 [compound]
