@@ -387,3 +387,130 @@ describe('collect-generator: different templates produce different tokens', () =
     );
   });
 });
+
+// ============================================================================
+// 9. collect-generator: cdArrayOverride
+// ============================================================================
+
+describe('collect-generator: cdArrayOverride produces different output', () => {
+  it('custom cdArrayOverride yields a different token than default', () => {
+    const defaultToken = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    const customCd = Array.from({ length: 59 }, (_, i) => 'override_' + i);
+    const overrideToken = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: customCd,
+    });
+    assert.notStrictEqual(overrideToken, defaultToken,
+      'override token should differ from default');
+  });
+
+  it('override token is a non-empty URL-encoded string', () => {
+    const customCd = Array.from({ length: 59 }, (_, i) => 'val_' + i);
+    const token = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: customCd,
+    });
+    assert.ok(typeof token === 'string', 'should be a string');
+    assert.ok(token.length > 0, 'should be non-empty');
+  });
+});
+
+describe('collect-generator: cdArrayOverride uses the provided array', () => {
+  it('two different override arrays produce different tokens', () => {
+    const cdA = Array.from({ length: 59 }, (_, i) => 'a_' + i);
+    const cdB = Array.from({ length: 59 }, (_, i) => 'b_' + i);
+    const tokenA = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: cdA,
+    });
+    const tokenB = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: cdB,
+    });
+    assert.notStrictEqual(tokenA, tokenB,
+      'different override arrays should produce different tokens');
+  });
+
+  it('same override array produces identical token (deterministic)', () => {
+    const customCd = Array.from({ length: 59 }, (_, i) => 'fixed_' + i);
+    const opts = { ...FIXED_OPTS, cdArrayOverride: customCd };
+    const token1 = generateCollect(profile, XTEA_A, opts);
+    const token2 = generateCollect(profile, XTEA_A, opts);
+    assert.strictEqual(token1, token2,
+      'same override should produce identical tokens');
+  });
+});
+
+describe('collect-generator: non-array cdArrayOverride is ignored', () => {
+  it('cdArrayOverride: "not an array" falls back to default', () => {
+    const defaultToken = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    const token = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: 'not an array',
+    });
+    assert.strictEqual(token, defaultToken,
+      'string cdArrayOverride should be ignored');
+  });
+
+  it('cdArrayOverride: null falls back to default', () => {
+    const defaultToken = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    const token = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: null,
+    });
+    assert.strictEqual(token, defaultToken,
+      'null cdArrayOverride should be ignored');
+  });
+
+  it('cdArrayOverride: {} falls back to default', () => {
+    const defaultToken = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    const token = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: {},
+    });
+    assert.strictEqual(token, defaultToken,
+      'object cdArrayOverride should be ignored');
+  });
+
+  it('cdArrayOverride: 42 falls back to default', () => {
+    const defaultToken = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    const token = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: 42,
+    });
+    assert.strictEqual(token, defaultToken,
+      'number cdArrayOverride should be ignored');
+  });
+});
+
+describe('collect-generator: cdArrayOverride skips reorderCdArray', () => {
+  it('cdFieldOrder is ignored when cdArrayOverride is provided', () => {
+    const customCd = Array.from({ length: 59 }, (_, i) => 'skip_reorder_' + i);
+    const withoutFieldOrder = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: customCd,
+    });
+    const withFieldOrder = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdArrayOverride: customCd,
+      cdFieldOrder: [58, 57, 56, 55, 54, 53, 52, 51, 50, 49],
+    });
+    assert.strictEqual(withFieldOrder, withoutFieldOrder,
+      'cdFieldOrder should be ignored when cdArrayOverride is set');
+  });
+
+  it('cdFieldOrder without cdArrayOverride produces different token', () => {
+    const defaultToken = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    const reorderedToken = generateCollect(profile, XTEA_A, {
+      ...FIXED_OPTS,
+      cdFieldOrder: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9,
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+        40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
+        50, 51, 52, 53, 54, 55, 56, 57, 58],
+    });
+    assert.notStrictEqual(reorderedToken, defaultToken,
+      'cdFieldOrder should change the token when cdArrayOverride is not set');
+  });
+});
