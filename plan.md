@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 17.3 — Full Chrome cd injection — live test
+Current task: none — awaiting direction
 
 ---
 
@@ -162,39 +162,37 @@ Current task: 17.3 — Full Chrome cd injection — live test
 |----|------|--------|
 | 17.1 | Chrome cd injection script | done |
 | 17.2 | Tests for Chrome cd injection script | done |
-| 17.3 | Full Chrome cd injection — live test | in-progress |
+| 17.3 | Full Chrome cd injection — live test | done |
 | 17.3.1 | Fix cd capture: decrypt Chrome's collect token | done |
-| 17.4 | Binary search: identify which cd fields the server validates | pending |
-| 17.5 | Fix identified fields in standalone generator | pending |
-| 17.6 | Live re-test with fixes | pending |
+| 17.4 | Binary search: identify which cd fields the server validates | superseded |
+| 17.5 | Fix identified fields in standalone generator | superseded |
+| 17.6 | Live re-test with fixes | superseded |
 
 ---
 
 ## Current Task
 
-**ID**: 17.3
-**Title**: Full Chrome cd injection — live test
-**Phase**: Chrome cd Injection — Identify Which Fields the Server Validates
-**Status**: in-progress
+*No active task — awaiting user direction after Phase 17 findings.*
 
-### Goal
-Run the fixed `scripts/chrome-cd-inject.js` (now using XTEA decryption) live against Tencent's CAPTCHA endpoint. Determine whether a standalone-encrypted token with Chrome's real cd values resolves errorCode 9.
+### Phase 17 Conclusion
 
-### Context
-- Script now decrypts Chrome's collect token to extract cd array (fixed in 17.3.1)
-- Previous attempt: JSON.stringify hook failed, script fell back to standalone cd
-- New unported template `DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG` in rotation (2/3 hits)
+**Experiment**: Injected Chrome's real cd array (extracted via XTEA decryption) into standalone-encrypted collect token, submitted via Chrome TLS.
 
-### Implementation Steps
-1. Run `node scripts/chrome-cd-inject.js` (3 attempts by default)
-2. Examine: cd decryption success, cd diff count, verify errorCode
-3. Record results
+**Result**: errorCode 9 persists. **cd values alone are NOT the root cause.**
 
-### Verification
-- [ ] Script runs to completion
-- [ ] cd array extracted via decryption (not fallback)
-- [ ] Verify response received
-- [ ] Results in `output/chrome-cd-inject.json`
+**Key data (attempt 1)**:
+- Template: 98-opcode unknown template, cd decryption succeeded (60 fields)
+- 57/60 cd fields differ between Chrome and standalone (completely different schema ordering for this template)
+- Despite using Chrome's exact cd values, standalone encryption still rejected
 
-### Suggested Agent
-general-purpose
+**Implications — the issue is in one or more of**:
+1. **XTEA encryption parameters** — keyMods may be wrong for newer templates, causing garbled ciphertext
+2. **Token assembly/segment layout** — chunk ordering, padding, or header differences
+3. **sd structure** — session data fields may differ between templates
+4. **Hand-rolled cd serialization** — the standalone `buildCdString()` may serialize differently than the VM's `func_276`
+5. **Timestamp/nonce binding** — the token may need to be encrypted with the SAME timestamp Chrome used
+
+**Additional observations**:
+- Live server now rotates 3+ TDC_NAMEs per 3 attempts, including two unknown 98-opcode templates
+- Template A decryption also failed (attempt 3), suggesting key rotation or derivation changes
+- New unported template `DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG` appeared repeatedly
