@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 28
-Current task: 28.9 — Fix collect encoding: use raw base64 instead of URL-encoded in POST body swap
+Current task: 28.10 — Deep token diff: compare original vs standalone structure
 
 ---
 
@@ -35,7 +35,7 @@ Current task: 28.9 — Fix collect encoding: use raw base64 instead of URL-encod
 | 28.7 | Tests for standalone token interception | done |
 | 28.8 | Act on 28.6 results | done |
 | 28.9 | Fix collect encoding: raw base64 in POST body swap | done |
-| 28.10 | Deep token diff: compare original vs standalone structure | pending |
+| 28.10 | Deep token diff: compare original vs standalone structure | in-progress |
 | 28.11 | Re-run isolation test after fixes | pending |
 
 ---
@@ -45,7 +45,7 @@ Current task: 28.9 — Fix collect encoding: use raw base64 instead of URL-encod
 **ID**: 28.10
 **Title**: Deep token diff: compare original vs standalone structure
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
 Understand WHY the standalone token is 812 chars shorter than the real one. Both should be raw base64 from the same XTEA encryption pipeline. The length gap suggests structural differences in the payload (different collector fields, missing behavioral events, different segment assembly). Need to decrypt both tokens and compare segment-by-segment.
