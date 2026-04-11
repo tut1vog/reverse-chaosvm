@@ -651,8 +651,17 @@ async function main() {
   log('Browser closed. Done.');
 }
 
-main().catch((err) => {
-  log(`FATAL: ${err.message}`);
-  log(err.stack);
-  process.exit(1);
-});
+// Only run main when executed directly (not when required for testing)
+if (require.main === module) {
+  main().catch((err) => {
+    log(`FATAL: ${err.message}`);
+    log(err.stack);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  replacePostField,
+  buildShowUrl,
+  parseArgs,
+};
