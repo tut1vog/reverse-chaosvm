@@ -231,6 +231,174 @@ function parseSegmentSizes(collectStr, sdStringLength) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Segment Decryption + Diff
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Decrypt a single base64-encoded XTEA segment to a plaintext string.
+ *
+ * @param {string} b64Str - Base64-encoded encrypted segment
+ * @param {object} params - XTEA params {key, delta, rounds, keyMods}
+ * @returns {string} Decrypted plaintext (may have trailing null padding)
+ */
+function decryptSegment(b64Str, params) {
+  const encrypted = Buffer.from(b64Str, 'base64').toString('binary');
+  return decryptXtea(encrypted, params);
+}
+
+/**
+ * Extract the cdBody base64 substring from a collect token.
+ *
+ * @param {string} collectStr - URL-encoded or raw base64 collect token
+ * @param {number} sdStringLength - Length of the sd string (for computing sig size)
+ * @returns {string} The cdBody base64 substring
+ */
+function extractCdBodyB64(collectStr, sdStringLength) {
+  const b64 = collectStr.includes('%')
+    ? urlDecodeCollect(collectStr)
+    : collectStr;
+
+  const HEADER_LEN = 192;
+  const HASH_LEN = 64;
+  const sigEncryptedLen = Math.ceil(sdStringLength / 8) * 8;
+  const sigB64Len = Math.ceil(sigEncryptedLen / 3) * 4;
+  const sigLen = Math.min(sigB64Len, Math.max(0, b64.length - HEADER_LEN - HASH_LEN));
+  const cdBodyEnd = b64.length - sigLen;
+
+  return b64.substring(HEADER_LEN + HASH_LEN, cdBodyEnd);
+}
+
+/**
+ * Diff two plaintext strings char-by-char and return divergence info.
+ *
+ * @param {string} a - First plaintext
+ * @param {string} b - Second plaintext
+ * @returns {{firstDivergence: number, aContext: string, bContext: string, aLength: number, bLength: number}}
+ */
+function diffPlaintext(a, b) {
+  const minLen = Math.min(a.length, b.length);
+  let firstDiv = -1;
+
+  for (let i = 0; i < minLen; i++) {
+    if (a.charCodeAt(i) !== b.charCodeAt(i)) {
+      firstDiv = i;
+      break;
+    }
+  }
+  // If no char mismatch but lengths differ, divergence is at the shorter string's end
+  if (firstDiv === -1 && a.length !== b.length) {
+    firstDiv = minLen;
+  }
+
+  const contextRadius = 25;
+  const ctxStart = Math.max(0, firstDiv - contextRadius);
+  const ctxEnd = firstDiv + contextRadius;
+
+  // Sanitize for logging: replace non-printable chars
+  const sanitize = (s) => s.replace(/[\x00-\x1f\x7f-\x9f]/g, '.');
+
+  return {
+    firstDivergence: firstDiv,
+    aContext: firstDiv >= 0 ? sanitize(a.substring(ctxStart, ctxEnd)) : '',
+    bContext: firstDiv >= 0 ? sanitize(b.substring(ctxStart, ctxEnd)) : '',
+    aLength: a.length,
+    bLength: b.length,
+  };
+}
+
+/**
+ * Identify which cd field index a character position falls in.
+ * Assumes the plaintext starts with '{"cd":[' and fields are comma-separated
+ * JSON values (strings or numbers).
+ *
+ * @param {string} plaintext - Decrypted cdBody plaintext
+ * @param {number} charPos - Character position in the plaintext
+ * @returns {{fieldIndex: number, fieldStart: number, fieldContent: string}|null}
+ */
+function identifyCdField(plaintext, charPos) {
+  // Find the cd array portion
+  const cdStart = plaintext.indexOf('"cd":[');
+  if (cdStart === -1) return null;
+
+  const arrayStart = plaintext.indexOf('[', cdStart);
+  if (arrayStart === -1) return null;
+
+  // Walk through the array, tracking field boundaries
+  let pos = arrayStart + 1;
+  let fieldIndex = 0;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  let fieldStart = pos;
+
+  while (pos < plaintext.length) {
+    const ch = plaintext[pos];
+
+    if (escaped) {
+      escaped = false;
+      pos++;
+      continue;
+    }
+
+    if (ch === '\\' && inString) {
+      escaped = true;
+      pos++;
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = !inString;
+      pos++;
+      continue;
+    }
+
+    if (inString) {
+      pos++;
+      continue;
+    }
+
+    if (ch === '[' || ch === '{') {
+      depth++;
+      pos++;
+      continue;
+    }
+
+    if (ch === ']' || ch === '}') {
+      if (depth === 0) {
+        // End of the cd array
+        if (charPos >= fieldStart && charPos <= pos) {
+          return {
+            fieldIndex,
+            fieldStart,
+            fieldContent: plaintext.substring(fieldStart, pos).trim(),
+          };
+        }
+        break;
+      }
+      depth--;
+      pos++;
+      continue;
+    }
+
+    if (ch === ',' && depth === 0) {
+      if (charPos >= fieldStart && charPos < pos) {
+        return {
+          fieldIndex,
+          fieldStart,
+          fieldContent: plaintext.substring(fieldStart, pos).trim(),
+        };
+      }
+      fieldIndex++;
+      fieldStart = pos + 1;
+    }
+
+    pos++;
+  }
+
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Main Solver
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -677,6 +845,62 @@ async function solve(opts) {
           const s = segmentComparison[name];
           const diffStr = s.diff > 0 ? `+${s.diff}` : String(s.diff);
           log(`    ${name.padEnd(8)}: standalone=${String(s.standalone).padEnd(5)}, chrome=${String(s.chrome).padEnd(5)}, diff=${diffStr}`);
+        }
+
+        // ── cdBody plaintext diff ──
+        log('  cdBody plaintext diff:');
+        try {
+          const standaloneCdB64 = extractCdBodyB64(collectVal, sdStringLen);
+          const chromeCdB64 = extractCdBodyB64(chromeCollect, sdStringLen);
+
+          const standalonePlain = decryptSegment(standaloneCdB64, xteaParams);
+          const chromePlain = decryptSegment(chromeCdB64, xteaParams);
+
+          // Strip trailing null padding for comparison
+          const standaloneClean = standalonePlain.replace(/\0+$/, '');
+          const chromeClean = chromePlain.replace(/\0+$/, '');
+
+          const diff = diffPlaintext(standaloneClean, chromeClean);
+
+          log(`    Standalone cdBody plaintext: ${diff.aLength} chars`);
+          log(`    Chrome cdBody plaintext:     ${diff.bLength} chars`);
+          log(`    Length diff: ${diff.aLength - diff.bLength} chars`);
+
+          let standaloneField = null;
+          let chromeField = null;
+
+          if (diff.firstDivergence >= 0) {
+            log(`    First divergence at char ${diff.firstDivergence}:`);
+            log(`      Standalone: ...${diff.aContext}...`);
+            log(`      Chrome:     ...${diff.bContext}...`);
+
+            // Identify which cd field the divergence falls in
+            standaloneField = identifyCdField(standaloneClean, diff.firstDivergence);
+            chromeField = identifyCdField(chromeClean, diff.firstDivergence);
+
+            if (standaloneField) {
+              log(`      Standalone field[${standaloneField.fieldIndex}]: ${standaloneField.fieldContent.substring(0, 80)}`);
+            }
+            if (chromeField) {
+              log(`      Chrome field[${chromeField.fieldIndex}]: ${chromeField.fieldContent.substring(0, 80)}`);
+            }
+          } else {
+            log(`    cdBody plaintext is IDENTICAL`);
+          }
+
+          // Store in segmentComparison for results JSON
+          segmentComparison.cdBodyDiff = {
+            standaloneLength: diff.aLength,
+            chromeLength: diff.bLength,
+            firstDivergence: diff.firstDivergence,
+            standaloneContext: diff.aContext,
+            chromeContext: diff.bContext,
+            standaloneFieldIndex: standaloneField ? standaloneField.fieldIndex : null,
+            chromeFieldIndex: chromeField ? chromeField.fieldIndex : null,
+          };
+        } catch (diffErr) {
+          log(`    cdBody diff FAILED: ${diffErr.message}`);
+          segmentComparison.cdBodyDiff = { error: diffErr.message };
         }
       }
 
