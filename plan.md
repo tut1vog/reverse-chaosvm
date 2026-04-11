@@ -39,77 +39,53 @@ Current task: 32.1 — Switch cache key from TDC_NAME to source hash
 
 | ID | Task | Status |
 |----|------|--------|
-| 32.1 | Switch cache key from TDC_NAME to source hash | in-progress |
-| 32.2 | Tests for source hash cache key | pending |
+| 32.1 | Switch cache key from TDC_NAME to source hash | done |
+| 32.2 | Tests for source hash cache key | in-progress |
 | 32.3 | Clear cache and live test | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 32.1
-**Title**: Switch cache key from TDC_NAME to source hash
+**ID**: 32.2
+**Title**: Tests for source hash cache key
 **Phase**: Switch Template Cache Key to Source Hash
 **Status**: in-progress
 
 ### Goal
-Replace TDC_NAME as the template cache key with a SHA-256 hash of the tdc.js source after stripping the eks value. This ensures builds with the same code but different eks tokens share a cache entry, while builds with different XTEA params get separate entries.
+Fix the 8 broken tests and add new tests for `computeSourceHash()`. The broken tests use TDC_NAME as cache key but `seed()` now uses source hash. Also need tests covering the new `computeSourceHash` function itself.
 
 ### Context
 
-**Why TDC_NAME fails**: History 28.13 showed that `CSMHFmMCDWYSdnHeTJAbbedQBMaAnGdl` had stale keyMods `[0,0,0,0]` in cache but the actual live build had `[1579040,0,2829060,0]`. Same TDC_NAME, different XTEA keys. The TDC_NAME identifies the template rotation slot, not the specific build.
+**Broken tests** (8 failures):
+- `tests/test-pipeline-integration.js` — `describe('template-cache: seed')`: 2 tests that look up seeded entries by TDC_NAME
+- `tests/test-pipeline-integration.js` — `describe('template-cache: lookup')`: 2 tests looking up by TDC_NAME
+- `tests/test-scraper-foundation.js` — `describe('TemplateCache seed() with structureParams')`: 2 tests
+- `tests/test-scraper-foundation.js` — `describe('template-cache: lookup')` (if exists): looking up by TDC_NAME or checking entry count after seed
 
-**What varies per-session**: Only the eks token changes per tdc.js response. The eks is a base64 string (~312 chars) assigned via `window.<TDC_NAME> = '<base64>'` or `window[TDC_NAME] = '<base64>'`. Everything else (VM bytecode, XTEA key derivation, opcodes) is identical for builds that should share cache entries.
+**Root cause**: `seed()` now reads the full target file, computes `computeSourceHash(source)`, and stores under that hash. Tests that call `seed()` and then `lookup(tdcName)` will get null because the key is now a hash, not TDC_NAME.
 
-**Stripping eks**: Use the same regex patterns from `extractEks()` in `scraper/tdc-utils.js` to find and remove the eks assignment line before hashing. This way, two tdc.js responses that differ only in eks will produce the same hash.
+**Fix approach**: In seed-related tests, either:
+- Compute the expected hash from the target file source and use that for lookup
+- Or use `lookupByStructure(caseCount)` which still works (scans by value, not key)
+- Or iterate cache entries to verify content without relying on specific keys
 
-**Key files to modify**:
-- `scraper/tdc-utils.js` — add `computeSourceHash(source)` function
-- `scraper/scraper.js` — replace `tdcName` with `sourceHash` as cache key in solveCaptcha() and _autoPort()
-- `scraper/template-cache.js` — update `seed()` to use source hash (read target file, strip eks, hash)
-- `scraper/cache/templates.json` — will be cleared after implementation
+**New tests needed for `computeSourceHash`**:
+- Same source → same hash
+- Different eks → same hash (proves stripping works)
+- Different VM code → different hash
+- Both eks patterns stripped: `window.<ID> = '<base64>'` and `window[TDC_NAME] = '<base64>'`
 
-**Hash approach**:
-1. Strip eks: replace the `window.<TDC_NAME> = '<eks-value>'` line with empty string (or just the eks value with a placeholder)
-2. Compute SHA-256 of the stripped source
-3. Use first 16 hex chars as the cache key (64 bits — sufficient for uniqueness, readable in logs)
-
-**What to preserve**:
-- `extractTdcName()` is still useful for logging — keep it
-- `extractEks()` is used to get the eks value for verify POST — keep it
-- `lookupByStructure()` fallback still useful for cross-template matching — keep it
-- `_autoPort()` uses the cache key for store/lookup — update to use hash
-
-### Implementation Steps
-1. In `scraper/tdc-utils.js`:
-   - Add `const crypto = require('crypto');`
-   - Add `computeSourceHash(source)` that strips eks and returns first 16 chars of SHA-256 hex
-   - Export it alongside existing functions
-
-2. In `scraper/scraper.js` solveCaptcha():
-   - After extracting tdcSource (line 397), compute `const sourceHash = computeSourceHash(tdcSource);`
-   - Log both TDC_NAME (for human readability) and sourceHash (for cache key)
-   - Replace `this._templateCache.lookup(tdcName)` with `this._templateCache.lookup(sourceHash)`
-   - Replace `this._templateCache.store(tdcName, cached)` with `this._templateCache.store(sourceHash, cached)`
-   - Replace `this._autoPort(tdcName, tdcSource)` with `this._autoPort(sourceHash, tdcSource)`
-
-3. In `scraper/scraper.js` _autoPort():
-   - Parameter is now `sourceHash` instead of `tdcName` (it's just a string key — the method doesn't care about the format)
-
-4. In `scraper/template-cache.js` seed():
-   - After reading target file, call `computeSourceHash(targetSource)` to get hash
-   - Use hash as cache key instead of TDC_NAME extracted from first line
-
-5. After all code changes: delete `scraper/cache/templates.json` (will be recreated by seed() on next init)
+**Key files**:
+- `tests/test-pipeline-integration.js` — fix seed/lookup tests
+- `tests/test-scraper-foundation.js` — fix seed/lookup tests
+- `tests/test-auto-port.js` — check if any tests need updating (the `resolveTemplate` helper uses `lookup(tdcName)` but in that context the key is just a string, not a real TDC_NAME, so it should still work)
+- New or existing test file — add `computeSourceHash` tests
 
 ### Verification
-- [ ] `node -c scraper/scraper.js` passes
-- [ ] `node -c scraper/tdc-utils.js` passes
-- [ ] `node -c scraper/template-cache.js` passes
-- [ ] `npm test` — no regressions
-- [ ] Code review: computeSourceHash strips eks before hashing
-- [ ] Code review: all cache lookup/store calls use sourceHash, not tdcName
-- [ ] Code review: TDC_NAME still extracted and logged for readability
+- [ ] `npm test` — back to 255/257 baseline (8 fixed, 2 known)
+- [ ] New `computeSourceHash` tests pass
+- [ ] Tests cover eks stripping, hash stability, and both eks patterns
 
 ### Suggested Agent
 general-purpose
