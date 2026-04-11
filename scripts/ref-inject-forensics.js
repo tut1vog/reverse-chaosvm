@@ -69,7 +69,7 @@ const TEMPLATE_A_XTEA = {
   keyModConstants: [2368517, 592130],
 };
 
-const DEFAULT_AID = '2090803262';
+const DEFAULT_AID = '2046626881';
 const BASE_URL = 'https://t.captcha.qq.com';
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
@@ -637,10 +637,10 @@ async function run(opts) {
 
     let injected = false;
 
-    // Use CDP to intercept tdc.js and serve our reference build
+    // Use CDP Fetch at Request stage ONLY for tdc.js — all other requests pass through
     const cdp = await page.target().createCDPSession();
     await cdp.send('Fetch.enable', {
-      patterns: [{ urlPattern: '*tdc.js*', requestStage: 'Response' }],
+      patterns: [{ urlPattern: '*tdc.js*', requestStage: 'Request' }],
     });
 
     cdp.on('Fetch.requestPaused', async (event) => {
@@ -651,7 +651,7 @@ async function run(opts) {
           requestId,
           responseCode: 200,
           responseHeaders: [
-            { name: 'Content-Type', value: 'application/javascript' },
+            { name: 'Content-Type', value: 'application/javascript; charset=utf-8' },
             { name: 'Access-Control-Allow-Origin', value: '*' },
           ],
           body,
@@ -666,8 +666,17 @@ async function run(opts) {
       }
     });
 
-    await page.goto(showUrl, { waitUntil: 'networkidle2', timeout: NAV_TIMEOUT });
-    log('  Show page loaded');
+    const showResponse = await page.goto(showUrl, { waitUntil: 'networkidle2', timeout: NAV_TIMEOUT });
+    log(`  Show page loaded — HTTP ${showResponse ? showResponse.status() : 'unknown'}`);
+    const pageContent = await page.content();
+    log(`  Page content length: ${pageContent.length}`);
+    log(`  Page URL: ${page.url()}`);
+    if (pageContent.length < 500) {
+      log(`  Page content: ${pageContent.substring(0, 400)}`);
+    } else {
+      log(`  Page title: ${pageContent.match(/<title>(.*?)<\/title>/)?.[1] || 'none'}`);
+      log(`  Has tdc.js ref: ${pageContent.includes('tdc.js')}`);
+    }
 
     // Wait for injection
     const waitStart = Date.now();
