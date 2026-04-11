@@ -12,18 +12,6 @@ describe('Scraper: constructor defaults', () => {
     assert.strictEqual(s.aid, '2046626881');
   });
 
-  it('default slideRatio is 0.5', () => {
-    assert.strictEqual(s.slideRatio, 0.5);
-  });
-
-  it('default calibration is -25', () => {
-    assert.strictEqual(s.calibration, -25);
-  });
-
-  it('default slideY is 45', () => {
-    assert.strictEqual(s.slideY, 45);
-  });
-
   it('default maxRetries is 3', () => {
     assert.strictEqual(s.maxRetries, 3);
   });
@@ -40,27 +28,12 @@ describe('Scraper: constructor defaults', () => {
 describe('Scraper: constructor overrides', () => {
   const s = new Scraper({
     aid: '999',
-    slideRatio: 1.0,
-    calibration: -10,
-    slideY: 99,
     maxRetries: 7,
     verbose: true,
   });
 
   it('custom aid is stored', () => {
     assert.strictEqual(s.aid, '999');
-  });
-
-  it('custom slideRatio is stored', () => {
-    assert.strictEqual(s.slideRatio, 1.0);
-  });
-
-  it('custom calibration is stored', () => {
-    assert.strictEqual(s.calibration, -10);
-  });
-
-  it('custom slideY is stored', () => {
-    assert.strictEqual(s.slideY, 99);
   });
 
   it('custom maxRetries is stored', () => {

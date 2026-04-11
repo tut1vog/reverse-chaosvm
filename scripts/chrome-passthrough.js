@@ -46,8 +46,6 @@ const DEFAULT_AID = '2046626881';
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36';
-const NATURAL_CALIBRATION = -13;
-const SLIDE_Y = 158;
 const NAV_TIMEOUT = 30000;
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -214,11 +212,12 @@ async function solve(opts) {
         throw new Error('Failed to intercept CAPTCHA images');
       }
 
-      // Extract nonce, vsig, websig, subcapclass from show page config
+      // Extract nonce, vsig, websig, subcapclass, spt from show page config
       let nonce = '';
       let vsig = '';
       let websig = '';
       let subcapclass = '';
+      let spt = '0';
       let showSess = session.sess;
       if (capturedShowConfig) {
         const nonceMatch = capturedShowConfig.match(/["']?nonce["']?\s*:\s*["']([^"']+)["']/);
@@ -231,7 +230,9 @@ async function solve(opts) {
         if (subcapMatch) subcapclass = subcapMatch[1];
         const sessMatch = capturedShowConfig.match(/["']?sess["']?\s*:\s*["']([^"']+)["']/);
         if (sessMatch) showSess = sessMatch[1];
-        log(`  Config: nonce=${nonce}, vsig=${vsig.slice(0, 10)}..., subcapclass=${subcapclass}`);
+        const sptMatch = capturedShowConfig.match(/["']?spt["']?\s*:\s*["']([^"']+)["']/);
+        if (sptMatch) spt = sptMatch[1];
+        log(`  Config: nonce=${nonce}, vsig=${vsig.slice(0, 10)}..., subcapclass=${subcapclass}, spt=${spt}`);
       }
 
       // ── Step 3: Wait for TDC ready ──
@@ -254,9 +255,10 @@ async function solve(opts) {
       const rawOffset = await solveSlider(interceptedImages.bg, interceptedImages.slice);
       log(`  rawOffset: ${rawOffset}`);
 
-      const xAnswer = Math.round(rawOffset + NATURAL_CALIBRATION);
-      const ans = `${xAnswer},${SLIDE_Y};`;
-      log(`  xAnswer: ${xAnswer} (rawOffset=${rawOffset}, calibration=${NATURAL_CALIBRATION})`);
+      const xAnswer = rawOffset;
+      const yAnswer = Math.floor(parseInt(spt, 10)) || 0;
+      const ans = `${xAnswer},${yAnswer};`;
+      log(`  xAnswer: ${xAnswer} (rawOffset=${rawOffset})`);
       log(`  ans: ${ans}`);
 
       // ── Step 5: Capture Chrome's collect token (AS-IS) ──

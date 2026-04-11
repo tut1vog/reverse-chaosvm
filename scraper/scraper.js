@@ -39,9 +39,6 @@ class Scraper {
    * @param {string} [config.referer='https://urlsec.qq.com/'] - Referer header (must match iframe origin)
    * @param {string} [config.userAgent] - User-Agent string
    * @param {Object} [config.profile] - Browser fingerprint profile (default: profiles/default.json)
-   * @param {number} [config.slideRatio=0.5] - Slide image ratio (may need tuning)
-   * @param {number} [config.calibration=-25] - Slide calibration offset
-   * @param {number} [config.slideY=45] - Default Y coordinate for slide answer
    * @param {number} [config.maxRetries=3] - Max CAPTCHA solve attempts
    * @param {boolean} [config.verbose=false] - Log progress to stderr
    */
@@ -51,9 +48,6 @@ class Scraper {
     this.referer = cfg.referer || 'https://urlsec.qq.com/';
     this.userAgent = cfg.userAgent || DEFAULT_USER_AGENT;
     this.profile = cfg.profile || null;
-    this.slideRatio = cfg.slideRatio !== undefined ? cfg.slideRatio : 0.5;
-    this.calibration = cfg.calibration !== undefined ? cfg.calibration : -25;
-    this.slideY = cfg.slideY !== undefined ? cfg.slideY : 45;
     this.maxRetries = cfg.maxRetries !== undefined ? cfg.maxRetries : 3;
     this.verbose = !!cfg.verbose;
 
@@ -358,15 +352,16 @@ class Scraper {
         const rawOffset = await solveSlider(bgBuffer, sliceBuffer);
         this._log(`  rawOffset: ${rawOffset}`);
 
-        // (h) Compute answer with ratio and calibration
-        const calibration = this.calibration + Math.floor(Math.random() * 11) - 5;
-        const xAnswer = Math.round(rawOffset * this.slideRatio + calibration);
-        const ans = `${xAnswer},${this.slideY};`;
+        // (h) Compute answer: X = rawOffset, Y = spt from server
+        const spt = sig.spt || '0';
+        const xAnswer = rawOffset;
+        const yAnswer = Math.floor(parseInt(spt, 10)) || 0;
+        const ans = `${xAnswer},${yAnswer};`;
         this._log(`  ans: ${ans}`);
 
         // (i) Generate behavioral events and slide sd
         const now = Date.now();
-        const behavioralEvents = generateBehavioralEvents(xAnswer, this.slideY, now);
+        const behavioralEvents = generateBehavioralEvents(xAnswer, yAnswer, now);
 
         // Build slideValue for sd from behavioral events (8-element → 3-element tuples)
         // First entry: [firstDx, cursorViewportY, firstDt] — absolute cursor position of first move
@@ -395,7 +390,7 @@ class Scraper {
         slideValueArray.push([0, 0, 0]); // terminator
 
         const slideSd = buildSlideSd(
-          { x: xAnswer, y: this.slideY },
+          { x: xAnswer, y: yAnswer },
           slideValueArray,
           { trycnt: attempt, refreshcnt: 0 }
         );

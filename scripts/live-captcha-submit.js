@@ -54,9 +54,6 @@ const DEFAULT_AID = '2046626881';
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36';
-const DEFAULT_RATIO = 0.5;
-const CALIBRATION_OFFSET = -25;
-const DEFAULT_SLIDE_Y = 45;
 const NAV_TIMEOUT = 30000;
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -643,11 +640,12 @@ async function solve(opts) {
         throw new Error('Failed to intercept tdc.js source');
       }
 
-      // Extract nonce, vsig, websig, subcapclass from show page config
+      // Extract nonce, vsig, websig, subcapclass, spt from show page config
       let nonce = '';
       let vsig = '';
       let websig = '';
       let subcapclass = '';
+      let spt = '0';
       let showSess = session.sess;
       if (capturedShowConfig) {
         const nonceMatch = capturedShowConfig.match(/["']?nonce["']?\s*:\s*["']([^"']+)["']/);
@@ -660,7 +658,9 @@ async function solve(opts) {
         if (subcapMatch) subcapclass = subcapMatch[1];
         const sessMatch = capturedShowConfig.match(/["']?sess["']?\s*:\s*["']([^"']+)["']/);
         if (sessMatch) showSess = sessMatch[1];
-        log(`  Config: nonce=${nonce}, vsig=${vsig.slice(0, 10)}..., subcapclass=${subcapclass}`);
+        const sptMatch = capturedShowConfig.match(/["']?spt["']?\s*:\s*["']([^"']+)["']/);
+        if (sptMatch) spt = sptMatch[1];
+        log(`  Config: nonce=${nonce}, vsig=${vsig.slice(0, 10)}..., subcapclass=${subcapclass}, spt=${spt}`);
       }
 
       // ── Step 3: Wait for TDC and capture Chrome's collect token ──
@@ -971,16 +971,16 @@ async function solve(opts) {
       const rawOffset = await solveSlider(interceptedImages.bg, interceptedImages.slice);
       log(`  rawOffset: ${rawOffset}`);
 
-      const calibration = CALIBRATION_OFFSET + Math.floor(Math.random() * 11) - 5;
-      const xAnswer = Math.round(rawOffset * DEFAULT_RATIO + calibration);
-      const ans = `${xAnswer},${DEFAULT_SLIDE_Y};`;
+      const xAnswer = rawOffset;
+      const yAnswer = Math.floor(parseInt(spt, 10)) || 0;
+      const ans = `${xAnswer},${yAnswer};`;
       log(`  ans: ${ans}`);
 
       // ── Step 8: Generate standalone collect token ──
       log('Step 8: Generate standalone collect token...');
       const now = Date.now();
       const nowSec = Math.round(now / 1000);
-      const behavioralEvents = generateBehavioralEvents(xAnswer, DEFAULT_SLIDE_Y, now);
+      const behavioralEvents = generateBehavioralEvents(xAnswer, yAnswer, now);
 
       const profileOverrides = Object.assign({}, profile, {
         pageUrl: showUrl,
