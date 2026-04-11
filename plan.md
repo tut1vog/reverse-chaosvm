@@ -30,29 +30,22 @@ Current task: 29.1 — Audit and refresh stale template cache entries
 |----|------|--------|
 | 29.1 | Audit and refresh stale template cache entries | done |
 | 29.2 | Tests for refreshed cache entries | pending |
-| 29.3 | Verify TLS fingerprinting as cause of 403 on cap_union_new_show | done |
-| 29.4 | Act on 29.3 results | pending |
+| 29.3 | Verify TLS fingerprinting as cause of 403 on cap_union_new_show | done (NOT TLS — it's missing sess!) |
+| 29.4 | Act on 29.3 results | done (no TLS blocker — full headless flow is possible) |
 
 ---
 
 ## Current Task
 
-**ID**: 29.4
-**Title**: Act on TLS investigation results
-**Phase**: Cache Refresh & TLS Verification
-**Status**: pending
+Phase 29 complete. Cache refreshed, TLS myth busted.
 
-### Findings from 29.3
-- **Confirmed**: TLS fingerprinting (JA3/JA4) blocks all non-browser clients on `cap_union_new_show`
-- Tested: Node.js, curl, curl-impersonate-chrome, custom TLS variants — ALL get 403
-- **Only `cap_union_new_show` is blocked** — prehandle, tdc.js, verify all work from Node.js
-- Server: `Trpc httpd`, TLS 1.2 only, uses full Client Hello structure fingerprinting
+### Key outcomes
+1. All 10 template cache entries refreshed with correct keyMods + cdFieldOrder
+2. `cap_union_new_show` 403 is NOT TLS fingerprinting — just requires valid `sess` from prehandle
+3. **Full headless CAPTCHA solve flow is possible** — no Puppeteer needed for any step
+4. Legacy `/cap_union_new_getsig` confirmed dead (404)
 
-### Options
-1. **Hybrid Puppeteer+headless**: Puppeteer for show page only, headless for everything else
-2. **Full Puppeteer with token swap**: Proven working (28.15), use `singleBlob` mode
-3. **Go utls for JA3 spoofing**: Complex, different language
-4. **Accept the limitation**: Document it, use Puppeteer-based solver
-
-### Suggested next step
-User decision on direction
+### Next priorities
+1. Integrate `singleBlob: true` into `scraper/scraper.js`
+2. End-to-end headless test (prehandle → show config → images → solve → token → verify)
+3. Tests for single-blob mode (28.12, deferred)

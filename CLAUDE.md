@@ -185,7 +185,7 @@ See `docs/VERSION_DIFFERENCES.md` for the full porting strategy and what changes
 - `test-cfg.js`: 583/584 assertions pass (1 edge case in func 272).
 - `test-emit.js`: Code quality threshold assertions fail (cosmetic, not functional).
 - The scraper is built for slide CAPTCHAs; urlsec.qq.com has switched to click-image-selection CAPTCHAs.
-- `cap_union_new_show` returns HTTP 403 for non-browser TLS clients (JA3/JA4 fingerprinting).
+- `cap_union_new_show` returns HTTP 403 when called without a valid `sess` parameter from prehandle (NOT TLS fingerprinting — verified 2026-04-11). With valid sess, plain Node.js works fine.
 
 ## Documentation
 
@@ -243,5 +243,5 @@ All documentation should be treated as **reference — verify against live behav
 
 **Known limitations**:
 - **urlsec.qq.com now serves click-image CAPTCHAs** (not slide) — the scraper handles slide only
-- **TLS fingerprinting**: `cap_union_new_show` returns 403 for Node.js HTTP clients
-- **New template**: Live server serves TDC_NAME `XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR` (not yet ported)
+- **cap_union_new_show 403**: Requires valid `sess` from prehandle (not TLS fingerprinting — corrected 2026-04-11)
+- All 10 known templates ported with correct XTEA params, cdFieldOrder, singleBlob encryption
