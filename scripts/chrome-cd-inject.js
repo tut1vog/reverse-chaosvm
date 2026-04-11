@@ -594,12 +594,10 @@ async function solve(opts) {
       }
       slideValueArray.push([0, 0, 0]); // terminator
 
-      const slideSd = buildSlideSd(
-        { x: xAnswer, y: DEFAULT_SLIDE_Y },
-        slideValueArray,
-        { trycnt: attempt, refreshcnt: 0 }
-      );
-      log(`  [DIAG] Our sd: ${JSON.stringify(slideSd)}`.substring(0, 200));
+      // Chrome's sd only contains {od, clientType} — NO slide interaction data.
+      // Behavioral data (coordinate, slideValue, trycnt) does NOT go in the sd.
+      const slideSd = { od: 'C', clientType: '' };
+      log(`  [DIAG] sd: ${JSON.stringify(slideSd)}`);
 
       const profileOverrides = Object.assign({}, profile, {
         pageUrl: showUrl,
