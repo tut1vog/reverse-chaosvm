@@ -135,6 +135,64 @@ describe('Scraper: _buildPostFields', () => {
   });
 });
 
+describe('Scraper: ans computation formula', () => {
+  // Replicates the inline formula from scraper.js solveCaptcha() (lines 355-359)
+  function computeAns(rawOffset, spt) {
+    const sptVal = spt || '0';
+    const xAnswer = rawOffset;
+    const yAnswer = Math.floor(parseInt(sptVal, 10)) || 0;
+    return `${xAnswer},${yAnswer};`;
+  }
+
+  it('matches live successful solve (rawOffset=478, spt="30")', () => {
+    assert.strictEqual(computeAns(478, '30'), '478,30;');
+  });
+
+  it('X = rawOffset directly, no ratio or calibration', () => {
+    assert.strictEqual(computeAns(257, '30'), '257,30;');
+    assert.strictEqual(computeAns(467, '30'), '467,30;');
+    assert.strictEqual(computeAns(509, '30'), '509,30;');
+  });
+
+  it('Y = parseInt(spt) for normal integer strings', () => {
+    assert.strictEqual(computeAns(100, '30'), '100,30;');
+    assert.strictEqual(computeAns(100, '158'), '100,158;');
+    assert.strictEqual(computeAns(100, '0'), '100,0;');
+  });
+
+  it('spt empty string falls back to Y=0', () => {
+    assert.strictEqual(computeAns(100, ''), '100,0;');
+  });
+
+  it('spt undefined falls back to Y=0', () => {
+    assert.strictEqual(computeAns(100, undefined), '100,0;');
+  });
+
+  it('spt null falls back to Y=0', () => {
+    assert.strictEqual(computeAns(100, null), '100,0;');
+  });
+
+  it('spt with decimal is floored (Math.floor)', () => {
+    assert.strictEqual(computeAns(100, '45.7'), '100,45;');
+    assert.strictEqual(computeAns(100, '99.9'), '100,99;');
+  });
+
+  it('ans format is "${X},${Y};" with trailing semicolon', () => {
+    const ans = computeAns(300, '50');
+    assert.ok(ans.endsWith(';'), 'ans must end with semicolon');
+    assert.strictEqual(ans.split(',').length, 2, 'ans must have exactly one comma');
+    assert.strictEqual(ans, '300,50;');
+  });
+
+  it('various rawOffset values used directly without transformation', () => {
+    for (const offset of [0, 1, 100, 257, 467, 478, 509, 1000]) {
+      const ans = computeAns(offset, '30');
+      const x = parseInt(ans.split(',')[0], 10);
+      assert.strictEqual(x, offset, `rawOffset ${offset} should appear as-is in ans`);
+    }
+  });
+});
+
 describe('Scraper: methods exist', () => {
   const s = new Scraper();
 
