@@ -182,7 +182,8 @@ describe('template-cache: lookup', () => {
     assert.strictEqual(entry.delta, XTEA_A.delta);
     assert.strictEqual(entry.rounds, XTEA_A.rounds);
     assert.ok(Array.isArray(entry.keyModConstants), 'keyModConstants should be an array');
-    assert.strictEqual(entry.keyModConstants.length, 2);
+    assert.ok(entry.keyModConstants.length === 2 || entry.keyModConstants.length === 4,
+      'keyModConstants should have 2 (legacy) or 4 elements');
 
     // Clean up
     if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);

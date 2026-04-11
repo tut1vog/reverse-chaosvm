@@ -524,9 +524,9 @@ function analyzeTrace(ops) {
   const keyMods = keyModCandidates.map(pickMostCommon);
   result.keyMods = keyMods;
 
-  // Legacy format: keyModConstants = [mod_for_idx_1, mod_for_idx_3]
-  // Kept for backward compatibility with template cache
-  result.keyModConstants = [keyMods[1], keyMods[3]];
+  // Full 4-element array (was legacy 2-element [idx1, idx3] — now lossless)
+  // Kept as keyModConstants for backward compatibility with template cache
+  result.keyModConstants = keyMods.slice();
 
   const nonZeroMods = keyMods.map((v, i) => v > 0 ? `key[${i}]+${v}` : null).filter(Boolean);
   if (nonZeroMods.length > 0) {

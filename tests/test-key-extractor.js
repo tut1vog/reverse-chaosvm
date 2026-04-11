@@ -24,7 +24,7 @@ const TDC_PATH = path.join(TARGETS, 'tdc.js');
 const EXPECTED_KEY = [0x6257584f, 0x462a4564, 0x636a5062, 0x6d644140];
 const EXPECTED_DELTA = 0x9E3779B9;
 const EXPECTED_ROUNDS = 32;
-const EXPECTED_KEY_MODS = [2368517, 592130];
+const EXPECTED_KEY_MODS = [0, 2368517, 0, 592130];
 
 // Cache the result across all tests (single Puppeteer launch)
 let cachedResult = null;

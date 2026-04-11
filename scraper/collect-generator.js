@@ -146,6 +146,10 @@ function normalizeKeyMods(params) {
     return params.keyMods;
   }
   if (params.keyModConstants && Array.isArray(params.keyModConstants)) {
+    if (params.keyModConstants.length === 4) {
+      return params.keyModConstants.slice();
+    }
+    // Legacy 2-element: best effort mapping to indices [1] and [3]
     return [0, params.keyModConstants[0], 0, params.keyModConstants[1]];
   }
   return [0, 0, 0, 0];

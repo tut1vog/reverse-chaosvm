@@ -77,9 +77,14 @@ class TemplateCache {
     });
     // Ensure both keyMods and keyModConstants are present for compatibility
     if (entry.keyMods && !entry.keyModConstants) {
-      entry.keyModConstants = [entry.keyMods[1], entry.keyMods[3]];
+      entry.keyModConstants = entry.keyMods.slice();  // full 4-element copy
     } else if (entry.keyModConstants && !entry.keyMods) {
-      entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];
+      if (entry.keyModConstants.length === 4) {
+        entry.keyMods = entry.keyModConstants.slice();
+      } else {
+        // Legacy 2-element: can't recover lost indices, best effort
+        entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];
+      }
     }
     this._cache[tdcName] = entry;
     this.save();
@@ -135,7 +140,12 @@ class TemplateCache {
         if (config.xteaParams.keyMods) {
           cacheEntry.keyMods = config.xteaParams.keyMods;
         } else if (config.xteaParams.keyModConstants) {
-          cacheEntry.keyMods = [0, config.xteaParams.keyModConstants[0], 0, config.xteaParams.keyModConstants[1]];
+          if (config.xteaParams.keyModConstants.length === 4) {
+            cacheEntry.keyMods = config.xteaParams.keyModConstants.slice();
+          } else {
+            // Legacy 2-element: best effort
+            cacheEntry.keyMods = [0, config.xteaParams.keyModConstants[0], 0, config.xteaParams.keyModConstants[1]];
+          }
         }
       }
       // Add cdFieldOrder from config if available
@@ -174,7 +184,12 @@ class TemplateCache {
    */
   static _normalizeEntry(entry) {
     if (!entry.keyMods && entry.keyModConstants) {
-      entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];
+      if (entry.keyModConstants.length === 4) {
+        entry.keyMods = entry.keyModConstants.slice();
+      } else {
+        // Legacy 2-element: can't recover lost indices, best effort
+        entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];
+      }
     }
     return entry;
   }

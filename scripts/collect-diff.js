@@ -304,8 +304,12 @@ async function runOnce(opts, projectRoot) {
     keyMods = cached.keyMods;
     console.log(`  Using keyMods from cache: [${keyMods.join(', ')}]`);
   } else if (keyResult.keyModConstants) {
-    // Default mapping: keyModConstants[0] → idx 1, keyModConstants[1] → idx 3
-    keyMods = [0, keyResult.keyModConstants[0] || 0, 0, keyResult.keyModConstants[1] || 0];
+    // Support both 4-element (new) and 2-element (legacy) keyModConstants
+    if (keyResult.keyModConstants.length === 4) {
+      keyMods = keyResult.keyModConstants.slice();
+    } else {
+      keyMods = [0, keyResult.keyModConstants[0] || 0, 0, keyResult.keyModConstants[1] || 0];
+    }
     console.log(`  Derived keyMods from pipeline: [${keyMods.join(', ')}]`);
   } else {
     keyMods = [0, 0, 0, 0];

@@ -66,23 +66,21 @@ function cipherRoundParam(r9, key, delta, rounds, keyModConstants) {
   let v1 = r9[1];
   let sum = 0;
   const targetSum = rounds * delta;
-  const keyMod1 = keyModConstants[0];
-  const keyMod3 = keyModConstants[1];
+  // Support both 4-element (new) and 2-element (legacy) keyModConstants
+  const kmc = keyModConstants.length === 4
+    ? keyModConstants
+    : [0, keyModConstants[0], 0, keyModConstants[1]];
 
   while (sum !== targetSum) {
     const idx0 = sum & 3;
-    let k0 = key[idx0];
-    if (idx0 === 1) k0 += keyMod1;
-    else if (idx0 === 3) k0 += keyMod3;
+    let k0 = key[idx0] + kmc[idx0];
 
     v0 += (((v1 << 4) ^ (v1 >>> 5)) + v1) ^ (sum + k0);
 
     sum += delta;
 
     const idx1 = (sum >>> 11) & 3;
-    let k1 = key[idx1];
-    if (idx1 === 1) k1 += keyMod1;
-    else if (idx1 === 3) k1 += keyMod3;
+    let k1 = key[idx1] + kmc[idx1];
 
     v1 += (((v0 << 4) ^ (v0 >>> 5)) + v0) ^ (sum + k1);
   }
@@ -125,8 +123,10 @@ function encryptParam(inputBytes, keyParams) {
 function decryptParam(inputBytes, keyParams) {
   let output = '';
   const targetSum = keyParams.rounds * keyParams.delta;
-  const keyMod1 = keyParams.keyModConstants[0];
-  const keyMod3 = keyParams.keyModConstants[1];
+  // Support both 4-element (new) and 2-element (legacy) keyModConstants
+  const kmc = keyParams.keyModConstants.length === 4
+    ? keyParams.keyModConstants
+    : [0, keyParams.keyModConstants[0], 0, keyParams.keyModConstants[1]];
 
   for (let pos = 0; pos < inputBytes.length; pos += 8) {
     const slice1 = inputBytes.slice(pos, pos + 4);
@@ -138,17 +138,13 @@ function decryptParam(inputBytes, keyParams) {
 
     while (sum !== 0) {
       const idx1 = (sum >>> 11) & 3;
-      let k1 = keyParams.key[idx1];
-      if (idx1 === 1) k1 += keyMod1;
-      else if (idx1 === 3) k1 += keyMod3;
+      const k1 = keyParams.key[idx1] + kmc[idx1];
       v1 -= (((v0 << 4) ^ (v0 >>> 5)) + v0) ^ (sum + k1);
 
       sum -= keyParams.delta;
 
       const idx0 = sum & 3;
-      let k0 = keyParams.key[idx0];
-      if (idx0 === 1) k0 += keyMod1;
-      else if (idx0 === 3) k0 += keyMod3;
+      const k0 = keyParams.key[idx0] + kmc[idx0];
       v0 -= (((v1 << 4) ^ (v1 >>> 5)) + v1) ^ (sum + k0);
     }
 
