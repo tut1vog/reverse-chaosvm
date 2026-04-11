@@ -28,8 +28,8 @@ puppeteer.use(StealthPlugin());
 
 const { CaptchaClient } = require('../puppeteer/captcha-client');
 const { solveSlider } = require('../puppeteer/slide-solver');
-const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray } = require('../scraper/collect-generator');
-const { buildSdString } = require('../token/outer-pipeline');
+const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray, buildSerializationOverrides } = require('../scraper/collect-generator');
+const { buildSdString, buildCdString } = require('../token/outer-pipeline');
 const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const { parseVmFunction } = require('../pipeline/vm-parser');
 const { mapOpcodes } = require('../pipeline/opcode-mapper');
@@ -737,6 +737,114 @@ async function solve(opts) {
         log('  No Chrome collect to analyze (will use defaults)');
       }
 
+      // ── Step 6b: Pre-encryption cd string comparison ──
+      let cdStringComparison = null;
+      if (strippedCd && chromeCollect) {
+        log('Step 6b: Pre-encryption cd string comparison...');
+        try {
+          // Build OUR cd string the same way generateCollect does
+          const serOverrides = buildSerializationOverrides(serializationDiffs);
+          const ourCdString = buildCdString(strippedCd, serOverrides);
+
+          // Extract Chrome's RAW cd string from the full decrypted plaintext
+          const fullDecrypt = decryptCollect(chromeCollect, xteaParams);
+          const chromePlaintext = fullDecrypt.plaintext;
+
+          // The plaintext is the concatenation of all decrypted segments.
+          // The cd portion starts with '{"cd":[' and we need to find where it ends.
+          // The sd portion follows, starting with '"sd":{' (the leading '{' was stripped
+          // by buildSdString, so the boundary is '}' followed by '"sd":').
+          // Look for the boundary: '}"sd":' or ']}"sd":' in the plaintext.
+          let chromeCdString = '';
+          const sdBoundary = chromePlaintext.indexOf('}"sd":');
+          if (sdBoundary >= 0) {
+            // cd string goes up to and including the '}' before '"sd":'
+            chromeCdString = chromePlaintext.substring(0, sdBoundary + 1);
+          } else {
+            // Fallback: try to find just the cd portion by looking for '{"cd":['
+            const cdStart = chromePlaintext.indexOf('{"cd":[');
+            if (cdStart >= 0) {
+              // Find the matching ']}' ending
+              const cdEnd = chromePlaintext.lastIndexOf(']}');
+              if (cdEnd >= 0) {
+                chromeCdString = chromePlaintext.substring(cdStart, cdEnd + 2);
+              } else {
+                chromeCdString = chromePlaintext;
+              }
+            } else {
+              log('  WARNING: Could not find cd portion in Chrome plaintext');
+              chromeCdString = chromePlaintext;
+            }
+          }
+
+          log(`  Our cd string length:    ${ourCdString.length}`);
+          log(`  Chrome cd string length: ${chromeCdString.length}`);
+          log(`  Length diff: ${ourCdString.length - chromeCdString.length} chars`);
+
+          // Char-by-char diff
+          const cdDiff = diffPlaintext(ourCdString, chromeCdString);
+
+          if (cdDiff.firstDivergence >= 0) {
+            log(`  First divergence at char ${cdDiff.firstDivergence}:`);
+            log(`    Ours:   ...${cdDiff.aContext}...`);
+            log(`    Chrome: ...${cdDiff.bContext}...`);
+
+            // Identify which cd field the divergence falls in
+            const ourField = identifyCdField(ourCdString, cdDiff.firstDivergence);
+            const chromeFieldInfo = identifyCdField(chromeCdString, cdDiff.firstDivergence);
+
+            if (ourField) {
+              log(`    Our field[${ourField.fieldIndex}]: ${ourField.fieldContent.substring(0, 120)}`);
+            }
+            if (chromeFieldInfo) {
+              log(`    Chrome field[${chromeFieldInfo.fieldIndex}]: ${chromeFieldInfo.fieldContent.substring(0, 120)}`);
+            }
+
+            // Show surrounding fields for deeper context
+            if (ourField || chromeFieldInfo) {
+              const fieldIdx = (ourField || chromeFieldInfo).fieldIndex;
+              log(`  Detailed field comparison around divergence (field ${fieldIdx}):`);
+
+              // Parse both cd arrays for field-by-field comparison
+              const ourParsed = JSON.parse(ourCdString);
+              const chromeParsed = JSON.parse(chromeCdString);
+              const ourArr = ourParsed.cd || [];
+              const chromeArr = chromeParsed.cd || [];
+
+              // Compare fields around the divergence point
+              const startField = Math.max(0, fieldIdx - 2);
+              const endField = Math.min(Math.max(ourArr.length, chromeArr.length), fieldIdx + 5);
+              for (let fi = startField; fi < endField; fi++) {
+                const ourVal = fi < ourArr.length ? JSON.stringify(ourArr[fi]) : '<missing>';
+                const chromeVal = fi < chromeArr.length ? JSON.stringify(chromeArr[fi]) : '<missing>';
+                const marker = ourVal !== chromeVal ? ' <<<DIFF' : '';
+                log(`    [${fi}] our=${ourVal.substring(0, 80)} | chrome=${chromeVal.substring(0, 80)}${marker}`);
+              }
+            }
+          } else {
+            log(`  cd strings are IDENTICAL`);
+          }
+
+          // Also log first 200 chars of each for visual inspection
+          log(`  Our cd (first 200):    ${ourCdString.substring(0, 200)}`);
+          log(`  Chrome cd (first 200): ${chromeCdString.substring(0, 200)}`);
+
+          cdStringComparison = {
+            ourLength: ourCdString.length,
+            chromeLength: chromeCdString.length,
+            lengthDiff: ourCdString.length - chromeCdString.length,
+            firstDivergence: cdDiff.firstDivergence,
+            ourContext: cdDiff.aContext,
+            chromeContext: cdDiff.bContext,
+            ourFieldIndex: identifyCdField(ourCdString, cdDiff.firstDivergence)?.fieldIndex ?? null,
+            chromeFieldIndex: identifyCdField(chromeCdString, cdDiff.firstDivergence)?.fieldIndex ?? null,
+          };
+        } catch (cdCompErr) {
+          log(`  cd string comparison FAILED: ${cdCompErr.message}`);
+          cdStringComparison = { error: cdCompErr.message };
+        }
+      }
+
       // ── Step 7: Solve slider via OpenCV ──
       log('Step 7: Solve slider via OpenCV...');
       const rawOffset = await solveSlider(interceptedImages.bg, interceptedImages.slice);
@@ -1136,6 +1244,7 @@ async function solve(opts) {
         chromeCollectLength: chromeCollect ? chromeCollect.length : null,
         collectSizeDiff: chromeCollect ? collectVal.length - chromeCollect.length : null,
         segmentComparison: segmentComparison,
+        cdStringComparison: cdStringComparison,
         usedCdArrayOverride: !!strippedCd,
         vDataLength: vData.length,
         httpStatus: verifyResult.status,
