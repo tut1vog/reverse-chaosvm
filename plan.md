@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 33
-Current task: 33.2 — Tests for survey script
+Current task: 33.3 — Run survey and analyze results
 
 ---
 
@@ -45,37 +45,25 @@ Current task: 33.2 — Tests for survey script
 | ID | Task | Status |
 |----|------|--------|
 | 33.1 | Create tdc.js survey script | done |
-| 33.2 | Tests for survey script | pending |
+| 33.2 | Tests for survey script | done |
 | 33.3 | Run survey and analyze results | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 33.2
-**Title**: Tests for survey script
+**ID**: 33.3
+**Title**: Run survey and analyze results
 **Phase**: TDC Survey — Collect Live Template Data
 **Status**: in-progress
 
 ### Goal
-Write unit tests for `scripts/tdc-survey.js` — verify CLI arg parsing, the `autoPort` function, `buildPostFields` construction, summary/report generation logic.
-
-### Context
-- `scripts/tdc-survey.js` — the script to test (539 lines)
-- Key functions: `parseArgs()` (line 38), `autoPort()` (line 94), `buildPostFields()` (line 135), `main()` (line 190)
-- Functions are module-local (not exported), so tests may need to either: (a) add a `module.exports` block guarded by `require.main !== module`, or (b) test by spawning the script as a subprocess with mocked HTTP.
-- Existing test pattern: `tests/test-*.js` using Node.js built-in `node:test` + `node:assert`
-
-### Implementation Steps
-1. Create `tests/test-tdc-survey.js`
-2. Export testable functions from `tdc-survey.js` when not run as main
-3. Test: parseArgs with various flag combinations
-4. Test: buildPostFields produces correct field structure
-5. Test: report JSON structure validation
+Run `node scripts/tdc-survey.js --attempts 30 --verbose --save-sources` and analyze the results. This is a manual/interactive task — the director runs the survey and interprets the output.
 
 ### Verification
-- [ ] `node --test tests/test-tdc-survey.js` passes
-- [ ] `npm test` — no regressions
+- [ ] Survey completes without fatal errors
+- [ ] Report saved to `output/tdc-survey/report.json`
+- [ ] Summary table reviewed and findings documented
 
 ### Suggested Agent
-general-purpose
+none (director runs this directly)
