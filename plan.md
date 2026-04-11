@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 33
-Current task: 33.3 — Run survey and analyze results
+Current phase: Phase 33 (complete)
+Current task: none — awaiting direction
 
 ---
 
@@ -46,24 +46,35 @@ Current task: 33.3 — Run survey and analyze results
 |----|------|--------|
 | 33.1 | Create tdc.js survey script | done |
 | 33.2 | Tests for survey script | done |
-| 33.3 | Run survey and analyze results | pending |
+| 33.3 | Run survey and analyze results | done |
 
 ---
 
-## Current Task
+## Survey Results (Phase 33)
 
-**ID**: 33.3
-**Title**: Run survey and analyze results
-**Phase**: TDC Survey — Collect Live Template Data
-**Status**: in-progress
+30 attempts → **10 unique builds** observed.
 
-### Goal
-Run `node scripts/tdc-survey.js --attempts 30 --verbose --save-sources` and analyze the results. This is a manual/interactive task — the director runs the survey and interprets the output.
+| Hash | Opcodes | Template | Size | Port | Solves | errorCodes |
+|------|---------|----------|------|------|--------|------------|
+| e6a45ba64d246f82 | 98 | unknown | 129K | OK | 4 | -1,-1,err:verify,12 |
+| 79dd6b418d0a7406 | 94 | B | 131K | OK | 3 | 12,12,9 |
+| 3e77d1890dff73ab | 98 | unknown | 147K | OK | 2 | -1,12 |
+| 83d7be69627c3d9e | 95 | A | 133K | OK | 4 | 12,-1,-1,12 |
+| 27dda893f81dbc4f | ? | ? | 202K | FAIL:vm-parse | 4 | - |
+| 3429444f324c6110 | ? | ? | 199K | FAIL:vm-parse | 3 | - |
+| 5cc91a7dbcc64cdb | 94 | B | 132K | OK | 4 | 12,12,12,12 |
+| e5341ccb12b78e65 | 96 | unknown | 144K | OK | 2 | 12,12 |
+| 0e2b306a1f0e24b6 | 94 | B | 131K | OK | 2 | 12,12 |
+| e2170903e201e018 | ? | ? | 162K | FAIL:vm-parse | 2 | - |
 
-### Verification
-- [ ] Survey completes without fatal errors
-- [ ] Report saved to `output/tdc-survey/report.json`
-- [ ] Summary table reviewed and findings documented
+**Key findings**:
+- **7/10 builds port successfully** (vm-parser + pipeline OK)
+- **3/10 builds fail vm-parse** ("Could not identify thisCtx variable") — all are large (162K-202K), likely a new VM architecture
+- **errorCode -1 (success) achieved** on 3 distinct builds (e6a45ba6, 3e77d189, 83d7be69)
+- **errorCode 12 dominates** — even ported builds frequently get 12 (token rejected)
+- **errorCode 9** seen once (wrong slider answer)
+- Template classification: 1× A (95 ops), 3× B (94 ops), 3× "unknown" (96/98 ops), 3× unparseable
 
-### Suggested Agent
-none (director runs this directly)
+**Next priorities**:
+1. Fix vm-parser to handle the large 162K-202K builds (new VM architecture)
+2. Investigate why errorCode 12 is inconsistent (same build sometimes -1, sometimes 12)
