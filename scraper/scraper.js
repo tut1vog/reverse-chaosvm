@@ -23,7 +23,6 @@ const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./c
 const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
-const { parseVmFunction } = require('../pipeline/vm-parser');
 const { execFile } = require('child_process');
 const os = require('os');
 
@@ -408,24 +407,7 @@ class Scraper {
 
         let cached = this._templateCache.lookup(sourceHash);
         if (!cached) {
-          // Source hash not in cache — fall back to structural matching
-          // by running the VM parser to identify template by opcode count
-          this._log(`  Source hash not in cache, running structural lookup...`);
-          try {
-            const vmInfo = parseVmFunction(tdcSource);
-            this._log(`  Parsed VM: ${vmInfo.caseCount} opcodes`);
-            cached = this._templateCache.lookupByStructure(vmInfo.caseCount);
-            if (cached) {
-              // Cache this source hash for faster future lookups
-              this._templateCache.store(sourceHash, cached);
-              this._log(`  Matched template ${cached.template} by structure (${vmInfo.caseCount} opcodes)`);
-            }
-          } catch (parseErr) {
-            this._log(`  VM parse failed: ${parseErr.message}`);
-          }
-        }
-        if (!cached) {
-          this._log('  No structural match — attempting auto-port via pipeline...');
+          this._log('  Source hash not in cache — attempting auto-port via pipeline...');
           cached = await this._autoPort(sourceHash, tdcSource);
         }
         if (!cached) {

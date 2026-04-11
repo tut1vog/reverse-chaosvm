@@ -469,31 +469,26 @@ describe('solveCaptcha template resolution chain', () => {
   });
 
   /**
-   * Simulate the template resolution chain from solveCaptcha() lines 407-431.
+   * Simulate the template resolution chain from solveCaptcha().
    * This avoids calling the full HTTP-dependent solveCaptcha() method while
-   * exercising the exact same lookup → structural → auto-port → throw logic.
+   * exercising the exact same lookup → auto-port → throw logic.
+   * (Structural lookup was removed — each build has unique XTEA keys.)
    */
-  async function resolveTemplate(scraper, tdcName, tdcSource, caseCount) {
-    let cached = scraper._templateCache.lookup(tdcName);
+  async function resolveTemplate(scraper, sourceHash, tdcSource) {
+    let cached = scraper._templateCache.lookup(sourceHash);
     if (!cached) {
-      cached = scraper._templateCache.lookupByStructure(caseCount);
-      if (cached) {
-        scraper._templateCache.store(tdcName, cached);
-      }
+      cached = await scraper._autoPort(sourceHash, tdcSource);
     }
     if (!cached) {
-      cached = await scraper._autoPort(tdcName, tdcSource);
-    }
-    if (!cached) {
-      throw new Error(`Unknown template ${tdcName}, auto-port failed`);
+      throw new Error(`Unknown template (hash=${sourceHash}), auto-port failed`);
     }
     return cached;
   }
 
   // -----------------------------------------------------------------------
-  // 14. Cache hit by name skips structural lookup and auto-port
+  // 14. Cache hit by hash skips auto-port
   // -----------------------------------------------------------------------
-  it('returns cached entry by name without calling _autoPort', async () => {
+  it('returns cached entry by hash without calling _autoPort', async () => {
     const tdcName = uniqueTdcName();
     currentName = tdcName;
 
@@ -515,10 +510,10 @@ describe('solveCaptcha template resolution chain', () => {
 
     // Override _autoPort to throw — it must NOT be called
     scraper._autoPort = async () => {
-      throw new Error('_autoPort should not be called when cache hits by name');
+      throw new Error('_autoPort should not be called when cache hits');
     };
 
-    const result = await resolveTemplate(scraper, tdcName, 'irrelevant source', 999);
+    const result = await resolveTemplate(scraper, tdcName, 'irrelevant source');
 
     assert.ok(result, 'should return the cached entry');
     assert.strictEqual(result.template, 'CachedTemplate');
@@ -527,51 +522,9 @@ describe('solveCaptcha template resolution chain', () => {
   });
 
   // -----------------------------------------------------------------------
-  // 15. Structural match skips auto-port
+  // 15. Auto-port called when cache misses, result cached
   // -----------------------------------------------------------------------
-  it('finds entry by structure when name lookup misses, without calling _autoPort', async () => {
-    const tdcName = uniqueTdcName();
-    const otherName = uniqueTdcName();
-    currentName = tdcName;
-
-    const { scraper } = setupScraper((cmd, args, opts, cb) => {
-      cb(null, '', '');
-    });
-
-    // Store an entry under a different name but with a known caseCount
-    const entry = {
-      template: 'StructuralMatch',
-      key: [0xAA, 0xBB, 0xCC, 0xDD],
-      delta: 0x9E3779B9,
-      rounds: 32,
-      keyModConstants: [50, 60],
-      keyMods: [0, 50, 0, 60],
-      caseCount: 94,
-    };
-    scraper._templateCache.store(otherName, entry);
-
-    // Override _autoPort to throw — structural match should prevent it
-    scraper._autoPort = async () => {
-      throw new Error('_autoPort should not be called when structural match succeeds');
-    };
-
-    // tdcName is NOT in cache, but caseCount 94 matches the stored entry
-    const result = await resolveTemplate(scraper, tdcName, 'irrelevant source', 94);
-
-    assert.ok(result, 'should return the structurally matched entry');
-    assert.strictEqual(result.template, 'StructuralMatch');
-    assert.deepStrictEqual(result.key, [0xAA, 0xBB, 0xCC, 0xDD]);
-
-    // Verify the structural match was also cached under the new tdcName
-    const reLookup = scraper._templateCache.lookup(tdcName);
-    assert.ok(reLookup, 'structural match should be stored under the new tdcName');
-    assert.strictEqual(reLookup.template, 'StructuralMatch');
-  });
-
-  // -----------------------------------------------------------------------
-  // 16. Auto-port called and succeeds when both lookups miss
-  // -----------------------------------------------------------------------
-  it('calls _autoPort when both name and structural lookups miss, caches result', async () => {
+  it('calls _autoPort when cache misses, caches result', async () => {
     const tdcName = uniqueTdcName();
     currentName = tdcName;
     const config = fullConfig();
@@ -582,8 +535,8 @@ describe('solveCaptcha template resolution chain', () => {
 
     writePipelineConfig(tdcName, config);
 
-    // Empty cache — no name match, no structural match (caseCount 999 matches nothing)
-    const result = await resolveTemplate(scraper, tdcName, 'auto-port source', 999);
+    // Empty cache → auto-port should fire
+    const result = await resolveTemplate(scraper, tdcName, 'auto-port source');
 
     assert.ok(result, 'should return the auto-ported entry');
     assert.strictEqual(result.template, 'X');
@@ -597,9 +550,9 @@ describe('solveCaptcha template resolution chain', () => {
   });
 
   // -----------------------------------------------------------------------
-  // 17. Throws with "auto-port failed" when everything misses
+  // 16. Throws with "auto-port failed" when cache misses and auto-port fails
   // -----------------------------------------------------------------------
-  it('throws with "auto-port failed" when all lookups and auto-port return null', async () => {
+  it('throws with "auto-port failed" when cache misses and auto-port returns null', async () => {
     const tdcName = uniqueTdcName();
     currentName = tdcName;
 
@@ -608,18 +561,13 @@ describe('solveCaptcha template resolution chain', () => {
       cb(new Error('pipeline crashed'));
     });
 
-    // Empty cache, no structural match, auto-port returns null
     await assert.rejects(
-      () => resolveTemplate(scraper, tdcName, 'doomed source', 999),
+      () => resolveTemplate(scraper, tdcName, 'doomed source'),
       (err) => {
         assert.ok(err instanceof Error);
         assert.ok(
           err.message.includes('auto-port failed'),
           `Error message should contain "auto-port failed", got: "${err.message}"`
-        );
-        assert.ok(
-          err.message.includes(tdcName),
-          `Error message should contain the tdcName "${tdcName}", got: "${err.message}"`
         );
         return true;
       }
@@ -627,9 +575,9 @@ describe('solveCaptcha template resolution chain', () => {
   });
 
   // -----------------------------------------------------------------------
-  // 18. Resolution chain order: name → structure → auto-port
+  // 17. Resolution chain order: lookup → auto-port
   // -----------------------------------------------------------------------
-  it('follows the correct resolution order: name → structure → auto-port', async () => {
+  it('follows the correct resolution order: lookup → auto-port', async () => {
     const tdcName = uniqueTdcName();
     currentName = tdcName;
     const config = fullConfig();
@@ -642,17 +590,11 @@ describe('solveCaptcha template resolution chain', () => {
 
     const callOrder = [];
 
-    // Wrap cache methods and _autoPort to track call order
+    // Wrap cache lookup and _autoPort to track call order
     const origLookup = scraper._templateCache.lookup.bind(scraper._templateCache);
     scraper._templateCache.lookup = function (name) {
       callOrder.push('lookup');
       return origLookup(name);
-    };
-
-    const origStructural = scraper._templateCache.lookupByStructure.bind(scraper._templateCache);
-    scraper._templateCache.lookupByStructure = function (count) {
-      callOrder.push('lookupByStructure');
-      return origStructural(count);
     };
 
     const origAutoPort = scraper._autoPort.bind(scraper);
@@ -661,12 +603,12 @@ describe('solveCaptcha template resolution chain', () => {
       return origAutoPort(name, source);
     };
 
-    // Empty cache, no structural match → all three steps should fire
-    await resolveTemplate(scraper, tdcName, 'order test source', 999);
+    // Empty cache → lookup miss → auto-port
+    await resolveTemplate(scraper, tdcName, 'order test source');
 
-    // _autoPort internally calls store() then lookup() on the cache (line 154-156
-    // of scraper.js), so the final 'lookup' is from inside _autoPort, not the chain.
-    assert.deepStrictEqual(callOrder, ['lookup', 'lookupByStructure', 'autoPort', 'lookup'],
-      'resolution chain should call lookup, then lookupByStructure, then _autoPort (which internally calls lookup)');
+    // _autoPort internally calls store() then lookup(), so the final 'lookup'
+    // is from inside _autoPort, not the chain.
+    assert.deepStrictEqual(callOrder, ['lookup', 'autoPort', 'lookup'],
+      'resolution chain should call lookup, then _autoPort (which internally calls lookup)');
   });
 });
