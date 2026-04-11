@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 34
-Current task: 34.2 — Tests for vm-parser obfuscation fixes
+Current task: 34.3 — Re-run survey to verify all builds port
 
 ---
 
@@ -84,7 +84,7 @@ Current task: 34.2 — Tests for vm-parser obfuscation fixes
 | ID | Task | Status |
 |----|------|--------|
 | 34.1 | Fix extractThisCtx and extractCatchVars for obfuscated builds | done |
-| 34.2 | Tests for vm-parser obfuscation fixes | pending |
+| 34.2 | Tests for vm-parser obfuscation fixes | done |
 | 34.3 | Re-run survey to verify all builds port | pending |
 
 ---
@@ -97,26 +97,14 @@ Current task: 34.2 — Tests for vm-parser obfuscation fixes
 **Status**: in-progress
 
 ### Goal
-Write tests covering the vm-parser obfuscation fixes (bracket-notation .call() and fallback catchStack detection).
-
-### Context
-- `pipeline/vm-parser.js` — fixed to handle bracket notation `.call()` and obfuscated `.pop()` via pc-assignment heuristic
-- 3 obfuscated builds saved at: `output/tdc-survey/27dda893f81dbc4f.js`, `output/tdc-survey/3429444f324c6110.js`, `output/tdc-survey/e2170903e201e018.js`
-- Existing vm-parser tests: `tests/test-vm-parser.js`
-- Tests should verify that `parseVmFunction` succeeds on obfuscated builds and returns all 6 variables
-
-### Implementation Steps
-1. Read existing `tests/test-vm-parser.js` to understand the test structure
-2. Add new tests that parse the 3 obfuscated survey builds
-3. Verify all 6 variables are extracted (bytecode, pc, regs, thisCtx, catchStack, excVal)
-4. Verify caseCount is correct (103, 91, 93)
+Re-run survey to confirm all 10 builds now port successfully (vm-parser fixed). Director runs directly.
 
 ### Verification
-- [ ] `node --test tests/test-vm-parser.js` passes
-- [ ] `npm test` — no regressions
+- [ ] Survey completes, 0 FAIL:vm-parse builds
+- [ ] Report updated
 
 ### Suggested Agent
-general-purpose
+none (director runs directly)
 
 ### Suggested Agent
 general-purpose
