@@ -39,7 +39,7 @@ Current task: 28.3 — Fix ans computation in scraper pipeline
 | 28.2 | Live re-test with chrome-passthrough (manual POST still fails) | done (failed — but root cause now understood) |
 | 28.2.1 | Run captcha-solver.js with real drag | done (errorCode 0 — success!) |
 | 28.3 | Fix ans computation in scraper pipeline (X=rawOffset, Y=spt) | done |
-| 28.4 | Tests for ans computation | pending |
+| 28.4 | Tests for ans computation | done |
 | 28.4.1 | Fix captcha-solver.js CALIBRATION_OFFSET for non-drag scripts | pending |
 | 28.5 | Live test: scraper with corrected ans (no Puppeteer) | pending |
 | 28.6 | If TLS blocks verify: investigate workarounds | pending |
@@ -48,13 +48,13 @@ Current task: 28.3 — Fix ans computation in scraper pipeline
 
 ## Current Task
 
-**ID**: 28.4
-**Title**: Tests for ans computation
+**ID**: 28.5
+**Title**: Live test: scraper with corrected ans (no Puppeteer)
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
 **Status**: pending
 
 ### Goal
-Add tests verifying the corrected ans computation logic (X=rawOffset, Y=spt).
+Run the headless scraper (`scraper/cli.js`) live with the corrected ans computation to see if CAPTCHA passes without Puppeteer.
 
 ### Suggested Agent
-general-purpose
+Director runs this directly (interactive live test)
