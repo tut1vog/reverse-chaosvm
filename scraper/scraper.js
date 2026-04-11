@@ -419,6 +419,7 @@ class Scraper {
           cdFieldOrder: cached.cdFieldOrder || null,
           behavioralEvents: behavioralEvents,
           timestamp: now,
+          serializationDiffs: cached.serializationDiffs || null,
         });
         // Decode URI-encoded collect for the POST fields (captcha-client does this too)
         let collectVal = collectEncoded;

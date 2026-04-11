@@ -179,6 +179,34 @@ function createEncryptFn(params) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Serialization Overrides
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Convert serializationDiffs (from structure extractor) to the
+ * serializationOverrides format expected by buildCdString.
+ *
+ * Input format (from detectSerializationDiffs):
+ *   [{ index: 9, keys: ['timeZone', 'calendar'], ... }]
+ *
+ * Output format (for buildCdString):
+ *   { "9": ["timeZone", "calendar"] }
+ *
+ * @param {Array|null} serializationDiffs - Array of diff objects from structure extractor
+ * @returns {Object|null} Map of field index → allowed keys, or null if no overrides
+ */
+function buildSerializationOverrides(serializationDiffs) {
+  if (!serializationDiffs || !Array.isArray(serializationDiffs)) return null;
+  const overrides = {};
+  for (const diff of serializationDiffs) {
+    if (diff.keys && Array.isArray(diff.keys) && diff.keys.length > 0) {
+      overrides[String(diff.index)] = diff.keys;
+    }
+  }
+  return Object.keys(overrides).length > 0 ? overrides : null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // Behavioral Events Generator
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -355,8 +383,9 @@ function generateCollect(profile, xteaParams, options) {
     }
   }
 
-  // Step 2: Build cdString (hand-rolled JSON)
-  const cdString = buildCdString(cdArray);
+  // Step 2: Build cdString (hand-rolled JSON, with optional serialization overrides)
+  const serializationOverrides = buildSerializationOverrides(opts.serializationDiffs);
+  const cdString = buildCdString(cdArray, serializationOverrides);
 
   // Step 3: Build sdObject and sdString
   let sdObject;
@@ -408,6 +437,7 @@ module.exports = {
   normalizeKeyMods,
   reorderCdArray,
   generateFt,
+  buildSerializationOverrides,
 
   // Internals (for testing/injection)
   buildDefaultCdArray,

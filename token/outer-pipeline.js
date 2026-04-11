@@ -53,9 +53,12 @@ function buildSdString(sdObject) {
  *   - Entries are comma-separated
  *
  * @param {Array} collectorEntries - Array of 59 collector values (mixed types)
+ * @param {Object} [serializationOverrides] - Optional map of field index (string) to array
+ *   of key names. When present, object fields at those indices are serialized using only
+ *   the listed keys instead of full JSON.stringify.
  * @returns {string} The cd JSON string, e.g. '{"cd":[1,"linux",2,...]}'
  */
-function buildCdString(collectorEntries) {
+function buildCdString(collectorEntries, serializationOverrides) {
   // func_276 starts with '{"cd":[' and ends with ']}'
   let result = '{"cd":[';
 
@@ -81,8 +84,21 @@ function buildCdString(collectorEntries) {
       // Arrays → standard JSON notation
       result += JSON.stringify(entry);
     } else if (typeof entry === 'object') {
-      // Objects → standard JSON notation
-      result += JSON.stringify(entry);
+      // Objects → standard JSON notation (with optional key filtering)
+      if (serializationOverrides && serializationOverrides[String(i)]) {
+        const allowedKeys = serializationOverrides[String(i)];
+        if (Array.isArray(allowedKeys)) {
+          const filtered = {};
+          for (const k of allowedKeys) {
+            if (k in entry) filtered[k] = entry[k];
+          }
+          result += JSON.stringify(filtered);
+        } else {
+          result += JSON.stringify(entry);
+        }
+      } else {
+        result += JSON.stringify(entry);
+      }
     } else {
       // Fallback for unexpected types (boolean, undefined, etc.)
       /* UNCERTAIN: func_276 may handle these differently, but no such types
