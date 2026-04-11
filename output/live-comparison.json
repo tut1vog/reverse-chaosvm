@@ -17,7 +17,7 @@
         0,
         1644806
       ],
-      "chromeCollectLength": 4236,
+      "chromeCollectLength": 4240,
       "decryptionSuccess": true,
       "chromeCdFieldCount": 60,
       "headerSplit": {
@@ -25,34 +25,97 @@
         "contentLength": 144,
         "paddingLength": 0
       },
-      "standaloneCollectLength": 4074,
+      "standaloneCollectLength": 4076,
       "segmentComparison": {
         "headerMatch": true,
         "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: byte-boundary (content=144, padding=0)",
         "fieldCountMatch": false,
-        "fieldDiffs": null,
-        "totalFields": null
+        "fieldDiffs": 58,
+        "totalFields": 60,
+        "fieldDiffDetails": [
+          {
+            "index": 0,
+            "chrome": "",
+            "standalone": 1
+          },
+          {
+            "index": 1,
+            "chrome": 0,
+            "standalone": "windows"
+          },
+          {
+            "index": 2,
+            "chrome": "",
+            "standalone": 2
+          },
+          {
+            "index": 3,
+            "chrome": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+            "standalone": 800
+          },
+          {
+            "index": 4,
+            "chrome": 1775884264,
+            "standalone": "7448307515255877632"
+          },
+          {
+            "index": 5,
+            "chrome": 8,
+            "standalone": ""
+          },
+          {
+            "index": 6,
+            "chrome": {
+              "timeZone": "Asia/Shanghai",
+              "calendar": "gregory",
+              "numberingSystem": "latn",
+              "locale": "en-US"
+            },
+            "standalone": [
+              "en-US",
+              "en"
+            ]
+          },
+          {
+            "index": 7,
+            "chrome": 1,
+            "standalone": ""
+          },
+          {
+            "index": 8,
+            "chrome": 8955392,
+            "standalone": 8
+          },
+          {
+            "index": 9,
+            "chrome": "",
+            "standalone": [
+              1280,
+              1400
+            ]
+          }
+        ]
       },
       "error": null
     },
     {
-      "tdcName": "hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig",
-      "caseCount": 95,
-      "template": "A",
+      "tdcName": "MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn",
+      "caseCount": 98,
+      "template": "unknown-98",
       "keyExtracted": true,
       "key": [
-        "0x6a4f4b4d",
-        "0x4f3d3841",
-        "0x6c656741",
-        "0x47434743"
+        "0x693c303a",
+        "0x41445741",
+        "0x481f394c",
+        "0x4f475943"
       ],
       "keyMods": [
+        1579040,
         0,
-        1579012,
-        460551,
+        2829060,
         0
       ],
-      "chromeCollectLength": 4214,
+      "chromeCollectLength": 4188,
       "decryptionSuccess": true,
       "chromeCdFieldCount": 60,
       "headerSplit": {
@@ -60,16 +123,107 @@
         "contentLength": 144,
         "paddingLength": 0
       },
-      "standaloneCollectLength": 4118,
+      "standaloneCollectLength": 4156,
       "segmentComparison": {
-        "headerMatch": false,
-        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: field-boundary (content=143, padding=1)",
+        "headerMatch": true,
+        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: byte-boundary (content=144, padding=0)",
         "fieldCountMatch": false,
-        "fieldDiffs": null,
-        "totalFields": null
+        "fieldDiffs": 57,
+        "totalFields": 60,
+        "fieldDiffDetails": [
+          {
+            "index": 0,
+            "chrome": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+            "standalone": 1
+          },
+          {
+            "index": 1,
+            "chrome": "srgb",
+            "standalone": "windows"
+          },
+          {
+            "index": 2,
+            "chrome": "Linux x86_64",
+            "standalone": 2
+          },
+          {
+            "index": 3,
+            "chrome": "UTF-8",
+            "standalone": 800
+          },
+          {
+            "index": 4,
+            "chrome": "7448598508026916864",
+            "standalone": "7448307515255877632"
+          },
+          {
+            "index": 5,
+            "chrome": 1775884272,
+            "standalone": ""
+          },
+          {
+            "index": 6,
+            "chrome": [
+              {
+                "codec": "H.264",
+                "support": "probably"
+              },
+              {
+                "codec": "H.264 High",
+                "support": "probably"
+              },
+              {
+                "codec": "H.265/HEVC",
+                "support": ""
+              },
+              {
+                "codec": "VP8",
+                "support": "probably"
+              },
+              {
+                "codec": "VP9",
+                "support": "probably"
+              },
+              {
+                "codec": "AV1",
+                "support": "probably"
+              },
+              {
+                "codec": "Theora",
+                "support": ""
+              },
+              {
+                "codec": "MPEG-4",
+                "support": ""
+              }
+            ],
+            "standalone": [
+              "en-US",
+              "en"
+            ]
+          },
+          {
+            "index": 7,
+            "chrome": "unknown",
+            "standalone": ""
+          },
+          {
+            "index": 8,
+            "chrome": "",
+            "standalone": 8
+          },
+          {
+            "index": 9,
+            "chrome": 0,
+            "standalone": [
+              1280,
+              1400
+            ]
+          }
+        ]
       },
       "error": null
     }
   ],
-  "timestamp": "2026-04-11T04:57:51.350Z"
+  "timestamp": "2026-04-11T05:11:03.188Z"
 }

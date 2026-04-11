@@ -118,7 +118,35 @@ function decryptCollect(collectStr, params) {
     .replace(/%2F/g, '/')
     .replace(/%3D/g, '=');
 
-  const encrypted = Buffer.from(b64, 'base64').toString('binary');
+  // The token is 4 separately base64-encoded segments concatenated in order
+  // [1, 0, 2, 3] with fixed sizes: seg[1]=192, seg[0]=64, seg[2]=variable,
+  // seg[3]=120 base64 chars. Decoding the whole string as one base64 fails
+  // when intermediate segments have '=' padding, because Node's Buffer.from
+  // stops at the first padding. Split at known boundaries and decode each
+  // segment independently.
+  const HEADER_LEN = 192;  // segment[1]
+  const HASH_LEN = 64;     // segment[0]
+  const SIG_LEN = 120;     // segment[3]
+
+  let encrypted;
+  if (b64.length > HEADER_LEN + HASH_LEN + SIG_LEN) {
+    const seg1B64 = b64.substring(0, HEADER_LEN);
+    const seg0B64 = b64.substring(HEADER_LEN, HEADER_LEN + HASH_LEN);
+    const dataEnd = b64.length - SIG_LEN;
+    const seg2B64 = b64.substring(HEADER_LEN + HASH_LEN, dataEnd);
+    const seg3B64 = b64.substring(dataEnd);
+
+    encrypted = Buffer.concat([
+      Buffer.from(seg1B64, 'base64'),
+      Buffer.from(seg0B64, 'base64'),
+      Buffer.from(seg2B64, 'base64'),
+      Buffer.from(seg3B64, 'base64'),
+    ]).toString('binary');
+  } else {
+    // Fallback for short/unusual tokens
+    encrypted = Buffer.from(b64, 'base64').toString('binary');
+  }
+
   const decrypted = decryptXtea(encrypted, params);
   const plaintext = decrypted.replace(/[\0\s]+$/, '');
 
