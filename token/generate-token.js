@@ -94,7 +94,9 @@ function buildHashChunk(timestamp) {
  * @param {string} sdString - The sd string from buildSdString, e.g. '"sd":{...}}'
  * @param {number} [timestamp=Date.now()] - Timestamp for the hash chunk
  * @param {Object} [options] - Optional parameters
- * @param {number} [options.headerFieldCount] - Override HEADER_FIELD_COUNT (default 11)
+ * @param {Object} [options.headerSplit] - Header split strategy override
+ * @param {string} [options.headerSplit.strategy] - 'field-boundary' or 'byte-boundary'
+ * @param {number} [options.headerSplit.contentLength] - Content length before padding (field-boundary only)
  * @returns {string[]} Array of 4 binary strings [hash, header, cdBody, sig]
  */
 function buildInputChunks(cdString, sdString, timestamp, options) {
@@ -112,16 +114,27 @@ function buildInputChunks(cdString, sdString, timestamp, options) {
   //      {"cd":[...],"sd":{...}}
   const payloadBody = cdString.slice(0, -1) + ',';
 
-  // 3. Header chunk: first HEADER_SIZE (144) bytes of payload body.
-  //    Chrome's VM takes exactly 144 bytes of the payload body as the header,
-  //    regardless of field boundaries. If the payload is shorter than 144,
-  //    it's space-padded. No field-boundary splitting — the cut can fall
-  //    mid-field, mid-string, or mid-number.
-  const headerContent = payloadBody.substring(0, HEADER_SIZE);
+  // 3. Header chunk: split payload body into header and cdBody.
+  //    Default (byte-boundary): cut at position 144, no padding needed if content >= 144.
+  //    Field-boundary: cut at contentLength (e.g. 133), pad header to 144 with spaces.
+  //    When using field-boundary, the comma at the split point is duplicated:
+  //    header ends with ',' and cdBody also starts with ','.
+  let splitPos = HEADER_SIZE;
+  let duplicateComma = false;
+  if (options && options.headerSplit && options.headerSplit.strategy === 'field-boundary') {
+    splitPos = options.headerSplit.contentLength || HEADER_SIZE;
+    duplicateComma = true;
+  }
+
+  const headerContent = payloadBody.substring(0, splitPos);
   const header = headerContent.padEnd(HEADER_SIZE, ' ');
 
-  // 4. CD body chunk: remaining payload body, space-padded to 8-byte alignment
-  const cdContent = payloadBody.substring(HEADER_SIZE);
+  // 4. CD body chunk: remaining payload body, space-padded to 8-byte alignment.
+  //    For field-boundary: prepend ',' to duplicate the comma at the split point.
+  let cdContent = payloadBody.substring(splitPos);
+  if (duplicateComma && splitPos < payloadBody.length) {
+    cdContent = ',' + cdContent;
+  }
   let cdBody = '';
   if (cdContent.length > 0) {
     const paddedLen = Math.ceil(cdContent.length / 8) * 8;

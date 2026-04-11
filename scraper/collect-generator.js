@@ -408,8 +408,8 @@ function generateCollect(profile, xteaParams, options) {
   // Step 4: Build input chunks
   const timestamp = opts.timestamp || Date.now();
   const chunkOpts = {};
-  if (opts.headerFieldCount) {
-    chunkOpts.headerFieldCount = opts.headerFieldCount;
+  if (opts.headerSplit) {
+    chunkOpts.headerSplit = opts.headerSplit;
   }
   const chunks = buildInputChunks(cdString, sdString, timestamp, chunkOpts);
 

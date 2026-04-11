@@ -420,6 +420,7 @@ class Scraper {
           behavioralEvents: behavioralEvents,
           timestamp: now,
           serializationDiffs: cached.serializationDiffs || null,
+          headerSplit: cached.headerSplit || null,
         });
         // Decode URI-encoded collect for the POST fields (captcha-client does this too)
         let collectVal = collectEncoded;
