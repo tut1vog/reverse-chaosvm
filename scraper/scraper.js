@@ -423,7 +423,11 @@ class Scraper {
           }
         }
         if (!cached) {
-          throw new Error(`Unknown template ${tdcName}, run pipeline to port it`);
+          this._log('  No structural match — attempting auto-port via pipeline...');
+          cached = await this._autoPort(tdcName, tdcSource);
+        }
+        if (!cached) {
+          throw new Error(`Unknown template ${tdcName}, auto-port failed`);
         }
         this._log(`  Template: ${cached.template}, opcodes: ${cached.caseCount}`);
 
