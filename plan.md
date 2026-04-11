@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 22
-Current task: 22.3 — Tests for key extraction fixes
+Current phase: Phase 23
+Current task: 23.1 — Fix analyzeHeaderSplit for full-token decrypted plaintext
 
 ---
 
@@ -20,7 +20,7 @@ Current task: 22.3 — Tests for key extraction fixes
 |----|------|--------|
 | 22.1 | Diagnose key extraction failures on live templates | done |
 | 22.2 | Fix keyModConstants legacy format lossy serialization | done |
-| 22.3 | Tests for key extraction fixes | pending |
+| 22.3 | Tests for key extraction fixes | done |
 
 ### Phase 23: Header Split Strategy Application
 > `analyzeHeaderSplit()` returns "unknown" for live templates because full-token decryption scrambles segment boundaries. The extracted `headerSplit` is stored in cache but never applied in `buildInputChunks()`. Fix detection and wire the strategy through to token generation.
@@ -44,33 +44,30 @@ Current task: 22.3 — Tests for key extraction fixes
 
 ## Current Task
 
-**ID**: 22.3
-**Title**: Tests for key extraction fixes
-**Phase**: Reliable Key Extraction for Live Templates
+**ID**: 23.1
+**Title**: Fix analyzeHeaderSplit for full-token decrypted plaintext
+**Phase**: Header Split Strategy Application
 **Status**: pending
 
 ### Goal
-Add tests covering the keyModConstants ↔ keyMods round-trip for all key index combinations ([0,2], [0,3], [1,2], [1,3], [2,3]), ensuring no data loss. Also test legacy 2-element format backward compatibility.
+`analyzeHeaderSplit()` in `pipeline/structure-extractor.js` returns "unknown" for live templates because full-token decryption concatenates all segments (header + hash + cdBody + sig), making the cd/sd boundaries unclear. Fix the detection to correctly identify the header split point.
 
 ### Context
-- `scraper/template-cache.js` — `store()`, `seed()`, `_normalizeEntry()` all handle 4-element and legacy 2-element formats
-- `pipeline/key-extractor.js` — `analyzeTrace()` now outputs 4-element `keyModConstants`
-- `pipeline/token-verifier.js` — `cipherRoundParam()` and `decryptParam()` handle both formats
-- `scraper/collect-generator.js` — `normalizeKeyMods()` handles both formats
-- Existing tests: `tests/test-key-extractor.js`, `tests/test-scraper-foundation.js`
+- `pipeline/structure-extractor.js` — `analyzeHeaderSplit(chromePlaintext)` function
+- The header is always the first 144 bytes of the plaintext (padded with spaces to reach 144)
+- Template A uses field-boundary split at position 133 (cd[0..10]), padded to 144
+- Other templates may have different split points
+- History note: from 19.5+19.6 — the fix was HEADER_FIELD_COUNT=11, split at field boundary, pad with spaces, duplicate comma at split point
+- From 20.3+ — for live templates, header trimmed length IS 144 (no padding), only reference build pads
 
 ### Implementation Steps
-1. In `tests/test-scraper-foundation.js` or a new test file: add tests for `_normalizeEntry()` with:
-   - 4-element keyModConstants → keyMods preserved exactly
-   - 2-element legacy keyModConstants → maps to [0, v0, 0, v1]
-   - keyMods already present → not overwritten
-2. Add tests for `normalizeKeyMods()` in collect-generator with all index combinations
-3. Add tests for `store()` round-trip: store with keyMods at various indices, verify lookup preserves them
+1. Read current `analyzeHeaderSplit()` to understand why it fails
+2. Fix detection: the header is decrypted as a separate segment (first 192 base64 chars = 144 bytes). When given the full concatenated plaintext, the function should look at the first 144 chars and find the last complete cd field within that span
+3. Determine the strategy: if trailing spaces exist → "field-boundary" with padding; if no trailing spaces → "byte-boundary" at position 144
 
 ### Verification
-- [ ] `npm test` passes with new tests added (baseline + new, same 2 known failures)
-- [ ] Tests cover all 5 observed keyMod index patterns: [0,2], [0,3], [1,2], [1,3], [2,3]
-- [ ] Tests cover legacy 2-element backward compatibility
+- [ ] `analyzeHeaderSplit` returns a meaningful strategy (not "unknown") for test inputs
+- [ ] `npm test` passes (236 total, 2 known failures)
 
 ### Suggested Agent
 general-purpose
