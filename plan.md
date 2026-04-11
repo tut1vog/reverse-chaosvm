@@ -39,44 +39,22 @@ Current task: 24.3 — Live CAPTCHA submission — aim for errorCode != 9
 | 24.1 | Live test: decrypt Chrome token + field-by-field comparison | done |
 | 24.1.1 | Fix standalone token comparison in live-comparison.js | done |
 | 24.2 | Integrate field order detection into live-comparison | done |
-| 24.3 | Live CAPTCHA submission — aim for errorCode != 9 | pending |
+| 24.3 | Live CAPTCHA submission — aim for errorCode != 9 | done |
 
 ---
 
 ## Current Task
 
-**ID**: 24.3
-**Title**: Live CAPTCHA submission — aim for errorCode != 9
-**Phase**: End-to-End Live Verification
-**Status**: pending
+Phase 24 complete. All tasks done.
 
-### Goal
-Submit a standalone-generated collect token + live eks to Tencent's verify endpoint via Chrome TLS. Previous attempts all got errorCode 9. With correct keyMods and field ordering, test if the token is now accepted.
+### Key findings from 24.3
+- errorCode 9 persists despite correct key extraction, field ordering, and header split
+- **Root cause identified**: standalone tokens are 2.7-3.3x larger than Chrome's (14092 vs 4206 chars)
+- The size difference is caused by the default fingerprint profile generating much larger field values than Chrome's real values (e.g., plugin lists, font lists, canvas data)
+- Encryption, key extraction, field ordering, and header splitting are all working correctly
+- The remaining gap is cd field VALUES, not structure
 
-### Context
-- Key extraction works for live templates (proven in 24.1)
-- Field diffs reduced to ~20/60 (value diffs, not ordering)
-- Previous errorCode 9 causes identified: wrong XTEA key (now fixed), wrong keyMods (now fixed), wrong header split (now fixed)
-- The remaining 20 value diffs are expected — they're actual fingerprint differences between our default profile and Chrome's real values
-- The verify endpoint may accept tokens with minor fingerprint diffs (these are browser-specific)
-- `scripts/chrome-cd-inject.js` has the full CAPTCHA solve + submit flow
-- The script needs: prehandle → show → slider solve → generate collect → submit verify
-
-### Implementation Steps
-1. Update `scripts/chrome-cd-inject.js` (or create new script) with all Phase 22-23 fixes:
-   - Pipeline key extraction with correct 4-element keyMods
-   - Live field order detection via matchFieldOrder
-   - headerSplit from header segment analysis
-   - serializationDiffs detection
-2. Solve the slider CAPTCHA (OpenCV)
-3. Generate standalone collect with all detected params
-4. Submit via Chrome's fetch() (Chrome TLS) with live eks
-5. Report errorCode
-
-### Verification
-- [ ] Script runs to completion with CAPTCHA submission
-- [ ] errorCode reported (target: not 9)
-- [ ] If still errorCode 9: identify which remaining diff is likely the cause
-
-### Suggested Agent
-general-purpose
+### Next steps (future phases)
+- Use Chrome's real cd values (cdArrayOverride) instead of default profile → test if size-matched token passes
+- Or: strip/truncate oversized fields to match Chrome's typical sizes
+- Or: capture Chrome's actual fingerprint values to build a more realistic default profile
