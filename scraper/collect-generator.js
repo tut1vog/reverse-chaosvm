@@ -374,7 +374,11 @@ function generateCollect(profile, xteaParams, options) {
 
   // Step 4: Build input chunks
   const timestamp = opts.timestamp || Date.now();
-  const chunks = buildInputChunks(cdString, sdString, timestamp);
+  const chunkOpts = {};
+  if (opts.headerFieldCount) {
+    chunkOpts.headerFieldCount = opts.headerFieldCount;
+  }
+  const chunks = buildInputChunks(cdString, sdString, timestamp, chunkOpts);
 
   // Step 5: Encrypt with parameterized XTEA
   const encryptFn = createEncryptFn(xteaParams);

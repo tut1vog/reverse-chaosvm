@@ -592,7 +592,21 @@ async function solve(opts) {
       };
 
       if (capturedCd) {
-        collectOpts.cdArrayOverride = capturedCd;
+        // Strip hash chunk artifacts from Chrome's parsed cd array.
+        // When decrypted segments are concatenated, hash chunks appear as
+        // cd fields matching pattern [[4,-1,-1,<timestamp>,0,0,0,0]].
+        // These are inter-segment artifacts, not real cd fields.
+        const cleanCd = capturedCd.filter(field => {
+          if (!Array.isArray(field) || field.length !== 1) return true;
+          const inner = field[0];
+          if (!Array.isArray(inner) || inner.length !== 8) return true;
+          return !(inner[0] === 4 && inner[1] === -1 && inner[2] === -1 &&
+                   inner[4] === 0 && inner[5] === 0 && inner[6] === 0 && inner[7] === 0);
+        });
+        if (cleanCd.length !== capturedCd.length) {
+          log(`  Stripped ${capturedCd.length - cleanCd.length} hash artifact(s): ${capturedCd.length} → ${cleanCd.length} fields`);
+        }
+        collectOpts.cdArrayOverride = cleanCd;
         log('  Using Chrome cd array for collect generation');
       } else {
         collectOpts.cdFieldOrder = cached.cdFieldOrder || null;

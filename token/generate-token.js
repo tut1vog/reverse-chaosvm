@@ -93,9 +93,11 @@ function buildHashChunk(timestamp) {
  * @param {string} cdString - The cd JSON string from buildCdString, e.g. '{"cd":[...]}'
  * @param {string} sdString - The sd string from buildSdString, e.g. '"sd":{...}}'
  * @param {number} [timestamp=Date.now()] - Timestamp for the hash chunk
+ * @param {Object} [options] - Optional parameters
+ * @param {number} [options.headerFieldCount] - Override HEADER_FIELD_COUNT (default 11)
  * @returns {string[]} Array of 4 binary strings [hash, header, cdBody, sig]
  */
-function buildInputChunks(cdString, sdString, timestamp) {
+function buildInputChunks(cdString, sdString, timestamp, options) {
   if (typeof timestamp === 'undefined') {
     timestamp = Date.now();
   }
@@ -110,19 +112,19 @@ function buildInputChunks(cdString, sdString, timestamp) {
   //      {"cd":[...],"sd":{...}}
   const payloadBody = cdString.slice(0, -1) + ',';
 
-  // 3. Header chunk: payload body split after the first HEADER_FIELD_COUNT
-  //    cd array elements, space-padded to HEADER_SIZE.
-  //    Chrome's VM serializes the cd array and puts the first 11 fields
-  //    (indices 0-10) in the header, then pads with spaces to 144 bytes.
-  //    Fields 11+ go into the cdBody chunk.
-  //    We count top-level cd array commas (at depth 2 in the JSON) to find
-  //    the boundary after the 11th field.
+  // 3. Header chunk: payload body split after headerFieldCount cd array
+  //    elements, space-padded to HEADER_SIZE.
+  //    Chrome's VM serializes cd fields and puts the first N fields in the
+  //    header (N depends on the template). The comma after the Nth field
+  //    stays in the header AND is duplicated at the start of cdBody.
+  //    Default is HEADER_FIELD_COUNT (11) but can be overridden via options.
+  const headerFieldCount = (options && options.headerFieldCount) || HEADER_FIELD_COUNT;
   let splitPos = Math.min(payloadBody.length, HEADER_SIZE);
   if (payloadBody.length > HEADER_SIZE) {
     let fieldCount = 0;
     let depth = 0;
     let inStr = false;
-    for (let i = 0; i < payloadBody.length; i++) {
+    for (let i = 0; i < payloadBody.length && i < HEADER_SIZE; i++) {
       const ch = payloadBody[i];
       if (inStr) {
         if (ch === '\\') { i++; }
@@ -133,7 +135,7 @@ function buildInputChunks(cdString, sdString, timestamp) {
         else if (ch === ']' || ch === '}') { depth--; }
         else if (ch === ',' && depth === 2) {
           fieldCount++;
-          if (fieldCount === HEADER_FIELD_COUNT) {
+          if (fieldCount === headerFieldCount) {
             splitPos = i + 1;  // position AFTER the comma (comma stays in header)
             break;
           }
