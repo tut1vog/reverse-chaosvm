@@ -191,20 +191,20 @@ describe('TemplateCache seed() with structureParams', () => {
   });
 
   it('seed() picks up structureParams from pipeline-config.json', () => {
-    // The TDC_NAME for targets/tdc.js is already in the real cache,
+    // The source hash for targets/tdc.js is already in the real cache,
     // but our fresh temp cache is empty so seed() should populate it.
     cache.seed();
 
-    // Extract the TDC_NAME from targets/tdc.js so we know what key to look up
-    const { extractTdcName } = require('../scraper/tdc-utils');
+    // Compute the source hash from targets/tdc.js so we know what key to look up
+    const { computeSourceHash } = require('../scraper/tdc-utils');
     const tdcSource = fs.readFileSync(
       path.join(__dirname, '..', 'targets', 'tdc.js'),
       'utf8'
     );
-    const tdcName = extractTdcName(tdcSource);
-    assert.ok(tdcName, 'should extract TDC_NAME from targets/tdc.js');
+    const sourceHash = computeSourceHash(tdcSource);
+    assert.ok(sourceHash, 'should compute source hash from targets/tdc.js');
 
-    const entry = cache.lookup(tdcName);
+    const entry = cache.lookup(sourceHash);
     assert.notEqual(entry, null, 'seed() should create cache entry');
     assert.equal(entry.hashPosition, 11, 'hashPosition from structureParams');
     assert.ok(Array.isArray(entry.fieldOrder), 'fieldOrder is an array');
@@ -215,13 +215,13 @@ describe('TemplateCache seed() with structureParams', () => {
   });
 
   it('seed() sets cdFieldOrder from fieldOrder for backward compat', () => {
-    const { extractTdcName } = require('../scraper/tdc-utils');
+    const { computeSourceHash } = require('../scraper/tdc-utils');
     const tdcSource = fs.readFileSync(
       path.join(__dirname, '..', 'targets', 'tdc.js'),
       'utf8'
     );
-    const tdcName = extractTdcName(tdcSource);
-    const entry = cache.lookup(tdcName);
+    const sourceHash = computeSourceHash(tdcSource);
+    const entry = cache.lookup(sourceHash);
     assert.notEqual(entry, null);
     assert.deepEqual(
       entry.cdFieldOrder,

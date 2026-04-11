@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
+const { extractTdcName, extractEks, computeSourceHash } = require('../scraper/tdc-utils');
 const TemplateCache = require('../scraper/template-cache');
 const {
   generateCollect,
@@ -141,6 +141,49 @@ describe('tdc-utils: extractEks', () => {
 });
 
 // ============================================================================
+// 2b. tdc-utils: computeSourceHash
+// ============================================================================
+
+describe('tdc-utils: computeSourceHash', () => {
+  it('deterministic: same source produces same hash every time', () => {
+    const source = 'var x = 1; function foo() { return 42; }';
+    const hash1 = computeSourceHash(source);
+    const hash2 = computeSourceHash(source);
+    assert.strictEqual(hash1, hash2);
+  });
+
+  it('returns 16 hex chars', () => {
+    const hash = computeSourceHash('some source code');
+    assert.match(hash, /^[0-9a-f]{16}$/);
+  });
+
+  it('eks stripping (literal form): different eks values produce same hash', () => {
+    const src1 = 'code before; window.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef = \'base64dataAAAA\'; code after;';
+    const src2 = 'code before; window.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef = \'differentBase64\'; code after;';
+    assert.strictEqual(computeSourceHash(src1), computeSourceHash(src2));
+  });
+
+  it('eks stripping (variable form): different eks values produce same hash', () => {
+    const src1 = 'code before; window[TDC_NAME] = \'base64dataAAAA\'; code after;';
+    const src2 = 'code before; window[TDC_NAME] = \'differentBase64\'; code after;';
+    assert.strictEqual(computeSourceHash(src1), computeSourceHash(src2));
+  });
+
+  it('different VM code produces different hash', () => {
+    const src1 = 'function vm1() { return 1; }';
+    const src2 = 'function vm2() { return 2; }';
+    assert.notStrictEqual(computeSourceHash(src1), computeSourceHash(src2));
+  });
+
+  it('real target files produce stable hash', () => {
+    const hash1 = computeSourceHash(tdcSource);
+    const hash2 = computeSourceHash(tdcSource);
+    assert.strictEqual(hash1, hash2);
+    assert.match(hash1, /^[0-9a-f]{16}$/);
+  });
+});
+
+// ============================================================================
 // 3. template-cache: lookup
 // ============================================================================
 
@@ -148,25 +191,30 @@ describe('template-cache: lookup', () => {
   let cache;
   let tmpPath;
 
+  // Compute source hashes for each target (seed() now keys by source hash)
+  const HASH_A = computeSourceHash(tdcSource);
+  const HASH_B = computeSourceHash(tdcV2Source);
+  const HASH_C = computeSourceHash(tdcV5Source);
+
   // Seed a cache from pipeline-config files once
   it('loads pre-seeded cache and looks up Template A with correct key', () => {
     tmpPath = tmpCachePath();
     cache = new TemplateCache(tmpPath);
     cache.seed();
 
-    const entry = cache.lookup(TDC_NAMES.A);
+    const entry = cache.lookup(HASH_A);
     assert.ok(entry !== null, 'Template A entry should exist');
     assert.deepStrictEqual(entry.key, XTEA_A.key);
   });
 
   it('looks up Template B with correct key', () => {
-    const entry = cache.lookup(TDC_NAMES.B);
+    const entry = cache.lookup(HASH_B);
     assert.ok(entry !== null, 'Template B entry should exist');
     assert.deepStrictEqual(entry.key, XTEA_B.key);
   });
 
   it('looks up Template C with correct key', () => {
-    const entry = cache.lookup(TDC_NAMES.C);
+    const entry = cache.lookup(HASH_C);
     assert.ok(entry !== null, 'Template C entry should exist');
     assert.deepStrictEqual(entry.key, XTEA_C.key);
   });
@@ -177,7 +225,7 @@ describe('template-cache: lookup', () => {
   });
 
   it('each entry has delta, rounds, keyModConstants fields', () => {
-    const entry = cache.lookup(TDC_NAMES.A);
+    const entry = cache.lookup(HASH_A);
     assert.ok(entry !== null);
     assert.strictEqual(entry.delta, XTEA_A.delta);
     assert.strictEqual(entry.rounds, XTEA_A.rounds);
@@ -261,15 +309,20 @@ describe('template-cache: store and persistence', () => {
 // ============================================================================
 
 describe('template-cache: seed', () => {
+  // Compute source hashes for each target (seed() now keys by source hash)
+  const HASH_A = computeSourceHash(tdcSource);
+  const HASH_B = computeSourceHash(tdcV2Source);
+  const HASH_C = computeSourceHash(tdcV5Source);
+
   it('populates 3 entries from pipeline-config files', () => {
     const tmpPath = tmpCachePath();
     const cache = new TemplateCache(tmpPath);
     cache.seed();
 
-    // Should have entries for all 3 distinct TDC_NAMEs
-    const a = cache.lookup(TDC_NAMES.A);
-    const b = cache.lookup(TDC_NAMES.B);
-    const c = cache.lookup(TDC_NAMES.C);
+    // Should have entries for all 3 distinct source hashes
+    const a = cache.lookup(HASH_A);
+    const b = cache.lookup(HASH_B);
+    const c = cache.lookup(HASH_C);
     assert.ok(a !== null, 'Template A should be seeded');
     assert.ok(b !== null, 'Template B should be seeded');
     assert.ok(c !== null, 'Template C should be seeded');
@@ -283,9 +336,9 @@ describe('template-cache: seed', () => {
     const cache = new TemplateCache(tmpPath);
     cache.seed();
 
-    const a = cache.lookup(TDC_NAMES.A);
-    const b = cache.lookup(TDC_NAMES.B);
-    const c = cache.lookup(TDC_NAMES.C);
+    const a = cache.lookup(HASH_A);
+    const b = cache.lookup(HASH_B);
+    const c = cache.lookup(HASH_C);
 
     assert.deepStrictEqual(a.key, XTEA_A.key);
     assert.deepStrictEqual(b.key, XTEA_B.key);
