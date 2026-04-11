@@ -1,0 +1,3875 @@
+{
+  "tdc-live.js": {
+    "label": "tdc-live.js",
+    "totalOps": 333331,
+    "phases": {
+      "phase1_delta": {
+        "totalDeltaOps": 10886,
+        "deltaByPC": {
+          "6270": 319,
+          "10156": 319,
+          "63422": 10248
+        },
+        "firstFewDeltaOps": [
+          {
+            "index": 10,
+            "pc": 63422,
+            "mn": "ADD",
+            "srcVal": [
+              13272178845,
+              2654435769
+            ]
+          },
+          {
+            "index": 40,
+            "pc": 63422,
+            "mn": "ADD",
+            "srcVal": [
+              15926614614,
+              2654435769
+            ]
+          },
+          {
+            "index": 72,
+            "pc": 63422,
+            "mn": "ADD",
+            "srcVal": [
+              18581050383,
+              2654435769
+            ]
+          },
+          {
+            "index": 102,
+            "pc": 63422,
+            "mn": "ADD",
+            "srcVal": [
+              21235486152,
+              2654435769
+            ]
+          },
+          {
+            "index": 132,
+            "pc": 63422,
+            "mn": "ADD",
+            "srcVal": [
+              23889921921,
+              2654435769
+            ]
+          }
+        ]
+      },
+      "phase2_rounds": {
+        "sumDeltaPC": "63422",
+        "sumDeltaCount": 10248,
+        "pcDistribution": [
+          [
+            "63422",
+            10248
+          ],
+          [
+            "6270",
+            319
+          ],
+          [
+            "10156",
+            319
+          ]
+        ],
+        "assumedRounds": 32
+      },
+      "phase3_key": {
+        "windowRange": {
+          "start": 0,
+          "end": 1069,
+          "size": 1069
+        },
+        "firstDeltaIdx": 10,
+        "endDeltaIdx": 1019,
+        "propGetCount": 74,
+        "propGetsFirst20": [
+          {
+            "index": 4,
+            "pc": 10148,
+            "keyVal": 1,
+            "elemVal": 1094997825,
+            "elemValHex": "0x41445741",
+            "dst": 13
+          },
+          {
+            "index": 22,
+            "pc": 6266,
+            "keyVal": 3,
+            "elemVal": 1330075971,
+            "elemValHex": "0x4F475943",
+            "dst": 72
+          },
+          {
+            "index": 34,
+            "pc": 39828,
+            "keyVal": 2,
+            "elemVal": 1210005836,
+            "elemValHex": "0x481F394C",
+            "dst": 38
+          },
+          {
+            "index": 52,
+            "pc": 56147,
+            "keyVal": 2,
+            "elemVal": 1210005836,
+            "elemValHex": "0x481F394C",
+            "dst": 72
+          },
+          {
+            "index": 66,
+            "pc": 10148,
+            "keyVal": 3,
+            "elemVal": 1330075971,
+            "elemValHex": "0x4F475943",
+            "dst": 13
+          },
+          {
+            "index": 84,
+            "pc": 6266,
+            "keyVal": 1,
+            "elemVal": 1094997825,
+            "elemValHex": "0x41445741",
+            "dst": 72
+          },
+          {
+            "index": 96,
+            "pc": 23573,
+            "keyVal": 0,
+            "elemVal": 1765552186,
+            "elemValHex": "0x693C303A",
+            "dst": 72
+          },
+          {
+            "index": 112,
+            "pc": 48239,
+            "keyVal": 0,
+            "elemVal": 1765552186,
+            "elemValHex": "0x693C303A",
+            "dst": 72
+          },
+          {
+            "index": 126,
+            "pc": 10148,
+            "keyVal": 1,
+            "elemVal": 1094997825,
+            "elemValHex": "0x41445741",
+            "dst": 13
+          },
+          {
+            "index": 142,
+            "pc": 48239,
+            "keyVal": 0,
+            "elemVal": 1765552186,
+            "elemValHex": "0x693C303A",
+            "dst": 72
+          },
+          {
+            "index": 155,
+            "pc": 39828,
+            "keyVal": 2,
+            "elemVal": 1210005836,
+            "elemValHex": "0x481F394C",
+            "dst": 38
+          },
+          {
+            "index": 173,
+            "pc": 6266,
+            "keyVal": 3,
+            "elemVal": 1330075971,
+            "elemValHex": "0x4F475943",
+            "dst": 72
+          },
+          {
+            "index": 186,
+            "pc": 10148,
+            "keyVal": 3,
+            "elemVal": 1330075971,
+            "elemValHex": "0x4F475943",
+            "dst": 13
+          },
+          {
+            "index": 204,
+            "pc": 56147,
+            "keyVal": 2,
+            "elemVal": 1210005836,
+            "elemValHex": "0x481F394C",
+            "dst": 72
+          },
+          {
+            "index": 217,
+            "pc": 23573,
+            "keyVal": 0,
+            "elemVal": 1765552186,
+            "elemValHex": "0x693C303A",
+            "dst": 72
+          },
+          {
+            "index": 235,
+            "pc": 6266,
+            "keyVal": 1,
+            "elemVal": 1094997825,
+            "elemValHex": "0x41445741",
+            "dst": 72
+          },
+          {
+            "index": 248,
+            "pc": 10148,
+            "keyVal": 1,
+            "elemVal": 1094997825,
+            "elemValHex": "0x41445741",
+            "dst": 13
+          },
+          {
+            "index": 266,
+            "pc": 6266,
+            "keyVal": 1,
+            "elemVal": 1094997825,
+            "elemValHex": "0x41445741",
+            "dst": 72
+          },
+          {
+            "index": 278,
+            "pc": 39828,
+            "keyVal": 2,
+            "elemVal": 1210005836,
+            "elemValHex": "0x481F394C",
+            "dst": 38
+          },
+          {
+            "index": 294,
+            "pc": 48239,
+            "keyVal": 0,
+            "elemVal": 1765552186,
+            "elemValHex": "0x693C303A",
+            "dst": 72
+          }
+        ],
+        "keyAccessCounts": {
+          "0": 18,
+          "1": 20,
+          "2": 16,
+          "3": 16
+        },
+        "keyValues": [
+          {
+            "decimal": 1765552186,
+            "hex": "0x693C303A",
+            "signed": 1765552186
+          },
+          {
+            "decimal": 1094997825,
+            "hex": "0x41445741",
+            "signed": 1094997825
+          },
+          {
+            "decimal": 1210005836,
+            "hex": "0x481F394C",
+            "signed": 1210005836
+          },
+          {
+            "decimal": 1330075971,
+            "hex": "0x4F475943",
+            "signed": 1330075971
+          }
+        ],
+        "hasAll4": true
+      },
+      "phase4_keymods": {
+        "addKOpsInWindow": 36,
+        "subKOpsInWindow": 0,
+        "addRROpsMatchingKey": 34,
+        "allAddKOps": [
+          {
+            "index": 35,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 53,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 97,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 113,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 143,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 156,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 205,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 218,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 279,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 295,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 339,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 357,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 401,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 448,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 461,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 510,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 523,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 584,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 600,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 644,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 662,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 694,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 707,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 754,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 767,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 816,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 845,
+            "pc": 11170,
+            "mn": "ADD_K",
+            "dst": 49,
+            "k": 8,
+            "kUnsigned": 8,
+            "kHex": "0x8",
+            "srcVal0": 312,
+            "srcVal0Unsigned": 312,
+            "srcVal0Hex": "0x138",
+            "srcVal1": 8,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 848,
+            "pc": 11062,
+            "mn": "ADD_K",
+            "dst": 67,
+            "k": 4,
+            "kUnsigned": 4,
+            "kHex": "0x4",
+            "srcVal0": 320,
+            "srcVal0Unsigned": 320,
+            "srcVal0Hex": "0x140",
+            "srcVal1": 4,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 864,
+            "pc": 11093,
+            "mn": "ADD_K",
+            "dst": 55,
+            "k": 4,
+            "kUnsigned": 4,
+            "kHex": "0x4",
+            "srcVal0": 320,
+            "srcVal0Unsigned": 320,
+            "srcVal0Hex": "0x140",
+            "srcVal1": 4,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 865,
+            "pc": 11097,
+            "mn": "ADD_K",
+            "dst": 49,
+            "k": 8,
+            "kUnsigned": 8,
+            "kHex": "0x8",
+            "srcVal0": 320,
+            "srcVal0Unsigned": 320,
+            "srcVal0Hex": "0x140",
+            "srcVal1": 8,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 892,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 941,
+            "pc": 56151,
+            "mn": "ADD_K",
+            "dst": 38,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 954,
+            "pc": 39832,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "kHex": "0x2B2B04",
+            "srcVal0": 1210005836,
+            "srcVal0Unsigned": 1210005836,
+            "srcVal0Hex": "0x481F394C",
+            "srcVal1": 2829060,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 1001,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 1014,
+            "pc": 23577,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 1030,
+            "pc": 48243,
+            "mn": "ADD_K",
+            "dst": 13,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "kHex": "0x181820",
+            "srcVal0": 1765552186,
+            "srcVal0Unsigned": 1765552186,
+            "srcVal0Hex": "0x693C303A",
+            "srcVal1": 1579040,
+            "matchesKey": [
+              0
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          }
+        ],
+        "allSubKOps": "none",
+        "addRROpsMatchingKey_detail": [
+          {
+            "index": 6,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 13272178845,
+            "srcVal0Unsigned": 387276957,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 23,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 15926614614,
+            "srcVal0Unsigned": 3041712726,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 68,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 18581050383,
+            "srcVal0Unsigned": 1401181199,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 85,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 21235486152,
+            "srcVal0Unsigned": 4055616968,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 128,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 23889921921,
+            "srcVal0Unsigned": 2415085441,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 174,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 29198793459,
+            "srcVal0Unsigned": 3428989683,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 188,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 29198793459,
+            "srcVal0Unsigned": 3428989683,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 236,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 34507664997,
+            "srcVal0Unsigned": 147926629,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 250,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 34507664997,
+            "srcVal0Unsigned": 147926629,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 267,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 37162100766,
+            "srcVal0Unsigned": 2802362398,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 310,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 39816536535,
+            "srcVal0Unsigned": 1161830871,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 327,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 42470972304,
+            "srcVal0Unsigned": 3816266640,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 372,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 45125408073,
+            "srcVal0Unsigned": 2175735113,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 389,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 47779843842,
+            "srcVal0Unsigned": 535203586,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 419,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 50434279611,
+            "srcVal0Unsigned": 3189639355,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 433,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 50434279611,
+            "srcVal0Unsigned": 3189639355,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 479,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 55743151149,
+            "srcVal0Unsigned": 4203543597,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 493,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 55743151149,
+            "srcVal0Unsigned": 4203543597,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 541,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 61052022687,
+            "srcVal0Unsigned": 922480543,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 555,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 61052022687,
+            "srcVal0Unsigned": 922480543,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 572,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 63706458456,
+            "srcVal0Unsigned": 3576916312,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 615,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 66360894225,
+            "srcVal0Unsigned": 1936384785,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 632,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 69015329994,
+            "srcVal0Unsigned": 295853258,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 677,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 71669765763,
+            "srcVal0Unsigned": 2950289027,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 725,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 76978637301,
+            "srcVal0Unsigned": 3964193269,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 739,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 76978637301,
+            "srcVal0Unsigned": 3964193269,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 785,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 82287508839,
+            "srcVal0Unsigned": 683130215,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 799,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 82287508839,
+            "srcVal0Unsigned": 683130215,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 910,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 2654435769,
+            "srcVal0Unsigned": 2654435769,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 924,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 2654435769,
+            "srcVal0Unsigned": 2654435769,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 972,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 7963307307,
+            "srcVal0Unsigned": 3668340011,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 986,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 7963307307,
+            "srcVal0Unsigned": 3668340011,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 1045,
+            "pc": 10156,
+            "mn": "ADD",
+            "dst": 72,
+            "srcVal0": 13272178845,
+            "srcVal0Unsigned": 387276957,
+            "srcVal1": 1094997825,
+            "srcVal1Unsigned": 1094997825,
+            "matchesKey0": [],
+            "matchesKey1": [
+              1
+            ]
+          },
+          {
+            "index": 1062,
+            "pc": 6270,
+            "mn": "ADD",
+            "dst": 13,
+            "srcVal0": 15926614614,
+            "srcVal0Unsigned": 3041712726,
+            "srcVal1": 1330075971,
+            "srcVal1Unsigned": 1330075971,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          }
+        ],
+        "currentFilterResult": [
+          {
+            "keyIdx": 0,
+            "candidates": [
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040
+            ],
+            "count": 16
+          },
+          {
+            "keyIdx": 1,
+            "candidates": [],
+            "count": 0
+          },
+          {
+            "keyIdx": 2,
+            "candidates": [
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060
+            ],
+            "count": 16
+          },
+          {
+            "keyIdx": 3,
+            "candidates": [],
+            "count": 0
+          }
+        ],
+        "relaxedFilterResult": [
+          {
+            "keyIdx": 0,
+            "candidates": [
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040,
+              1579040
+            ],
+            "count": 16
+          },
+          {
+            "keyIdx": 1,
+            "candidates": [],
+            "count": 0
+          },
+          {
+            "keyIdx": 2,
+            "candidates": [
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060,
+              2829060
+            ],
+            "count": 16
+          },
+          {
+            "keyIdx": 3,
+            "candidates": [],
+            "count": 0
+          }
+        ],
+        "wideWindowRange": {
+          "start": 0,
+          "end": 1219
+        },
+        "wideWindowAddKMatchingKey": [
+          {
+            "index": 35,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 53,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 97,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 113,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 143,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 156,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 205,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 218,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 279,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 295,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 339,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 357,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 401,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 448,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 461,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 510,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 523,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 584,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 600,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 644,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 662,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 694,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 707,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 754,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 767,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 816,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 892,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 941,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 954,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 1001,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 1014,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 1030,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": true
+          },
+          {
+            "index": 1074,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1092,
+            "pc": 56151,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1136,
+            "pc": 23577,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1152,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1182,
+            "pc": 48243,
+            "k": 1579040,
+            "kUnsigned": 1579040,
+            "matchedKeyIdx": 0,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1195,
+            "pc": 39832,
+            "k": 2829060,
+            "kUnsigned": 2829060,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": false
+          }
+        ],
+        "srcValMatchesModifiedKey": "none"
+      }
+    },
+    "extractedKeyMods": [
+      1579040,
+      0,
+      2829060,
+      0
+    ],
+    "extractedKeyModsRelaxed": [
+      1579040,
+      0,
+      2829060,
+      0
+    ],
+    "standardResult": {
+      "key": [
+        1765552186,
+        1094997825,
+        1210005836,
+        1330075971
+      ],
+      "keyHex": [
+        "0x693C303A",
+        "0x41445741",
+        "0x481F394C",
+        "0x4F475943"
+      ],
+      "delta": 2654435769,
+      "rounds": 32,
+      "keyMods": [
+        1579040,
+        0,
+        2829060,
+        0
+      ],
+      "keyModConstants": [
+        0,
+        0
+      ],
+      "notes": "Found 10248 sum+=delta at PC 63422; 10248 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x693C303A, 0x41445741, 0x481F394C, 0x4F475943]; Key mod constants: [1579040, 0, 2829060, 0] (key[0]+1579040, key[2]+2829060)"
+    }
+  },
+  "tdc-captured.js": {
+    "label": "tdc-captured.js",
+    "totalOps": 300000,
+    "phases": {
+      "phase1_delta": {
+        "totalDeltaOps": 9876,
+        "deltaByPC": {
+          "3839": 291,
+          "20957": 9294,
+          "48502": 291
+        },
+        "firstFewDeltaOps": [
+          {
+            "index": 34,
+            "pc": 20957,
+            "mn": "ADD",
+            "srcVal": [
+              0,
+              2654435769
+            ]
+          },
+          {
+            "index": 47,
+            "pc": 48502,
+            "mn": "ADD",
+            "srcVal": [
+              2654435769,
+              1297305698
+            ]
+          },
+          {
+            "index": 60,
+            "pc": 3839,
+            "mn": "ADD",
+            "srcVal": [
+              2654435769,
+              1112173894
+            ]
+          },
+          {
+            "index": 64,
+            "pc": 20957,
+            "mn": "ADD",
+            "srcVal": [
+              2654435769,
+              2654435769
+            ]
+          },
+          {
+            "index": 96,
+            "pc": 20957,
+            "mn": "ADD",
+            "srcVal": [
+              5308871538,
+              2654435769
+            ]
+          }
+        ]
+      },
+      "phase2_rounds": {
+        "sumDeltaPC": "20957",
+        "sumDeltaCount": 9294,
+        "pcDistribution": [
+          [
+            "20957",
+            9294
+          ],
+          [
+            "3839",
+            291
+          ],
+          [
+            "48502",
+            291
+          ]
+        ],
+        "assumedRounds": 32
+      },
+      "phase3_key": {
+        "windowRange": {
+          "start": 0,
+          "end": 1020,
+          "size": 1020
+        },
+        "firstDeltaIdx": 34,
+        "endDeltaIdx": 970,
+        "propGetCount": 75,
+        "propGetsFirst20": [
+          {
+            "index": 0,
+            "pc": 45871,
+            "keyVal": "slice",
+            "elemVal": {},
+            "elemValHex": null,
+            "dst": 55
+          },
+          {
+            "index": 18,
+            "pc": 17744,
+            "keyVal": 0,
+            "elemVal": 762077550,
+            "elemValHex": "0x2D6C616E",
+            "dst": 41
+          },
+          {
+            "index": 19,
+            "pc": 17754,
+            "keyVal": 1,
+            "elemVal": 761685104,
+            "elemValHex": "0x2D666470",
+            "dst": 42
+          },
+          {
+            "index": 29,
+            "pc": 55148,
+            "keyVal": 0,
+            "elemVal": 1632986445,
+            "elemValHex": "0x6155654D",
+            "dst": 42
+          },
+          {
+            "index": 46,
+            "pc": 48498,
+            "keyVal": 3,
+            "elemVal": 1297305698,
+            "elemValHex": "0x4D535062",
+            "dst": 30
+          },
+          {
+            "index": 58,
+            "pc": 3831,
+            "keyVal": 1,
+            "elemVal": 1110397508,
+            "elemValHex": "0x422F5244",
+            "dst": 30
+          },
+          {
+            "index": 76,
+            "pc": 46727,
+            "keyVal": 2,
+            "elemVal": 1330066487,
+            "elemValHex": "0x4F473437",
+            "dst": 30
+          },
+          {
+            "index": 90,
+            "pc": 37210,
+            "keyVal": 2,
+            "elemVal": 1330066487,
+            "elemValHex": "0x4F473437",
+            "dst": 41
+          },
+          {
+            "index": 106,
+            "pc": 18935,
+            "keyVal": 1,
+            "elemVal": 1110397508,
+            "elemValHex": "0x422F5244",
+            "dst": 30
+          },
+          {
+            "index": 120,
+            "pc": 55148,
+            "keyVal": 3,
+            "elemVal": 1297305698,
+            "elemValHex": "0x4D535062",
+            "dst": 42
+          },
+          {
+            "index": 137,
+            "pc": 48498,
+            "keyVal": 0,
+            "elemVal": 1632986445,
+            "elemValHex": "0x6155654D",
+            "dst": 30
+          },
+          {
+            "index": 150,
+            "pc": 55148,
+            "keyVal": 0,
+            "elemVal": 1632986445,
+            "elemValHex": "0x6155654D",
+            "dst": 42
+          },
+          {
+            "index": 167,
+            "pc": 48498,
+            "keyVal": 0,
+            "elemVal": 1632986445,
+            "elemValHex": "0x6155654D",
+            "dst": 30
+          },
+          {
+            "index": 179,
+            "pc": 3831,
+            "keyVal": 1,
+            "elemVal": 1110397508,
+            "elemValHex": "0x422F5244",
+            "dst": 30
+          },
+          {
+            "index": 197,
+            "pc": 48498,
+            "keyVal": 3,
+            "elemVal": 1297305698,
+            "elemValHex": "0x4D535062",
+            "dst": 30
+          },
+          {
+            "index": 210,
+            "pc": 37210,
+            "keyVal": 2,
+            "elemVal": 1330066487,
+            "elemValHex": "0x4F473437",
+            "dst": 41
+          },
+          {
+            "index": 228,
+            "pc": 46727,
+            "keyVal": 2,
+            "elemVal": 1330066487,
+            "elemValHex": "0x4F473437",
+            "dst": 30
+          },
+          {
+            "index": 242,
+            "pc": 55148,
+            "keyVal": 3,
+            "elemVal": 1297305698,
+            "elemValHex": "0x4D535062",
+            "dst": 42
+          },
+          {
+            "index": 257,
+            "pc": 18935,
+            "keyVal": 1,
+            "elemVal": 1110397508,
+            "elemValHex": "0x422F5244",
+            "dst": 30
+          },
+          {
+            "index": 271,
+            "pc": 55148,
+            "keyVal": 0,
+            "elemVal": 1632986445,
+            "elemValHex": "0x6155654D",
+            "dst": 42
+          }
+        ],
+        "keyAccessCounts": {
+          "0": 18,
+          "1": 19,
+          "2": 16,
+          "3": 15
+        },
+        "keyValues": [
+          {
+            "decimal": 1632986445,
+            "hex": "0x6155654D",
+            "signed": 1632986445
+          },
+          {
+            "decimal": 1110397508,
+            "hex": "0x422F5244",
+            "signed": 1110397508
+          },
+          {
+            "decimal": 1330066487,
+            "hex": "0x4F473437",
+            "signed": 1330066487
+          },
+          {
+            "decimal": 1297305698,
+            "hex": "0x4D535062",
+            "signed": 1297305698
+          }
+        ],
+        "hasAll4": true
+      },
+      "phase4_keymods": {
+        "addKOpsInWindow": 37,
+        "subKOpsInWindow": 0,
+        "addRROpsMatchingKey": 31,
+        "allAddKOps": [
+          {
+            "index": 1,
+            "pc": 45875,
+            "mn": "ADD_K",
+            "dst": 24,
+            "k": 4,
+            "kUnsigned": 4,
+            "kHex": "0x4",
+            "srcVal0": 184,
+            "srcVal0Unsigned": 184,
+            "srcVal0Hex": "0xB8",
+            "srcVal1": 4,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 2,
+            "pc": 45879,
+            "mn": "ADD_K",
+            "dst": 71,
+            "k": 8,
+            "kUnsigned": 8,
+            "kHex": "0x8",
+            "srcVal0": 184,
+            "srcVal0Unsigned": 184,
+            "srcVal0Hex": "0xB8",
+            "srcVal1": 8,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 59,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 77,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 91,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 107,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 180,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 211,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 229,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 258,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 301,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 332,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 380,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 409,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 422,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 438,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 452,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 530,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 543,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 559,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 573,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 589,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 662,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 680,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 694,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 710,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 739,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 782,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 813,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 831,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 862,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 891,
+            "pc": 18939,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 904,
+            "pc": 3835,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "kHex": "0x1B1B02",
+            "srcVal0": 1110397508,
+            "srcVal0Unsigned": 1110397508,
+            "srcVal0Hex": "0x422F5244",
+            "srcVal1": 1776386,
+            "matchesKey": [
+              1
+            ],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 935,
+            "pc": 37214,
+            "mn": "ADD_K",
+            "dst": 53,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 983,
+            "pc": 46731,
+            "mn": "ADD_K",
+            "dst": 42,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "kHex": "0xE0E32",
+            "srcVal0": 1330066487,
+            "srcVal0Unsigned": 1330066487,
+            "srcVal0Hex": "0x4F473437",
+            "srcVal1": 921138,
+            "matchesKey": [
+              2
+            ],
+            "keyDiffs": {
+              "key3": 32760789
+            },
+            "filterReasons": []
+          },
+          {
+            "index": 1014,
+            "pc": 45949,
+            "mn": "ADD_K",
+            "dst": 71,
+            "k": 8,
+            "kUnsigned": 8,
+            "kHex": "0x8",
+            "srcVal0": 184,
+            "srcVal0Unsigned": 184,
+            "srcVal0Hex": "0xB8",
+            "srcVal1": 8,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          },
+          {
+            "index": 1018,
+            "pc": 45844,
+            "mn": "ADD_K",
+            "dst": 50,
+            "k": 4,
+            "kUnsigned": 4,
+            "kHex": "0x4",
+            "srcVal0": 192,
+            "srcVal0Unsigned": 192,
+            "srcVal0Hex": "0xC0",
+            "srcVal1": 4,
+            "matchesKey": [],
+            "keyDiffs": {},
+            "filterReasons": []
+          }
+        ],
+        "allSubKOps": "none",
+        "addRROpsMatchingKey_detail": [
+          {
+            "index": 30,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 0,
+            "srcVal0Unsigned": 0,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 47,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 2654435769,
+            "srcVal0Unsigned": 2654435769,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 121,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 7963307307,
+            "srcVal0Unsigned": 3668340011,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 138,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 10617743076,
+            "srcVal0Unsigned": 2027808484,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 151,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 10617743076,
+            "srcVal0Unsigned": 2027808484,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 168,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 13272178845,
+            "srcVal0Unsigned": 387276957,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 198,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 15926614614,
+            "srcVal0Unsigned": 3041712726,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 243,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 18581050383,
+            "srcVal0Unsigned": 1401181199,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 272,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 21235486152,
+            "srcVal0Unsigned": 4055616968,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 289,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 23889921921,
+            "srcVal0Unsigned": 2415085441,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 319,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 26544357690,
+            "srcVal0Unsigned": 774553914,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 350,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 29198793459,
+            "srcVal0Unsigned": 3428989683,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 363,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 29198793459,
+            "srcVal0Unsigned": 3428989683,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 394,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 31853229228,
+            "srcVal0Unsigned": 1788458156,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 470,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 39816536535,
+            "srcVal0Unsigned": 1161830871,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 483,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 39816536535,
+            "srcVal0Unsigned": 1161830871,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 500,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 42470972304,
+            "srcVal0Unsigned": 3816266640,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 513,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 42470972304,
+            "srcVal0Unsigned": 3816266640,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 603,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 50434279611,
+            "srcVal0Unsigned": 3189639355,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 620,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 53088715380,
+            "srcVal0Unsigned": 1549107828,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 633,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 53088715380,
+            "srcVal0Unsigned": 1549107828,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 650,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 55743151149,
+            "srcVal0Unsigned": 4203543597,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 724,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 61052022687,
+            "srcVal0Unsigned": 922480543,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 753,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 63706458456,
+            "srcVal0Unsigned": 3576916312,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 770,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 66360894225,
+            "srcVal0Unsigned": 1936384785,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 800,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 69015329994,
+            "srcVal0Unsigned": 295853258,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 845,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 71669765763,
+            "srcVal0Unsigned": 2950289027,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 876,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 74324201532,
+            "srcVal0Unsigned": 1309757500,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 922,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 79633073070,
+            "srcVal0Unsigned": 2323661742,
+            "srcVal1": 1632986445,
+            "srcVal1Unsigned": 1632986445,
+            "matchesKey0": [],
+            "matchesKey1": [
+              0
+            ]
+          },
+          {
+            "index": 953,
+            "pc": 48502,
+            "mn": "ADD",
+            "dst": 53,
+            "srcVal0": 82287508839,
+            "srcVal0Unsigned": 683130215,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          },
+          {
+            "index": 966,
+            "pc": 55152,
+            "mn": "ADD",
+            "dst": 41,
+            "srcVal0": 82287508839,
+            "srcVal0Unsigned": 683130215,
+            "srcVal1": 1297305698,
+            "srcVal1Unsigned": 1297305698,
+            "matchesKey0": [],
+            "matchesKey1": [
+              3
+            ]
+          }
+        ],
+        "currentFilterResult": [
+          {
+            "keyIdx": 0,
+            "candidates": [],
+            "count": 0
+          },
+          {
+            "keyIdx": 1,
+            "candidates": [
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386
+            ],
+            "count": 17
+          },
+          {
+            "keyIdx": 2,
+            "candidates": [
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138
+            ],
+            "count": 16
+          },
+          {
+            "keyIdx": 3,
+            "candidates": [],
+            "count": 0
+          }
+        ],
+        "relaxedFilterResult": [
+          {
+            "keyIdx": 0,
+            "candidates": [],
+            "count": 0
+          },
+          {
+            "keyIdx": 1,
+            "candidates": [
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386,
+              1776386
+            ],
+            "count": 17
+          },
+          {
+            "keyIdx": 2,
+            "candidates": [
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138,
+              921138
+            ],
+            "count": 16
+          },
+          {
+            "keyIdx": 3,
+            "candidates": [],
+            "count": 0
+          }
+        ],
+        "wideWindowRange": {
+          "start": 0,
+          "end": 1170
+        },
+        "wideWindowAddKMatchingKey": [
+          {
+            "index": 59,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 77,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 91,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 107,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 180,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 211,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 229,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 258,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 301,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 332,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 380,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 409,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 422,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 438,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 452,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 530,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 543,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 559,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 573,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 589,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 662,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 680,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 694,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 710,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 739,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 782,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 813,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 831,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 862,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 891,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 904,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": true
+          },
+          {
+            "index": 935,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 983,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": true
+          },
+          {
+            "index": 1092,
+            "pc": 3835,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1110,
+            "pc": 46731,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1124,
+            "pc": 37214,
+            "k": 921138,
+            "kUnsigned": 921138,
+            "matchedKeyIdx": 2,
+            "inOrigWindow": false
+          },
+          {
+            "index": 1140,
+            "pc": 18939,
+            "k": 1776386,
+            "kUnsigned": 1776386,
+            "matchedKeyIdx": 1,
+            "inOrigWindow": false
+          }
+        ],
+        "srcValMatchesModifiedKey": "none"
+      }
+    },
+    "extractedKeyMods": [
+      0,
+      1776386,
+      921138,
+      0
+    ],
+    "extractedKeyModsRelaxed": [
+      0,
+      1776386,
+      921138,
+      0
+    ],
+    "standardResult": {
+      "key": [
+        1632986445,
+        1110397508,
+        1330066487,
+        1297305698
+      ],
+      "keyHex": [
+        "0x6155654D",
+        "0x422F5244",
+        "0x4F473437",
+        "0x4D535062"
+      ],
+      "delta": 2654435769,
+      "rounds": 32,
+      "keyMods": [
+        0,
+        1776386,
+        921138,
+        0
+      ],
+      "keyModConstants": [
+        1776386,
+        0
+      ],
+      "notes": "Found 9294 sum+=delta at PC 20957; 9294 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x6155654D, 0x422F5244, 0x4F473437, 0x4D535062]; Key mod constants: [0, 1776386, 921138, 0] (key[1]+1776386, key[2]+921138)"
+    }
+  },
+  "tdc-diag.js (LIVE FETCH)": {
+    "label": "tdc-diag.js (LIVE FETCH)",
+    "error": "Could not find VM dispatch switch statement",
+    "stack": "Error: Could not find VM dispatch switch statement\n    at parseVmFunction (/home/ubun/github.com/tut1vog/reverse-chaosvm/pipeline/vm-parser.js:291:11)\n    at analyzeSingleTarget (/home/ubun/github.com/tut1vog/reverse-chaosvm/scripts/diag-keymods.js:560:18)\n    at main (/home/ubun/github.com/tut1vog/reverse-chaosvm/scripts/diag-keymods.js:705:37)"
+  },
+  "_findings": {
+    "executionDate": "2026-04-11T04:06:34.375Z",
+    "summary": "ROOT CAUSE IDENTIFIED: The keyModConstants legacy format [mod_idx1, mod_idx3] only captures keyMods at indices 1 and 3. When keyMods are at indices 0 and/or 2 (which happens in Templates B, C, and 98-opcode variants), they are silently lost. Three separate code paths propagate this data loss.",
+    "rootCause": {
+      "title": "keyModConstants legacy format loses keyMods at indices 0 and 2",
+      "detail": "The legacy keyModConstants format is a 2-element array: [keyMods[1], keyMods[3]]. This was originally correct for Template A where mods are at indices [1,3]. But other templates have mods at different index pairs: [0,2], [0,3], [1,2], [2,3]. When only keyModConstants is available and gets normalized back to keyMods[4], the conversion always maps to [0, kmc[0], 0, kmc[1]] = indices [1,3], losing data at [0] and [2].",
+      "bugLocations": [
+        {
+          "file": "pipeline/key-extractor.js",
+          "line": "527-529",
+          "code": "result.keyModConstants = [keyMods[1], keyMods[3]];",
+          "issue": "Only stores indices 1 and 3. If keyMods are at [0] or [2], they are discarded."
+        },
+        {
+          "file": "scraper/template-cache.js",
+          "line": "82",
+          "code": "entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];",
+          "issue": "store() converts legacy format back, assuming indices [1,3]. Wrong for [0,2], [0,3], etc."
+        },
+        {
+          "file": "scraper/template-cache.js",
+          "line": "138",
+          "code": "cacheEntry.keyMods = [0, config.xteaParams.keyModConstants[0], 0, config.xteaParams.keyModConstants[1]];",
+          "issue": "seed() same problem - when pipeline-config.json lacks keyMods, derives from keyModConstants with wrong index assumption."
+        },
+        {
+          "file": "scraper/template-cache.js",
+          "line": "177",
+          "code": "entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];",
+          "issue": "_normalizeEntry() same problem - lookup() calls this to normalize old cache entries."
+        },
+        {
+          "file": "pipeline/run.js",
+          "line": "268-269",
+          "code": "keyModConstants: keyResult.keyModConstants",
+          "issue": "savePipelineConfig stores keyModConstants (lossy) but keyMods may also be present. Older configs had no keyMods field at all."
+        }
+      ],
+      "impactedTemplates": {
+        "Template B (tdc-v2.js)": {
+          "actual": [
+            263173,
+            0,
+            0,
+            2236974
+          ],
+          "stored": [
+            0,
+            0,
+            0,
+            2236974
+          ],
+          "lost": "keyMods[0]=263173"
+        },
+        "Template C (tdc-v5.js)": {
+          "actual": [
+            986893,
+            0,
+            0,
+            263180
+          ],
+          "stored": [
+            0,
+            0,
+            0,
+            263180
+          ],
+          "lost": "keyMods[0]=986893"
+        },
+        "98-opcode (tdc-live.js)": {
+          "actual": [
+            1579040,
+            0,
+            2829060,
+            0
+          ],
+          "stored": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "lost": "keyMods[0]=1579040, keyMods[2]=2829060 (TOTAL LOSS)"
+        },
+        "Template A (tdc.js)": {
+          "actual": [
+            0,
+            2368517,
+            0,
+            592130
+          ],
+          "stored": [
+            0,
+            2368517,
+            0,
+            592130
+          ],
+          "lost": "NONE (indices [1,3] happen to be the correct ones)"
+        }
+      }
+    },
+    "secondaryFinding": {
+      "title": "Live CDN format change breaks the parser entirely",
+      "detail": "ssl.captcha.qq.com now serves tdc.js in a packed/minified bootstrapper format (!function(){...}) instead of the raw VM code. vm-parser.js cannot find the dispatch switch in this format. This is a separate blocker from the keyMods issue.",
+      "evidence": "tdc-diag.js (108KB) failed with: Could not find VM dispatch switch statement"
+    },
+    "analyzeTraceVerdict": {
+      "title": "analyzeTrace() Phase 4 works correctly",
+      "detail": "The core trace analysis logic (Phase 4 keyMod detection) produces correct results for all tested source files. The k<=0 and k>=10M filters are safe. The cipher window size is adequate. The signed/unsigned comparison is correct. The problem is entirely in the keyModConstants serialization format and its lossy round-trip conversion.",
+      "evidence": "All 6 saved targets produce correct keyMods when analyzed fresh via Puppeteer trace."
+    },
+    "observedKeyModPairs": {
+      "Template A (95 ops)": "[1,3] - key[1]+2368517, key[3]+592130",
+      "Template B tdc-v2 (94 ops)": "[0,3] - key[0]+263173, key[3]+2236974",
+      "Template B tdc-live-test (94 ops)": "[2,3] - key[2]+657930, key[3]+526341",
+      "Template B tdc-captured (94 ops)": "[1,2] - key[1]+1776386, key[2]+921138",
+      "Template C (100 ops)": "[0,3] - key[0]+986893, key[3]+263180",
+      "98-opcode tdc-live": "[0,2] - key[0]+1579040, key[2]+2829060",
+      "All observed values": "Range [263173, 2829060], all positive, all < 10M"
+    },
+    "recommendedFixes": [
+      "1. In key-extractor.js: Remove the keyModConstants legacy format entirely, or fix it to store all 4 indices",
+      "2. In template-cache.js: Remove the _normalizeEntry conversion. Always require keyMods[4] in the cache.",
+      "3. In pipeline/run.js savePipelineConfig: Ensure keyMods is always saved to pipeline-config.json",
+      "4. Re-run the pipeline on all targets to regenerate pipeline-config.json with correct keyMods[4]",
+      "5. Regenerate the template cache from the corrected pipeline-config files"
+    ]
+  }
+}
