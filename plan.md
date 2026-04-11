@@ -1,61 +1,89 @@
 # Plan
 
 ## Status
-Current phase: Phase 21
-Current task: 21.7 — Live CAPTCHA end-to-end verification
+Current phase: Phase 22
+Current task: 22.1 — Diagnose key extraction failures on live templates
 
 ---
 
 ## Phases
 
-### Phases 1-11: Foundation, Pipeline, Scraper (all done)
+### Phases 1-20: Foundation through Live Template Investigation (all done)
 
-### Phases 12-16: ErrorCode 9 Investigation (all done)
-> Identified collect token as root cause. Chrome's own token accepted, standalone rejected.
+### Phase 21: Automated Template Structure Extraction (done)
+> Built `pipeline/structure-extractor.js` (Stage 5). Extracts hash position, field order, serialization diffs, header split from any tdc.js build. Integrated into pipeline, template cache, and token generation flow. 218/220 tests.
 
-### Phase 17: Chrome cd Injection (done)
-> Proved cd VALUES alone don't cause errorCode 9.
-
-### Phase 18: Token Forensics (done)
-> Proved XTEA cipher is mathematically correct (round-trip). Key extraction for live builds initially failed, later fixed.
-
-### Phase 19: Reference tdc.js Injection (done)
-> **Byte-identical tokens** for Template A (reference build). Key fixes: header field-boundary split + duplicated comma. Also fixed pipeline key extraction for all 4 keyMod indices.
-
-### Phase 20: Live Template Investigation (done)
-> Key discoveries:
-> - Per-TDC_NAME pipeline key extraction works at runtime ✅
-> - Hash artifacts in decrypted cd must be stripped (60→59 fields) ✅
-> - sd structure: Chrome uses `{od,clientType}` only — no slide data ✅
-> - Header split: live templates use straight byte-boundary (144 bytes, no field-boundary padding) ✅
-> - **cd serialization**: `buildCdString` uses `JSON.stringify` for nested objects, but Chrome's `func_276` serializes only SPECIFIC keys per object type — 19-char difference at `intlOptions` alone ✅
-
-### Phase 21: Automated Template Structure Extraction
-> Build a pipeline module (`pipeline/structure-extractor.js`) that automatically extracts cd structure parameters from any tdc.js build — analogous to how `key-extractor.js` extracts XTEA keys via dynamic tracing. Parameters: hash artifact position, cd field order, object serialization rules, header split strategy. Results stored in template cache alongside XTEA params.
+### Phase 22: Reliable Key Extraction for Live Templates
+> The pipeline extracts correct keys from saved tdc.js files but fails ~50% of the time on live templates. Root cause: `analyzeTrace()` produces `keyMods: [0,0]` for some templates, and stale cached keys don't match rotated TDC_NAMEs. Until key extraction works reliably for ANY live template, nothing else can be validated.
 
 | ID | Task | Status |
 |----|------|--------|
-| 21.1 | Map all object serialization differences (diagnostic tool) | done |
-| 21.2 | Create structure-extractor pipeline module | done |
-| 21.3 | Tests for structure-extractor | done |
-| 21.4 | Integrate into pipeline/run.js and template cache | done |
-| 21.5 | Tests for pipeline integration | done |
-| 21.6 | Use extracted structure params in collect-generator | done |
-| 21.7 | Live CAPTCHA end-to-end verification | done |
+| 22.1 | Diagnose key extraction failures on live templates | pending |
+| 22.2 | Fix analyzeTrace for all key derivation patterns | pending |
+| 22.3 | Tests for key extraction fixes | pending |
+
+### Phase 23: Header Split Strategy Application
+> `analyzeHeaderSplit()` returns "unknown" for live templates because full-token decryption scrambles segment boundaries. The extracted `headerSplit` is stored in cache but never applied in `buildInputChunks()`. Fix detection and wire the strategy through to token generation.
+
+| ID | Task | Status |
+|----|------|--------|
+| 23.1 | Fix analyzeHeaderSplit for full-token decrypted plaintext | pending |
+| 23.2 | Wire headerSplit through to buildInputChunks | pending |
+| 23.3 | Tests for header split logic | pending |
+
+### Phase 24: End-to-End Live Verification
+> With reliable key extraction (Phase 22) and correct header splitting (Phase 23), run live tests to validate: cdFieldOrder produces correct reordering, serialization overrides reduce diffs, full token matches Chrome's output. Target: 0 field-level diffs on at least one live template.
+
+| ID | Task | Status |
+|----|------|--------|
+| 24.1 | Live test: decrypt Chrome token + field-by-field comparison | pending |
+| 24.2 | Fix remaining diffs found in 24.1 | pending |
+| 24.3 | Live CAPTCHA submission — aim for errorCode != 9 | pending |
 
 ---
 
-## Phase 21 Complete
+## Current Task
 
-All 7 tasks done. Pipeline now extracts cd structure parameters automatically.
+**ID**: 22.1
+**Title**: Diagnose key extraction failures on live templates
+**Phase**: Reliable Key Extraction for Live Templates
+**Status**: pending
 
-**Live verification results** (Template B, 94 opcodes, `XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR`):
-- Stage 5 completed successfully in ~30s
-- Hash position: 47 (varies by template — A=11, this B instance=47)
-- Field order: 54/60 matched (5 unmatched + 1 hash)
-- Serialization diffs: 1 (the hash field itself — space-padded in Chrome's full-token decryption)
-- Header split: detection returned "unknown" — needs investigation for non-reference builds
+### Goal
+Understand WHY `analyzeTrace()` produces `keyMods: [0,0]` for some live templates when it works perfectly for saved files. The extracted BASE KEY is correct (decryption with [0,0,0,0] keyMods produces something, just not valid JSON) — the issue is specifically in Phase 4 (keyMod detection) of `analyzeTrace()`.
 
-**Bug fix during verification**: `seed()` now merges structure params into existing cache entries (was skipping them).
+### What we know
+From history:
+- Pipeline extraction on SAVED files works: `tdc-live-test.js` (94 opcodes) → keyMods `[0, 0, 657930, 526341]` ✓
+- Pipeline extraction on LIVE templates often fails: `KhaJbXNVBBaBOAalQnkbOEZmGXAAcmFh` → keyMods `[0, 0]` ✗
+- In-page instrumentation (Phase 18.4-18.5) produced same wrong result → NOT an environment issue
+- keyMods on ANY indices observed: [0+3], [1+3], [2+3] all seen
+- 96-opcode template `SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk` DID extract correctly: keyMods `[1052701, 0, 0, 1644806]`
 
-**Remaining limitation**: Live diagnostic (chrome-cd-inject.js) still fails to decrypt most live tokens due to XTEA key rotation per TDC_NAME. The pipeline works on saved files but live key extraction often fails for unknown template types.
+**Two separate failure modes:**
+1. **Wrong key entirely**: Stale cached key used for rotated TDC_NAME → decryption produces garbage
+2. **Correct base key, wrong keyMods**: analyzeTrace finds the 4 key values but fails to find ADD_K ops with matching srcVal → keyMods all zero
+
+### Approach
+1. Capture a live tdc.js where key extraction fails (save to `targets/tdc-diag.js`)
+2. Run pipeline on it with verbose trace output — dump the actual trace ops around the cipher region
+3. Examine the trace to understand:
+   - Are ADD_K ops present but with different srcVal patterns?
+   - Is the srcVal comparison failing (unsigned vs signed)?
+   - Are keyMods applied at a different point in the cipher (not via ADD_K)?
+   - Is the cipher window (firstDeltaIdx ± 50) too narrow?
+4. Compare trace structure between a working template and a failing one
+
+### Context
+- `pipeline/key-extractor.js` lines 479-536 — Phase 4 (keyMod detection)
+- `pipeline/key-extractor.js` lines 415-474 — Phase 3 (base key extraction)
+- `pipeline/key-extractor.js` lines 100-197 — instrumentation code
+- `pipeline/key-extractor.js` lines 226-322 — Puppeteer trace collection
+
+### Verification
+- [ ] Identified root cause of keyMods [0,0] for failing templates
+- [ ] Documented the difference between working and failing trace structures
+- [ ] Proposed specific fix for analyzeTrace
+
+### Suggested Agent
+general-purpose
