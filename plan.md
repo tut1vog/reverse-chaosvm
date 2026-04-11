@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.4 — Fix comparison C: strip hash artifact from cd[11]
+Current task: 19.5 — Fix buildInputChunks header split
 
 ---
 
@@ -191,51 +191,84 @@ Current task: 19.4 — Fix comparison C: strip hash artifact from cd[11]
 | 19.1 | Create reference injection forensics script | done |
 | 19.2 | Live test with reference tdc.js injection | done |
 | 19.3 | Deep cd serialization analysis | done |
-| 19.4 | Fix comparison C: strip hash artifact from cd[11] | in-progress |
-| 19.5 | Definitive live test — verify byte-identical tokens | pending |
+| 19.4 | Root cause analysis — header splits at field boundary | done |
+| 19.5 | Fix buildInputChunks header split | in-progress |
+| 19.6 | Verify fix with ref-inject-forensics | pending |
+| 19.7 | Live re-test with actual CAPTCHA | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 19.4
-**Title**: Fix comparison C: strip hash artifact from cd[11]
+**ID**: 19.5
+**Title**: Fix buildInputChunks header split
 **Phase**: Reference tdc.js Injection Forensics
 **Status**: in-progress
 
 ### Goal
-Fix comparison C in `ref-inject-forensics.js` to strip the hash chunk artifact from cd[11] before generating the standalone token. Then verify that our token generation pipeline produces byte-identical output to Chrome.
+Fix `token/generate-token.js` `buildInputChunks()` to split the payload body at the last complete JSON field boundary within HEADER_SIZE (144 bytes), instead of at a fixed byte boundary. Chrome's VM does this, causing header content to end at a natural comma-separator and be space-padded to 144. Our code takes exactly 144 bytes of continuous content, producing different header and cdBody chunks.
 
-### Analysis from 19.3
+### Evidence from 19.3/19.4
+- Chrome header: 144 bytes, **trimmed to 133** (11 bytes space padding) — content = first 11 cd fields ending with `,`
+- Our header: 144 bytes, **all content** (no padding) — includes partial field 11
+- Chrome cdBody starts with `,0,[{"codec":...` (field 11 = sessionStorageAvail) 
+- Our cdBody starts mid-content at byte 144
 
-**Key discovery**: The field-by-field analysis found exactly ONE difference — cd[11]:
-- Chrome cd[11] = empty string (0 chars in serialized form → the hash position is empty in the real cd body)
-- Our cd[11] = `[[4,-1,-1,ts,0,0,0,0]]` (33 chars — the hash chunk value)
+### The Fix
 
-**But this is an artifact of the decryption!** When all 4 encrypted segments are decrypted and concatenated into one plaintext, the hash chunk (segment[0]) appears between the header (first 144 bytes of cd body) and cdBody (remaining cd body). JSON.parse sees this as cd field[11] because the hash chunk sits at exactly that position in the concatenated stream.
+In `buildInputChunks` (line 106-108 of `token/generate-token.js`), change:
+```js
+// OLD: split at fixed byte boundary
+const headerContent = payloadBody.substring(0, HEADER_SIZE);
+const header = headerContent.padEnd(HEADER_SIZE, ' ');
+```
+to:
+```js
+// NEW: split at last field boundary within HEADER_SIZE
+// Find the last comma-separated field boundary within HEADER_SIZE
+// Walk the payload body, tracking JSON depth to find top-level commas
+let splitPos = Math.min(payloadBody.length, HEADER_SIZE);
+if (payloadBody.length > HEADER_SIZE) {
+  // Find the last top-level comma at or before HEADER_SIZE
+  let lastComma = -1;
+  let depth = 0;
+  let inStr = false;
+  for (let i = 0; i < HEADER_SIZE && i < payloadBody.length; i++) {
+    const ch = payloadBody[i];
+    if (inStr) {
+      if (ch === '\\') i++;  // skip escaped char
+      else if (ch === '"') inStr = false;
+    } else {
+      if (ch === '"') inStr = true;
+      else if (ch === '[' || ch === '{') depth++;
+      else if (ch === ']' || ch === '}') depth--;
+      else if (ch === ',' && depth === 1) lastComma = i + 1;  // after the comma
+    }
+  }
+  if (lastComma > 0) splitPos = lastComma;
+}
+const headerContent = payloadBody.substring(0, splitPos);
+const header = headerContent.padEnd(HEADER_SIZE, ' ');
+```
 
-**In reality**: Chrome's cd has 59 fields (like ours). cd[11] = `sessionStorageAvail` = 0. The hash chunk is a SEPARATE segment, not a cd field. Our `buildDefaultCdArray` correctly produces 59 fields without the hash. Our `buildInputChunks` correctly creates a separate hash segment.
+And for the cdBody:
+```js
+const cdContent = payloadBody.substring(splitPos);
+```
 
-**The bug is in comparison C**: it feeds Chrome's 60-field parsed cd (with hash artifact at index 11) to `generateCollect(cdArrayOverride)`, which serializes ALL 60 fields including the hash, creating a LONGER cd string. Then `buildInputChunks` adds ANOTHER hash segment. The token has double hash content.
+The `depth === 1` check ensures we only split at top-level cd array commas (inside `{"cd":[`), not at commas within nested objects/arrays.
 
-**The fix**: Before feeding Chrome's cd to `generateCollect`, remove index 11 (the hash artifact). With the corrected 59-field array, comparison C should produce byte-identical tokens.
-
-### Implementation Steps
-1. In comparison C (around line 570), before calling `generateCollect`:
-   ```js
-   // Remove the hash chunk artifact from cd[11]
-   // When segments are decrypted and concatenated, the hash chunk appears 
-   // at cd[11] position — it's not a real cd field
-   const cleanCd = [...parsed.cd];
-   cleanCd.splice(11, 1);  // Remove index 11 (hash artifact)
-   ```
-2. Use `cleanCd` instead of `parsed.cd` in the `cdArrayOverride`
-3. Also fix comparison A: when building our cd string from Chrome's cd, use the clean array
+### Context
+- File: `token/generate-token.js` lines 91-123
+- `HEADER_SIZE = 144` (line 36)
+- The function is used by both `token/generate-token.js` and `scraper/collect-generator.js`
+- Tests: `tests/` — need to check if any tests depend on the exact header split
 
 ### Verification
-- [ ] `node -c scripts/ref-inject-forensics.js` passes
-- [ ] Live run shows comparison C: header IDENTICAL, hash IDENTICAL, cdBody IDENTICAL, sig IDENTICAL
-- [ ] Full reconstruction MATCH
+- [ ] `node -c token/generate-token.js` passes
+- [ ] `npm test` passes (173/175 or adjusts for changed split behavior)
+- [ ] For the default 59-field cd array with default profile, the header content length is ~133 bytes (matching Chrome)
+- [ ] `node scripts/ref-inject-forensics.js` shows comparison C: all segments IDENTICAL
 
 ### Suggested Agent
-general-purpose — but this is a small focused fix, I'll do it directly.
+general-purpose
