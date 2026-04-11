@@ -368,6 +368,8 @@ function reorderCdArray(cdArray, cdFieldOrder, behavioralEvents) {
  * @param {number[]} [options.cdFieldOrder] - Field reordering array (schema indices, -1 = behavioralEvents)
  * @param {*} [options.behavioralEvents] - Behavioral events value to insert at -1 position in cdFieldOrder
  * @param {Array} [options.cdArrayOverride] - Pre-built cd array to use instead of building from profile
+ * @param {Object} [options.hashPadding] - Hash artifact padding config for buildCdString
+ * @param {number} [options.hashPadding.totalSize] - Total padded size for inline hash artifacts
  * @returns {string} URL-encoded collect token string
  */
 function generateCollect(profile, xteaParams, options) {
@@ -389,7 +391,8 @@ function generateCollect(profile, xteaParams, options) {
 
   // Step 2: Build cdString (hand-rolled JSON, with optional serialization overrides)
   const serializationOverrides = buildSerializationOverrides(opts.serializationDiffs);
-  const cdString = buildCdString(cdArray, serializationOverrides);
+  const hashPadding = opts.hashPadding || null;
+  const cdString = buildCdString(cdArray, serializationOverrides, hashPadding);
 
   // Step 3: Build sdObject and sdString
   let sdObject;

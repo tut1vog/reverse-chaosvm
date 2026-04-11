@@ -399,6 +399,85 @@ function identifyCdField(plaintext, charPos) {
   return null;
 }
 
+/**
+ * Extract the raw text of the N-th field from a cd JSON string.
+ * The cd string format is: {"cd":[field0,field1,...,fieldN]}
+ * This preserves any trailing spaces/padding in the field value.
+ *
+ * @param {string} cdStr - The full cd JSON string
+ * @param {number} fieldIndex - Zero-based field index to extract
+ * @returns {string|null} The raw text of the field, or null if not found
+ */
+function extractRawCdField(cdStr, fieldIndex) {
+  const arrayStart = cdStr.indexOf('"cd":[');
+  if (arrayStart === -1) return null;
+
+  let pos = cdStr.indexOf('[', arrayStart) + 1;
+  let currentField = 0;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  let fieldStart = pos;
+
+  while (pos < cdStr.length) {
+    const ch = cdStr[pos];
+
+    if (escaped) {
+      escaped = false;
+      pos++;
+      continue;
+    }
+
+    if (ch === '\\' && inString) {
+      escaped = true;
+      pos++;
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = !inString;
+      pos++;
+      continue;
+    }
+
+    if (inString) {
+      pos++;
+      continue;
+    }
+
+    if (ch === '[' || ch === '{') {
+      depth++;
+      pos++;
+      continue;
+    }
+
+    if (ch === ']' || ch === '}') {
+      if (depth === 0) {
+        // End of the cd array
+        if (currentField === fieldIndex) {
+          return cdStr.substring(fieldStart, pos);
+        }
+        return null;
+      }
+      depth--;
+      pos++;
+      continue;
+    }
+
+    if (ch === ',' && depth === 0) {
+      if (currentField === fieldIndex) {
+        return cdStr.substring(fieldStart, pos);
+      }
+      currentField++;
+      fieldStart = pos + 1;
+    }
+
+    pos++;
+  }
+
+  return null;
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // Main Solver
 // ═══════════════════════════════════════════════════════════════════════
@@ -682,6 +761,7 @@ async function solve(opts) {
       let chromeCdFieldCount = null;
       let fieldOrderMatchCount = null;
       let strippedCd = null;
+      let hashPadding = null;
 
       if (chromeCollect) {
         const fullDecrypt = decryptCollect(chromeCollect, xteaParams);
@@ -742,10 +822,6 @@ async function solve(opts) {
       if (strippedCd && chromeCollect) {
         log('Step 6b: Pre-encryption cd string comparison...');
         try {
-          // Build OUR cd string the same way generateCollect does
-          const serOverrides = buildSerializationOverrides(serializationDiffs);
-          const ourCdString = buildCdString(strippedCd, serOverrides);
-
           // Extract Chrome's RAW cd string from the full decrypted plaintext
           const fullDecrypt = decryptCollect(chromeCollect, xteaParams);
           const chromePlaintext = fullDecrypt.plaintext;
@@ -776,6 +852,30 @@ async function solve(opts) {
               chromeCdString = chromePlaintext;
             }
           }
+
+          // ── Hash field padding analysis ──
+          // Extract Chrome's hash padding BEFORE building our cd string so we can match it
+          const hashPosForPadding = strippedCd ? detectAllHashPositions(strippedCd) : [];
+          if (hashPosForPadding.length > 0) {
+            log(`  Hash field padding analysis:`);
+            for (const hpos of hashPosForPadding) {
+              const chromeFieldRaw = extractRawCdField(chromeCdString, hpos);
+              if (chromeFieldRaw !== null) {
+                log(`    Chrome hash field[${hpos}]: "${chromeFieldRaw}" (${chromeFieldRaw.length} chars)`);
+                const trimmed = chromeFieldRaw.replace(/\s+$/, '');
+                const trailingSpaces = chromeFieldRaw.length - trimmed.length;
+                log(`    Chrome hash trimmed: "${trimmed}" (${trimmed.length} chars) + ${trailingSpaces} trailing spaces`);
+                hashPadding = { totalSize: chromeFieldRaw.length };
+                log(`    Setting hashPadding.totalSize = ${hashPadding.totalSize}`);
+              } else {
+                log(`    Chrome hash field[${hpos}]: EXTRACTION FAILED`);
+              }
+            }
+          }
+
+          // Build OUR cd string with hash padding to match Chrome
+          const serOverrides = buildSerializationOverrides(serializationDiffs);
+          const ourCdString = buildCdString(strippedCd, serOverrides, hashPadding);
 
           log(`  Our cd string length:    ${ourCdString.length}`);
           log(`  Chrome cd string length: ${chromeCdString.length}`);
@@ -823,6 +923,20 @@ async function solve(opts) {
             }
           } else {
             log(`  cd strings are IDENTICAL`);
+          }
+
+          // Log hash field comparison with padding applied
+          if (hashPosForPadding.length > 0) {
+            for (const hpos of hashPosForPadding) {
+              const ourFieldRaw = extractRawCdField(ourCdString, hpos);
+              const chromeFieldRaw = extractRawCdField(chromeCdString, hpos);
+              if (ourFieldRaw !== null) {
+                log(`    Our hash field[${hpos}] (with padding):    "${ourFieldRaw}" (${ourFieldRaw.length} chars)`);
+              }
+              if (chromeFieldRaw !== null && ourFieldRaw !== null) {
+                log(`    Hash field match: ${ourFieldRaw === chromeFieldRaw ? 'IDENTICAL' : 'DIFFER'}`);
+              }
+            }
           }
 
           // Also log first 200 chars of each for visual inspection
@@ -914,6 +1028,11 @@ async function solve(opts) {
           contentLength: headerSplit.contentLength,
         };
         log(`  Using field-boundary headerSplit (contentLength=${headerSplit.contentLength})`);
+      }
+
+      if (hashPadding) {
+        collectOpts.hashPadding = hashPadding;
+        log(`  Using hashPadding from Chrome cd analysis (totalSize=${hashPadding.totalSize})`);
       }
 
       const collectEncoded = generateCollect(profileOverrides, xteaParams, collectOpts);

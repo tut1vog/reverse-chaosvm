@@ -37,6 +37,35 @@ function buildSdString(sdObject) {
 }
 
 // ---------------------------------------------------------------------------
+// Hash artifact detection and padding constants
+// ---------------------------------------------------------------------------
+/**
+ * Chrome's VM pads inline hash artifacts in the cd array with both leading
+ * and trailing spaces. The trailing padding uses HASH_SIZE (48) — the same
+ * as the separate hash chunk. The total padded size (including leading spaces)
+ * varies by template: observed 55 (unknown-98) and 71 (Template B).
+ *
+ * buildCdString accepts an optional hashPaddedSize parameter to match the
+ * exact size observed from Chrome's decrypted cd string. If not provided,
+ * only trailing padding (padEnd to 48) is applied.
+ */
+const HASH_SIZE = 48;
+
+/**
+ * Check if a cd array entry is a hash artifact: [[4,-1,-1,any,0,0,0,0]]
+ *
+ * @param {*} entry - A cd array entry
+ * @returns {boolean} True if this is a hash artifact
+ */
+function isHashArtifact(entry) {
+  if (!Array.isArray(entry) || entry.length !== 1) return false;
+  const inner = entry[0];
+  if (!Array.isArray(inner) || inner.length !== 8) return false;
+  return inner[0] === 4 && inner[1] === -1 && inner[2] === -1 &&
+         inner[4] === 0 && inner[5] === 0 && inner[6] === 0 && inner[7] === 0;
+}
+
+// ---------------------------------------------------------------------------
 // buildCdString — hand-rolled JSON serialization of collector data (func_276)
 // ---------------------------------------------------------------------------
 /**
@@ -56,9 +85,13 @@ function buildSdString(sdObject) {
  * @param {Object} [serializationOverrides] - Optional map of field index (string) to array
  *   of key names. When present, object fields at those indices are serialized using only
  *   the listed keys instead of full JSON.stringify.
+ * @param {Object} [hashPadding] - Optional hash artifact padding configuration
+ * @param {number} [hashPadding.totalSize] - Total padded size for inline hash artifacts
+ *   (includes both leading and trailing spaces). If not provided, only trailing padding
+ *   (padEnd to HASH_SIZE=48) is applied.
  * @returns {string} The cd JSON string, e.g. '{"cd":[1,"linux",2,...]}'
  */
-function buildCdString(collectorEntries, serializationOverrides) {
+function buildCdString(collectorEntries, serializationOverrides, hashPadding) {
   // func_276 starts with '{"cd":[' and ends with ']}'
   let result = '{"cd":[';
 
@@ -81,8 +114,20 @@ function buildCdString(collectorEntries, serializationOverrides) {
       // in collector data. Use plain toString for standard numbers.
       result += JSON.stringify(entry);
     } else if (Array.isArray(entry)) {
-      // Arrays → standard JSON notation
-      result += JSON.stringify(entry);
+      // Arrays → standard JSON notation, with hash artifact padding
+      if (isHashArtifact(entry)) {
+        // Chrome's VM pads inline hash artifacts with trailing spaces (to HASH_SIZE=48)
+        // and optionally leading spaces (to hashPadding.totalSize).
+        // The total padded size varies by template.
+        const compact = JSON.stringify(entry);
+        let padded = compact.padEnd(HASH_SIZE, ' ');
+        if (hashPadding && hashPadding.totalSize && hashPadding.totalSize > padded.length) {
+          padded = padded.padStart(hashPadding.totalSize, ' ');
+        }
+        result += padded;
+      } else {
+        result += JSON.stringify(entry);
+      }
     } else if (typeof entry === 'object') {
       // Objects → standard JSON notation (with optional key filtering)
       if (serializationOverrides && serializationOverrides[String(i)]) {
