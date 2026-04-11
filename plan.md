@@ -192,8 +192,8 @@ Current task: 19.5 — Fix buildInputChunks header split
 | 19.2 | Live test with reference tdc.js injection | done |
 | 19.3 | Deep cd serialization analysis | done |
 | 19.4 | Root cause analysis — header splits at field boundary | done |
-| 19.5 | Fix buildInputChunks header split | in-progress |
-| 19.6 | Verify fix with ref-inject-forensics | pending |
+| 19.5 | Fix buildInputChunks header split | done |
+| 19.6 | Verify fix with ref-inject-forensics | done |
 | 19.7 | Live re-test with actual CAPTCHA | pending |
 
 ---
