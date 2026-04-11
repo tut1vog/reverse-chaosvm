@@ -510,6 +510,9 @@ async function solve(opts) {
             log(`  Decrypted Chrome cd: ${capturedCd.length} fields`);
             log(`  First 5: ${JSON.stringify(capturedCd.slice(0, 5))}`);
             log(`  Last 5: ${JSON.stringify(capturedCd.slice(-5))}`);
+            if (decryptResult.parsed.sd) {
+              log(`  [DIAG] Chrome sd: ${JSON.stringify(decryptResult.parsed.sd)}`);
+            }
 
             // ── Diagnostic: determine Chrome's headerFieldCount ──
             // Split Chrome's token into segments and decrypt the header to find
@@ -596,6 +599,7 @@ async function solve(opts) {
         slideValueArray,
         { trycnt: attempt, refreshcnt: 0 }
       );
+      log(`  [DIAG] Our sd: ${JSON.stringify(slideSd)}`.substring(0, 200));
 
       const profileOverrides = Object.assign({}, profile, {
         pageUrl: showUrl,
