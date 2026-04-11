@@ -139,6 +139,25 @@ class TemplateCache {
       if (config.cdFieldOrder) {
         cacheEntry.cdFieldOrder = config.cdFieldOrder;
       }
+      // Add structure params from config if available
+      if (config.structureParams) {
+        if (config.structureParams.hashPosition !== undefined) {
+          cacheEntry.hashPosition = config.structureParams.hashPosition;
+        }
+        if (config.structureParams.fieldOrder) {
+          cacheEntry.fieldOrder = config.structureParams.fieldOrder;
+          // Also set cdFieldOrder for backward compatibility
+          if (!cacheEntry.cdFieldOrder) {
+            cacheEntry.cdFieldOrder = config.structureParams.fieldOrder;
+          }
+        }
+        if (config.structureParams.headerSplit) {
+          cacheEntry.headerSplit = config.structureParams.headerSplit;
+        }
+        if (config.structureParams.serializationDiffs) {
+          cacheEntry.serializationDiffs = config.structureParams.serializationDiffs;
+        }
+      }
       this._cache[tdcName] = cacheEntry;
     }
     this.save();

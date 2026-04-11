@@ -7,6 +7,7 @@ const { parseVmFunction } = require('./vm-parser');
 const { mapOpcodes } = require('./opcode-mapper');
 const { extractKey } = require('./key-extractor');
 const { verifyToken } = require('./token-verifier');
+const { extractStructure } = require('./structure-extractor');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -61,6 +62,7 @@ function log(msg) {
  * @param {string} tdcPath - Path to the tdc.js file
  * @param {object} [options]
  * @param {boolean} [options.skipVerify] - Skip Stage 4 (token verification)
+ * @param {boolean} [options.skipStructure] - Skip Stage 5 (structure extraction)
  * @returns {Promise<object>} Pipeline result
  */
 async function portVersion(tdcPath, options) {
@@ -80,7 +82,8 @@ async function portVersion(tdcPath, options) {
     parsed: null,
     mapped: null,
     keyResult: null,
-    verifyResult: null
+    verifyResult: null,
+    structureResult: null
   };
 
   // Ensure output directory exists
@@ -104,9 +107,9 @@ async function portVersion(tdcPath, options) {
       parsed.variables.excVal
     ].filter(Boolean).join('/');
 
-    log(`Stage 1/4: Parsing VM... found ${parsed.caseCount} opcodes, variables: ${varNames}`);
+    log(`Stage 1/5: Parsing VM... found ${parsed.caseCount} opcodes, variables: ${varNames}`);
   } catch (err) {
-    log(`Stage 1/4: Parsing VM... FAILED`);
+    log(`Stage 1/5: Parsing VM... FAILED`);
     log(`Error: ${err.message}`);
     log(`Partial results saved to ${outputDir}/`);
     result.failedStage = 1;
@@ -127,12 +130,12 @@ async function portVersion(tdcPath, options) {
     const unmappedCount = mapped.unmapped.length;
     const template = classifyTemplate(parsed.caseCount);
 
-    log(`Stage 2/4: Mapping opcodes... ${mappedCount}/${parsed.caseCount} mapped, ${unmappedCount} unmapped (Template ${template})`);
+    log(`Stage 2/5: Mapping opcodes... ${mappedCount}/${parsed.caseCount} mapped, ${unmappedCount} unmapped (Template ${template})`);
 
     // Save opcode-table.json
     saveJson(outputDir, 'opcode-table.json', mapped.opcodeTable);
   } catch (err) {
-    log(`Stage 2/4: Mapping opcodes... FAILED`);
+    log(`Stage 2/5: Mapping opcodes... FAILED`);
     log(`Error: ${err.message}`);
     log(`Partial results saved to ${outputDir}/`);
     result.failedStage = 2;
@@ -154,19 +157,19 @@ async function portVersion(tdcPath, options) {
     const deltaHex = keyResult.delta ? hex32(keyResult.delta) : 'null';
     const rounds = keyResult.rounds || 'unknown';
 
-    log(`Stage 3/4: Extracting XTEA key... key=${keyHex} delta=${deltaHex} rounds=${rounds}`);
+    log(`Stage 3/5: Extracting XTEA key... key=${keyHex} delta=${deltaHex} rounds=${rounds}`);
 
     // Save xtea-params.json
     saveJson(outputDir, 'xtea-params.json', keyResult);
   } catch (err) {
-    log(`Stage 3/4: Extracting XTEA key... FAILED`);
+    log(`Stage 3/5: Extracting XTEA key... FAILED`);
     log(`Error: ${err.message}`);
     log(`Partial results saved to ${outputDir}/`);
     result.failedStage = 3;
     result.error = err.message;
 
     // Save partial pipeline-config
-    savePipelineConfig(outputDir, tdcPath, parsed, mapped, null, null);
+    savePipelineConfig(outputDir, tdcPath, parsed, mapped, null, null, null);
     return result;
   }
 
@@ -175,7 +178,7 @@ async function portVersion(tdcPath, options) {
   // =========================================================================
   let verifyResult = null;
   if (opts.skipVerify) {
-    log('Stage 4/4: Verifying token... SKIPPED (--skip-verify)');
+    log('Stage 4/5: Verifying token... SKIPPED (--skip-verify)');
   } else {
     try {
       verifyResult = await verifyToken(resolvedPath, keyResult);
@@ -185,30 +188,62 @@ async function portVersion(tdcPath, options) {
         const segInfo = verifyResult.segments
           ? verifyResult.segments.filter(s => s.match).length + '/' + verifyResult.segments.length + ' segments identical'
           : 'all segments identical';
-        log(`Stage 4/4: Verifying token... MATCH (${verifyResult.liveTokenLength} chars, ${segInfo})`);
+        log(`Stage 4/5: Verifying token... MATCH (${verifyResult.liveTokenLength} chars, ${segInfo})`);
       } else {
-        log(`Stage 4/4: Verifying token... MISMATCH (live=${verifyResult.liveTokenLength} standalone=${verifyResult.standaloneTokenLength})`);
+        log(`Stage 4/5: Verifying token... MISMATCH (live=${verifyResult.liveTokenLength} standalone=${verifyResult.standaloneTokenLength})`);
       }
 
       // Save verification-report.json
       saveJson(outputDir, 'verification-report.json', verifyResult);
     } catch (err) {
-      log(`Stage 4/4: Verifying token... FAILED`);
+      log(`Stage 4/5: Verifying token... FAILED`);
       log(`Error: ${err.message}`);
       log(`Partial results saved to ${outputDir}/`);
       result.failedStage = 4;
       result.error = err.message;
 
       // Save partial pipeline-config
-      savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, null);
+      savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, null, null);
       return result;
+    }
+  }
+
+  // =========================================================================
+  // Stage 5: Extract Structure
+  // =========================================================================
+  let structureResult = null;
+  if (opts.skipStructure) {
+    log('Stage 5/5: Extracting structure... SKIPPED (--skip-structure)');
+  } else {
+    try {
+      // Build xteaParams from keyResult for structure extraction
+      const xteaParams = {
+        key: keyResult.key,
+        delta: keyResult.delta,
+        rounds: keyResult.rounds,
+        keyMods: keyResult.keyMods || [0, 0, 0, 0],
+      };
+      structureResult = await extractStructure(resolvedPath, xteaParams);
+      result.structureResult = structureResult;
+
+      if (structureResult.success) {
+        log(`Stage 5/5: Extracting structure... hash@${structureResult.hashPosition}, ${structureResult.fieldOrder ? structureResult.fieldOrder.filter(x => x >= 0).length + ' fields matched' : 'no field order'}, split=${structureResult.headerSplit ? structureResult.headerSplit.strategy : 'unknown'}`);
+      } else {
+        log(`Stage 5/5: Extracting structure... FAILED (${structureResult.error})`);
+      }
+
+      saveJson(outputDir, 'structure-params.json', structureResult);
+    } catch (err) {
+      log(`Stage 5/5: Extracting structure... FAILED`);
+      log(`Error: ${err.message}`);
+      // Non-fatal: structure extraction failure doesn't block the pipeline
     }
   }
 
   // =========================================================================
   // Save combined pipeline-config.json
   // =========================================================================
-  const configPath = savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, verifyResult);
+  const configPath = savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, verifyResult, structureResult);
 
   result.success = true;
   log(`Pipeline complete. Config saved to ${configPath}`);
@@ -219,7 +254,7 @@ async function portVersion(tdcPath, options) {
 /**
  * Build and save the combined pipeline-config.json.
  */
-function savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, verifyResult) {
+function savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, verifyResult, structureResult) {
   const config = {
     target: path.basename(tdcPath),
     template: parsed ? classifyTemplate(parsed.caseCount) : 'unknown',
@@ -235,6 +270,12 @@ function savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, verif
       keyMods: keyResult.keyMods || null
     } : null,
     tokenVerified: verifyResult ? verifyResult.match : null,
+    structureParams: structureResult && structureResult.success ? {
+      hashPosition: structureResult.hashPosition,
+      fieldOrder: structureResult.fieldOrder,
+      serializationDiffs: structureResult.serializationDiffs,
+      headerSplit: structureResult.headerSplit,
+    } : null,
     timestamp: new Date().toISOString()
   };
 
@@ -250,10 +291,11 @@ if (require.main === module) {
 
   // Parse flags
   const skipVerify = args.includes('--skip-verify');
+  const skipStructure = args.includes('--skip-structure');
   const positional = args.filter(a => !a.startsWith('--'));
 
   if (positional.length < 1) {
-    console.error('Usage: node pipeline/run.js <tdc-path> [--skip-verify]');
+    console.error('Usage: node pipeline/run.js <tdc-path> [--skip-verify] [--skip-structure]');
     process.exit(1);
   }
 
@@ -264,7 +306,7 @@ if (require.main === module) {
     process.exit(1);
   }
 
-  portVersion(tdcPath, { skipVerify })
+  portVersion(tdcPath, { skipVerify, skipStructure })
     .then(result => {
       process.exit(result.success ? 0 : 1);
     })
