@@ -221,3 +221,68 @@ describe('vm-parser: error on invalid input', () => {
     assert.throws(() => parseVmFunction(smallSwitch), /Could not find VM dispatch switch/);
   });
 });
+
+// ============================================================================
+// 11. Obfuscated survey builds
+// ============================================================================
+
+const SURVEY_DIR = path.join(__dirname, '..', 'output', 'tdc-survey');
+const SURVEY_BUILDS = [
+  { hash: '27dda893f81dbc4f', expectedCases: 103 },
+  { hash: '3429444f324c6110', expectedCases: 91 },
+  { hash: 'e2170903e201e018', expectedCases: 93 },
+];
+
+// Pre-check which survey files exist
+const surveyAvailable = {};
+for (const build of SURVEY_BUILDS) {
+  const filePath = path.join(SURVEY_DIR, `${build.hash}.js`);
+  surveyAvailable[build.hash] = fs.existsSync(filePath);
+}
+
+// Cache parsed results for survey builds
+const surveyResults = {};
+function getSurveyResult(hash) {
+  if (!surveyResults[hash]) {
+    const src = fs.readFileSync(path.join(SURVEY_DIR, `${hash}.js`), 'utf8');
+    surveyResults[hash] = parseVmFunction(src);
+  }
+  return surveyResults[hash];
+}
+
+describe('vm-parser: obfuscated builds', () => {
+  for (const build of SURVEY_BUILDS) {
+    const testFn = surveyAvailable[build.hash] ? it : it.skip;
+
+    testFn(`parses ${build.hash.slice(0, 8)} (${build.expectedCases} cases)`, () => {
+      const result = getSurveyResult(build.hash);
+
+      // Correct case count
+      assert.strictEqual(result.caseCount, build.expectedCases);
+
+      // All 6 variable keys exist and are non-null strings
+      const keys = ['bytecode', 'pc', 'regs', 'thisCtx', 'catchStack', 'excVal'];
+      for (const key of keys) {
+        assert.ok(
+          typeof result.variables[key] === 'string' && result.variables[key].length > 0,
+          `variables.${key} should be a non-empty string, got: ${result.variables[key]}`
+        );
+      }
+    });
+  }
+
+  const obfBuild = SURVEY_BUILDS[0];
+  const obfTestFn = surveyAvailable[obfBuild.hash] ? it : it.skip;
+
+  obfTestFn('variables are _0x-prefixed identifiers', () => {
+    const result = getSurveyResult(obfBuild.hash);
+    const keys = ['bytecode', 'pc', 'regs', 'thisCtx', 'catchStack', 'excVal'];
+    for (const key of keys) {
+      assert.match(
+        result.variables[key],
+        /^_0x[0-9a-f]+$/i,
+        `variables.${key} should be _0x-prefixed, got: ${result.variables[key]}`
+      );
+    }
+  });
+});
