@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.8 — Fix key-extractor keyMods for all 4 indices
+Current task: 19.9 — Add per-TDC_NAME pipeline extraction to chrome-cd-inject
 
 ---
 
@@ -195,8 +195,9 @@ Current task: 19.8 — Fix key-extractor keyMods for all 4 indices
 | 19.5 | Fix buildInputChunks header split | done |
 | 19.6 | Verify fix with ref-inject-forensics | done |
 | 19.7 | Live re-test with actual CAPTCHA | blocked |
-| 19.8 | Fix key-extractor keyMods for all 4 indices | in-progress |
-| 19.9 | Live re-test with fixed key extraction | pending |
+| 19.8 | Fix key-extractor keyMods for all 4 indices | done |
+| 19.9 | Add per-TDC_NAME pipeline extraction to chrome-cd-inject | in-progress |
+| 19.10 | Live re-test with per-name key extraction | pending |
 
 ---
 
