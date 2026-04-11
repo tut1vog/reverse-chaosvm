@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 23
-Current task: 23.1 — Fix analyzeHeaderSplit for full-token decrypted plaintext
+Current task: 23.2 — Wire headerSplit through to buildInputChunks
 
 ---
 
@@ -27,7 +27,7 @@ Current task: 23.1 — Fix analyzeHeaderSplit for full-token decrypted plaintext
 
 | ID | Task | Status |
 |----|------|--------|
-| 23.1 | Fix analyzeHeaderSplit for full-token decrypted plaintext | pending |
+| 23.1 | Fix analyzeHeaderSplit for full-token decrypted plaintext | done |
 | 23.2 | Wire headerSplit through to buildInputChunks | pending |
 | 23.3 | Tests for header split logic | pending |
 
@@ -44,30 +44,34 @@ Current task: 23.1 — Fix analyzeHeaderSplit for full-token decrypted plaintext
 
 ## Current Task
 
-**ID**: 23.1
-**Title**: Fix analyzeHeaderSplit for full-token decrypted plaintext
+**ID**: 23.2
+**Title**: Wire headerSplit through to buildInputChunks
 **Phase**: Header Split Strategy Application
 **Status**: pending
 
 ### Goal
-`analyzeHeaderSplit()` in `pipeline/structure-extractor.js` returns "unknown" for live templates because full-token decryption concatenates all segments (header + hash + cdBody + sig), making the cd/sd boundaries unclear. Fix the detection to correctly identify the header split point.
+The extracted `headerSplit` is stored in the template cache but never used by `buildInputChunks()` in `token/generate-token.js`. Wire the headerSplit strategy through the token generation path so that:
+- "field-boundary" strategy: split at `contentLength`, pad to 144 with spaces
+- "byte-boundary" strategy: split at position 144 (current default behavior)
 
 ### Context
-- `pipeline/structure-extractor.js` — `analyzeHeaderSplit(chromePlaintext)` function
-- The header is always the first 144 bytes of the plaintext (padded with spaces to reach 144)
-- Template A uses field-boundary split at position 133 (cd[0..10]), padded to 144
-- Other templates may have different split points
-- History note: from 19.5+19.6 — the fix was HEADER_FIELD_COUNT=11, split at field boundary, pad with spaces, duplicate comma at split point
-- From 20.3+ — for live templates, header trimmed length IS 144 (no padding), only reference build pads
+- `token/generate-token.js` lines 100-136: `buildInputChunks()` — currently always does byte-boundary split at 144
+- `scraper/collect-generator.js`: calls `generateToken()` from `token/generate-token.js` — passes options
+- `scraper/template-cache.js`: cache entries have `headerSplit: { strategy, contentLength, paddingLength }`
+- History from 19.5+19.6: Template A needs field-boundary split at 133 (11 fields), pad to 144
+- History from 20.3+: live templates have byte-boundary split (no padding, content fills all 144 bytes)
 
 ### Implementation Steps
-1. Read current `analyzeHeaderSplit()` to understand why it fails
-2. Fix detection: the header is decrypted as a separate segment (first 192 base64 chars = 144 bytes). When given the full concatenated plaintext, the function should look at the first 144 chars and find the last complete cd field within that span
-3. Determine the strategy: if trailing spaces exist → "field-boundary" with padding; if no trailing spaces → "byte-boundary" at position 144
+1. Add `headerSplit` option to `buildInputChunks()` in `token/generate-token.js`
+2. When `headerSplit.strategy === 'field-boundary'`: split at `headerSplit.contentLength`, pad with spaces to 144
+3. When `headerSplit.strategy === 'byte-boundary'` or absent: current behavior (split at 144)
+4. Pass `headerSplit` from template cache through `scraper/collect-generator.js` → `generateCollect` → `generateToken` → `buildInputChunks`
+5. Also pass through `scraper/scraper.js` if it calls generateCollect
 
 ### Verification
-- [ ] `analyzeHeaderSplit` returns a meaningful strategy (not "unknown") for test inputs
-- [ ] `npm test` passes (236 total, 2 known failures)
+- [ ] `npm test` passes (237 total, 2 known failures)
+- [ ] `buildInputChunks` with field-boundary option produces header with trailing spaces
+- [ ] `buildInputChunks` without option produces current default behavior (no regression)
 
 ### Suggested Agent
 general-purpose
