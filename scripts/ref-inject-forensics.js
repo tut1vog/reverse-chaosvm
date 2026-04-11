@@ -192,7 +192,7 @@ function urlDecodeCollect(collectStr) {
 // Comparison A: Plaintext Serialization
 // ═══════════════════════════════════════════════════════════════════════
 
-function comparisonA(plaintext, parsed, xteaParams) {
+function comparisonA(plaintext, parsed, xteaParams, decryptedSegments) {
   log('=== COMPARISON A: Plaintext Serialization ===');
 
   const result = {
@@ -224,6 +224,104 @@ function comparisonA(plaintext, parsed, xteaParams) {
   log(`  Chrome cd array length: ${chromeCd.length} fields`);
   log(`  Our cdString length: ${ourCdString.length} chars`);
   log(`  Our sdString length: ${ourSdString.length} chars`);
+
+  // ── Clean cd string reconstruction from decrypted segments ──
+  // The raw plaintext has inter-chunk artifacts (header padding, hash chunk).
+  // Instead, reconstruct from decrypted header + cdBody segments which form
+  // the actual payload body without padding artifacts.
+  let chromeCdStringClean = null;
+  if (decryptedSegments && decryptedSegments.header && decryptedSegments.cdBody) {
+    const headerContent = decryptedSegments.header.replace(/[\0\s]+$/, '');
+    const cdBodyContent = decryptedSegments.cdBody.replace(/[\0\s]+$/, '');
+    const chromePayloadBody = headerContent + cdBodyContent;
+    // chromePayloadBody = cdString.slice(0,-1) + ','  (the full payload body)
+    // Chrome's cd string = remove trailing comma, add closing brace
+    chromeCdStringClean = chromePayloadBody.slice(0, -1) + '}';
+
+    log(`  Chrome clean cd string (from segments): ${chromeCdStringClean.length} chars`);
+    log(`  Our buildCdString: ${ourCdString.length} chars`);
+    log(`  Difference: ${ourCdString.length - chromeCdStringClean.length} chars`);
+
+    // Compare clean cd strings
+    const cleanCdCmp = compareStrings(chromeCdStringClean, ourCdString, 'cleanCdString');
+    if (cleanCdCmp.match) {
+      log('  Clean cd strings: IDENTICAL');
+      result.cleanCdMatch = true;
+    } else {
+      log(`  Clean cd strings: DIFFER at position ${cleanCdCmp.position}`);
+      log(`    Chrome: ...${JSON.stringify(cleanCdCmp.contextA)}...`);
+      log(`    Ours:   ...${JSON.stringify(cleanCdCmp.contextB)}...`);
+      log(`    Chrome char: ${cleanCdCmp.charA} (${String.fromCharCode(cleanCdCmp.charA || 32)})`);
+      log(`    Our char:    ${cleanCdCmp.charB} (${String.fromCharCode(cleanCdCmp.charB || 32)})`);
+      result.cleanCdMatch = false;
+    }
+    result.cleanCdLengths = { chrome: chromeCdStringClean.length, ours: ourCdString.length };
+
+    // ── Field-by-field serialization comparison ──
+    log(`\n  Field-by-field serialization comparison (${chromeCd.length} fields):`);
+
+    const fieldDiffs = [];
+    let chromePos = '{"cd":['.length;  // skip the opening
+
+    for (let i = 0; i < chromeCd.length; i++) {
+      // Our serialization of this field
+      const entry = chromeCd[i];
+      let ourField;
+      if (entry === null) ourField = 'null';
+      else ourField = JSON.stringify(entry);
+
+      // Extract this field from Chrome's string using depth-aware parsing
+      let depth = 0;
+      let inStr = false;
+      let j = chromePos;
+      while (j < chromeCdStringClean.length - 2) {  // -2 for ']}'
+        const ch = chromeCdStringClean[j];
+        if (inStr) {
+          if (ch === '\\') { j++; }  // skip escaped char
+          else if (ch === '"') { inStr = false; }
+        } else {
+          if (ch === '"') { inStr = true; }
+          else if (ch === '[' || ch === '{') { depth++; }
+          else if (ch === ']' || ch === '}') { depth--; }
+          else if (ch === ',' && depth === 0) { break; }
+        }
+        j++;
+      }
+      const chromeField = chromeCdStringClean.substring(chromePos, j);
+
+      if (chromeField !== ourField) {
+        log(`    [${i}] DIFFER:`);
+        log(`      Chrome: ${chromeField.substring(0, 80)}${chromeField.length > 80 ? '...' : ''}`);
+        log(`      Ours:   ${ourField.substring(0, 80)}${ourField.length > 80 ? '...' : ''}`);
+        log(`      Lengths: chrome=${chromeField.length}, ours=${ourField.length}`);
+        fieldDiffs.push({
+          index: i,
+          chrome: chromeField,
+          ours: ourField,
+          chromeLen: chromeField.length,
+          ourLen: ourField.length,
+        });
+      }
+
+      chromePos = j + 1;  // skip comma
+    }
+
+    if (fieldDiffs.length === 0) {
+      log('    All fields serialize identically');
+    } else {
+      log(`    ${fieldDiffs.length} field(s) differ`);
+      const totalChromeDiff = fieldDiffs.reduce((s, d) => s + d.chromeLen, 0);
+      const totalOurDiff = fieldDiffs.reduce((s, d) => s + d.ourLen, 0);
+      log(`    Total char difference from differing fields: ${totalOurDiff - totalChromeDiff}`);
+    }
+
+    result.fieldDiffs = fieldDiffs;
+  } else {
+    log('  No decrypted segments available — skipping clean cd reconstruction');
+  }
+
+  // ── Legacy comparison from raw plaintext (kept for backward compat) ──
+  log('\n  Legacy plaintext-based comparison:');
 
   // Extract Chrome's cd string from the decrypted plaintext.
   const cdJsonStart = plaintext.indexOf('{"cd":[');
@@ -439,6 +537,9 @@ function comparisonB(chromeCollect, xteaParams, sdStringLength) {
 
   // Store the decrypted hash content for Comparison C
   result.hashContent = decrypted.hash.replace(/[\0\s]+$/, '');
+
+  // Store all decrypted segments for Comparison A clean reconstruction
+  result.decryptedSegments = decrypted;
 
   return result;
 }
@@ -770,9 +871,7 @@ async function run(opts) {
     }
 
     // ── Run Comparisons ──
-    results.comparisonA = comparisonA(plaintext, parsed, xteaParams);
-
-    // sd string length for segment splitting
+    // Run B first to get decrypted segments for clean cd reconstruction in A
     let sdStringLen;
     if (parsed && parsed.sd) {
       sdStringLen = buildSdString(parsed.sd).length;
@@ -786,6 +885,10 @@ async function run(opts) {
     }
     results.comparisonB = comparisonB(chromeCollect, xteaParams, sdStringLen);
 
+    // Pass decrypted segments from B to A for clean cd string reconstruction
+    const decryptedSegments = results.comparisonB.decryptedSegments || null;
+    results.comparisonA = comparisonA(plaintext, parsed, xteaParams, decryptedSegments);
+
     const hashContent = results.comparisonB.hashContent || '';
     results.comparisonC = comparisonC(chromeCollect, parsed, xteaParams, hashContent);
 
@@ -796,6 +899,11 @@ async function run(opts) {
   } finally {
     await page.close().catch(() => {});
     await browser.close().catch(() => {});
+  }
+
+  // ── Clean up binary data before serialization ──
+  if (results.comparisonB && results.comparisonB.decryptedSegments) {
+    delete results.comparisonB.decryptedSegments;
   }
 
   // ── Write results ──
@@ -811,6 +919,12 @@ async function run(opts) {
   if (results.comparisonA) {
     const a = results.comparisonA;
     log(`  A (Plaintext): cd=${a.cdStringsMatch ? 'MATCH' : 'DIFFER'}, sd=${a.sdStringsMatch ? 'MATCH' : 'DIFFER'}, fullBody=${a.fullBodyMatch ? 'MATCH' : 'DIFFER'}`);
+    if (a.cleanCdLengths) {
+      log(`  A (Clean CD): ${a.cleanCdMatch ? 'MATCH' : 'DIFFER'} (chrome=${a.cleanCdLengths.chrome}, ours=${a.cleanCdLengths.ours}, delta=${a.cleanCdLengths.ours - a.cleanCdLengths.chrome})`);
+    }
+    if (a.fieldDiffs && a.fieldDiffs.length > 0) {
+      log(`  A (Field Diffs): ${a.fieldDiffs.length} field(s) differ: [${a.fieldDiffs.map(d => d.index).join(', ')}]`);
+    }
   }
   if (results.comparisonB) {
     const b = results.comparisonB;
