@@ -545,34 +545,10 @@ async function solve(opts) {
               log(`  [DIAG] Header field count: ${diagFieldCount} (commas between cd fields)`);
               log(`  [DIAG] → headerFieldCount should be ${diagFieldCount} for this template`);
 
-              // Decrypt ALL segments for full cd string comparison
-              const hashB64 = diagB64.substring(192, 256);
-
-              // Determine sig size from Chrome's sd
-              const chromeSdStr = buildSdString(decryptResult.parsed.sd);
-              const sigEncLen = Math.ceil(chromeSdStr.length / 8) * 8;
-              const sigB64Len = Math.ceil(sigEncLen / 3) * 4;
-              const cdBodyB64 = diagB64.substring(256, diagB64.length - sigB64Len);
-              const cdBodyEnc = Buffer.from(cdBodyB64, 'base64').toString('binary');
-              const cdBodyDec = decryptXtea(cdBodyEnc, xteaParams);
-              const cdBodyTrimmed = cdBodyDec.replace(/[\0\s]+$/, '');
-              log(`  [DIAG] cdBody: ${cdBodyDec.length}b, trimmed ${cdBodyTrimmed.length}b`);
-              log(`  [DIAG] cdBody starts: ${JSON.stringify(cdBodyTrimmed.substring(0, 60))}`);
-
-              // Reconstruct Chrome's payload body from header + cdBody
-              // The payload body = headerContent(144) + cdBodyContent
-              // Since header may have trailing padding, we use the full 144 bytes
-              const chromePayloadBody = headerDec + cdBodyTrimmed;
-              // Extract the cd string: payloadBody ends with ',' → remove it, add '}'
-              // But the payload actually includes padding from headerDec at positions
-              // headerTrimmed.length to 143. Let's reconstruct properly:
-              // payloadBody = headerDec[0:144] + cdBodyContent
-              // The actual cd JSON = remove trailing comma + add '}'
-              const fullPayload = headerDec.substring(0, 144) + cdBodyTrimmed;
-              // Strip trailing comma if present
-              let chromeCdStr2 = fullPayload.endsWith(',')
-                ? fullPayload.slice(0, -1) + '}'
-                : fullPayload + '}';
+              // Use decryptResult.plaintext — the full decrypted cd string
+              // This is much more reliable than reconstructing from per-segment
+              // decryption (header + cdBody), which breaks at segment boundaries.
+              const chromeCdStr2 = decryptResult.plaintext;
 
               // Now build our cd string from the SAME cd array (after hash strip)
               const chromeCleanCd = [...decryptResult.parsed.cd];
