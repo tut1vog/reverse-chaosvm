@@ -426,18 +426,60 @@ async function solve(opts) {
       log('Step 7: Template cache lookup...');
       let cached = cache.lookup(tdcName);
       if (!cached) {
-        log('  TDC_NAME not in cache, running structural lookup...');
+        log('  TDC_NAME not in cache, running pipeline key extraction...');
+        const { parseVmFunction } = require('../pipeline/vm-parser');
+        const { mapOpcodes } = require('../pipeline/opcode-mapper');
+        const { extractKey } = require('../pipeline/key-extractor');
+        const os = require('os');
+
+        let vmInfo = null;
+        let pipelineExtracted = false;
         try {
-          const { parseVmFunction } = require('../pipeline/vm-parser');
-          const vmInfo = parseVmFunction(capturedTdcSource);
+          vmInfo = parseVmFunction(capturedTdcSource);
           log(`  Parsed VM: ${vmInfo.caseCount} opcodes`);
-          cached = cache.lookupByStructure(vmInfo.caseCount);
-          if (cached) {
+
+          const mapResult = mapOpcodes(vmInfo, capturedTdcSource);
+          log(`  Mapped opcodes: ${Object.keys(mapResult.opcodeTable).length} mapped, ${mapResult.unmapped.length} unmapped`);
+
+          // extractKey needs a file path — write captured source to temp file
+          const tmpFile = path.join(os.tmpdir(), `tdc-${tdcName}-${Date.now()}.js`);
+          try {
+            fs.writeFileSync(tmpFile, capturedTdcSource, 'utf8');
+            log(`  Wrote temp tdc source: ${tmpFile}`);
+
+            const keyResult = await extractKey(tmpFile, mapResult.opcodeTable, vmInfo.variables);
+            log(`  Pipeline extracted key: [${keyResult.key.map(k => '0x' + (k >>> 0).toString(16)).join(', ')}]`);
+            log(`  keyMods: [${(keyResult.keyMods || [0, 0, 0, 0]).join(', ')}]`);
+            log(`  delta: 0x${(keyResult.delta >>> 0).toString(16)}, rounds: ${keyResult.rounds}`);
+
+            cached = {
+              template: 'live-extracted',
+              key: keyResult.key,
+              delta: keyResult.delta,
+              rounds: keyResult.rounds,
+              keyMods: keyResult.keyMods || [0, 0, 0, 0],
+              keyModConstants: keyResult.keyModConstants || [0, 0],
+              caseCount: vmInfo.caseCount,
+            };
+
+            // Store in cache for future lookups
             cache.store(tdcName, cached);
-            log(`  Matched template ${cached.template} by structure (${vmInfo.caseCount} opcodes)`);
+            log(`  Stored extracted params in cache for ${tdcName}`);
+            pipelineExtracted = true;
+          } finally {
+            // Clean up temp file
+            try { fs.unlinkSync(tmpFile); } catch (_) { /* ignore */ }
           }
-        } catch (parseErr) {
-          log(`  VM parse failed: ${parseErr.message}`);
+        } catch (pipelineErr) {
+          log(`  Pipeline extraction failed: ${pipelineErr.message}`);
+          // Fall back to structural lookup as last resort
+          if (vmInfo) {
+            cached = cache.lookupByStructure(vmInfo.caseCount);
+            if (cached) {
+              cache.store(tdcName, cached);
+              log(`  WARNING: Fell back to structural match (${vmInfo.caseCount} opcodes) — key may be wrong!`);
+            }
+          }
         }
       }
       if (!cached) throw new Error(`Unknown template ${tdcName}, run pipeline to port it`);
