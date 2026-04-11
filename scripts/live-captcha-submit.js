@@ -708,17 +708,12 @@ async function solve(opts) {
             serializationDiffs = detectSerializationDiffs(fullDecrypt.plaintext, fullDecrypt.parsed.cd);
             log(`  Serialization diffs: ${serializationDiffs.length} fields differ`);
 
-            // Strip ALL hash artifacts from Chrome's cd for cdArrayOverride
+            // Use Chrome's full cd array for cdArrayOverride (DON'T strip hash artifacts)
+            // Chrome's cd string includes [[4,-1,-1,ts,0,0,0,0]] inline; our buildHashChunk
+            // generates the separate hash segment independently, so both appear in the token.
             strippedCd = [...fullDecrypt.parsed.cd];
-            if (hashPositions.length > 0) {
-              // Remove in REVERSE order to preserve indices
-              for (let hi = hashPositions.length - 1; hi >= 0; hi--) {
-                strippedCd.splice(hashPositions[hi], 1);
-              }
-              log(`  Stripped ${hashPositions.length} hash artifacts at positions [${hashPositions.join(', ')}] (${fullDecrypt.parsed.cd.length} → ${strippedCd.length} fields)`);
-            } else {
-              log(`  No hash artifacts found in Chrome cd, using all ${strippedCd.length} fields`);
-            }
+            log(`  Hash positions: [${hashPositions.join(', ')}] (kept in cd for cdArrayOverride)`);
+            log(`  Using full Chrome cd: ${strippedCd.length} fields for cdArrayOverride`);
           }
 
           if (fullDecrypt.parsed.sd) {
@@ -889,7 +884,7 @@ async function solve(opts) {
       if (strippedCd) {
         // Use Chrome's exact cd values via cdArrayOverride
         collectOpts.cdArrayOverride = strippedCd;
-        log(`  Using cdArrayOverride with Chrome's cd (${strippedCd.length} fields, hash stripped)`);
+        log(`  Using cdArrayOverride with Chrome's full cd (${strippedCd.length} fields, hash kept)`);
         // Do NOT pass behavioralEvents — Chrome's pre-solve TDC.getData() has none
         // Do NOT pass cdFieldOrder — cdArrayOverride already in Chrome's order
       } else {
