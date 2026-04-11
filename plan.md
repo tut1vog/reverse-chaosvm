@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.5 — Fix buildInputChunks header split
+Current task: 19.7 — Live re-test with actual CAPTCHA
 
 ---
 
@@ -194,7 +194,7 @@ Current task: 19.5 — Fix buildInputChunks header split
 | 19.4 | Root cause analysis — header splits at field boundary | done |
 | 19.5 | Fix buildInputChunks header split | done |
 | 19.6 | Verify fix with ref-inject-forensics | done |
-| 19.7 | Live re-test with actual CAPTCHA | pending |
+| 19.7 | Live re-test with actual CAPTCHA | in-progress |
 
 ---
 
