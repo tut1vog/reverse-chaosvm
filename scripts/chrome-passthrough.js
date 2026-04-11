@@ -46,9 +46,8 @@ const DEFAULT_AID = '2046626881';
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36';
-const DEFAULT_RATIO = 0.5;
-const CALIBRATION_OFFSET = -25;
-const DEFAULT_SLIDE_Y = 45;
+const NATURAL_CALIBRATION = -13;
+const SLIDE_Y = 158;
 const NAV_TIMEOUT = 30000;
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -255,9 +254,9 @@ async function solve(opts) {
       const rawOffset = await solveSlider(interceptedImages.bg, interceptedImages.slice);
       log(`  rawOffset: ${rawOffset}`);
 
-      const calibration = CALIBRATION_OFFSET + Math.floor(Math.random() * 11) - 5;
-      const xAnswer = Math.round(rawOffset * DEFAULT_RATIO + calibration);
-      const ans = `${xAnswer},${DEFAULT_SLIDE_Y};`;
+      const xAnswer = Math.round(rawOffset + NATURAL_CALIBRATION);
+      const ans = `${xAnswer},${SLIDE_Y};`;
+      log(`  xAnswer: ${xAnswer} (rawOffset=${rawOffset}, calibration=${NATURAL_CALIBRATION})`);
       log(`  ans: ${ans}`);
 
       // ── Step 5: Capture Chrome's collect token (AS-IS) ──
