@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 25
-Current task: 25.2 — Analyze results and identify remaining gaps
+Current task: 25.3 — Decrypt and diff cdBody plaintext between standalone and Chrome
 
 ---
 
@@ -25,7 +25,8 @@ Current task: 25.2 — Analyze results and identify remaining gaps
 | ID | Task | Status |
 |----|------|--------|
 | 25.1 | cdArrayOverride live test with Chrome's exact cd values | done |
-| 25.2 | Analyze results and identify remaining gaps | in-progress |
+| 25.2 | Analyze results and identify remaining gaps | done |
+| 25.3 | Decrypt and diff cdBody plaintext between standalone and Chrome | pending |
 
 ### Phase 26: Realistic Fingerprint Profile
 > If Phase 25 confirms that Chrome's exact cd values pass, build a more realistic default profile that matches Chrome's typical value sizes. Key areas: strip/truncate oversized fields (plugin lists, font lists, canvas data), remove behavioral events from pre-solve token, match Chrome's sd structure.
@@ -50,32 +51,34 @@ Current task: 25.2 — Analyze results and identify remaining gaps
 
 ## Current Task
 
-**ID**: 25.2
-**Title**: Analyze results and identify remaining gaps
+**ID**: 25.3
+**Title**: Decrypt and diff cdBody plaintext between standalone and Chrome
 **Phase**: Chrome cd Injection — Validate Token Structure
-**Status**: in-progress
+**Status**: pending
 
 ### Goal
-Analyze why errorCode 9 persists with Chrome's exact cd values. The standalone collect is 248-336 chars SMALLER than Chrome's (3928 vs 4176-4264). Identify what structural differences remain between our token and Chrome's.
+The 40-52 char cdBody difference is the ONLY remaining gap between standalone and Chrome tokens. With Chrome's exact cd values (via cdArrayOverride), header/hash/sig are identical. Decrypt both cdBody segments and diff the plaintext to find exactly what serialization difference causes the gap.
 
 ### Context
-- 25.1 results: cdArrayOverride works, standalone collect ~3928, Chrome ~4200, diff -248 to -336
-- Standalone is SMALLER — something Chrome includes is missing from ours
-- Candidates: hash segment size, sig segment, sd serialization, header content
-- Previous forensics (Phase 19) showed segments are IDENTICAL for Template A reference build
-- Live templates may have different segment structures
-- Key files: `scripts/live-captcha-submit.js`, `scraper/collect-generator.js`, `token/generate-token.js`, `token/outer-pipeline.js`
+- 25.2 results: header=0, hash=0, sig=0, cdBody=-40 to -52 chars
+- We use Chrome's exact cd values, so the diff must be in HOW we serialize them (buildCdString in outer-pipeline.js)
+- Previous Phase 19 forensics showed cdBody was IDENTICAL for Template A reference build, so the diff is template-specific
+- Live templates: 94-opcode (Template B) and 98-opcode observed
+- Key serialization: `token/outer-pipeline.js` `buildCdString()` — hand-rolled JSON concatenation
+- The VM's func_276 does custom object serialization that may differ from our buildCdString for certain field types
+- Files: `scripts/live-captcha-submit.js`, `token/outer-pipeline.js`, `token/crypto-core.js`
 
 ### Implementation Steps
-1. Add per-segment size logging to live-captcha-submit.js (header, hash, cdBody, sig sizes in base64 chars)
-2. Decrypt Chrome's token into individual segments and log their sizes
-3. Compare segment-by-segment: which segment is smaller in standalone?
-4. Report findings
+1. After generating standalone collect, decrypt its cdBody segment using the same XTEA params
+2. Decrypt Chrome's cdBody segment 
+3. Diff the two plaintext strings char-by-char, find first divergence point
+4. Log: divergence position, context around it, field index where it diverges
+5. Run live and report findings
 
 ### Verification
-- [ ] Per-segment size comparison available for at least one live attempt
-- [ ] Root cause of 248-336 char gap identified (which segment differs and by how much)
-- [ ] Actionable next step proposed based on findings
+- [ ] cdBody plaintext from both standalone and Chrome available for at least one attempt
+- [ ] First divergence point identified with surrounding context
+- [ ] Specific cd field or serialization pattern causing the diff identified
 
 ### Suggested Agent
 general-purpose
