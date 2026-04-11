@@ -35,67 +35,64 @@ Current task: 31.1 — Add auto-port method to scraper
 |----|------|--------|
 | 31.1 | Add auto-port method to scraper | done |
 | 31.2 | Tests for auto-port | done |
-| 31.3 | Integrate auto-port into solve loop | in-progress |
-| 31.4 | Tests for solve loop integration | pending |
+| 31.3 | Integrate auto-port into solve loop | done |
+| 31.4 | Tests for solve loop integration | in-progress |
 | 31.5 | Live end-to-end test with unknown template | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 31.3
-**Title**: Integrate auto-port into solve loop
+**ID**: 31.4
+**Title**: Tests for solve loop integration
 **Phase**: Auto-Port Unknown Templates in Scraper
 **Status**: in-progress
 
 ### Goal
-Modify the `solveCaptcha()` method in `scraper/scraper.js` so that when both direct cache lookup and structural lookup fail, it calls `_autoPort(tdcName, tdcSource)` before giving up. If auto-port succeeds, continue the solve flow normally. If it fails, throw the existing error.
+Add tests verifying the auto-port integration in `solveCaptcha()`. The tests should confirm that when both cache lookup and structural lookup miss, `_autoPort` is called, and that the solve flow continues on success or throws on failure.
 
 ### Context
 
-**Integration point**: `scraper/scraper.js`, lines 425-427. Currently:
+**Integration point** (`scraper/scraper.js`, lines 425-431):
 ```js
 if (!cached) {
-  throw new Error(`Unknown template ${tdcName}, run pipeline to port it`);
+  this._log('  No structural match — attempting auto-port via pipeline...');
+  cached = await this._autoPort(tdcName, tdcSource);
+}
+if (!cached) {
+  throw new Error(`Unknown template ${tdcName}, auto-port failed`);
 }
 ```
 
-After the structural lookup attempt (lines 411-424) falls through, the code should try `_autoPort` as a last resort.
+**Testing approach**: Since `solveCaptcha()` involves HTTP calls (prehandle, getSig, image download, tdc download, slider solve, verify POST), testing the full method requires extensive mocking. The most practical approach is to:
+1. Add tests to the existing `tests/test-auto-port.js` that test the integration logic
+2. OR create a focused test that patches just the relevant methods on a Scraper instance
 
-**Available variables at integration point**:
-- `tdcName` — string, already extracted
-- `tdcSource` — string, the full tdc.js source (fetched at line 397)
-- `this._autoPort(tdcName, tdcSource)` — returns cached entry or null
+The cleanest approach: test by patching `_autoPort` on the Scraper prototype and testing the template-lookup flow directly. We can extract the lookup+autoport logic into a testable path by calling the relevant section directly, or test via solveCaptcha with all HTTP methods stubbed.
 
-**Flow change**:
-```
-lookup(tdcName) → miss →
-  parseVmFunction → lookupByStructure(caseCount) → miss →
-    _autoPort(tdcName, tdcSource) → miss →
-      throw Error
-```
+**Simpler alternative**: Since `_autoPort` is already well-tested (31.2), and the integration is a 4-line change, we can write a targeted test that:
+- Creates a Scraper with empty cache
+- Stubs `_autoPort` to return a known entry
+- Verifies the flow reaches `_autoPort` when lookup and structural lookup both miss
+- This is most practically done by testing at the unit level: mock the cache to return null, mock `_autoPort`, and check it gets called
 
 **Key files**:
-- `scraper/scraper.js` — modify `solveCaptcha()` around lines 425-427
+- `scraper/scraper.js` — the integration point
+- `tests/test-auto-port.js` — add integration tests here
 
 ### Implementation Steps
-1. Replace the `if (!cached)` block at lines 425-427 with:
-   ```js
-   if (!cached) {
-     this._log('  No structural match — attempting auto-port via pipeline...');
-     cached = await this._autoPort(tdcName, tdcSource);
-   }
-   if (!cached) {
-     throw new Error(`Unknown template ${tdcName}, auto-port failed`);
-   }
-   ```
-2. That's it — the `_autoPort` method already handles all the subprocess work, caching, and error handling.
+1. Add a new `describe('solveCaptcha auto-port integration')` block to `tests/test-auto-port.js`
+2. Tests should create a Scraper instance, stub `_templateCache.lookup` to return null, stub `_templateCache.lookupByStructure` to return null, stub `_autoPort` to return a known entry or null
+3. Since we can't easily call `solveCaptcha()` without all HTTP plumbing, instead test the conditional logic by extracting the relevant snippet into a test or by verifying `_autoPort` is called at the right time
+4. At minimum, test:
+   - When `_autoPort` succeeds, scraper doesn't throw (the `cached` variable gets the result)
+   - When `_autoPort` returns null, scraper throws with "auto-port failed"
+   - When lookup hits (cache HIT), `_autoPort` is NOT called
 
 ### Verification
-- [ ] `node -c scraper/scraper.js` passes
+- [ ] New tests pass
 - [ ] `npm test` — no regressions
-- [ ] Code review: auto-port call is in the right place (after structural lookup, before throw)
-- [ ] Code review: error message updated to mention auto-port failure
+- [ ] Code review: tests verify the integration behavior, not just _autoPort in isolation
 
 ### Suggested Agent
 general-purpose
