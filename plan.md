@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 34
-Current task: 34.1 — Fix extractThisCtx for bracket-notation .call()
+Current task: 34.2 — Tests for vm-parser obfuscation fixes
 
 ---
 
@@ -75,16 +75,16 @@ Current task: 34.1 — Fix extractThisCtx for bracket-notation .call()
 - **errorCode 9** seen once (wrong slider answer)
 - Template classification: 1× A (95 ops), 3× B (94 ops), 3× "unknown" (96/98 ops), 3× unparseable
 
-### Phase 34: Fix VM Parser for Bracket-Notation Builds
-> The 3 unparseable builds (162K-202K) use `['call']` (bracket notation) instead
-> of `.call` (dot notation). The vm-parser's `extractThisCtx` only matches
-> `property.type === 'Identifier'` — needs to also match `property.type === 'Literal'`.
-> All other parser steps (switch finding, bytecode/pc, regs, catchStack) already work.
+### Phase 34: Fix VM Parser for Obfuscated Builds
+> The 3 unparseable builds (162K-202K) use obfuscated property access:
+> `['call']` instead of `.call`, and `array[decoderFn(0xNN)]()` instead of
+> `array.pop()`. Two fixes needed in vm-parser.js: extractThisCtx and
+> extractCatchVars.
 
 | ID | Task | Status |
 |----|------|--------|
-| 34.1 | Fix extractThisCtx for bracket-notation .call() | in-progress |
-| 34.2 | Tests for bracket-notation vm-parser fix | pending |
+| 34.1 | Fix extractThisCtx and extractCatchVars for obfuscated builds | done |
+| 34.2 | Tests for vm-parser obfuscation fixes | pending |
 | 34.3 | Re-run survey to verify all builds port | pending |
 
 ---
@@ -97,33 +97,26 @@ Current task: 34.1 — Fix extractThisCtx for bracket-notation .call()
 **Status**: in-progress
 
 ### Goal
-Modify `extractThisCtx()` in `pipeline/vm-parser.js` to also match bracket-notation `.call()` — where property is `Literal` with value `'call'` instead of `Identifier` named `call`. This is a one-line fix.
+Write tests covering the vm-parser obfuscation fixes (bracket-notation .call() and fallback catchStack detection).
 
 ### Context
-- `pipeline/vm-parser.js` line 179: currently checks `node.callee.property.type === 'Identifier' && node.callee.property.name === 'call'`
-- Failing builds use `regs[bytecode[++pc]]['call'](thisCtx, ...)` — bracket notation
-- In the AST, bracket notation produces `property.type === 'Literal'` with `property.value === 'call'`
-- Confirmed via diagnostic: all 3 failing builds have 3 bracket-notation `.call()` patterns each, and the thisCtx candidate is correctly found when matching both notations
-- No other parser functions need changes — bytecode/pc/regs/catchStack extraction all work on these builds
+- `pipeline/vm-parser.js` — fixed to handle bracket notation `.call()` and obfuscated `.pop()` via pc-assignment heuristic
+- 3 obfuscated builds saved at: `output/tdc-survey/27dda893f81dbc4f.js`, `output/tdc-survey/3429444f324c6110.js`, `output/tdc-survey/e2170903e201e018.js`
+- Existing vm-parser tests: `tests/test-vm-parser.js`
+- Tests should verify that `parseVmFunction` succeeds on obfuscated builds and returns all 6 variables
 
 ### Implementation Steps
-1. In `extractThisCtx()`, change the `.call` check on line 179 from:
-   ```js
-   node.callee.property.type === 'Identifier' &&
-   node.callee.property.name === 'call'
-   ```
-   to:
-   ```js
-   ((node.callee.property.type === 'Identifier' && node.callee.property.name === 'call') ||
-    (node.callee.property.type === 'Literal' && node.callee.property.value === 'call'))
-   ```
+1. Read existing `tests/test-vm-parser.js` to understand the test structure
+2. Add new tests that parse the 3 obfuscated survey builds
+3. Verify all 6 variables are extracted (bytecode, pc, regs, thisCtx, catchStack, excVal)
+4. Verify caseCount is correct (103, 91, 93)
 
 ### Verification
-- [ ] `node -c pipeline/vm-parser.js` passes
-- [ ] All 3 previously-failing builds parse successfully:
-      `node -e "const {parseVmFunction}=require('./pipeline/vm-parser'); const fs=require('fs'); for (const h of ['27dda893f81dbc4f','3429444f324c6110','e2170903e201e018']) { const src=fs.readFileSync('output/tdc-survey/'+h+'.js','utf8'); const r=parseVmFunction(src); console.log(h+': '+r.caseCount+' cases, thisCtx='+r.variables.thisCtx); }"`
-- [ ] All previously-working builds still parse: `node -e "const {parseVmFunction}=require('./pipeline/vm-parser'); const fs=require('fs'); const src=fs.readFileSync('targets/tdc.js','utf8'); const r=parseVmFunction(src); console.log('tdc.js:', r.caseCount, 'cases, thisCtx='+r.variables.thisCtx);"`
+- [ ] `node --test tests/test-vm-parser.js` passes
 - [ ] `npm test` — no regressions
+
+### Suggested Agent
+general-purpose
 
 ### Suggested Agent
 general-purpose
