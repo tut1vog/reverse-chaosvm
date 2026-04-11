@@ -435,7 +435,16 @@ async function main() {
             'utf8'
           );
 
-          log(`  Dumped tokens to ${isoDir}/`);
+          // Also save the captured tdc.js source for pipeline analysis
+          if (capturedTdcSource) {
+            fs.writeFileSync(
+              path.join(isoDir, 'tdc-source.js'),
+              capturedTdcSource,
+              'utf8'
+            );
+          }
+
+          log(`  Dumped tokens + tdc source to ${isoDir}/`);
         } catch (dumpErr) {
           log(`  WARNING: Failed to dump tokens: ${dumpErr.message}`);
         }
