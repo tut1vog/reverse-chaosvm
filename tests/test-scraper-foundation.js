@@ -683,3 +683,35 @@ describe('collect-generator: normalizeKeyMods', () => {
     assert.deepStrictEqual(result, [500, 600, 700, 800]);
   });
 });
+
+// ============================================================================
+// 13. collect-generator: generateCollect — singleBlob
+// ============================================================================
+
+describe('generateCollect — singleBlob', () => {
+  it('singleBlob: true produces a shorter token than segmented mode', () => {
+    const result = generateCollect(profile, XTEA_A, { ...FIXED_OPTS, singleBlob: true });
+    const segmented = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    assert.ok(result.length < segmented.length,
+      'singleBlob output should be shorter than segmented output');
+  });
+
+  it('without singleBlob produces the segmented (4-chunk) format', () => {
+    const result = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    assert.ok(typeof result === 'string', 'should be a string');
+    assert.ok(result.length > 4000, 'segmented output should be > 4000 chars');
+  });
+
+  it('singleBlob output is valid URL-encoded base64', () => {
+    const result = generateCollect(profile, XTEA_A, { ...FIXED_OPTS, singleBlob: true });
+    const decoded = decodeURIComponent(result);
+    assert.match(decoded, /^[A-Za-z0-9+/=]+$/, 'decoded singleBlob should be valid base64');
+  });
+
+  it('singleBlob and non-singleBlob produce different outputs', () => {
+    const withBlob = generateCollect(profile, XTEA_A, { ...FIXED_OPTS, singleBlob: true });
+    const withoutBlob = generateCollect(profile, XTEA_A, FIXED_OPTS);
+    assert.notStrictEqual(withBlob, withoutBlob,
+      'singleBlob and non-singleBlob should produce different outputs');
+  });
+});
