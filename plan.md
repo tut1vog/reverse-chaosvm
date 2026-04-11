@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 23
-Current task: 23.2 — Wire headerSplit through to buildInputChunks
+Current task: 23.3 — Tests for header split logic
 
 ---
 
@@ -28,7 +28,7 @@ Current task: 23.2 — Wire headerSplit through to buildInputChunks
 | ID | Task | Status |
 |----|------|--------|
 | 23.1 | Fix analyzeHeaderSplit for full-token decrypted plaintext | done |
-| 23.2 | Wire headerSplit through to buildInputChunks | pending |
+| 23.2 | Wire headerSplit through to buildInputChunks | done |
 | 23.3 | Tests for header split logic | pending |
 
 ### Phase 24: End-to-End Live Verification
@@ -44,34 +44,31 @@ Current task: 23.2 — Wire headerSplit through to buildInputChunks
 
 ## Current Task
 
-**ID**: 23.2
-**Title**: Wire headerSplit through to buildInputChunks
+**ID**: 23.3
+**Title**: Tests for header split logic
 **Phase**: Header Split Strategy Application
 **Status**: pending
 
 ### Goal
-The extracted `headerSplit` is stored in the template cache but never used by `buildInputChunks()` in `token/generate-token.js`. Wire the headerSplit strategy through the token generation path so that:
-- "field-boundary" strategy: split at `contentLength`, pad to 144 with spaces
-- "byte-boundary" strategy: split at position 144 (current default behavior)
+Add tests covering the `buildInputChunks` headerSplit wiring: field-boundary splitting with padding and comma duplication, byte-boundary default behavior, and the full passthrough from collect-generator.
 
 ### Context
-- `token/generate-token.js` lines 100-136: `buildInputChunks()` — currently always does byte-boundary split at 144
-- `scraper/collect-generator.js`: calls `generateToken()` from `token/generate-token.js` — passes options
-- `scraper/template-cache.js`: cache entries have `headerSplit: { strategy, contentLength, paddingLength }`
-- History from 19.5+19.6: Template A needs field-boundary split at 133 (11 fields), pad to 144
-- History from 20.3+: live templates have byte-boundary split (no padding, content fills all 144 bytes)
+- `token/generate-token.js` — `buildInputChunks()` now accepts `options.headerSplit`
+- `scraper/collect-generator.js` — passes `opts.headerSplit` through
+- Existing tests: `tests/test-outer-pipeline.js` has buildInputChunks tests (read to find exact location)
 
 ### Implementation Steps
-1. Add `headerSplit` option to `buildInputChunks()` in `token/generate-token.js`
-2. When `headerSplit.strategy === 'field-boundary'`: split at `headerSplit.contentLength`, pad with spaces to 144
-3. When `headerSplit.strategy === 'byte-boundary'` or absent: current behavior (split at 144)
-4. Pass `headerSplit` from template cache through `scraper/collect-generator.js` → `generateCollect` → `generateToken` → `buildInputChunks`
-5. Also pass through `scraper/scraper.js` if it calls generateCollect
+1. Add tests in the existing test file for `buildInputChunks`:
+   - Default (no headerSplit): header is 144 bytes, split at position 144
+   - field-boundary with contentLength=50: header has 94 trailing spaces, cdBody starts with `,`
+   - field-boundary with contentLength=133: header has 11 trailing spaces (Template A pattern)
+   - byte-boundary explicit: same as default
+   - No headerSplit option: no regression vs current behavior
+2. Run `npm test` to verify
 
 ### Verification
-- [ ] `npm test` passes (237 total, 2 known failures)
-- [ ] `buildInputChunks` with field-boundary option produces header with trailing spaces
-- [ ] `buildInputChunks` without option produces current default behavior (no regression)
+- [ ] `npm test` passes with new tests (2 known failures only)
+- [ ] Tests cover both strategies and comma duplication
 
 ### Suggested Agent
 general-purpose
