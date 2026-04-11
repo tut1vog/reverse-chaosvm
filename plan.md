@@ -1,60 +1,84 @@
 # Plan
 
 ## Status
-Current phase: Phase 24
-Current task: 24.3 — Live CAPTCHA submission — aim for errorCode != 9
+Current phase: Phase 25
+Current task: 25.1 — cdArrayOverride live test with Chrome's exact cd values
 
 ---
 
 ## Phases
 
-### Phases 1-20: Foundation through Live Template Investigation (all done)
+### Phases 1-21: Foundation through Automated Structure Extraction (all done)
 
-### Phase 21: Automated Template Structure Extraction (done)
-> Built `pipeline/structure-extractor.js` (Stage 5). Extracts hash position, field order, serialization diffs, header split from any tdc.js build. Integrated into pipeline, template cache, and token generation flow. 218/220 tests.
+### Phase 22: Reliable Key Extraction for Live Templates (done)
+> Fixed lossy keyModConstants serialization. `analyzeTrace()` was always correct — the bug was `keyModConstants = [keyMods[1], keyMods[3]]` dropping indices 0 and 2. Now lossless 4-element everywhere. 18 new tests.
 
-### Phase 22: Reliable Key Extraction for Live Templates
-> The pipeline extracts correct keys from saved tdc.js files but fails ~50% of the time on live templates. Root cause: `analyzeTrace()` produces `keyMods: [0,0]` for some templates, and stale cached keys don't match rotated TDC_NAMEs. Until key extraction works reliably for ANY live template, nothing else can be validated.
+### Phase 23: Header Split Strategy Application (done)
+> Per-segment header decryption preserves trailing spaces. `analyzeHeaderSplit` detects field-boundary vs byte-boundary. Wired through buildInputChunks. 13 new tests.
 
-| ID | Task | Status |
-|----|------|--------|
-| 22.1 | Diagnose key extraction failures on live templates | done |
-| 22.2 | Fix keyModConstants legacy format lossy serialization | done |
-| 22.3 | Tests for key extraction fixes | done |
+### Phase 24: End-to-End Live Verification (done)
+> Live key extraction works for ALL templates. Live field order detection reduces diffs 58→20. CAPTCHA submission: errorCode 9 persists. Root cause: standalone tokens 3x larger than Chrome's due to `behavioralEvents` bloating the cd string (Chrome's TDC.getData captures BEFORE slider interaction, so no behavioral events). Token structure is correct.
 
-### Phase 23: Header Split Strategy Application
-> `analyzeHeaderSplit()` returns "unknown" for live templates because full-token decryption scrambles segment boundaries. The extracted `headerSplit` is stored in cache but never applied in `buildInputChunks()`. Fix detection and wire the strategy through to token generation.
+### Phase 25: Chrome cd Injection — Validate Token Structure
+> Use Chrome's exact cd values (cdArrayOverride) to generate a size-matched standalone token, isolating whether the errorCode 9 is caused by cd VALUE differences or by remaining structural issues (encryption, segment layout, sd format). If cdArrayOverride + standalone encryption passes → cd values are the only remaining gap. If it still fails → structural issue remains.
 
 | ID | Task | Status |
 |----|------|--------|
-| 23.1 | Fix analyzeHeaderSplit for full-token decrypted plaintext | done |
-| 23.2 | Wire headerSplit through to buildInputChunks | done |
-| 23.3 | Tests for header split logic | done |
+| 25.1 | cdArrayOverride live test with Chrome's exact cd values | pending |
+| 25.2 | Analyze results and identify remaining gaps | pending |
 
-### Phase 24: End-to-End Live Verification
-> With reliable key extraction (Phase 22) and correct header splitting (Phase 23), run live tests to validate: cdFieldOrder produces correct reordering, serialization overrides reduce diffs, full token matches Chrome's output. Target: 0 field-level diffs on at least one live template.
+### Phase 26: Realistic Fingerprint Profile
+> If Phase 25 confirms that Chrome's exact cd values pass, build a more realistic default profile that matches Chrome's typical value sizes. Key areas: strip/truncate oversized fields (plugin lists, font lists, canvas data), remove behavioral events from pre-solve token, match Chrome's sd structure.
 
 | ID | Task | Status |
 |----|------|--------|
-| 24.1 | Live test: decrypt Chrome token + field-by-field comparison | done |
-| 24.1.1 | Fix standalone token comparison in live-comparison.js | done |
-| 24.2 | Integrate field order detection into live-comparison | done |
-| 24.3 | Live CAPTCHA submission — aim for errorCode != 9 | done |
+| 26.1 | Capture and catalog Chrome's actual fingerprint values across sessions | pending |
+| 26.2 | Build trimmed default profile matching Chrome's typical sizes | pending |
+| 26.3 | Tests for profile trimming | pending |
+| 26.4 | Live CAPTCHA re-test with trimmed profile | pending |
+
+### Phase 27: VM Parser Extension for New Templates
+> Live server serves templates the VM parser can't handle: 199K-char packed bootstrapper format (`BGDfWkdQ...`) and missing `thisCtx` variable identification. Extend `pipeline/vm-parser.js` to handle these formats.
+
+| ID | Task | Status |
+|----|------|--------|
+| 27.1 | Diagnose VM parser failures for new template formats | pending |
+| 27.2 | Extend vm-parser for packed bootstrapper format | pending |
+| 27.3 | Tests for parser extensions | pending |
 
 ---
 
 ## Current Task
 
-Phase 24 complete. All tasks done.
+**ID**: 25.1
+**Title**: cdArrayOverride live test with Chrome's exact cd values
+**Phase**: Chrome cd Injection — Validate Token Structure
+**Status**: pending
 
-### Key findings from 24.3
-- errorCode 9 persists despite correct key extraction, field ordering, and header split
-- **Root cause identified**: standalone tokens are 2.7-3.3x larger than Chrome's (14092 vs 4206 chars)
-- The size difference is caused by the default fingerprint profile generating much larger field values than Chrome's real values (e.g., plugin lists, font lists, canvas data)
-- Encryption, key extraction, field ordering, and header splitting are all working correctly
-- The remaining gap is cd field VALUES, not structure
+### Goal
+Modify `scripts/live-captcha-submit.js` to use `cdArrayOverride` — inject Chrome's exact decrypted cd array into the standalone token generation. This produces a token with identical cd VALUES but our standalone encryption. If the server accepts it, the only remaining work is building a realistic fingerprint profile. If it still rejects, there's a structural issue beyond cd values.
 
-### Next steps (future phases)
-- Use Chrome's real cd values (cdArrayOverride) instead of default profile → test if size-matched token passes
-- Or: strip/truncate oversized fields to match Chrome's typical sizes
-- Or: capture Chrome's actual fingerprint values to build a more realistic default profile
+### Context
+- `cdArrayOverride` option is already supported by `generateCollect()` (from Phase 17)
+- When `cdArrayOverride` is set, `generateCollect` skips `buildDefaultCdArray` and `reorderCdArray`
+- Chrome's cd is available from `fullDecrypt.parsed.cd` (already extracted in Step 6)
+- Must strip the hash artifact before passing (hash is a separate encrypted segment)
+- Must NOT include behavioral events (Chrome's pre-solve token doesn't have them)
+- `live-captcha-submit.js` currently generates behavioral events — remove them for this test
+
+### Implementation Steps
+1. After decrypting Chrome's cd (Step 6), strip hash artifact at `hashPosition`
+2. Set `collectOpts.cdArrayOverride = strippedCdArray`
+3. Remove `behavioralEvents` from collectOpts (Chrome's pre-solve token doesn't have them)
+4. Keep everything else: live eks, slider solve, vData, Chrome TLS submit
+5. Compare collect sizes (should now be close to Chrome's ~4200 chars)
+6. Run and report errorCode
+
+### Verification
+- [ ] Standalone collect size within ±200 chars of Chrome's collect size
+- [ ] errorCode reported
+- [ ] If errorCode 9: identify what else differs (sd structure? encoding?)
+- [ ] If errorCode != 9: confirm Phase 25 success, move to Phase 26
+
+### Suggested Agent
+general-purpose
