@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 21
-Current task: 21.1 — Map all object serialization differences
+Current task: 21.2 — Create structure-extractor pipeline module
 
 ---
 
@@ -30,57 +30,82 @@ Current task: 21.1 — Map all object serialization differences
 > - Header split: live templates use straight byte-boundary (144 bytes, no field-boundary padding) ✅
 > - **cd serialization**: `buildCdString` uses `JSON.stringify` for nested objects, but Chrome's `func_276` serializes only SPECIFIC keys per object type — 19-char difference at `intlOptions` alone ✅
 
-### Phase 21: Fix Object Serialization in buildCdString
-> Chrome's hand-rolled serializer (`func_276`) emits only specific keys for each complex cd field object. Our `buildCdString` uses `JSON.stringify` which includes ALL keys. Fix each diverging field to match Chrome's output.
+### Phase 21: Automated Template Structure Extraction
+> Build a pipeline module (`pipeline/structure-extractor.js`) that automatically extracts cd structure parameters from any tdc.js build — analogous to how `key-extractor.js` extracts XTEA keys via dynamic tracing. Parameters: hash artifact position, cd field order, object serialization rules, header split strategy. Results stored in template cache alongside XTEA params.
 
 | ID | Task | Status |
 |----|------|--------|
-| 21.1 | Map all object serialization differences | done |
-| 21.2 | Fix buildCdString with per-field custom serializers | pending |
-| 21.3 | Verify fix via live forensics comparison | pending |
-| 21.4 | Live CAPTCHA test with all fixes | pending |
+| 21.1 | Map all object serialization differences (diagnostic tool) | done |
+| 21.2 | Create structure-extractor pipeline module | pending |
+| 21.3 | Tests for structure-extractor | pending |
+| 21.4 | Integrate into pipeline/run.js and template cache | pending |
+| 21.5 | Tests for pipeline integration | pending |
+| 21.6 | Use extracted structure params in collect-generator | pending |
+| 21.7 | Live CAPTCHA end-to-end verification | pending |
 
 ---
 
 ## Current Task
 
 **ID**: 21.2
-**Title**: Fix buildCdString with per-field custom serializers
-**Phase**: Fix Object Serialization in buildCdString
+**Title**: Create structure-extractor pipeline module
+**Phase**: Automated Template Structure Extraction
 **Status**: pending
 
 ### Goal
-Based on 21.1 findings, the cd string diffs between Chrome and our buildCdString fall into TWO categories:
-1. **Hash artifact positioning**: Chrome embeds `[[4,-1,-1,ts,0,0,0,0]]` at field[51] (space-padded to ~56 chars). Our code strips hash artifacts and has 59 fields vs Chrome's 60. The hash position varies by template.
-2. **Object key filtering** (from earlier intlOptions finding on a different template): Chrome's `func_276` serializes only specific keys per object type, while our `JSON.stringify` includes all keys.
+Create `pipeline/structure-extractor.js` — a module that, given a tdc.js source + XTEA params, launches Puppeteer, captures Chrome's encrypted collect token, decrypts it, and extracts structural parameters by comparing Chrome's raw cd string with our `buildCdString()` output.
 
-The 94-opcode template (Template B) shows:
-- Chrome: 60 fields (including hash artifact at [51])
-- Ours: 59 fields (hash stripped)
-- 51/60 fields match perfectly
-- 9 diffs: all caused by the hash artifact at position 51 shifting subsequent fields by 1
+This mirrors the pattern of `pipeline/key-extractor.js`: instrument → run in Puppeteer → capture → analyze → return structured result.
 
-**The real fix**: Stop stripping hash artifacts from the cd array before serialization. The hash IS a cd field — it belongs in the serialized cd string. Our code currently strips it and puts it in a separate segment, but Chrome keeps it inline.
+### What to extract
 
-Wait — this contradicts the Template A forensics from Phase 19 where byte-identical tokens WERE achieved. In Template A, the hash was at cd[11] and WAS stripped. So the hash handling differs by template. Need to check whether Template A strips vs embeds.
+1. **hashPosition** (number): Index in the cd array where the hash artifact `[[4,-1,-1,ts,0,0,0,0]]` appears. Template A has it at index 11; Template B has it at index 51; others unknown. Detected by scanning the decrypted cd array for the pattern.
+
+2. **cdFieldOrder** (number[]): Mapping from Chrome's cd field indices to our 59-field schema. Uses the signature/heuristic matching engine already implemented in `scripts/discover-field-order.js` (lines 144-350). Should be extracted into a reusable module.
+
+3. **serializationOverrides** (object): Per-field-index map of fields where Chrome's `func_276` serializes differently from `JSON.stringify`. Detected by the field-by-field comparison already implemented in `scripts/chrome-cd-inject.js` (lines 593-733). For each differing field, stores the KEYS that Chrome emits (e.g., `{9: ["timeZone", "calendar"]}` for intlOptions).
+
+4. **headerSplitStrategy** (string): Either `"field-boundary"` (Template A: split after N fields, pad with spaces) or `"byte-boundary"` (live templates: split at byte 144, no padding). Detected from header padding analysis.
+
+### Approach
+The module should:
+1. Accept `(tdcSource, xteaParams)` as input
+2. Launch Puppeteer with stealth, load a minimal CAPTCHA page (prehandle → show → TDC.getData)
+3. Capture Chrome's encrypted collect token
+4. Decrypt using provided XTEA params
+5. Extract hash position from cd array
+6. Run field-order matching (reuse logic from discover-field-order.js)
+7. Run field-level serialization comparison (reuse logic from chrome-cd-inject.js DIAG)
+8. Analyze header padding to determine split strategy
+9. Return a structured result object
 
 ### Context
-- `scripts/chrome-cd-inject.js` — field-by-field diagnostic (just completed in 21.1)
-- `token/outer-pipeline.js` — `buildCdString()` at line 58
-- `token/generate-token.js` — `buildInputChunks()` where hash is handled
-- `scraper/collect-generator.js` — `generateCollect()` where hash artifacts are stripped from cdArrayOverride
-- Phase 19 notes: For Template A, byte-identical tokens achieved WITH hash stripping + separate hash segment
+- `pipeline/key-extractor.js` — pattern to follow (instrument → Puppeteer → analyze)
+- `scripts/discover-field-order.js` lines 144-350 — field matching engine (signatureMatch + heuristicMatch)
+- `scripts/chrome-cd-inject.js` lines 593-733 — field-by-field serialization comparison
+- `token/outer-pipeline.js` line 58 — `buildCdString()` 
+- `token/collector-schema.js` — 59-field schema definition
+- `scraper/template-cache.js` — where results will be stored (task 21.4)
 
 ### Implementation Steps
-1. Run the diagnostic on a Template A build (via ref-inject-forensics) to confirm hash handling for Template A
-2. Compare Template A hash handling vs Template B hash handling
-3. If hash treatment differs by template, parameterize it in generateCollect/buildInputChunks
-4. For the `intlOptions` object key filtering (found on earlier 96-opcode template), add custom serializer to buildCdString for objects that func_276 serializes selectively
+1. Extract the field matching engine from `scripts/discover-field-order.js` into a reusable module (either in `pipeline/` or `token/`)
+2. Extract the `parseCdFields()` and field comparison logic from `scripts/chrome-cd-inject.js` into a reusable function
+3. Create `pipeline/structure-extractor.js` with:
+   - `async function extractStructure(tdcPath, xteaParams)` — main entry point
+   - Internal: launch Puppeteer, navigate CAPTCHA, get token, decrypt, analyze
+   - `detectHashPosition(cdArray)` — scan for `[[4,-1,-1,*,0,0,0,0]]` pattern
+   - `matchFieldOrder(cdArray, schemaLookup)` — call extracted field matching engine
+   - `detectSerializationDiffs(chromePlaintext, cdArray)` — compare func_276 vs JSON.stringify per field
+   - `analyzeHeaderSplit(chromePlaintext)` — check first 144 chars for trailing space padding
+4. Return result object: `{ hashPosition, cdFieldOrder, serializationOverrides, headerSplitStrategy, chromeCdLength, notes }`
+5. Export main function + individual detection helpers (for testing)
 
 ### Verification
-- [ ] `npm test` passes 173/175 (no regressions)
-- [ ] ref-inject-forensics.js still produces byte-identical tokens for Template A
-- [ ] chrome-cd-inject.js field diagnostic shows 0 diffs for at least one live template
+- [ ] `node -c pipeline/structure-extractor.js` passes
+- [ ] `npm test` still passes 173/175
+- [ ] Module exports `extractStructure` and helper functions
+- [ ] `detectHashPosition` correctly identifies hash at known positions (unit-testable with mock cd arrays)
+- [ ] `parseCdFields` correctly splits a known cd string into individual fields (unit-testable)
 
 ### Suggested Agent
 general-purpose
