@@ -175,8 +175,8 @@ function extractThisCtx(switchNode, bytecodeVar, pcVar, regsVar) {
   walk(switchNode, (node) => {
     if (node.type === 'CallExpression' &&
         node.callee.type === 'MemberExpression' &&
-        node.callee.property.type === 'Identifier' &&
-        node.callee.property.name === 'call' &&
+        ((node.callee.property.type === 'Identifier' && node.callee.property.name === 'call') ||
+         (node.callee.property.type === 'Literal' && node.callee.property.value === 'call')) &&
         node.arguments.length >= 1) {
       // The callee object should be regs[bytecode[++pc]]
       const calleeObj = node.callee.object;
@@ -220,7 +220,7 @@ function extractThisCtx(switchNode, bytecodeVar, pcVar, regsVar) {
  * - An identifier that has .length and .pop() => catchStack
  * - An assignment catchParam => excVal (excVal = catchParam)
  */
-function extractCatchVars(dispatchFn, switchNode) {
+function extractCatchVars(dispatchFn, switchNode, pcVar) {
   // Find the TryStatement in the dispatch function that contains the switch
   const tryNode = findFirst(dispatchFn.body, (node) => {
     if (node.type !== 'TryStatement') return false;
@@ -254,6 +254,22 @@ function extractCatchVars(dispatchFn, switchNode) {
       catchStack = node.right.callee.object.name;
     }
   });
+
+  // Fallback: if .pop() wasn't matched (obfuscated builds use decoded method names),
+  // look for: pcVar = someArray[expr]() — the pc being reassigned from an array method call
+  if (!catchStack && pcVar) {
+    walk(catchBody, (node) => {
+      if (node.type === 'AssignmentExpression' &&
+          node.operator === '=' &&
+          node.left.type === 'Identifier' &&
+          node.left.name === pcVar &&
+          node.right.type === 'CallExpression' &&
+          node.right.callee.type === 'MemberExpression' &&
+          node.right.callee.object.type === 'Identifier') {
+        catchStack = node.right.callee.object.name;
+      }
+    });
+  }
 
   // Find excVal: assignment of catch param to a variable
   // Pattern: excVal = catchParam
@@ -316,7 +332,7 @@ function parseVmFunction(sourceCode) {
   }
 
   // Step 6: Extract catchStack and excVal from the try-catch wrapper
-  const { catchStack, excVal } = extractCatchVars(dispatchFunction, switchNode);
+  const { catchStack, excVal } = extractCatchVars(dispatchFunction, switchNode, bcPc.pc);
   if (!catchStack) {
     throw new Error('Could not identify catchStack variable');
   }
