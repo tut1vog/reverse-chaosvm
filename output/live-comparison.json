@@ -1,0 +1,75 @@
+{
+  "attempts": [
+    {
+      "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
+      "caseCount": 96,
+      "template": "unknown-96",
+      "keyExtracted": true,
+      "key": [
+        "0x4e49314a",
+        "0x67666c43",
+        "0x44576b4e",
+        "0x592e4d42"
+      ],
+      "keyMods": [
+        1052701,
+        0,
+        0,
+        1644806
+      ],
+      "chromeCollectLength": 4236,
+      "decryptionSuccess": true,
+      "chromeCdFieldCount": 60,
+      "headerSplit": {
+        "strategy": "byte-boundary",
+        "contentLength": 144,
+        "paddingLength": 0
+      },
+      "standaloneCollectLength": 4074,
+      "segmentComparison": {
+        "headerMatch": true,
+        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: byte-boundary (content=144, padding=0)",
+        "fieldCountMatch": false,
+        "fieldDiffs": null,
+        "totalFields": null
+      },
+      "error": null
+    },
+    {
+      "tdcName": "hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig",
+      "caseCount": 95,
+      "template": "A",
+      "keyExtracted": true,
+      "key": [
+        "0x6a4f4b4d",
+        "0x4f3d3841",
+        "0x6c656741",
+        "0x47434743"
+      ],
+      "keyMods": [
+        0,
+        1579012,
+        460551,
+        0
+      ],
+      "chromeCollectLength": 4214,
+      "decryptionSuccess": true,
+      "chromeCdFieldCount": 60,
+      "headerSplit": {
+        "strategy": "byte-boundary",
+        "contentLength": 144,
+        "paddingLength": 0
+      },
+      "standaloneCollectLength": 4118,
+      "segmentComparison": {
+        "headerMatch": false,
+        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: field-boundary (content=143, padding=1)",
+        "fieldCountMatch": false,
+        "fieldDiffs": null,
+        "totalFields": null
+      },
+      "error": null
+    }
+  ],
+  "timestamp": "2026-04-11T04:57:51.350Z"
+}
