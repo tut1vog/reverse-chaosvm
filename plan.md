@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 22
-Current task: 22.2 — Fix keyModConstants legacy format lossy serialization
+Current task: 22.3 — Tests for key extraction fixes
 
 ---
 
@@ -19,7 +19,7 @@ Current task: 22.2 — Fix keyModConstants legacy format lossy serialization
 | ID | Task | Status |
 |----|------|--------|
 | 22.1 | Diagnose key extraction failures on live templates | done |
-| 22.2 | Fix keyModConstants legacy format lossy serialization | pending |
+| 22.2 | Fix keyModConstants legacy format lossy serialization | done |
 | 22.3 | Tests for key extraction fixes | pending |
 
 ### Phase 23: Header Split Strategy Application
@@ -44,42 +44,33 @@ Current task: 22.2 — Fix keyModConstants legacy format lossy serialization
 
 ## Current Task
 
-**ID**: 22.2
-**Title**: Fix keyModConstants legacy format lossy serialization
+**ID**: 22.3
+**Title**: Tests for key extraction fixes
 **Phase**: Reliable Key Extraction for Live Templates
 **Status**: pending
 
 ### Goal
-Fix the lossy `keyModConstants` serialization that drops keyMods at indices 0 and 2. The root cause (from 22.1): `keyModConstants = [keyMods[1], keyMods[3]]` only stores two of four possible indices. Round-tripping via `_normalizeEntry()` maps them back to `[0, kmc[0], 0, kmc[1]]` — always indices [1,3], silently losing any mods at [0] or [2].
+Add tests covering the keyModConstants ↔ keyMods round-trip for all key index combinations ([0,2], [0,3], [1,2], [1,3], [2,3]), ensuring no data loss. Also test legacy 2-element format backward compatibility.
 
 ### Context
-Five locations need fixing:
-
-1. **`pipeline/key-extractor.js:527-529`** — `result.keyModConstants = [keyMods[1], keyMods[3]]`. Change to store all 4: `result.keyModConstants = keyMods.slice()` or deprecate `keyModConstants` entirely in favor of `keyMods`.
-
-2. **`scraper/template-cache.js:80-83`** — `store()` method: `keyModConstants = [keyMods[1], keyMods[3]]` and `keyMods = [0, kmc[0], 0, kmc[1]]`. Both directions are lossy.
-
-3. **`scraper/template-cache.js:135-138`** — `seed()` method: same wrong normalization from `keyModConstants` → `keyMods`.
-
-4. **`scraper/template-cache.js:175-178`** — `_normalizeEntry()`: same wrong pattern.
-
-5. **`pipeline/run.js`** — `savePipelineConfig` stores the lossy `keyModConstants`. Ensure `keyMods` (4-element) is always saved.
-
-Also: update existing `output/*/xtea-params.json` and `scraper/cache/templates.json` to include correct `keyMods` by re-running extraction on the 5 saved targets + `tdc-live-test.js`.
+- `scraper/template-cache.js` — `store()`, `seed()`, `_normalizeEntry()` all handle 4-element and legacy 2-element formats
+- `pipeline/key-extractor.js` — `analyzeTrace()` now outputs 4-element `keyModConstants`
+- `pipeline/token-verifier.js` — `cipherRoundParam()` and `decryptParam()` handle both formats
+- `scraper/collect-generator.js` — `normalizeKeyMods()` handles both formats
+- Existing tests: `tests/test-key-extractor.js`, `tests/test-scraper-foundation.js`
 
 ### Implementation Steps
-1. In `key-extractor.js`: keep `keyModConstants` for backward compat but make it a direct copy of `keyMods`. Or better: change `keyModConstants` to just be `keyMods` aliased.
-2. In `template-cache.js`: fix all 3 locations to use `keyMods` as the primary 4-element format. When only `keyModConstants` is available (legacy data), use it as-is if 4 elements, or pad with zeros if 2 elements BUT preserve the values at whatever positions they represent (since we can't recover the lost indices, just stop losing NEW data).
-3. In `pipeline/run.js`: ensure `keyMods` (4-element) is saved to pipeline-config.json.
-4. Re-run `pipeline/run.js` on all 6 targets to regenerate xtea-params.json with correct `keyMods`.
-5. Regenerate `scraper/cache/templates.json` from updated pipeline outputs.
+1. In `tests/test-scraper-foundation.js` or a new test file: add tests for `_normalizeEntry()` with:
+   - 4-element keyModConstants → keyMods preserved exactly
+   - 2-element legacy keyModConstants → maps to [0, v0, 0, v1]
+   - keyMods already present → not overwritten
+2. Add tests for `normalizeKeyMods()` in collect-generator with all index combinations
+3. Add tests for `store()` round-trip: store with keyMods at various indices, verify lookup preserves them
 
 ### Verification
-- [ ] `node -e "..."` check: all 6 target xtea-params.json have 4-element `keyMods` with correct values
-- [ ] `npm test` passes (218/220 baseline, same 2 known failures)
-- [ ] `node pipeline/run.js targets/tdc.js --skip-verify` produces correct keyMods `[0, 2368517, 0, 592130]`
-- [ ] `node pipeline/run.js targets/tdc-live-test.js --skip-verify` produces correct keyMods `[0, 0, 657930, 526341]`
-- [ ] No code path in template-cache.js hardcodes `[0, kmc[0], 0, kmc[1]]` pattern
+- [ ] `npm test` passes with new tests added (baseline + new, same 2 known failures)
+- [ ] Tests cover all 5 observed keyMod index patterns: [0,2], [0,3], [1,2], [1,3], [2,3]
+- [ ] Tests cover legacy 2-element backward compatibility
 
 ### Suggested Agent
 general-purpose
