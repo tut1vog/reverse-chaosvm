@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 30
-Current task: 30.1 — Add singleBlob to scraper and fix collect encoding
+Current task: 30.2 — Tests for 30.1 changes
 
 ---
 
@@ -29,7 +29,7 @@ Current task: 30.1 — Add singleBlob to scraper and fix collect encoding
 
 | ID | Task | Status |
 |----|------|--------|
-| 30.1 | Add singleBlob to scraper and fix collect encoding | pending |
+| 30.1 | Add singleBlob to scraper generateCollect call | done |
 | 30.2 | Tests for 30.1 changes | pending |
 | 30.3 | Live end-to-end headless test (`scraper/cli.js --captcha-only`) | pending |
 | 30.4 | Act on 30.3 results — fix any remaining issues | pending |
@@ -39,56 +39,36 @@ Current task: 30.1 — Add singleBlob to scraper and fix collect encoding
 
 ## Current Task
 
-**ID**: 30.1
-**Title**: Add singleBlob to scraper and fix collect encoding
+**ID**: 30.2
+**Title**: Tests for 30.1 changes
 **Phase**: Puppeteer-Free Domain Query
 **Status**: pending
 
 ### Goal
-Two changes to `scraper/scraper.js` to align with what the isolation test proved works:
-1. Add `singleBlob: true` to the `generateCollect()` call
-2. Fix the collect value passed to `verify()` — should be raw base64, not URL-encoded
+Add tests verifying that the scraper's `generateCollect()` call includes `singleBlob: true` and that the resulting token is in single-blob format.
 
 ### Context
 
-**The isolation test (28.15) proved**: `generateCollect(profile, xteaParams, { singleBlob: true })` produces an accepted token (errorCode 0) when the raw base64 form (decodeURIComponent of the URL-encoded output) is placed in the POST body.
+Task 30.1 added `singleBlob: true` at line 419 of `scraper/scraper.js`. The existing test file `tests/test-scraper-foundation.js` already has tests for `collect-generator.js` (including cdArrayOverride tests from task 17.2). New tests should go there.
 
-**Current scraper code** (`scraper/scraper.js` line 410-424):
-```js
-const collectEncoded = generateCollect(profileOverrides, xteaParams, {
-  appid: this.aid,
-  nonce: sig.nonce,
-  sdOverride: slideSd,
-  cdFieldOrder: cached.cdFieldOrder || null,
-  behavioralEvents: behavioralEvents,
-  timestamp: now,
-  serializationDiffs: cached.serializationDiffs || null,
-  headerSplit: cached.headerSplit || null,
-  // MISSING: singleBlob: true
-});
-// Decode URI-encoded collect for the POST fields
-let collectVal = collectEncoded;
-if (collectVal.includes('%')) {
-  try { collectVal = decodeURIComponent(collectVal); } catch (_) {}
-}
-```
+The `generateCollect()` function is exported from `scraper/collect-generator.js`. When `singleBlob: true` is passed, it produces a single encrypted blob instead of a 4-segment `A|B|C|D` token. The test should call `generateCollect()` with and without `singleBlob` and verify the output format differs (single-blob has no `|` separators).
 
-**Issues**:
-1. Missing `singleBlob: true` — generates 4-segment token instead of single blob
-2. The decoding logic is correct (collectVal becomes raw base64) — but `verify()` receives `collectEncoded` (URL-encoded) at line 455 instead of `collectVal` (raw base64). Need to check what `verify()` expects and whether this matters.
-
-**What verify() does** (captcha-client.js): The `prebuiltBody` path (used when vData is available) sends the jQuery-serialized body directly. The `collect` param is used for the non-prebuilt path. In the prebuilt path, the collect is already embedded in `serializedBody` via `generateVData()`. So the `collect` field passed to `verify()` is only used in the non-prebuilt fallback. Need to check both paths.
+Key files:
+- `scraper/collect-generator.js` — the function under test
+- `tests/test-scraper-foundation.js` — where to add tests
+- `scraper/cache/` — contains XTEA params JSON files for test fixtures
 
 ### Implementation Steps
-1. Add `singleBlob: true` to the generateCollect options (one line)
-2. Verify the collect encoding flow: what format does `_buildPostFields` expect? What does `generateVData` receive?
-3. Ensure raw base64 (not URL-encoded) goes into the POST body, matching what the isolation test proved works
+1. Read `tests/test-scraper-foundation.js` to understand existing test structure
+2. Add a describe block for singleBlob behavior with tests:
+   - `generateCollect` with `singleBlob: true` produces output without `|` separators
+   - `generateCollect` without `singleBlob` produces output with `|` separators
+   - Both outputs decode as valid base64
+3. Use existing profile/xteaParams fixtures from the file
 
 ### Verification
-- [ ] `node -c scraper/scraper.js` passes
-- [ ] `npm test` — 251/253 (no regressions)
-- [ ] Code review: `singleBlob: true` present in generateCollect call
-- [ ] Code review: collect value in POST body is raw base64
+- [ ] `npm test` — all new tests pass, no regressions (251/253 baseline)
+- [ ] New tests contain meaningful assertions (not just "runs without error")
 
 ### Suggested Agent
 general-purpose
