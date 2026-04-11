@@ -515,3 +515,171 @@ describe('collect-generator: cdArrayOverride skips reorderCdArray', () => {
       'cdFieldOrder should change the token when cdArrayOverride is not set');
   });
 });
+
+// ============================================================================
+// 10. TemplateCache._normalizeEntry: keyModConstants/keyMods normalization
+// ============================================================================
+
+const { normalizeKeyMods } = require('../scraper/collect-generator');
+
+describe('TemplateCache._normalizeEntry: keyModConstants/keyMods normalization', () => {
+  it('4-element keyModConstants preserved as keyMods', () => {
+    const entry = { keyModConstants: [1579040, 0, 2829060, 0] };
+    const result = TemplateCache._normalizeEntry(entry);
+    assert.deepStrictEqual(result.keyMods, [1579040, 0, 2829060, 0]);
+  });
+
+  it('2-element legacy keyModConstants mapped to [0, v0, 0, v1]', () => {
+    const entry = { keyModConstants: [2368517, 592130] };
+    const result = TemplateCache._normalizeEntry(entry);
+    assert.deepStrictEqual(result.keyMods, [0, 2368517, 0, 592130]);
+  });
+
+  it('keyMods already present is NOT overwritten by keyModConstants', () => {
+    const entry = {
+      keyMods: [111, 222, 333, 444],
+      keyModConstants: [999, 888, 777, 666],
+    };
+    const result = TemplateCache._normalizeEntry(entry);
+    assert.deepStrictEqual(result.keyMods, [111, 222, 333, 444]);
+  });
+
+  it('no keyModConstants and no keyMods leaves both absent', () => {
+    const entry = { key: [1, 2, 3, 4], delta: 0x9E3779B9 };
+    const result = TemplateCache._normalizeEntry(entry);
+    assert.strictEqual(result.keyMods, undefined);
+    assert.strictEqual(result.keyModConstants, undefined);
+  });
+});
+
+// ============================================================================
+// 11. TemplateCache store/lookup round-trip: keyMods preservation
+// ============================================================================
+
+describe('TemplateCache store/lookup round-trip: keyMods preservation', () => {
+  it('keyMods with values at indices 0+2 survives round-trip', () => {
+    const tmpPath = tmpCachePath();
+    const cache = new TemplateCache(tmpPath);
+    cache.load();
+    cache.store('RoundTrip_02', {
+      template: 'T', key: [1, 2, 3, 4],
+      keyMods: [1579040, 0, 2829060, 0],
+    });
+    const entry = cache.lookup('RoundTrip_02');
+    assert.deepStrictEqual(entry.keyMods, [1579040, 0, 2829060, 0]);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('keyMods with values at indices 2+3 survives round-trip', () => {
+    const tmpPath = tmpCachePath();
+    const cache = new TemplateCache(tmpPath);
+    cache.load();
+    cache.store('RoundTrip_23', {
+      template: 'T', key: [1, 2, 3, 4],
+      keyMods: [0, 0, 657930, 526341],
+    });
+    const entry = cache.lookup('RoundTrip_23');
+    assert.deepStrictEqual(entry.keyMods, [0, 0, 657930, 526341]);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('keyMods with values at indices 0+3 survives round-trip', () => {
+    const tmpPath = tmpCachePath();
+    const cache = new TemplateCache(tmpPath);
+    cache.load();
+    cache.store('RoundTrip_03', {
+      template: 'T', key: [1, 2, 3, 4],
+      keyMods: [1052701, 0, 0, 1644806],
+    });
+    const entry = cache.lookup('RoundTrip_03');
+    assert.deepStrictEqual(entry.keyMods, [1052701, 0, 0, 1644806]);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('keyMods with values at indices 1+3 survives round-trip', () => {
+    const tmpPath = tmpCachePath();
+    const cache = new TemplateCache(tmpPath);
+    cache.load();
+    cache.store('RoundTrip_13', {
+      template: 'T', key: [1, 2, 3, 4],
+      keyMods: [0, 2368517, 0, 592130],
+    });
+    const entry = cache.lookup('RoundTrip_13');
+    assert.deepStrictEqual(entry.keyMods, [0, 2368517, 0, 592130]);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('legacy 2-element keyModConstants stored without keyMods gets keyMods [0, v0, 0, v1] on lookup', () => {
+    const tmpPath = tmpCachePath();
+    const cache = new TemplateCache(tmpPath);
+    cache.load();
+    cache.store('RoundTrip_Legacy', {
+      template: 'T', key: [1, 2, 3, 4],
+      keyModConstants: [100, 200],
+    });
+    const entry = cache.lookup('RoundTrip_Legacy');
+    assert.deepStrictEqual(entry.keyMods, [0, 100, 0, 200]);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('keyMods round-trips through disk persistence', () => {
+    const tmpPath = tmpCachePath();
+    const cache1 = new TemplateCache(tmpPath);
+    cache1.load();
+    cache1.store('RoundTrip_Persist', {
+      template: 'T', key: [1, 2, 3, 4],
+      keyMods: [1052701, 0, 2829060, 592130],
+    });
+
+    const cache2 = new TemplateCache(tmpPath);
+    cache2.load();
+    const entry = cache2.lookup('RoundTrip_Persist');
+    assert.deepStrictEqual(entry.keyMods, [1052701, 0, 2829060, 592130]);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+});
+
+// ============================================================================
+// 12. collect-generator: normalizeKeyMods
+// ============================================================================
+
+describe('collect-generator: normalizeKeyMods', () => {
+  it('keyMods 4-element array returned as-is', () => {
+    const result = normalizeKeyMods({ keyMods: [10, 20, 30, 40] });
+    assert.deepStrictEqual(result, [10, 20, 30, 40]);
+  });
+
+  it('keyModConstants 4-element array returned as copy', () => {
+    const orig = [1579040, 0, 2829060, 0];
+    const result = normalizeKeyMods({ keyModConstants: orig });
+    assert.deepStrictEqual(result, [1579040, 0, 2829060, 0]);
+    // Should be a copy, not the same reference
+    assert.notStrictEqual(result, orig);
+  });
+
+  it('keyModConstants 2-element legacy mapped to [0, v0, 0, v1]', () => {
+    const result = normalizeKeyMods({ keyModConstants: [2368517, 592130] });
+    assert.deepStrictEqual(result, [0, 2368517, 0, 592130]);
+  });
+
+  it('empty params returns [0, 0, 0, 0]', () => {
+    const result = normalizeKeyMods({});
+    assert.deepStrictEqual(result, [0, 0, 0, 0]);
+  });
+
+  it('keyMods takes precedence over keyModConstants', () => {
+    const result = normalizeKeyMods({
+      keyMods: [11, 22, 33, 44],
+      keyModConstants: [99, 88, 77, 66],
+    });
+    assert.deepStrictEqual(result, [11, 22, 33, 44]);
+  });
+
+  it('keyMods with wrong length falls through to keyModConstants', () => {
+    const result = normalizeKeyMods({
+      keyMods: [1, 2],  // wrong length
+      keyModConstants: [500, 600, 700, 800],
+    });
+    assert.deepStrictEqual(result, [500, 600, 700, 800]);
+  });
+});
