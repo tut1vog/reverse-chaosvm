@@ -257,61 +257,70 @@ describe('detectSerializationDiffs', () => {
 // ═══════════════════════════════════════════════════════════════════════
 
 describe('analyzeHeaderSplit', () => {
-  it('detects field-boundary when trailing spaces in first 144 chars', () => {
-    // Build a cd string body that is >144 chars, with trailing spaces before char 144
-    const fields = '"field1","field2","field3"';
-    // Pad to make body exactly have spaces before position 144
-    const content = '{"cd":[' + fields;
-    const padLen = 144 - content.length;
-    const padded = content + ' '.repeat(padLen > 0 ? padLen : 0) + ']}';
-    const result = analyzeHeaderSplit(padded);
-    if (padLen > 0) {
-      assert.equal(result.strategy, 'field-boundary');
-      assert.ok(result.paddingLength > 0);
-    }
+  it('detects field-boundary when trailing spaces present', () => {
+    // Simulate a header with content padded to 144 chars with trailing spaces
+    const content = 'abc';
+    const header = content.padEnd(144, ' ');
+    const result = analyzeHeaderSplit(header);
+    assert.equal(result.strategy, 'field-boundary');
+    assert.equal(result.contentLength, 3);
+    assert.equal(result.paddingLength, 141);
   });
 
-  it('detects byte-boundary when NO trailing spaces in first 144 chars', () => {
-    // Build a body >144 chars with no trailing spaces
-    const longValue = '"' + 'x'.repeat(200) + '"';
-    const plaintext = '{"cd":[' + longValue + ']}';
-    const result = analyzeHeaderSplit(plaintext);
+  it('detects byte-boundary when NO trailing spaces', () => {
+    // 144 chars of content with no trailing spaces
+    const header = 'x'.repeat(144);
+    const result = analyzeHeaderSplit(header);
     assert.equal(result.strategy, 'byte-boundary');
     assert.equal(result.paddingLength, 0);
+    assert.equal(result.contentLength, 144);
   });
 
-  it('returns "unknown" for malformed input (no cd array)', () => {
-    const result = analyzeHeaderSplit('this is not valid');
+  it('returns "unknown" for empty string', () => {
+    const result = analyzeHeaderSplit('');
     assert.equal(result.strategy, 'unknown');
     assert.equal(result.contentLength, 0);
     assert.equal(result.paddingLength, 0);
   });
 
-  it('returns "unknown" when ]} is missing', () => {
-    const result = analyzeHeaderSplit('{"cd":[1,2,3');
+  it('returns "unknown" for non-string input', () => {
+    const result = analyzeHeaderSplit(null);
     assert.equal(result.strategy, 'unknown');
+    assert.equal(result.contentLength, 0);
+    assert.equal(result.paddingLength, 0);
   });
 
-  it('handles short plaintext (< 144 chars) as byte-boundary if no spaces', () => {
-    const plaintext = '{"cd":[1,2,3]}';
-    const result = analyzeHeaderSplit(plaintext);
-    // Body is short, no trailing spaces → byte-boundary
+  it('handles short header (< 144 chars) as byte-boundary if no spaces', () => {
+    const header = '{"cd":[1,2,3],';
+    const result = analyzeHeaderSplit(header);
     assert.equal(result.strategy, 'byte-boundary');
     assert.equal(result.paddingLength, 0);
-    assert.ok(result.contentLength > 0);
+    assert.equal(result.contentLength, header.length);
   });
 
   it('returns correct contentLength and paddingLength', () => {
-    // Body: '{"cd":[42]}' = 11 chars, well under 144
-    const plaintext = '{"cd":[42]}';
-    const result = analyzeHeaderSplit(plaintext);
-    assert.equal(result.contentLength + result.paddingLength, Math.min(11, 144));
+    const content = '{"cd":[42],';
+    const header = content.padEnd(144, ' ');
+    const result = analyzeHeaderSplit(header);
+    assert.equal(result.contentLength, content.length);
+    assert.equal(result.paddingLength, 144 - content.length);
+    assert.equal(result.contentLength + result.paddingLength, 144);
   });
 
-  it('handles plaintext with cd and sd sections', () => {
-    // The function searches for '{"cd":[' and then ']}' — should find the cd portion
-    const plaintext = '{"cd":[1,2,3]},"sd":"data"}';
-    const result = analyzeHeaderSplit(plaintext);
-    assert.ok(['field-boundary', 'byte-boundary'].includes(result.strategy));
+  it('handles header that is all spaces', () => {
+    const header = ' '.repeat(144);
+    const result = analyzeHeaderSplit(header);
+    assert.equal(result.strategy, 'field-boundary');
+    assert.equal(result.contentLength, 0);
+    assert.equal(result.paddingLength, 144);
+  });
+
+  it('handles header with single trailing space', () => {
+    const content = 'a'.repeat(143);
+    const header = content + ' ';
+    const result = analyzeHeaderSplit(header);
+    assert.equal(result.strategy, 'field-boundary');
+    assert.equal(result.contentLength, 143);
+    assert.equal(result.paddingLength, 1);
   });
 });

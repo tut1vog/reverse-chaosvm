@@ -597,48 +597,75 @@ function detectSerializationDiffs(chromePlaintext, cdArray) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// 4. analyzeHeaderSplit — detect header splitting strategy
+// 4a. decryptHeaderSegment — extract and decrypt just the header segment
 // ═══════════════════════════════════════════════════════════════════════
 
 /**
- * Analyze the first 144 characters of Chrome's payload to determine
- * the header splitting strategy.
+ * Extract and decrypt just the header segment from a URL-encoded collect
+ * token string.
  *
- * If positions ~130-143 are spaces, it's field-boundary split with padding.
- * If no trailing spaces, it's byte-boundary split.
+ * The assembled token is: segments[1] (header) + segments[0] (hash) +
+ * segments[2] (cdBody) + segments[3] (sig). The header segment is always
+ * exactly 192 base64 chars (= 144 bytes encrypted). Decrypting this segment
+ * individually preserves trailing space padding that would be lost if the
+ * entire token were decrypted as one block.
  *
- * @param {string} chromePlaintext - Chrome's raw decrypted plaintext
+ * @param {string} collectStr - URL-encoded collect token string
+ * @param {Object} params - XTEA parameters { key, delta, rounds, keyMods }
+ * @returns {string} The 144-char decrypted header plaintext (with any trailing spaces)
+ */
+function decryptHeaderSegment(collectStr, params) {
+  const HEADER_B64_LEN = 192; // 144 bytes → 192 base64 chars
+
+  // URL-decode to get raw base64
+  const b64 = collectStr
+    .replace(/%2B/g, '+')
+    .replace(/%2F/g, '/')
+    .replace(/%3D/g, '=');
+
+  // The first 192 base64 chars are the header segment (assembly order puts header first)
+  const headerB64 = b64.substring(0, HEADER_B64_LEN);
+
+  // Decode base64 → binary (144 bytes)
+  const encrypted = Buffer.from(headerB64, 'base64').toString('binary');
+
+  // Decrypt with XTEA
+  const decrypted = decryptXtea(encrypted, params);
+
+  return decrypted;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// 4b. analyzeHeaderSplit — detect header splitting strategy
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Analyze the header segment's trailing-space padding to determine the
+ * header splitting strategy.
+ *
+ * If the header has trailing spaces, it's field-boundary split (the VM
+ * padded to avoid cutting mid-field). If no trailing spaces, it's
+ * byte-boundary split (the VM cut at exactly 144 bytes).
+ *
+ * @param {string} headerPlaintext - The raw decrypted header string (up to 144 chars)
  * @returns {Object} { strategy, contentLength, paddingLength }
  */
-function analyzeHeaderSplit(chromePlaintext) {
-  // The cd string inside the plaintext (minus the closing '}') is the payload body
-  // Header is the first 144 characters of this body
-  const cdStart = chromePlaintext.indexOf('{"cd":[');
-  if (cdStart < 0) {
+function analyzeHeaderSplit(headerPlaintext) {
+  if (typeof headerPlaintext !== 'string' || headerPlaintext.length === 0) {
     return { strategy: 'unknown', contentLength: 0, paddingLength: 0 };
   }
 
-  // The body is the cd string minus its closing '}'
-  const cdEnd = chromePlaintext.indexOf(']}', cdStart);
-  if (cdEnd < 0) {
-    return { strategy: 'unknown', contentLength: 0, paddingLength: 0 };
-  }
-
-  const body = chromePlaintext.substring(cdStart, cdEnd + 2);
-  // The header chunk is the first 144 chars of the body
-  const headerChunk = body.substring(0, 144);
-
-  // Count trailing spaces in the header chunk
+  // Count trailing spaces
   let paddingLength = 0;
-  for (let i = headerChunk.length - 1; i >= 0; i--) {
-    if (headerChunk[i] === ' ') {
+  for (let i = headerPlaintext.length - 1; i >= 0; i--) {
+    if (headerPlaintext[i] === ' ') {
       paddingLength++;
     } else {
       break;
     }
   }
 
-  const contentLength = headerChunk.length - paddingLength;
+  const contentLength = headerPlaintext.length - paddingLength;
   const strategy = paddingLength > 0 ? 'field-boundary' : 'byte-boundary';
 
   return { strategy, contentLength, paddingLength };
@@ -824,8 +851,10 @@ async function extractStructure(tdcPath, xteaParams) {
     result.serializationDiffs = detectSerializationDiffs(decryptResult.plaintext, cdArray);
     log(`  Serialization diffs: ${result.serializationDiffs.length}`);
 
-    // 4. Header split analysis
-    result.headerSplit = analyzeHeaderSplit(decryptResult.plaintext);
+    // 4. Header split analysis — decrypt the header segment individually
+    //    to preserve trailing space padding (lost in full-token decryption)
+    const headerPlaintext = decryptHeaderSegment(chromeCollect, xteaParams);
+    result.headerSplit = analyzeHeaderSplit(headerPlaintext);
     log(`  Header split: ${result.headerSplit.strategy} (content=${result.headerSplit.contentLength}, padding=${result.headerSplit.paddingLength})`);
 
     result.success = true;
@@ -851,4 +880,5 @@ module.exports = {
   matchFieldOrder,
   detectSerializationDiffs,
   analyzeHeaderSplit,
+  decryptHeaderSegment,
 };
