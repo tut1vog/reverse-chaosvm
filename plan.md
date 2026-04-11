@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.3 — Deep cd serialization analysis
+Current task: 19.4 — Fix comparison C: strip hash artifact from cd[11]
 
 ---
 
@@ -190,56 +190,52 @@ Current task: 19.3 — Deep cd serialization analysis
 |----|------|--------|
 | 19.1 | Create reference injection forensics script | done |
 | 19.2 | Live test with reference tdc.js injection | done |
-| 19.3 | Deep cd serialization analysis | in-progress |
-| 19.4 | Fix cd serialization to match Chrome | pending |
-| 19.5 | Live re-test with fix | pending |
+| 19.3 | Deep cd serialization analysis | done |
+| 19.4 | Fix comparison C: strip hash artifact from cd[11] | in-progress |
+| 19.5 | Definitive live test — verify byte-identical tokens | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 19.3
-**Title**: Deep cd serialization analysis
+**ID**: 19.4
+**Title**: Fix comparison C: strip hash artifact from cd[11]
 **Phase**: Reference tdc.js Injection Forensics
 **Status**: in-progress
 
 ### Goal
-Modify `ref-inject-forensics.js` to produce a detailed field-by-field comparison of Chrome's cd array serialization vs our `buildCdString()` output. Identify exactly which fields serialize differently and how.
+Fix comparison C in `ref-inject-forensics.js` to strip the hash chunk artifact from cd[11] before generating the standalone token. Then verify that our token generation pipeline produces byte-identical output to Chrome.
 
-### What we know from 19.2
+### Analysis from 19.3
 
-**Forensics results**:
-- Chrome's cd has 60 fields, our `buildDefaultCdArray` produces 59
-- `buildCdString(chromeCd)` produces 2897 chars; Chrome's actual cd string is 2864 chars — **33 chars shorter**
-- sd strings: IDENTICAL
-- Encryption: IDENTICAL (round-trip passes)
-- The 33-char difference comes from `buildCdString` using `JSON.stringify()` for nested objects/arrays, while the VM's `func_276` uses hand-rolled serialization that produces shorter output
+**Key discovery**: The field-by-field analysis found exactly ONE difference — cd[11]:
+- Chrome cd[11] = empty string (0 chars in serialized form → the hash position is empty in the real cd body)
+- Our cd[11] = `[[4,-1,-1,ts,0,0,0,0]]` (33 chars — the hash chunk value)
 
-**Comparison A was misleading**: It compared the cd portion extracted from the raw concatenated plaintext (which includes inter-chunk padding and the hash chunk). The real comparison is: take Chrome's parsed cd array → serialize it with `buildCdString` → compare against what the VM actually produced.
+**But this is an artifact of the decryption!** When all 4 encrypted segments are decrypted and concatenated into one plaintext, the hash chunk (segment[0]) appears between the header (first 144 bytes of cd body) and cdBody (remaining cd body). JSON.parse sees this as cd field[11] because the hash chunk sits at exactly that position in the concatenated stream.
 
-**The fix requires**: 
-1. Extract Chrome's ACTUAL cd string from the decrypted segments (header content + cdBody content, excluding padding and hash)
-2. Run `buildCdString(chromeCd)` to get our version
-3. Compare character-by-character to find where `JSON.stringify` produces different output than `func_276`
+**In reality**: Chrome's cd has 59 fields (like ours). cd[11] = `sessionStorageAvail` = 0. The hash chunk is a SEPARATE segment, not a cd field. Our `buildDefaultCdArray` correctly produces 59 fields without the hash. Our `buildInputChunks` correctly creates a separate hash segment.
 
-### Context
-- `scripts/ref-inject-forensics.js` — already has the forensic comparison infrastructure and successful decryption
-- `token/outer-pipeline.js` — `buildCdString()` at line 58 — uses `JSON.stringify()` for nested types
-- `docs/TOKEN_FORMAT.md` — documents func_276's hand-rolled serialization
-- Comparison B already decrypts each segment separately — we can get clean header_content and cdBody_content
+**The bug is in comparison C**: it feeds Chrome's 60-field parsed cd (with hash artifact at index 11) to `generateCollect(cdArrayOverride)`, which serializes ALL 60 fields including the hash, creating a LONGER cd string. Then `buildInputChunks` adds ANOTHER hash segment. The token has double hash content.
+
+**The fix**: Before feeding Chrome's cd to `generateCollect`, remove index 11 (the hash artifact). With the corrected 59-field array, comparison C should produce byte-identical tokens.
 
 ### Implementation Steps
-1. In the comparison A function, fix the cd string extraction: instead of extracting from raw plaintext (which has inter-chunk artifacts), reconstruct from the decrypted segments:
-   - `cleanCd = headerDecrypted.trimEnd() + cdBodyDecrypted.trimEnd()` (trim trailing spaces/nulls from each)
-   - This gives Chrome's actual cd string without hash or padding artifacts
-2. Compare this clean Chrome cd string with `buildCdString(chromeCd)` char-by-char
-3. For each difference found, log the field index, the Chrome serialization, and our serialization
-4. Also produce a field-by-field JSON.stringify comparison: for each cd[i], compare `JSON.stringify(cd[i])` with what appears in Chrome's string at that position
+1. In comparison C (around line 570), before calling `generateCollect`:
+   ```js
+   // Remove the hash chunk artifact from cd[11]
+   // When segments are decrypted and concatenated, the hash chunk appears 
+   // at cd[11] position — it's not a real cd field
+   const cleanCd = [...parsed.cd];
+   cleanCd.splice(11, 1);  // Remove index 11 (hash artifact)
+   ```
+2. Use `cleanCd` instead of `parsed.cd` in the `cdArrayOverride`
+3. Also fix comparison A: when building our cd string from Chrome's cd, use the clean array
 
 ### Verification
 - [ ] `node -c scripts/ref-inject-forensics.js` passes
-- [ ] Script extracts clean cd string from decrypted header+cdBody (no hash/padding artifacts)
-- [ ] Field-by-field diff output shows exactly which fields serialize differently
+- [ ] Live run shows comparison C: header IDENTICAL, hash IDENTICAL, cdBody IDENTICAL, sig IDENTICAL
+- [ ] Full reconstruction MATCH
 
 ### Suggested Agent
-general-purpose
+general-purpose — but this is a small focused fix, I'll do it directly.

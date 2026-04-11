@@ -212,10 +212,17 @@ function comparisonA(plaintext, parsed, xteaParams, decryptedSegments) {
     return result;
   }
 
-  const chromeCd = parsed.cd;
+  let chromeCd = parsed.cd;
   const chromeSd = parsed.sd;
 
-  // Build our cd string from Chrome's values
+  // Remove hash chunk artifact from cd[11] if present (60 fields → 59)
+  if (chromeCd.length === 60) {
+    chromeCd = [...chromeCd];
+    chromeCd.splice(11, 1);
+    log(`  Removed hash artifact from cd[11]: ${chromeCd.length} fields`);
+  }
+
+  // Build our cd string from Chrome's values (cleaned)
   const ourCdString = buildCdString(chromeCd);
 
   // Build our sd string from Chrome's values
@@ -568,9 +575,21 @@ function comparisonC(chromeCollect, parsed, xteaParams, hashContent) {
   log(`  Chrome timestamp from hash: ${chromeTimestamp}`);
   log(`  Hash content: ${JSON.stringify(hashContent)}`);
 
-  // Run through full generateCollect with Chrome's cd and sd
+  // Remove the hash chunk artifact from Chrome's parsed cd array.
+  // When all 4 segments are decrypted and concatenated, the hash chunk
+  // (segment[0]) appears at cd[11] position in the JSON. It's not a real
+  // cd field — it's an inter-segment artifact. Our buildInputChunks already
+  // creates the hash segment separately, so including it in the cd array
+  // would double-count it.
+  const cleanCd = [...parsed.cd];
+  if (cleanCd.length === 60) {
+    cleanCd.splice(11, 1);  // Remove index 11 (hash artifact)
+    log(`  Removed hash artifact from cd[11]: ${cleanCd.length} fields`);
+  }
+
+  // Run through full generateCollect with Chrome's cd (cleaned) and sd
   const fullToken = generateCollect({}, xteaParams, {
-    cdArrayOverride: parsed.cd,
+    cdArrayOverride: cleanCd,
     sdOverride: parsed.sd,
     timestamp: chromeTimestamp,
   });
