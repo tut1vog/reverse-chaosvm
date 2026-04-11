@@ -363,6 +363,7 @@ async function main() {
           timestamp: now,
           serializationDiffs: cached.serializationDiffs || null,
           headerSplit: cached.headerSplit || null,
+          singleBlob: true,
         });
 
         // collectEncoded is URL-encoded (%2B, %2F, %3D).

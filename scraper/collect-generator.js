@@ -368,6 +368,7 @@ function reorderCdArray(cdArray, cdFieldOrder, behavioralEvents) {
  * @param {number[]} [options.cdFieldOrder] - Field reordering array (schema indices, -1 = behavioralEvents)
  * @param {*} [options.behavioralEvents] - Behavioral events value to insert at -1 position in cdFieldOrder
  * @param {Array} [options.cdArrayOverride] - Pre-built cd array to use instead of building from profile
+ * @param {boolean} [options.singleBlob] - If true, encrypt as single continuous blob (live template format)
  * @param {Object} [options.hashPadding] - Hash artifact padding config for buildCdString
  * @param {number} [options.hashPadding.totalSize] - Total padded size for inline hash artifacts
  * @returns {string} URL-encoded collect token string
@@ -408,7 +409,19 @@ function generateCollect(profile, xteaParams, options) {
   }
   const sdString = buildSdString(sdObject);
 
-  // Step 4: Build input chunks
+  if (opts.singleBlob) {
+    // Single-blob mode: encrypt entire payload as one XTEA-ECB stream.
+    // Live templates (95/96/98 opcodes) use this format.
+    const { key, delta, rounds } = xteaParams;
+    const keyMods = normalizeKeyMods(xteaParams);
+    const payloadBody = cdString.slice(0, -1) + ',';
+    const fullPlaintext = payloadBody + sdString;
+    const encrypted = encrypt(fullPlaintext, key, delta, rounds, keyMods);
+    const b64 = Buffer.from(encrypted, 'binary').toString('base64');
+    return urlEncode(b64);
+  }
+
+  // Step 4: Build input chunks (4-segment mode — Template A reference build)
   const timestamp = opts.timestamp || Date.now();
   const chunkOpts = {};
   if (opts.headerSplit) {
