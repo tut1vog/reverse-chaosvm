@@ -17,11 +17,11 @@ Current task: 28.10 — Deep token diff: compare original vs standalone structur
 ### Phase 27: VM Parser Extension for New Templates (pending)
 
 ### Phase 28: End-to-End CAPTCHA Solve (No Puppeteer Drag)
-> **ROOT CAUSE FOUND**: Live templates encrypt the token as a **single continuous
-> XTEA blob** — NOT as 4 separately-encrypted segments concatenated together.
-> Our `assembleToken()` encrypts 4 chunks independently then concatenates base64.
-> The server expects one continuous ciphertext → can't decrypt ours → errorCode 12.
-> Template A (reference build) uses 4 segments; live templates (95/96/98 opcodes) use 1.
+> **ROOT CAUSES FOUND (two)**:
+> 1. **Single-blob encryption**: Live templates use one continuous XTEA-ECB blob, not 4 segments. FIXED in 28.11.
+> 2. **XTEA keys are per-build, not per-TDC_NAME**: Same TDC_NAME can have different XTEA keys across builds.
+>    Our cache maps TDC_NAME → params, but the live tdc.js served in a session may have different keys.
+>    Need to extract XTEA key from the actual captured tdc.js source at runtime.
 
 | ID | Task | Status |
 |----|------|--------|
@@ -38,24 +38,38 @@ Current task: 28.10 — Deep token diff: compare original vs standalone structur
 | 28.10 | Deep token diff: compare original vs standalone structure | done |
 | 28.11 | Add single-blob encryption mode to collect-generator | done |
 | 28.12 | Tests for single-blob encryption mode | pending |
-| 28.13 | Re-run isolation test with single-blob mode | pending |
+| 28.13 | Re-run isolation test with single-blob mode | done (still errorCode 12 — wrong XTEA key) |
+| 28.14 | Extract XTEA key from captured tdc.js at runtime in isolation test | pending |
+| 28.15 | Re-run isolation test with runtime key extraction | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 28.13
-**Title**: Re-run isolation test with single-blob mode
+**ID**: 28.14
+**Title**: Extract XTEA key from captured tdc.js at runtime in isolation test
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
-**Status**: pending (user-driven — requires display + CAPTCHA service)
+**Status**: pending
 
 ### Goal
-Re-run the isolation test with the single-blob fix to see if errorCode 12 resolves.
+Modify the isolation test to save the captured tdc.js source to `output/token-isolation/tdc-source.js`, and also add a helper script that runs the porting pipeline on a saved tdc source to extract fresh XTEA params. This avoids relying on stale cache entries — each TDC build has unique keys.
+
+### Context
+- **Root cause**: Same TDC_NAME can have different XTEA keys across builds. Our cache maps TDC_NAME → params, but the params may be stale.
+- The tdc.js source is already captured in `capturedTdcSource` during the isolation test.
+- The pipeline (`pipeline/run.js`) can extract XTEA params from any tdc.js file.
+- After extracting, update the cache and re-run.
+
+### Implementation Steps
+1. Modify `scripts/token-isolation-test.js` to also save `capturedTdcSource` to `output/token-isolation/tdc-source.js`
+2. After saving, run `node pipeline/run.js output/token-isolation/tdc-source.js` to extract XTEA params
+3. The pipeline output goes to `output/tdc-source/` — read the `xtea-params.json` from there
+4. Use the fresh XTEA params instead of cache lookup
 
 ### Verification
-- [ ] `node scripts/token-isolation-test.js` — check errorCode
-- [ ] If errorCode 0 → single-blob was the fix, proceed to integrate into scraper
-- [ ] If errorCode 12 still → additional issues (field values, sd structure, field count)
+- [ ] tdc source saved to output
+- [ ] Pipeline extracts valid XTEA params
+- [ ] Re-run with fresh params — check errorCode
 
 ### Suggested Agent
-User-driven
+general-purpose
