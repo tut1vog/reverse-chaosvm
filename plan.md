@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.9 — Add per-TDC_NAME pipeline extraction to chrome-cd-inject
+Current task: 20.1 — Create field order discovery script
 
 ---
 
@@ -196,82 +196,81 @@ Current task: 19.9 — Add per-TDC_NAME pipeline extraction to chrome-cd-inject
 | 19.6 | Verify fix with ref-inject-forensics | done |
 | 19.7 | Live re-test with actual CAPTCHA | blocked |
 | 19.8 | Fix key-extractor keyMods for all 4 indices | done |
-| 19.9 | Add per-TDC_NAME pipeline extraction to chrome-cd-inject | in-progress |
-| 19.10 | Live re-test with per-name key extraction | pending |
+| 19.9 | Add per-TDC_NAME pipeline extraction to chrome-cd-inject | done |
+| 19.10 | Live re-test with per-name key extraction | done |
+
+**Phase 19 outcome**: Token structure byte-identical for Template A. Pipeline key extraction works at runtime for all templates. keyMods on all 4 indices. But errorCode 9 persists — live templates have different cd field ordering (57/60 differ). `cdFieldOrder` infrastructure exists but is unpopulated.
+
+### Phase 20: cd Field Order Discovery
+> Determine the cd field ordering for live templates by comparing Chrome's decrypted cd values against our known schema fields, then build and test the cdFieldOrder mapping.
+
+| ID | Task | Status |
+|----|------|--------|
+| 20.1 | Create field order discovery script | in-progress |
+| 20.2 | Live test — capture and map field ordering | pending |
+| 20.3 | Store cdFieldOrder in cache + verify token | pending |
+| 20.4 | Live re-test with correct field ordering | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 19.5
-**Title**: Fix buildInputChunks header split
-**Phase**: Reference tdc.js Injection Forensics
+**ID**: 20.1
+**Title**: Create field order discovery script
+**Phase**: cd Field Order Discovery
 **Status**: in-progress
 
 ### Goal
-Fix `token/generate-token.js` `buildInputChunks()` to split the payload body at the last complete JSON field boundary within HEADER_SIZE (144 bytes), instead of at a fixed byte boundary. Chrome's VM does this, causing header content to end at a natural comma-separator and be space-padded to 144. Our code takes exactly 144 bytes of continuous content, producing different header and cdBody chunks.
+Create `scripts/discover-field-order.js` — a Puppeteer script that:
+1. Captures Chrome's decrypted cd array from a live session (using pipeline key extraction)
+2. Compares each Chrome field value against our known 59-field schema to identify which schema field maps to which Chrome position
+3. Produces a `cdFieldOrder` array that maps Chrome positions → schema indices
+4. Handles the hash artifact at cd[11]
 
-### Evidence from 19.3/19.4
-- Chrome header: 144 bytes, **trimmed to 133** (11 bytes space padding) — content = first 11 cd fields ending with `,`
-- Our header: 144 bytes, **all content** (no padding) — includes partial field 11
-- Chrome cdBody starts with `,0,[{"codec":...` (field 11 = sessionStorageAvail) 
-- Our cdBody starts mid-content at byte 144
+### Approach
 
-### The Fix
+Chrome's decrypted cd has 60 fields (including hash at [11]). After removing the hash, 59 fields remain but in a DIFFERENT order than our schema. To find the mapping:
 
-In `buildInputChunks` (line 106-108 of `token/generate-token.js`), change:
-```js
-// OLD: split at fixed byte boundary
-const headerContent = payloadBody.substring(0, HEADER_SIZE);
-const header = headerContent.padEnd(HEADER_SIZE, ' ');
-```
-to:
-```js
-// NEW: split at last field boundary within HEADER_SIZE
-// Find the last comma-separated field boundary within HEADER_SIZE
-// Walk the payload body, tracking JSON depth to find top-level commas
-let splitPos = Math.min(payloadBody.length, HEADER_SIZE);
-if (payloadBody.length > HEADER_SIZE) {
-  // Find the last top-level comma at or before HEADER_SIZE
-  let lastComma = -1;
-  let depth = 0;
-  let inStr = false;
-  for (let i = 0; i < HEADER_SIZE && i < payloadBody.length; i++) {
-    const ch = payloadBody[i];
-    if (inStr) {
-      if (ch === '\\') i++;  // skip escaped char
-      else if (ch === '"') inStr = false;
-    } else {
-      if (ch === '"') inStr = true;
-      else if (ch === '[' || ch === '{') depth++;
-      else if (ch === ']' || ch === '}') depth--;
-      else if (ch === ',' && depth === 1) lastComma = i + 1;  // after the comma
-    }
-  }
-  if (lastComma > 0) splitPos = lastComma;
-}
-const headerContent = payloadBody.substring(0, splitPos);
-const header = headerContent.padEnd(HEADER_SIZE, ' ');
-```
+**Anchor fields** — fields with distinctive, identifiable values:
+- `userAgent` (index 31): long distinctive string containing "Mozilla/5.0..."
+- `screenResolution` (index 9): array like [1280,1400]
+- `languages` (index 6): array like ["en-US","en"]
+- `videoCodecs` (index 12): array of objects with "codec" and "support" keys
+- `audioFingerprint` (index 18): object with "nt_vc_output" key
+- `plugins` (index 23): array of objects with "name", "description", "filename"
+- `mimeTypes` (index 19): array of objects with "type", "suffixes"
+- `highEntropyValues` (index 37): object with "architecture", "bitness", "brands"
+- `userAgentData` (index 46): object with "brands", "mobile", "platform"
+- `intlOptions` (index 34): object with "timeZone", "calendar"
+- `platform` (index 48): string like "Linux x86_64" or "Win32"
+- `vendor` (index 36): string like "Google Inc."
+- `webglRenderer` (index 40): long string containing "ANGLE"
+- `storageEstimate` (index 21): object with "quota" key
+- `screenComposite` (index 47): string matching pattern "NNN-NNN-NNN-NN-*-*-|-*"
+- `canvasHash` (index 15): large integer
+- `performanceHash` (index 54): large integer
 
-And for the cdBody:
-```js
-const cdContent = payloadBody.substring(splitPos);
-```
+**Type-matching** for remaining fields:
+- Numbers that are small flags (0, 1, 2): sessionStorageAvail, localStorageAvail, touchSupport, etc.
+- Empty strings: flashFonts, webglImage, cssOverflowResult, etc.
+- Timestamps: timestampInit, timestampCollectionStart, timestampCollectionEnd
 
-The `depth === 1` check ensures we only split at top-level cd array commas (inside `{"cd":[`), not at commas within nested objects/arrays.
+**Algorithm**:
+1. Build our default cd array from the same browser profile Chrome would use
+2. For each Chrome field, find matching schema field(s) by:
+   a. Exact value match (for distinctive fields)
+   b. Type + structure match (for objects/arrays with known keys)
+   c. Type + range match (for numbers, strings)
+3. For ambiguous matches, use position heuristics or leave unresolved
+4. Produce cdFieldOrder array
 
-### Context
-- File: `token/generate-token.js` lines 91-123
-- `HEADER_SIZE = 144` (line 36)
-- The function is used by both `token/generate-token.js` and `scraper/collect-generator.js`
-- Tests: `tests/` — need to check if any tests depend on the exact header split
+### Implementation
+Base the script on chrome-cd-inject.js (already has pipeline key extraction + cd decryption). Strip the solve/verify logic — only capture and analyze.
 
 ### Verification
-- [ ] `node -c token/generate-token.js` passes
-- [ ] `npm test` passes (173/175 or adjusts for changed split behavior)
-- [ ] For the default 59-field cd array with default profile, the header content length is ~133 bytes (matching Chrome)
-- [ ] `node scripts/ref-inject-forensics.js` shows comparison C: all segments IDENTICAL
+- [ ] `node -c scripts/discover-field-order.js` passes
+- [ ] Script captures Chrome's cd, identifies anchor fields, produces cdFieldOrder
+- [ ] cdFieldOrder has 59 entries (or 60 with -1 for behavioral events)
 
 ### Suggested Agent
 general-purpose
