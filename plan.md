@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 20.1 — Create field order discovery script
+Current task: 20.2 — Store cdFieldOrder + live verification test
 
 ---
 
@@ -206,8 +206,8 @@ Current task: 20.1 — Create field order discovery script
 
 | ID | Task | Status |
 |----|------|--------|
-| 20.1 | Create field order discovery script | in-progress |
-| 20.2 | Live test — capture and map field ordering | pending |
+| 20.1 | Create field order discovery script | done |
+| 20.2 | Store cdFieldOrder + live verification test | in-progress |
 | 20.3 | Store cdFieldOrder in cache + verify token | pending |
 | 20.4 | Live re-test with correct field ordering | pending |
 
