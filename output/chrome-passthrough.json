@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-04-11T10:24:33.680Z",
+  "method": "chrome-passthrough",
+  "results": [
+    {
+      "attempt": 1,
+      "errorCode": 9,
+      "ticket": null,
+      "collectLength": 3980,
+      "eksLength": 312,
+      "vDataLength": 152,
+      "sliderRawOffset": 494,
+      "sliderAnswer": 225,
+      "httpStatus": 200
+    },
+    {
+      "attempt": 2,
+      "errorCode": 9,
+      "ticket": null,
+      "collectLength": 3980,
+      "eksLength": 312,
+      "vDataLength": 152,
+      "sliderRawOffset": 488,
+      "sliderAnswer": 214,
+      "httpStatus": 200
+    },
+    {
+      "attempt": 3,
+      "errorCode": 9,
+      "ticket": null,
+      "collectLength": 3980,
+      "eksLength": 312,
+      "vDataLength": 152,
+      "sliderRawOffset": 462,
+      "sliderAnswer": 203,
+      "httpStatus": 200
+    }
+  ],
+  "conclusion": "slider_issue"
+}
