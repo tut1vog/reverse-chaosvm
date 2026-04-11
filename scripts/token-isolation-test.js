@@ -365,9 +365,8 @@ async function main() {
           headerSplit: cached.headerSplit || null,
         });
 
-        // collectEncoded is URL-encoded. For the POST body we need
-        // the URL-encoded form since we're inserting into a URL-encoded body.
-        // But first decode to get raw length for tlg.
+        // collectEncoded is URL-encoded (%2B, %2F, %3D).
+        // Decode to raw base64 — the real POST body uses raw base64 for collect.
         let collectDecoded;
         try {
           collectDecoded = decodeURIComponent(collectEncoded);
@@ -375,18 +374,24 @@ async function main() {
           collectDecoded = collectEncoded;
         }
         const newTlg = String(collectDecoded.length);
-        standaloneCollectLen = collectEncoded.length;
+        standaloneCollectLen = collectDecoded.length;
 
-        log(`  Standalone collect (URL-encoded) length: ${standaloneCollectLen}`);
-        log(`  Standalone collect first 80 chars: ${collectEncoded.slice(0, 80)}...`);
-        log(`  New tlg (decoded length): ${newTlg}`);
+        // Decode original collect for fair length comparison
+        const originalCollectDecoded = collectMatch
+          ? originalCollectRaw  // already raw base64 in POST body
+          : '';
+
+        log(`  Original collect (raw base64) length: ${originalCollectDecoded.length}`);
+        log(`  Standalone collect (raw base64) length: ${standaloneCollectLen}`);
+        log(`  Length delta: ${originalCollectDecoded.length - standaloneCollectLen} chars`);
+        log(`  Standalone collect first 80 chars: ${collectDecoded.slice(0, 80)}...`);
+        log(`  New tlg: ${newTlg}`);
 
         // Replace collect and tlg in the POST body.
-        // The POST body is application/x-www-form-urlencoded: field=value&field=value
-        // The original collect value in the body is already URL-encoded
-        // (contains %xx sequences). Our generateCollect also returns URL-encoded
-        // output, so we can substitute directly — no double-encoding needed.
-        let newBody = replacePostField(postData, 'collect', collectEncoded);
+        // The real POST body contains raw base64 for collect (with literal +, /, =).
+        // Our generateCollect returns URL-encoded form (%2B, %2F, %3D), so we must
+        // use the decoded form (collectDecoded) to match the real format.
+        let newBody = replacePostField(postData, 'collect', collectDecoded);
         newBody = replacePostField(newBody, 'tlg', newTlg);
 
         log(`  New POST body length: ${newBody.length} chars`);
