@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 25
-Current task: 25.1 — cdArrayOverride live test with Chrome's exact cd values
+Current task: 25.2 — Analyze results and identify remaining gaps
 
 ---
 
@@ -24,8 +24,8 @@ Current task: 25.1 — cdArrayOverride live test with Chrome's exact cd values
 
 | ID | Task | Status |
 |----|------|--------|
-| 25.1 | cdArrayOverride live test with Chrome's exact cd values | pending |
-| 25.2 | Analyze results and identify remaining gaps | pending |
+| 25.1 | cdArrayOverride live test with Chrome's exact cd values | done |
+| 25.2 | Analyze results and identify remaining gaps | in-progress |
 
 ### Phase 26: Realistic Fingerprint Profile
 > If Phase 25 confirms that Chrome's exact cd values pass, build a more realistic default profile that matches Chrome's typical value sizes. Key areas: strip/truncate oversized fields (plugin lists, font lists, canvas data), remove behavioral events from pre-solve token, match Chrome's sd structure.
@@ -50,35 +50,32 @@ Current task: 25.1 — cdArrayOverride live test with Chrome's exact cd values
 
 ## Current Task
 
-**ID**: 25.1
-**Title**: cdArrayOverride live test with Chrome's exact cd values
+**ID**: 25.2
+**Title**: Analyze results and identify remaining gaps
 **Phase**: Chrome cd Injection — Validate Token Structure
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
-Modify `scripts/live-captcha-submit.js` to use `cdArrayOverride` — inject Chrome's exact decrypted cd array into the standalone token generation. This produces a token with identical cd VALUES but our standalone encryption. If the server accepts it, the only remaining work is building a realistic fingerprint profile. If it still rejects, there's a structural issue beyond cd values.
+Analyze why errorCode 9 persists with Chrome's exact cd values. The standalone collect is 248-336 chars SMALLER than Chrome's (3928 vs 4176-4264). Identify what structural differences remain between our token and Chrome's.
 
 ### Context
-- `cdArrayOverride` option is already supported by `generateCollect()` (from Phase 17)
-- When `cdArrayOverride` is set, `generateCollect` skips `buildDefaultCdArray` and `reorderCdArray`
-- Chrome's cd is available from `fullDecrypt.parsed.cd` (already extracted in Step 6)
-- Must strip the hash artifact before passing (hash is a separate encrypted segment)
-- Must NOT include behavioral events (Chrome's pre-solve token doesn't have them)
-- `live-captcha-submit.js` currently generates behavioral events — remove them for this test
+- 25.1 results: cdArrayOverride works, standalone collect ~3928, Chrome ~4200, diff -248 to -336
+- Standalone is SMALLER — something Chrome includes is missing from ours
+- Candidates: hash segment size, sig segment, sd serialization, header content
+- Previous forensics (Phase 19) showed segments are IDENTICAL for Template A reference build
+- Live templates may have different segment structures
+- Key files: `scripts/live-captcha-submit.js`, `scraper/collect-generator.js`, `token/generate-token.js`, `token/outer-pipeline.js`
 
 ### Implementation Steps
-1. After decrypting Chrome's cd (Step 6), strip hash artifact at `hashPosition`
-2. Set `collectOpts.cdArrayOverride = strippedCdArray`
-3. Remove `behavioralEvents` from collectOpts (Chrome's pre-solve token doesn't have them)
-4. Keep everything else: live eks, slider solve, vData, Chrome TLS submit
-5. Compare collect sizes (should now be close to Chrome's ~4200 chars)
-6. Run and report errorCode
+1. Add per-segment size logging to live-captcha-submit.js (header, hash, cdBody, sig sizes in base64 chars)
+2. Decrypt Chrome's token into individual segments and log their sizes
+3. Compare segment-by-segment: which segment is smaller in standalone?
+4. Report findings
 
 ### Verification
-- [ ] Standalone collect size within ±200 chars of Chrome's collect size
-- [ ] errorCode reported
-- [ ] If errorCode 9: identify what else differs (sd structure? encoding?)
-- [ ] If errorCode != 9: confirm Phase 25 success, move to Phase 26
+- [ ] Per-segment size comparison available for at least one live attempt
+- [ ] Root cause of 248-336 char gap identified (which segment differs and by how much)
+- [ ] Actionable next step proposed based on findings
 
 ### Suggested Agent
 general-purpose
