@@ -34,7 +34,7 @@ Current task: 28.9 — Fix collect encoding: use raw base64 instead of URL-encod
 | 28.6 | Isolation test: standalone token via Puppeteer request interception | done |
 | 28.7 | Tests for standalone token interception | done |
 | 28.8 | Act on 28.6 results | done |
-| 28.9 | Fix collect encoding: raw base64 in POST body swap | pending |
+| 28.9 | Fix collect encoding: raw base64 in POST body swap | done |
 | 28.10 | Deep token diff: compare original vs standalone structure | pending |
 | 28.11 | Re-run isolation test after fixes | pending |
 
@@ -42,30 +42,29 @@ Current task: 28.9 — Fix collect encoding: use raw base64 instead of URL-encod
 
 ## Current Task
 
-**ID**: 28.9
-**Title**: Fix collect encoding: raw base64 in POST body swap + add token length comparison logging
+**ID**: 28.10
+**Title**: Deep token diff: compare original vs standalone structure
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
 **Status**: pending
 
 ### Goal
-Fix the encoding mismatch in `scripts/token-isolation-test.js`: the real POST body contains raw base64 collect (with literal `+`, `/`, `=`) but our standalone token is URL-encoded (`%2B`, `%2F`, `%3D`). Also add detailed logging to diagnose the 812-char length difference (original 6104 raw base64 vs standalone 5292 decoded).
+Understand WHY the standalone token is 812 chars shorter than the real one. Both should be raw base64 from the same XTEA encryption pipeline. The length gap suggests structural differences in the payload (different collector fields, missing behavioral events, different segment assembly). Need to decrypt both tokens and compare segment-by-segment.
 
 ### Context
-- **Encoding bug**: Line 389 uses `collectEncoded` (URL-encoded form). Should use `collectDecoded` (raw base64).
-- **Length gap**: Even after encoding fix, standalone token is 812 chars shorter (5292 vs 6104). This is a structural difference in the token payload, not just encoding.
-- **New template**: Live server now serves TDC_NAME `SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk` with 96 opcodes — not in known templates (A=95, B=94, C=100).
-- `collectDecoded` is already computed at line 373 — just needs to be used instead of `collectEncoded` at line 389.
+- The isolation test captures the original POST body including the real collect field
+- We can modify the test to also dump both tokens to files for offline comparison
+- `scripts/decrypt-collect.js` or `docs/TOKEN_DECRYPTION.md` may help decode tokens
+- New template has 96 opcodes — possibly different collector field count or order
+- Key question: is the length gap from (a) missing/different collector fields, (b) missing behavioral events, (c) different segment sizes, or (d) different encryption params?
 
 ### Implementation Steps
-1. In `scripts/token-isolation-test.js`, line 389: change `collectEncoded` → `collectDecoded`
-2. Update `standaloneCollectLen` to track the decoded length for fair comparison
-3. Add logging: decoded lengths side-by-side for both original and standalone
-4. Add logging: first 50 chars of decoded standalone vs original (both raw base64 for comparison)
+1. Modify `token-isolation-test.js` to dump both tokens (original and standalone) to `output/token-isolation/` as JSON
+2. Create a comparison script that decrypts both and shows segment-by-segment diff
+3. Or: add inline comparison logging to the isolation test itself
 
 ### Verification
-- [ ] `node -c scripts/token-isolation-test.js` passes
-- [ ] `node --test tests/test-token-isolation.js` still passes (14/14)
-- [ ] Code review confirms `collectDecoded` (raw base64) is used in `replacePostField` call
+- [ ] Both tokens dumped and decrypted
+- [ ] Root cause of 812-char length difference identified
 
 ### Suggested Agent
 general-purpose
