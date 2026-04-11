@@ -30,34 +30,30 @@ Current task: 28.6 — Isolation test: standalone token via Puppeteer request in
 | 28.4 | Tests for ans computation | done |
 | 28.5 | Investigate errorCode -1 and 12 | done (12 is universal, not template-specific) |
 | 28.6 | Isolation test: standalone token via Puppeteer request interception | done |
-| 28.7 | Tests for standalone token interception | pending |
+| 28.7 | Tests for standalone token interception | done |
 | 28.8 | Act on 28.6 results | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 28.7
-**Title**: Tests for standalone token interception
+**ID**: 28.8
+**Title**: Act on 28.6 results
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
 **Status**: pending
 
 ### Goal
-Write unit tests for the helper functions in `scripts/token-isolation-test.js` — specifically `replacePostField`, `buildShowUrl`, and `parseArgs`. These are testable without Puppeteer or network access.
+Run `scripts/token-isolation-test.js` (both `--no-swap` control and swap mode), analyze the errorCode results, and decide next steps based on whether the issue is the token or the transport layer.
 
 ### Context
-- `scripts/token-isolation-test.js` was created in 28.6
-- Key testable functions: `replacePostField(body, fieldName, newValue)`, `buildShowUrl(session, aid, userAgent)`, `parseArgs()`
-- These are currently inline in the script and would need to be exported (or extracted to a shared module) for testing
-
-### Implementation Steps
-1. Refactor `scripts/token-isolation-test.js` to export the helper functions (conditionally, only when `require.main !== module`)
-2. Create `tests/test-token-isolation.js` with tests for `replacePostField` and `buildShowUrl`
+- `scripts/token-isolation-test.js` is ready — created and tested in 28.6/28.7
+- Requires display (headful Puppeteer) and network access to CAPTCHA service
+- User needs to run the script and report results
 
 ### Verification
-- [ ] `node --test tests/test-token-isolation.js` passes
-- [ ] Tests cover edge cases for `replacePostField` (field at start, middle, end, missing field, special chars)
-- [ ] Tests verify `buildShowUrl` produces valid URL with expected params
+- [ ] Control test (`--no-swap`) returns errorCode 0
+- [ ] Swap test result recorded and analyzed
+- [ ] Next steps decided based on result
 
 ### Suggested Agent
-general-purpose
+Depends on result — user-driven
