@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 28
-Current task: 28.10 — Deep token diff: compare original vs standalone structure
+Current phase: Phase 29
+Current task: 29.1 — Audit and refresh stale template cache entries
 
 ---
 
@@ -16,45 +16,72 @@ Current task: 28.10 — Deep token diff: compare original vs standalone structur
 
 ### Phase 27: VM Parser Extension for New Templates (pending)
 
-### Phase 28: End-to-End CAPTCHA Solve (No Puppeteer Drag)
-> **SOLVED! errorCode 0 achieved with standalone token swap (28.15).**
-> Root causes were: (1) 4-segment vs single-blob encryption — FIXED in 28.11;
-> (2) stale XTEA keyMods in cache — fixed by re-running pipeline on captured source.
-> Server accepts our token even with shorter payload (5240 vs 6636 chars).
-> Next: integrate singleBlob mode into the scraper pipeline + runtime key extraction.
+### Phase 28: End-to-End CAPTCHA Solve — Token Isolation (done)
+> Standalone token accepted by server (errorCode 0) via Puppeteer request interception.
+> Root causes: (1) live templates use single-blob XTEA encryption, not 4-segment;
+> (2) some cache entries had wrong keyMods from bad initial extraction.
+> Key insight: same TDC_NAME always has same XTEA key/keyMods/cdFieldOrder — only eks differs per build.
+
+### Phase 29: Cache Refresh & TLS Verification
+> Fix stale template cache entries (wrong keyMods), then verify whether TLS
+> fingerprinting is the real reason `cap_union_new_show` returns 403 for Node.js.
 
 | ID | Task | Status |
 |----|------|--------|
-| 28.1 | Fix ans coordinate space and calibration in chrome-passthrough | done |
-| 28.2 | Live re-test with chrome-passthrough (manual POST still fails) | done |
-| 28.2.1 | Run captcha-solver.js with real drag | done (errorCode 0 — success!) |
-| 28.3 | Fix ans computation in scraper pipeline (X=rawOffset, Y=spt) | done |
-| 28.4 | Tests for ans computation | done |
-| 28.5 | Investigate errorCode -1 and 12 | done (12 is universal, not template-specific) |
-| 28.6 | Isolation test: standalone token via Puppeteer request interception | done |
-| 28.7 | Tests for standalone token interception | done |
-| 28.8 | Act on 28.6 results | done |
-| 28.9 | Fix collect encoding: raw base64 in POST body swap | done |
-| 28.10 | Deep token diff: compare original vs standalone structure | done |
-| 28.11 | Add single-blob encryption mode to collect-generator | done |
-| 28.12 | Tests for single-blob encryption mode | pending |
-| 28.13 | Re-run isolation test with single-blob mode | done (still errorCode 12 — wrong XTEA key) |
-| 28.14 | Extract XTEA key from captured tdc.js at runtime in isolation test | pending |
-| 28.15 | Re-run isolation test with fresh params | done (errorCode 0 — SUCCESS!) |
+| 29.1 | Audit and refresh stale template cache entries | pending |
+| 29.2 | Tests for refreshed cache entries | pending |
+| 29.3 | Verify TLS fingerprinting as cause of 403 on cap_union_new_show | pending |
+| 29.4 | Act on 29.3 results | pending |
 
 ---
 
 ## Current Task
 
-Phase 28 complete. Standalone token accepted by server (errorCode 0).
+**ID**: 29.1
+**Title**: Audit and refresh stale template cache entries
+**Phase**: Cache Refresh & TLS Verification
+**Status**: pending
 
-### What was proven
-- Single-blob XTEA encryption + correct keyMods + cdFieldOrder = working token
-- Server tolerates shorter payload (different field values, fewer behavioral events)
-- XTEA params must be fresh-extracted per build (cache can go stale)
+### Goal
+Identify which template cache entries have bad/missing keyMods, re-run the porting pipeline on fresh tdc.js builds for those templates, and update the cache. After this, all cached templates should have correct XTEA params that can decrypt browser-generated tokens.
 
-### Next priorities
-1. Integrate `singleBlob: true` into `scraper/scraper.js` 
-2. Add runtime XTEA key extraction (run pipeline on fetched tdc.js during scraper flow)
-3. Refresh all stale cache entries by re-running pipeline on fresh tdc.js builds
-4. Tests for single-blob mode (28.12, deferred)
+### Context
+
+**Cache state** (from `scraper/cache/templates.json`):
+- 10 entries total, keyed by TDC_NAME
+- Some entries have `keyMods: [0,0,0,0]` (likely wrong — defaulted during extraction)
+- Some have no `cdFieldOrder` (needed for correct field reordering)
+- `MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn` was just refreshed via pipeline — has correct params now
+- `SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk` worked in the isolation test — params are correct
+
+**User insight**: Same TDC_NAME always has the same XTEA key/keyMods/cdFieldOrder. Only `eks` differs per build. So the cache model (TDC_NAME → params) is correct — we just need to fix entries that were initially extracted with wrong keyMods.
+
+**How to refresh**: For each stale entry:
+1. Fetch a fresh tdc.js build with that TDC_NAME (use `node scraper/cli.js` or `fetch-latest` skill)
+2. Run `node pipeline/run.js <tdc-file>` to extract correct params
+3. Update the cache entry
+
+**Alternative** (simpler): The isolation test already captures tdc.js sources. We can also use `scripts/token-isolation-test.js` repeatedly — each run captures a different template's source. Run the pipeline on each captured source.
+
+**Simplest approach**: Write a script that:
+1. Reads all cache entries
+2. For each entry with suspicious keyMods (all zeros, or missing cdFieldOrder):
+   - Try to fetch a fresh tdc.js build (or use already-captured sources)
+   - Run the pipeline to extract correct params
+   - Update the cache
+3. For entries that already have non-zero keyMods AND cdFieldOrder, skip
+
+### Implementation Steps
+1. Audit current cache: list each entry with its keyMods and cdFieldOrder status
+2. Identify which entries need refreshing
+3. For each stale entry, run pipeline on a fresh/captured tdc.js source
+4. Update cache with correct params
+5. Verify by decrypting a known browser token
+
+### Verification
+- [ ] All 10 cache entries have non-trivial keyMods (not all zeros unless genuinely zero)
+- [ ] All entries have cdFieldOrder arrays
+- [ ] At least one browser token decrypts correctly with refreshed params
+
+### Suggested Agent
+general-purpose — to create the audit/refresh script
