@@ -479,14 +479,18 @@ function analyzeTrace(ops) {
   // -----------------------------------------------------------------------
   // Phase 4: Extract key modification constants.
   //
-  // In modified XTEA, when key index == 1: key[1] + KEY_MOD_1 is used.
-  // When key index == 3: key[3] + KEY_MOD_3 is used.
-  // These appear as ADD_K ops where srcVal[0] matches the raw key value
+  // In modified XTEA, each key index may have an additive constant:
+  //   effective_key[i] = key[i] + keyMod[i]
+  // These appear as ADD_K ops where srcVal[0] matches a raw key value
   // and k is the modification constant.
+  //
+  // Different templates use different indices:
+  //   Template A: key[1] + 2368517, key[3] + 592130
+  //   Template B: key[2] + 657930, key[3] + 526341
+  // So we must check ALL 4 key indices, not just 1 and 3.
   // -----------------------------------------------------------------------
 
-  const keyModCandidates1 = [];
-  const keyModCandidates3 = [];
+  const keyModCandidates = [[], [], [], []];  // one array per key index
 
   for (let idx = windowStart; idx < windowEnd; idx++) {
     const op = ops[idx];
@@ -498,11 +502,10 @@ function analyzeTrace(ops) {
     const srcVal = op.srcVal ? op.srcVal[0] : null;
     if (srcVal === null || srcVal === undefined) continue;
 
-    if ((srcVal >>> 0) === result.key[1]) {
-      keyModCandidates1.push(k);
-    }
-    if ((srcVal >>> 0) === result.key[3]) {
-      keyModCandidates3.push(k);
+    for (let ki = 0; ki < 4; ki++) {
+      if ((srcVal >>> 0) === result.key[ki]) {
+        keyModCandidates[ki].push(k);
+      }
     }
   }
 
@@ -518,12 +521,16 @@ function analyzeTrace(ops) {
     return best;
   };
 
-  const keyMod1 = pickMostCommon(keyModCandidates1);
-  const keyMod3 = pickMostCommon(keyModCandidates3);
-  result.keyModConstants = [keyMod1, keyMod3];
+  const keyMods = keyModCandidates.map(pickMostCommon);
+  result.keyMods = keyMods;
 
-  if (keyMod1 > 0 || keyMod3 > 0) {
-    notes.push(`Key mod constants: [${keyMod1}, ${keyMod3}]`);
+  // Legacy format: keyModConstants = [mod_for_idx_1, mod_for_idx_3]
+  // Kept for backward compatibility with template cache
+  result.keyModConstants = [keyMods[1], keyMods[3]];
+
+  const nonZeroMods = keyMods.map((v, i) => v > 0 ? `key[${i}]+${v}` : null).filter(Boolean);
+  if (nonZeroMods.length > 0) {
+    notes.push(`Key mod constants: [${keyMods.join(', ')}] (${nonZeroMods.join(', ')})`);
   } else {
     notes.push('No key modification constants found (standard XTEA or undetected)');
   }

@@ -231,7 +231,8 @@ function savePipelineConfig(outputDir, tdcPath, parsed, mapped, keyResult, verif
       key: keyResult.key,
       delta: keyResult.delta,
       rounds: keyResult.rounds,
-      keyModConstants: keyResult.keyModConstants
+      keyModConstants: keyResult.keyModConstants,
+      keyMods: keyResult.keyMods || null
     } : null,
     tokenVerified: verifyResult ? verifyResult.match : null,
     timestamp: new Date().toISOString()
