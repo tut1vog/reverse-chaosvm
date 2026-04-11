@@ -37,6 +37,7 @@ const { extractKey } = require('../pipeline/key-extractor');
 const {
   matchFieldOrder,
   detectHashPosition,
+  detectAllHashPositions,
   detectSerializationDiffs,
   decryptHeaderSegment,
   analyzeHeaderSplit,
@@ -698,21 +699,25 @@ async function solve(opts) {
             fieldOrderMatchCount = fieldResult.fieldOrder.length - fieldResult.unmatchedCount;
             log(`  Field order: matched ${fieldOrderMatchCount}/${fieldResult.fieldOrder.length} fields (${fieldResult.unmatchedCount} unmatched)`);
 
-            // Detect hash position
-            hashPosition = detectHashPosition(fullDecrypt.parsed.cd);
-            log(`  Hash position: ${hashPosition >= 0 ? hashPosition : 'not found'}`);
+            // Detect ALL hash artifact positions
+            const hashPositions = detectAllHashPositions(fullDecrypt.parsed.cd);
+            hashPosition = hashPositions.length > 0 ? hashPositions[0] : -1; // keep first for backward compat
+            log(`  Hash positions: ${hashPositions.length > 0 ? `[${hashPositions.join(', ')}]` : 'none found'}`);
 
             // Detect serialization diffs
             serializationDiffs = detectSerializationDiffs(fullDecrypt.plaintext, fullDecrypt.parsed.cd);
             log(`  Serialization diffs: ${serializationDiffs.length} fields differ`);
 
-            // Strip hash artifact from Chrome's cd for cdArrayOverride
+            // Strip ALL hash artifacts from Chrome's cd for cdArrayOverride
             strippedCd = [...fullDecrypt.parsed.cd];
-            if (hashPosition >= 0) {
-              log(`  Stripping hash artifact at position ${hashPosition} from Chrome cd (${strippedCd.length} -> ${strippedCd.length - 1} fields)`);
-              strippedCd.splice(hashPosition, 1);
+            if (hashPositions.length > 0) {
+              // Remove in REVERSE order to preserve indices
+              for (let hi = hashPositions.length - 1; hi >= 0; hi--) {
+                strippedCd.splice(hashPositions[hi], 1);
+              }
+              log(`  Stripped ${hashPositions.length} hash artifacts at positions [${hashPositions.join(', ')}] (${fullDecrypt.parsed.cd.length} → ${strippedCd.length} fields)`);
             } else {
-              log(`  No hash artifact found in Chrome cd, using all ${strippedCd.length} fields for cdArrayOverride`);
+              log(`  No hash artifacts found in Chrome cd, using all ${strippedCd.length} fields`);
             }
           }
 

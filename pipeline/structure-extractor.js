@@ -148,6 +148,28 @@ function detectHashPosition(cdArray) {
   return -1;
 }
 
+/**
+ * Scan a decrypted cd array for ALL hash artifact positions.
+ * Same pattern as detectHashPosition but returns every matching index.
+ *
+ * @param {Array} cdArray - Decrypted cd array
+ * @returns {number[]} Array of indices where hash artifacts appear
+ */
+function detectAllHashPositions(cdArray) {
+  const positions = [];
+  for (let i = 0; i < cdArray.length; i++) {
+    const val = cdArray[i];
+    if (!Array.isArray(val) || val.length !== 1) continue;
+    const inner = val[0];
+    if (!Array.isArray(inner) || inner.length !== 8) continue;
+    if (inner[0] === 4 && inner[1] === -1 && inner[2] === -1 &&
+        inner[4] === 0 && inner[5] === 0 && inner[6] === 0 && inner[7] === 0) {
+      positions.push(i);
+    }
+  }
+  return positions;
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // 2. matchFieldOrder — map Chrome's cd fields to our 59-field schema
 // ═══════════════════════════════════════════════════════════════════════
@@ -877,6 +899,7 @@ async function extractStructure(tdcPath, xteaParams) {
 module.exports = {
   extractStructure,
   detectHashPosition,
+  detectAllHashPositions,
   matchFieldOrder,
   detectSerializationDiffs,
   analyzeHeaderSplit,
