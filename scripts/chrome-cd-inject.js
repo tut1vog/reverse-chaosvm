@@ -590,21 +590,146 @@ async function solve(opts) {
               log(`  [DIAG] Our buildCdString: ${ourCdStr.length} chars`);
               log(`  [DIAG] Diff: ${ourCdStr.length - chromeCdStr2.length} chars`);
 
-              // Character-by-character comparison
-              const minLen = Math.min(chromeCdStr2.length, ourCdStr.length);
-              let firstDiff = -1;
-              for (let ci = 0; ci < minLen; ci++) {
-                if (chromeCdStr2[ci] !== ourCdStr[ci]) { firstDiff = ci; break; }
-              }
-              if (firstDiff === -1 && chromeCdStr2.length !== ourCdStr.length) firstDiff = minLen;
+              // ── Field-by-field comparison ──
+              // Parse cd string into individual field raw strings.
+              // Format: {"cd":[field0,field1,...,fieldN]}
+              // Walk tracking JSON depth; commas at depth=1 (inside the outer []) separate fields.
+              function parseCdFields(cdStr) {
+                // Find the opening '[' after {"cd":
+                const arrStart = cdStr.indexOf('[');
+                if (arrStart === -1) return null;
+                // Find the matching closing ']'
+                let depth = 0;
+                let arrEnd = -1;
+                for (let k = arrStart; k < cdStr.length; k++) {
+                  if (cdStr[k] === '[' || cdStr[k] === '{') depth++;
+                  else if (cdStr[k] === ']' || cdStr[k] === '}') {
+                    depth--;
+                    if (depth === 0) { arrEnd = k; break; }
+                  }
+                }
+                if (arrEnd === -1) return null;
 
-              if (firstDiff === -1) {
-                log('  [DIAG] cd strings: IDENTICAL ✓');
-              } else {
-                log(`  [DIAG] cd strings DIFFER at position ${firstDiff}`);
-                const ctx = 40;
-                log(`  [DIAG]   Chrome: ${JSON.stringify(chromeCdStr2.substring(Math.max(0, firstDiff - ctx), firstDiff + ctx))}`);
-                log(`  [DIAG]   Ours:   ${JSON.stringify(ourCdStr.substring(Math.max(0, firstDiff - ctx), firstDiff + ctx))}`);
+                // Extract fields by walking inside the array, splitting on depth-1 commas
+                const fields = [];
+                let d = 0;
+                let inStr = false;
+                let fieldStart = arrStart + 1; // skip the '['
+                for (let k = arrStart + 1; k <= arrEnd; k++) {
+                  const ch = cdStr[k];
+                  if (inStr) {
+                    if (ch === '\\') { k++; continue; } // skip escaped char
+                    if (ch === '"') inStr = false;
+                    continue;
+                  }
+                  if (ch === '"') { inStr = true; continue; }
+                  if (ch === '[' || ch === '{') { d++; continue; }
+                  if (ch === ']' || ch === '}') {
+                    if (d > 0) { d--; continue; }
+                    // d === 0 means we hit the closing ']' of the outer array
+                    const raw = cdStr.substring(fieldStart, k).trim();
+                    if (raw.length > 0) fields.push(raw);
+                    break;
+                  }
+                  if (ch === ',' && d === 0) {
+                    fields.push(cdStr.substring(fieldStart, k));
+                    fieldStart = k + 1;
+                  }
+                }
+                return fields;
+              }
+
+              try {
+                const chromeFields = parseCdFields(chromeCdStr2);
+                const ourFields = parseCdFields(ourCdStr);
+
+                if (!chromeFields || !ourFields) {
+                  log('  [DIAG] Failed to parse cd fields (malformed cd string)');
+                } else {
+                  const maxFields = Math.max(chromeFields.length, ourFields.length);
+                  let matchCount = 0;
+                  let diffCount = 0;
+                  let totalCharDiff = 0;
+
+                  log(`  [DIAG] ── Field-by-field comparison ──`);
+                  log(`  [DIAG] Chrome fields: ${chromeFields.length}, Our fields: ${ourFields.length}`);
+
+                  for (let fi = 0; fi < maxFields; fi++) {
+                    const cf = fi < chromeFields.length ? chromeFields[fi] : undefined;
+                    const of_ = fi < ourFields.length ? ourFields[fi] : undefined;
+
+                    if (cf === undefined) {
+                      diffCount++;
+                      const trunc = of_.length > 100 ? of_.substring(0, 100) + '...' : of_;
+                      log(`  [DIAG] Field[${fi}]: EXTRA in ours (${of_.length} chars) → ${JSON.stringify(trunc)}`);
+                      totalCharDiff += of_.length + 1; // +1 for comma
+                    } else if (of_ === undefined) {
+                      diffCount++;
+                      const trunc = cf.length > 100 ? cf.substring(0, 100) + '...' : cf;
+                      log(`  [DIAG] Field[${fi}]: MISSING from ours (${cf.length} chars) → ${JSON.stringify(trunc)}`);
+                      totalCharDiff -= cf.length + 1;
+                    } else if (cf === of_) {
+                      matchCount++;
+                    } else {
+                      diffCount++;
+                      const lenDiff = of_.length - cf.length;
+                      totalCharDiff += lenDiff;
+
+                      // Classify the diff type
+                      let diffType = 'different value';
+                      try {
+                        const cfParsed = JSON.parse(cf);
+                        const ofParsed = JSON.parse(of_);
+                        if (typeof cfParsed === 'object' && cfParsed !== null &&
+                            typeof ofParsed === 'object' && ofParsed !== null &&
+                            !Array.isArray(cfParsed) && !Array.isArray(ofParsed)) {
+                          const cfKeys = Object.keys(cfParsed).sort();
+                          const ofKeys = Object.keys(ofParsed).sort();
+                          if (cfKeys.join(',') !== ofKeys.join(',')) {
+                            const extraKeys = ofKeys.filter(k => !cfKeys.includes(k));
+                            const missingKeys = cfKeys.filter(k => !ofKeys.includes(k));
+                            const parts = [];
+                            if (extraKeys.length) parts.push(`extra keys: [${extraKeys.join(',')}]`);
+                            if (missingKeys.length) parts.push(`missing keys: [${missingKeys.join(',')}]`);
+                            diffType = `object key filtering (${parts.join('; ')})`;
+                          } else {
+                            // Same keys, different values
+                            const changedKeys = cfKeys.filter(k =>
+                              JSON.stringify(cfParsed[k]) !== JSON.stringify(ofParsed[k])
+                            );
+                            if (changedKeys.length) {
+                              diffType = `different values for keys: [${changedKeys.join(',')}]`;
+                            }
+                          }
+                        } else if (Array.isArray(cfParsed) && Array.isArray(ofParsed)) {
+                          if (cfParsed.length !== ofParsed.length) {
+                            diffType = `array length (chrome=${cfParsed.length}, ours=${ofParsed.length})`;
+                          } else {
+                            diffType = 'array element values differ';
+                          }
+                        } else if (typeof cfParsed !== typeof ofParsed) {
+                          diffType = `type mismatch (chrome=${typeof cfParsed}, ours=${typeof ofParsed})`;
+                        }
+                      } catch (_) {
+                        // Not valid JSON individually — compare as raw strings
+                        diffType = 'raw string difference';
+                      }
+
+                      const cfTrunc = cf.length > 100 ? cf.substring(0, 100) + '...' : cf;
+                      const ofTrunc = of_.length > 100 ? of_.substring(0, 100) + '...' : of_;
+                      log(`  [DIAG] Field[${fi}]: DIFF (${lenDiff >= 0 ? '+' : ''}${lenDiff} chars) — ${diffType}`);
+                      log(`  [DIAG]   Chrome: ${JSON.stringify(cfTrunc)}`);
+                      log(`  [DIAG]   Ours:   ${JSON.stringify(ofTrunc)}`);
+                    }
+                  }
+
+                  log(`  [DIAG] ── Summary ──`);
+                  log(`  [DIAG] Total fields: ${maxFields} | Match: ${matchCount} | Differ: ${diffCount}`);
+                  log(`  [DIAG] Total char diff (ours - chrome): ${totalCharDiff >= 0 ? '+' : ''}${totalCharDiff}`);
+                  log(`  [DIAG] Actual string length diff: ${ourCdStr.length - chromeCdStr2.length}`);
+                }
+              } catch (fieldCompErr) {
+                log(`  [DIAG] Field comparison failed: ${fieldCompErr.message}`);
               }
             } catch (diagErr) {
               log(`  [DIAG] Diagnostic failed: ${diagErr.message}`);
