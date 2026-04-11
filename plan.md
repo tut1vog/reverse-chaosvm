@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.1 — Create reference injection forensics script
+Current task: 19.2 — Live test with reference tdc.js injection
 
 ---
 
@@ -188,8 +188,8 @@ Current task: 19.1 — Create reference injection forensics script
 
 | ID | Task | Status |
 |----|------|--------|
-| 19.1 | Create reference injection forensics script | in-progress |
-| 19.2 | Live test with reference tdc.js injection | pending |
+| 19.1 | Create reference injection forensics script | done |
+| 19.2 | Live test with reference tdc.js injection | in-progress |
 | 19.3 | Fix identified divergence | pending |
 | 19.4 | Live re-test with fix | pending |
 
