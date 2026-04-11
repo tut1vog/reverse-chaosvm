@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 33 (complete)
-Current task: none — awaiting direction
+Current phase: Phase 34
+Current task: 34.1 — Fix extractThisCtx for bracket-notation .call()
 
 ---
 
@@ -75,6 +75,55 @@ Current task: none — awaiting direction
 - **errorCode 9** seen once (wrong slider answer)
 - Template classification: 1× A (95 ops), 3× B (94 ops), 3× "unknown" (96/98 ops), 3× unparseable
 
-**Next priorities**:
-1. Fix vm-parser to handle the large 162K-202K builds (new VM architecture)
-2. Investigate why errorCode 12 is inconsistent (same build sometimes -1, sometimes 12)
+### Phase 34: Fix VM Parser for Bracket-Notation Builds
+> The 3 unparseable builds (162K-202K) use `['call']` (bracket notation) instead
+> of `.call` (dot notation). The vm-parser's `extractThisCtx` only matches
+> `property.type === 'Identifier'` — needs to also match `property.type === 'Literal'`.
+> All other parser steps (switch finding, bytecode/pc, regs, catchStack) already work.
+
+| ID | Task | Status |
+|----|------|--------|
+| 34.1 | Fix extractThisCtx for bracket-notation .call() | in-progress |
+| 34.2 | Tests for bracket-notation vm-parser fix | pending |
+| 34.3 | Re-run survey to verify all builds port | pending |
+
+---
+
+## Current Task
+
+**ID**: 34.1
+**Title**: Fix extractThisCtx for bracket-notation .call()
+**Phase**: Fix VM Parser for Bracket-Notation Builds
+**Status**: in-progress
+
+### Goal
+Modify `extractThisCtx()` in `pipeline/vm-parser.js` to also match bracket-notation `.call()` — where property is `Literal` with value `'call'` instead of `Identifier` named `call`. This is a one-line fix.
+
+### Context
+- `pipeline/vm-parser.js` line 179: currently checks `node.callee.property.type === 'Identifier' && node.callee.property.name === 'call'`
+- Failing builds use `regs[bytecode[++pc]]['call'](thisCtx, ...)` — bracket notation
+- In the AST, bracket notation produces `property.type === 'Literal'` with `property.value === 'call'`
+- Confirmed via diagnostic: all 3 failing builds have 3 bracket-notation `.call()` patterns each, and the thisCtx candidate is correctly found when matching both notations
+- No other parser functions need changes — bytecode/pc/regs/catchStack extraction all work on these builds
+
+### Implementation Steps
+1. In `extractThisCtx()`, change the `.call` check on line 179 from:
+   ```js
+   node.callee.property.type === 'Identifier' &&
+   node.callee.property.name === 'call'
+   ```
+   to:
+   ```js
+   ((node.callee.property.type === 'Identifier' && node.callee.property.name === 'call') ||
+    (node.callee.property.type === 'Literal' && node.callee.property.value === 'call'))
+   ```
+
+### Verification
+- [ ] `node -c pipeline/vm-parser.js` passes
+- [ ] All 3 previously-failing builds parse successfully:
+      `node -e "const {parseVmFunction}=require('./pipeline/vm-parser'); const fs=require('fs'); for (const h of ['27dda893f81dbc4f','3429444f324c6110','e2170903e201e018']) { const src=fs.readFileSync('output/tdc-survey/'+h+'.js','utf8'); const r=parseVmFunction(src); console.log(h+': '+r.caseCount+' cases, thisCtx='+r.variables.thisCtx); }"`
+- [ ] All previously-working builds still parse: `node -e "const {parseVmFunction}=require('./pipeline/vm-parser'); const fs=require('fs'); const src=fs.readFileSync('targets/tdc.js','utf8'); const r=parseVmFunction(src); console.log('tdc.js:', r.caseCount, 'cases, thisCtx='+r.variables.thisCtx);"`
+- [ ] `npm test` — no regressions
+
+### Suggested Agent
+general-purpose
