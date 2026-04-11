@@ -462,6 +462,12 @@ async function solve(opts) {
               caseCount: vmInfo.caseCount,
             };
 
+            // Propagate cdFieldOrder for known template structures
+            if (vmInfo.caseCount === 95) {
+              cached.cdFieldOrder = [0,4,23,44,21,11,39,26,1,28,5,47,24,27,8,46,12,30,-1,31,6,15,16,3,18,7,19,38,17,48,49,40,45,2,35,53,42,54,52,9,29,20,51,43,41,34,36,33,57,56,10,14,32,13,37,-1,-1,22,50];
+              log('  Added cdFieldOrder for 95-opcode template');
+            }
+
             // Store in cache for future lookups
             cache.store(tdcName, cached);
             log(`  Stored extracted params in cache for ${tdcName}`);
