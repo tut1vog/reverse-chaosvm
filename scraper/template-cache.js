@@ -117,10 +117,11 @@ class TemplateCache {
       const tdcName = extractTdcName(firstLine);
       if (!tdcName) continue;
 
-      // Skip if this TDC_NAME is already in cache (avoid duplicates for shared templates)
-      if (this._cache[tdcName]) continue;
+      // If entry exists, merge new structure params into it; otherwise create new
+      const existing = this._cache[tdcName];
+      if (existing && !config.structureParams) continue; // nothing new to add
 
-      const cacheEntry = {
+      const cacheEntry = existing || {
         template: config.template,
         key: config.xteaParams.key,
         delta: config.xteaParams.delta,
@@ -129,17 +130,19 @@ class TemplateCache {
         caseCount: config.caseCount,
         lastSeen: new Date().toISOString()
       };
-      // Add keyMods from config if available, otherwise derive from keyModConstants
-      if (config.xteaParams.keyMods) {
-        cacheEntry.keyMods = config.xteaParams.keyMods;
-      } else if (config.xteaParams.keyModConstants) {
-        cacheEntry.keyMods = [0, config.xteaParams.keyModConstants[0], 0, config.xteaParams.keyModConstants[1]];
+      if (!existing) {
+        // Add keyMods from config if available, otherwise derive from keyModConstants
+        if (config.xteaParams.keyMods) {
+          cacheEntry.keyMods = config.xteaParams.keyMods;
+        } else if (config.xteaParams.keyModConstants) {
+          cacheEntry.keyMods = [0, config.xteaParams.keyModConstants[0], 0, config.xteaParams.keyModConstants[1]];
+        }
       }
       // Add cdFieldOrder from config if available
-      if (config.cdFieldOrder) {
+      if (config.cdFieldOrder && !cacheEntry.cdFieldOrder) {
         cacheEntry.cdFieldOrder = config.cdFieldOrder;
       }
-      // Add structure params from config if available
+      // Add structure params from config if available (merge into existing)
       if (config.structureParams) {
         if (config.structureParams.hashPosition !== undefined) {
           cacheEntry.hashPosition = config.structureParams.hashPosition;
