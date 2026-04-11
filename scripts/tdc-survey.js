@@ -533,7 +533,14 @@ async function main() {
   process.stderr.write(`[survey] Report saved to ${reportPath}\n`);
 }
 
-main().catch(err => {
-  process.stderr.write(`[survey] Fatal error: ${err.message}\n`);
-  process.exit(1);
-});
+// Export for testing
+if (require.main !== module) {
+  module.exports = { parseArgs, buildPostFields };
+}
+
+if (require.main === module) {
+  main().catch(err => {
+    process.stderr.write(`[survey] Fatal error: ${err.message}\n`);
+    process.exit(1);
+  });
+}
