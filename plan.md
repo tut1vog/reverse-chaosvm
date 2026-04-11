@@ -35,7 +35,7 @@ Current task: 21.1 — Map all object serialization differences
 
 | ID | Task | Status |
 |----|------|--------|
-| 21.1 | Map all object serialization differences | pending |
+| 21.1 | Map all object serialization differences | done |
 | 21.2 | Fix buildCdString with per-field custom serializers | pending |
 | 21.3 | Verify fix via live forensics comparison | pending |
 | 21.4 | Live CAPTCHA test with all fixes | pending |
@@ -44,41 +44,43 @@ Current task: 21.1 — Map all object serialization differences
 
 ## Current Task
 
-**ID**: 21.1
-**Title**: Map all object serialization differences
+**ID**: 21.2
+**Title**: Fix buildCdString with per-field custom serializers
 **Phase**: Fix Object Serialization in buildCdString
 **Status**: pending
 
 ### Goal
-Extend the cd string diagnostic in `chrome-cd-inject.js` to identify EVERY position where Chrome's cd string diverges from our `buildCdString()` output. Currently we found one diff at position 145 (`intlOptions` has 2 keys in Chrome vs 4 in ours). There are likely more differences in other complex fields (audioFingerprint, highEntropyValues, storageEstimate, plugins, etc.).
+Based on 21.1 findings, the cd string diffs between Chrome and our buildCdString fall into TWO categories:
+1. **Hash artifact positioning**: Chrome embeds `[[4,-1,-1,ts,0,0,0,0]]` at field[51] (space-padded to ~56 chars). Our code strips hash artifacts and has 59 fields vs Chrome's 60. The hash position varies by template.
+2. **Object key filtering** (from earlier intlOptions finding on a different template): Chrome's `func_276` serializes only specific keys per object type, while our `JSON.stringify` includes all keys.
 
-### What we know
-From the last diagnostic run (96-opcode live template):
-- Chrome cd string: 2881 chars
-- Our buildCdString: 2862 chars  
-- Diff: -19 chars (ours is shorter)
-- First diff at position 145: `intlOptions` — Chrome emits `{timeZone, calendar}` (2 keys), we emit `{timeZone, calendar, numberingSystem, locale}` (4 keys)
+The 94-opcode template (Template B) shows:
+- Chrome: 60 fields (including hash artifact at [51])
+- Ours: 59 fields (hash stripped)
+- 51/60 fields match perfectly
+- 9 diffs: all caused by the hash artifact at position 51 shifting subsequent fields by 1
 
-Wait — ours is 19 chars SHORTER but Chrome has MORE keys removed... this means the difference comes from MULTIPLE fields, some longer in Chrome, some shorter. We need to see ALL diffs, not just the first one.
+**The real fix**: Stop stripping hash artifacts from the cd array before serialization. The hash IS a cd field — it belongs in the serialized cd string. Our code currently strips it and puts it in a separate segment, but Chrome keeps it inline.
 
-### Approach
-Modify the diagnostic to:
-1. After finding the first diff, continue scanning to find ALL diff positions
-2. For each diff region, identify which cd field (by index) the diff falls in  
-3. Show Chrome's serialization vs ours for each differing field
-4. Produce a complete list of fields that need custom serializers
-
-Alternatively, do a FIELD-BY-FIELD comparison: for each of the 59 cd fields, serialize it with `JSON.stringify` and compare with what Chrome's cd string has at that position. Walk both strings in parallel, extracting fields by tracking JSON depth.
+Wait — this contradicts the Template A forensics from Phase 19 where byte-identical tokens WERE achieved. In Template A, the hash was at cd[11] and WAS stripped. So the hash handling differs by template. Need to check whether Template A strips vs embeds.
 
 ### Context
-- `scripts/chrome-cd-inject.js` — already has the diagnostic code (DIAG section after step 7b)
+- `scripts/chrome-cd-inject.js` — field-by-field diagnostic (just completed in 21.1)
 - `token/outer-pipeline.js` — `buildCdString()` at line 58
-- The diagnostic already reconstructs Chrome's cd string from header+cdBody segments
-- Need to add field-level extraction and comparison
+- `token/generate-token.js` — `buildInputChunks()` where hash is handled
+- `scraper/collect-generator.js` — `generateCollect()` where hash artifacts are stripped from cdArrayOverride
+- Phase 19 notes: For Template A, byte-identical tokens achieved WITH hash stripping + separate hash segment
+
+### Implementation Steps
+1. Run the diagnostic on a Template A build (via ref-inject-forensics) to confirm hash handling for Template A
+2. Compare Template A hash handling vs Template B hash handling
+3. If hash treatment differs by template, parameterize it in generateCollect/buildInputChunks
+4. For the `intlOptions` object key filtering (found on earlier 96-opcode template), add custom serializer to buildCdString for objects that func_276 serializes selectively
 
 ### Verification
-- [ ] Diagnostic logs every field where Chrome's serialization differs from JSON.stringify
-- [ ] Each diff shows: field index, Chrome's serialization, our serialization, length difference
+- [ ] `npm test` passes 173/175 (no regressions)
+- [ ] ref-inject-forensics.js still produces byte-identical tokens for Template A
+- [ ] chrome-cd-inject.js field diagnostic shows 0 diffs for at least one live template
 
 ### Suggested Agent
 general-purpose
