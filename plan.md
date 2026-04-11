@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 22
-Current task: 22.1 — Diagnose key extraction failures on live templates
+Current task: 22.2 — Fix keyModConstants legacy format lossy serialization
 
 ---
 
@@ -18,8 +18,8 @@ Current task: 22.1 — Diagnose key extraction failures on live templates
 
 | ID | Task | Status |
 |----|------|--------|
-| 22.1 | Diagnose key extraction failures on live templates | pending |
-| 22.2 | Fix analyzeTrace for all key derivation patterns | pending |
+| 22.1 | Diagnose key extraction failures on live templates | done |
+| 22.2 | Fix keyModConstants legacy format lossy serialization | pending |
 | 22.3 | Tests for key extraction fixes | pending |
 
 ### Phase 23: Header Split Strategy Application
@@ -44,46 +44,42 @@ Current task: 22.1 — Diagnose key extraction failures on live templates
 
 ## Current Task
 
-**ID**: 22.1
-**Title**: Diagnose key extraction failures on live templates
+**ID**: 22.2
+**Title**: Fix keyModConstants legacy format lossy serialization
 **Phase**: Reliable Key Extraction for Live Templates
 **Status**: pending
 
 ### Goal
-Understand WHY `analyzeTrace()` produces `keyMods: [0,0]` for some live templates when it works perfectly for saved files. The extracted BASE KEY is correct (decryption with [0,0,0,0] keyMods produces something, just not valid JSON) — the issue is specifically in Phase 4 (keyMod detection) of `analyzeTrace()`.
-
-### What we know
-From history:
-- Pipeline extraction on SAVED files works: `tdc-live-test.js` (94 opcodes) → keyMods `[0, 0, 657930, 526341]` ✓
-- Pipeline extraction on LIVE templates often fails: `KhaJbXNVBBaBOAalQnkbOEZmGXAAcmFh` → keyMods `[0, 0]` ✗
-- In-page instrumentation (Phase 18.4-18.5) produced same wrong result → NOT an environment issue
-- keyMods on ANY indices observed: [0+3], [1+3], [2+3] all seen
-- 96-opcode template `SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk` DID extract correctly: keyMods `[1052701, 0, 0, 1644806]`
-
-**Two separate failure modes:**
-1. **Wrong key entirely**: Stale cached key used for rotated TDC_NAME → decryption produces garbage
-2. **Correct base key, wrong keyMods**: analyzeTrace finds the 4 key values but fails to find ADD_K ops with matching srcVal → keyMods all zero
-
-### Approach
-1. Capture a live tdc.js where key extraction fails (save to `targets/tdc-diag.js`)
-2. Run pipeline on it with verbose trace output — dump the actual trace ops around the cipher region
-3. Examine the trace to understand:
-   - Are ADD_K ops present but with different srcVal patterns?
-   - Is the srcVal comparison failing (unsigned vs signed)?
-   - Are keyMods applied at a different point in the cipher (not via ADD_K)?
-   - Is the cipher window (firstDeltaIdx ± 50) too narrow?
-4. Compare trace structure between a working template and a failing one
+Fix the lossy `keyModConstants` serialization that drops keyMods at indices 0 and 2. The root cause (from 22.1): `keyModConstants = [keyMods[1], keyMods[3]]` only stores two of four possible indices. Round-tripping via `_normalizeEntry()` maps them back to `[0, kmc[0], 0, kmc[1]]` — always indices [1,3], silently losing any mods at [0] or [2].
 
 ### Context
-- `pipeline/key-extractor.js` lines 479-536 — Phase 4 (keyMod detection)
-- `pipeline/key-extractor.js` lines 415-474 — Phase 3 (base key extraction)
-- `pipeline/key-extractor.js` lines 100-197 — instrumentation code
-- `pipeline/key-extractor.js` lines 226-322 — Puppeteer trace collection
+Five locations need fixing:
+
+1. **`pipeline/key-extractor.js:527-529`** — `result.keyModConstants = [keyMods[1], keyMods[3]]`. Change to store all 4: `result.keyModConstants = keyMods.slice()` or deprecate `keyModConstants` entirely in favor of `keyMods`.
+
+2. **`scraper/template-cache.js:80-83`** — `store()` method: `keyModConstants = [keyMods[1], keyMods[3]]` and `keyMods = [0, kmc[0], 0, kmc[1]]`. Both directions are lossy.
+
+3. **`scraper/template-cache.js:135-138`** — `seed()` method: same wrong normalization from `keyModConstants` → `keyMods`.
+
+4. **`scraper/template-cache.js:175-178`** — `_normalizeEntry()`: same wrong pattern.
+
+5. **`pipeline/run.js`** — `savePipelineConfig` stores the lossy `keyModConstants`. Ensure `keyMods` (4-element) is always saved.
+
+Also: update existing `output/*/xtea-params.json` and `scraper/cache/templates.json` to include correct `keyMods` by re-running extraction on the 5 saved targets + `tdc-live-test.js`.
+
+### Implementation Steps
+1. In `key-extractor.js`: keep `keyModConstants` for backward compat but make it a direct copy of `keyMods`. Or better: change `keyModConstants` to just be `keyMods` aliased.
+2. In `template-cache.js`: fix all 3 locations to use `keyMods` as the primary 4-element format. When only `keyModConstants` is available (legacy data), use it as-is if 4 elements, or pad with zeros if 2 elements BUT preserve the values at whatever positions they represent (since we can't recover the lost indices, just stop losing NEW data).
+3. In `pipeline/run.js`: ensure `keyMods` (4-element) is saved to pipeline-config.json.
+4. Re-run `pipeline/run.js` on all 6 targets to regenerate xtea-params.json with correct `keyMods`.
+5. Regenerate `scraper/cache/templates.json` from updated pipeline outputs.
 
 ### Verification
-- [ ] Identified root cause of keyMods [0,0] for failing templates
-- [ ] Documented the difference between working and failing trace structures
-- [ ] Proposed specific fix for analyzeTrace
+- [ ] `node -e "..."` check: all 6 target xtea-params.json have 4-element `keyMods` with correct values
+- [ ] `npm test` passes (218/220 baseline, same 2 known failures)
+- [ ] `node pipeline/run.js targets/tdc.js --skip-verify` produces correct keyMods `[0, 2368517, 0, 592130]`
+- [ ] `node pipeline/run.js targets/tdc-live-test.js --skip-verify` produces correct keyMods `[0, 0, 657930, 526341]`
+- [ ] No code path in template-cache.js hardcodes `[0, kmc[0], 0, kmc[1]]` pattern
 
 ### Suggested Agent
 general-purpose
