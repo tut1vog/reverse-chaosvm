@@ -38,8 +38,9 @@ Current task: 28.3 — Fix ans computation in scraper pipeline
 | 28.1 | Fix ans coordinate space and calibration in chrome-passthrough | done |
 | 28.2 | Live re-test with chrome-passthrough (manual POST still fails) | done (failed — but root cause now understood) |
 | 28.2.1 | Run captcha-solver.js with real drag | done (errorCode 0 — success!) |
-| 28.3 | Fix ans computation in scraper pipeline (X=rawOffset, Y=spt) | pending |
+| 28.3 | Fix ans computation in scraper pipeline (X=rawOffset, Y=spt) | done |
 | 28.4 | Tests for ans computation | pending |
+| 28.4.1 | Fix captcha-solver.js CALIBRATION_OFFSET for non-drag scripts | pending |
 | 28.5 | Live test: scraper with corrected ans (no Puppeteer) | pending |
 | 28.6 | If TLS blocks verify: investigate workarounds | pending |
 
@@ -47,47 +48,13 @@ Current task: 28.3 — Fix ans computation in scraper pipeline
 
 ## Current Task
 
-**ID**: 28.3
-**Title**: Fix ans computation in scraper pipeline
+**ID**: 28.4
+**Title**: Tests for ans computation
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
 **Status**: pending
 
 ### Goal
-Fix the `ans` field computation so the scraper pipeline sends correct coordinates without needing a browser drag. X = rawOffset (natural space, no ratio, no calibration). Y = `spt` from the getsig/show response. Also fix `chrome-passthrough.js` and `live-captcha-submit.js` if they exist.
-
-### Context
-- **`spt` (Y coordinate)**: Already parsed in `puppeteer/captcha-client.js`:
-  - `_getSigLegacy` returns `spt: data.spt || ''` (line 476)
-  - `_parseShowPageConfig` extracts `spt: extract('spt')` (line 669)
-  - `_getCapBySig` returns `spt: data.spt || sig.spt || ''` (line 735)
-  - In `t_captcha_slide.js`: `_.spt = e.inity` (getsig response field `inity`)
-  - Y = `Math.floor(parseInt(spt, 10))`
-- **X coordinate**: `rawOffset` from OpenCV, used directly (no ratio, no calibration)
-  - From successful captcha-solver.js run: raw=478 → page computed ans X=477 (essentially rawOffset)
-- **Scripts to fix**:
-  - `scripts/chrome-passthrough.js` — currently uses `NATURAL_CALIBRATION = -13` and `SLIDE_Y = 158`
-  - `scripts/live-captcha-submit.js` — if it exists, likely has same issue
-  - `scraper/scraper.js` — the headless scraper; check how it computes ans
-- **`puppeteer/captcha-client.js`** line 885 shows `verify()` accepts `params.ans`
-
-### Implementation Steps
-1. Read `scraper/scraper.js` to find how ans is currently computed
-2. Read `scripts/chrome-passthrough.js` ans computation (already known: line 257-258)
-3. Fix ans in all scripts:
-   - X = `rawOffset` (no multiplication, no calibration offset)
-   - Y = `parseInt(spt, 10)` from the getsig/show response
-   - Format: `"${X},${Y};"`
-4. Ensure `spt` is plumbed from CaptchaClient response → ans computation in each script
-5. Remove hardcoded Y constants (`SLIDE_Y`, `DEFAULT_SLIDE_Y`, etc.)
-6. Remove ratio multiplication and calibration offsets for non-drag usage
-
-### Verification
-- [ ] `node -c` passes on all modified files
-- [ ] `npm test` passes at baseline
-- [ ] No hardcoded Y constants remain (no `SLIDE_Y = 158`, `DEFAULT_SLIDE_Y = 45`)
-- [ ] No ratio multiplication on rawOffset for the manual POST path
-- [ ] `spt` is read from server response and used as Y in all ans computations
-- [ ] grep confirms: ans is built as `"${rawOffset},${spt};"` pattern
+Add tests verifying the corrected ans computation logic (X=rawOffset, Y=spt).
 
 ### Suggested Agent
 general-purpose
