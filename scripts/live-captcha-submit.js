@@ -456,6 +456,7 @@ async function solve(opts) {
       let headerSplit = null;
       let chromeCdFieldCount = null;
       let fieldOrderMatchCount = null;
+      let strippedCd = null;
 
       if (chromeCollect) {
         const fullDecrypt = decryptCollect(chromeCollect, xteaParams);
@@ -480,6 +481,15 @@ async function solve(opts) {
             // Detect serialization diffs
             serializationDiffs = detectSerializationDiffs(fullDecrypt.plaintext, fullDecrypt.parsed.cd);
             log(`  Serialization diffs: ${serializationDiffs.length} fields differ`);
+
+            // Strip hash artifact from Chrome's cd for cdArrayOverride
+            strippedCd = [...fullDecrypt.parsed.cd];
+            if (hashPosition >= 0) {
+              log(`  Stripping hash artifact at position ${hashPosition} from Chrome cd (${strippedCd.length} -> ${strippedCd.length - 1} fields)`);
+              strippedCd.splice(hashPosition, 1);
+            } else {
+              log(`  No hash artifact found in Chrome cd, using all ${strippedCd.length} fields for cdArrayOverride`);
+            }
           }
 
           if (fullDecrypt.parsed.sd) {
@@ -537,17 +547,28 @@ async function solve(opts) {
         nonce: nonce,
         sdOverride: slideSd,
         timestamp: now,
-        behavioralEvents: behavioralEvents,
       };
 
-      // Apply detected structure params
-      if (cdFieldOrder) {
-        collectOpts.cdFieldOrder = cdFieldOrder;
-        log(`  Using cdFieldOrder from live detection (${cdFieldOrder.length} entries, ${fieldOrderMatchCount} matched)`);
-      } else if (vmInfo.caseCount === 95) {
-        // Default Template A field order
-        collectOpts.cdFieldOrder = [0,4,23,44,21,11,39,26,1,28,5,47,24,27,8,46,12,30,-1,31,6,15,16,3,18,7,19,38,17,48,49,40,45,2,35,53,42,54,52,9,29,20,51,43,41,34,36,33,57,56,10,14,32,13,37,-1,-1,22,50];
-        log('  Using default Template A cdFieldOrder');
+      if (strippedCd) {
+        // Use Chrome's exact cd values via cdArrayOverride
+        collectOpts.cdArrayOverride = strippedCd;
+        log(`  Using cdArrayOverride with Chrome's cd (${strippedCd.length} fields, hash stripped)`);
+        // Do NOT pass behavioralEvents — Chrome's pre-solve TDC.getData() has none
+        // Do NOT pass cdFieldOrder — cdArrayOverride already in Chrome's order
+      } else {
+        // Fallback: standalone generation (original behavior)
+        log(`  WARNING: No Chrome cd available, falling back to standalone generation`);
+        collectOpts.behavioralEvents = behavioralEvents;
+
+        // Apply detected field order
+        if (cdFieldOrder) {
+          collectOpts.cdFieldOrder = cdFieldOrder;
+          log(`  Using cdFieldOrder from live detection (${cdFieldOrder.length} entries, ${fieldOrderMatchCount} matched)`);
+        } else if (vmInfo.caseCount === 95) {
+          // Default Template A field order
+          collectOpts.cdFieldOrder = [0,4,23,44,21,11,39,26,1,28,5,47,24,27,8,46,12,30,-1,31,6,15,16,3,18,7,19,38,17,48,49,40,45,2,35,53,42,54,52,9,29,20,51,43,41,34,36,33,57,56,10,14,32,13,37,-1,-1,22,50];
+          log('  Using default Template A cdFieldOrder');
+        }
       }
 
       if (serializationDiffs.length > 0) {
@@ -571,6 +592,13 @@ async function solve(opts) {
         try { collectVal = decodeURIComponent(collectVal); } catch (_) { /* leave as-is */ }
       }
       log(`  Collect length: ${collectVal.length} chars`);
+
+      // Size comparison with Chrome's collect
+      if (chromeCollect) {
+        const chromeLen = chromeCollect.length;
+        const diff = collectVal.length - chromeLen;
+        log(`  Standalone collect: ${collectVal.length} chars, Chrome collect: ${chromeLen} chars, Diff: ${diff > 0 ? '+' : ''}${diff}`);
+      }
 
       // ── Step 9: Generate vData via Chrome ──
       log('Step 9: Generate vData via Chrome...');
@@ -801,12 +829,15 @@ async function solve(opts) {
         serializationDiffCount: serializationDiffs.length,
         sliderOffset: rawOffset,
         collectLength: collectVal.length,
+        chromeCollectLength: chromeCollect ? chromeCollect.length : null,
+        collectSizeDiff: chromeCollect ? collectVal.length - chromeCollect.length : null,
+        usedCdArrayOverride: !!strippedCd,
         vDataLength: vData.length,
         httpStatus: verifyResult.status,
         errorCode: errorCode,
         ticket: ticket,
         randstr: verifyData.randstr || null,
-        verifyMethod: 'standalone collect + Chrome TLS',
+        verifyMethod: strippedCd ? 'cdArrayOverride + Chrome TLS' : 'standalone collect + Chrome TLS',
       };
 
       // Write results
@@ -872,6 +903,9 @@ async function solve(opts) {
       log(`  Serialization diffs: ${lastResult.serializationDiffCount || 0}`);
       log(`  Slider offset: ${lastResult.sliderOffset || 'N/A'}px`);
       log(`  Collect length: ${lastResult.collectLength || 'N/A'} chars`);
+      log(`  Chrome collect length: ${lastResult.chromeCollectLength || 'N/A'} chars`);
+      log(`  Collect size diff: ${lastResult.collectSizeDiff != null ? (lastResult.collectSizeDiff > 0 ? '+' : '') + lastResult.collectSizeDiff : 'N/A'}`);
+      log(`  Used cdArrayOverride: ${lastResult.usedCdArrayOverride ? 'YES' : 'NO'}`);
       log(`  vData generated: ${lastResult.vDataLength || 'N/A'} chars`);
       log(`  HTTP ${lastResult.httpStatus}`);
       log(`  errorCode: ${lastResult.errorCode}`);
