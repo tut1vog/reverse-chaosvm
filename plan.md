@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 29
-Current task: 29.1 — Audit and refresh stale template cache entries
+Current phase: Phase 30
+Current task: 30.1 — Add singleBlob to scraper and fix collect encoding
 
 ---
 
@@ -18,34 +18,77 @@ Current task: 29.1 — Audit and refresh stale template cache entries
 
 ### Phase 28: End-to-End CAPTCHA Solve — Token Isolation (done)
 > Standalone token accepted by server (errorCode 0) via Puppeteer request interception.
-> Root causes: (1) live templates use single-blob XTEA encryption, not 4-segment;
-> (2) some cache entries had wrong keyMods from bad initial extraction.
-> Key insight: same TDC_NAME always has same XTEA key/keyMods/cdFieldOrder — only eks differs per build.
 
-### Phase 29: Cache Refresh & TLS Verification
-> Fix stale template cache entries (wrong keyMods), then verify whether TLS
-> fingerprinting is the real reason `cap_union_new_show` returns 403 for Node.js.
+### Phase 29: Cache Refresh & TLS Verification (done)
+> All 10 templates refreshed. cap_union_new_show 403 was missing sess, not TLS.
+> Full headless flow confirmed possible.
+
+### Phase 30: Puppeteer-Free Domain Query
+> Make `node scraper/cli.js --verbose https://example.com` work end-to-end
+> with zero Puppeteer/browser dependency. Only Node.js + Python (OpenCV).
 
 | ID | Task | Status |
 |----|------|--------|
-| 29.1 | Audit and refresh stale template cache entries | done |
-| 29.2 | Tests for refreshed cache entries | pending |
-| 29.3 | Verify TLS fingerprinting as cause of 403 on cap_union_new_show | done (NOT TLS — it's missing sess!) |
-| 29.4 | Act on 29.3 results | done (no TLS blocker — full headless flow is possible) |
+| 30.1 | Add singleBlob to scraper and fix collect encoding | pending |
+| 30.2 | Tests for 30.1 changes | pending |
+| 30.3 | Live end-to-end headless test (`scraper/cli.js --captcha-only`) | pending |
+| 30.4 | Act on 30.3 results — fix any remaining issues | pending |
+| 30.5 | Full domain query test (`scraper/cli.js --verbose https://example.com`) | pending |
 
 ---
 
 ## Current Task
 
-Phase 29 complete. Cache refreshed, TLS myth busted.
+**ID**: 30.1
+**Title**: Add singleBlob to scraper and fix collect encoding
+**Phase**: Puppeteer-Free Domain Query
+**Status**: pending
 
-### Key outcomes
-1. All 10 template cache entries refreshed with correct keyMods + cdFieldOrder
-2. `cap_union_new_show` 403 is NOT TLS fingerprinting — just requires valid `sess` from prehandle
-3. **Full headless CAPTCHA solve flow is possible** — no Puppeteer needed for any step
-4. Legacy `/cap_union_new_getsig` confirmed dead (404)
+### Goal
+Two changes to `scraper/scraper.js` to align with what the isolation test proved works:
+1. Add `singleBlob: true` to the `generateCollect()` call
+2. Fix the collect value passed to `verify()` — should be raw base64, not URL-encoded
 
-### Next priorities
-1. Integrate `singleBlob: true` into `scraper/scraper.js`
-2. End-to-end headless test (prehandle → show config → images → solve → token → verify)
-3. Tests for single-blob mode (28.12, deferred)
+### Context
+
+**The isolation test (28.15) proved**: `generateCollect(profile, xteaParams, { singleBlob: true })` produces an accepted token (errorCode 0) when the raw base64 form (decodeURIComponent of the URL-encoded output) is placed in the POST body.
+
+**Current scraper code** (`scraper/scraper.js` line 410-424):
+```js
+const collectEncoded = generateCollect(profileOverrides, xteaParams, {
+  appid: this.aid,
+  nonce: sig.nonce,
+  sdOverride: slideSd,
+  cdFieldOrder: cached.cdFieldOrder || null,
+  behavioralEvents: behavioralEvents,
+  timestamp: now,
+  serializationDiffs: cached.serializationDiffs || null,
+  headerSplit: cached.headerSplit || null,
+  // MISSING: singleBlob: true
+});
+// Decode URI-encoded collect for the POST fields
+let collectVal = collectEncoded;
+if (collectVal.includes('%')) {
+  try { collectVal = decodeURIComponent(collectVal); } catch (_) {}
+}
+```
+
+**Issues**:
+1. Missing `singleBlob: true` — generates 4-segment token instead of single blob
+2. The decoding logic is correct (collectVal becomes raw base64) — but `verify()` receives `collectEncoded` (URL-encoded) at line 455 instead of `collectVal` (raw base64). Need to check what `verify()` expects and whether this matters.
+
+**What verify() does** (captcha-client.js): The `prebuiltBody` path (used when vData is available) sends the jQuery-serialized body directly. The `collect` param is used for the non-prebuilt path. In the prebuilt path, the collect is already embedded in `serializedBody` via `generateVData()`. So the `collect` field passed to `verify()` is only used in the non-prebuilt fallback. Need to check both paths.
+
+### Implementation Steps
+1. Add `singleBlob: true` to the generateCollect options (one line)
+2. Verify the collect encoding flow: what format does `_buildPostFields` expect? What does `generateVData` receive?
+3. Ensure raw base64 (not URL-encoded) goes into the POST body, matching what the isolation test proved works
+
+### Verification
+- [ ] `node -c scraper/scraper.js` passes
+- [ ] `npm test` — 251/253 (no regressions)
+- [ ] Code review: `singleBlob: true` present in generateCollect call
+- [ ] Code review: collect value in POST body is raw base64
+
+### Suggested Agent
+general-purpose
