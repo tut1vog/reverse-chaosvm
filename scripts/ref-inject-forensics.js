@@ -238,9 +238,32 @@ function comparisonA(plaintext, parsed, xteaParams, decryptedSegments) {
   // the actual payload body without padding artifacts.
   let chromeCdStringClean = null;
   if (decryptedSegments && decryptedSegments.header && decryptedSegments.cdBody) {
+    // headerContent has trailing space-padding (positions after the last cd field
+    // that fits in HEADER_SIZE). cdBody has the continuation. To reconstruct the
+    // payload body without gaps, we need the FULL header (with spaces) and strip
+    // them only at the boundary. The spaces replace real payload content that the
+    // VM chose to pad out. The cdBody starts right after the header in the payload.
+    // So: payloadBody = headerFull[0:HEADER_SIZE] + cdBodyContent
+    // But headerFull includes padding spaces that aren't in the real payload.
+    // The real payload = headerTrimmed + cdBodyTrimmed (no gap).
+    // However this creates a double-comma when header ends with ',' and cdBody
+    // starts with ','. Fix: the cdBody starts at position HEADER_SIZE in the
+    // payload body. The chars between headerTrimmed end and HEADER_SIZE are spaces
+    // that Chrome added as padding, NOT real payload content. So the REAL payload
+    // body is: headerTrimmed + cdBodyTrimmed (the gap is just padding).
+    // But wait — this IS the correct reconstruction. The payload body has content
+    // up to some split point, then the VM pads to HEADER_SIZE. The cdBody starts
+    // at the NEXT payload byte after the split, which is the continuation.
+    // There is NO overlap or gap — the split point is where the VM decided to break.
     const headerContent = decryptedSegments.header.replace(/[\0\s]+$/, '');
     const cdBodyContent = decryptedSegments.cdBody.replace(/[\0\s]+$/, '');
-    const chromePayloadBody = headerContent + cdBodyContent;
+    // Remove leading comma from cdBody if header already ends with comma
+    // to avoid double-comma artifact
+    let cdBodyJoin = cdBodyContent;
+    if (headerContent.endsWith(',') && cdBodyContent.startsWith(',')) {
+      cdBodyJoin = cdBodyContent.substring(1);
+    }
+    const chromePayloadBody = headerContent + cdBodyJoin;
     // chromePayloadBody = cdString.slice(0,-1) + ','  (the full payload body)
     // Chrome's cd string = remove trailing comma, add closing brace
     chromeCdStringClean = chromePayloadBody.slice(0, -1) + '}';
@@ -587,6 +610,25 @@ function comparisonC(chromeCollect, parsed, xteaParams, hashContent) {
     log(`  Removed hash artifact from cd[11]: ${cleanCd.length} fields`);
   }
 
+  // Debug: verify cleanCd produces the right cd string
+  const debugCdStr = buildCdString(cleanCd);
+  const debugPayload = debugCdStr.slice(0, -1) + ',';
+  log(`  cleanCd cdString length: ${debugCdStr.length}`);
+  log(`  cleanCd payload length: ${debugPayload.length}`);
+  // Find split point using same logic as buildInputChunks
+  let debugSplit = Math.min(debugPayload.length, 144);
+  {
+    let fc = 0, d = 0, inS = false;
+    for (let i = 0; i < debugPayload.length; i++) {
+      const ch = debugPayload[i];
+      if (inS) { if (ch === '\\') i++; else if (ch === '"') inS = false; }
+      else { if (ch === '"') inS = true; else if (ch === '[' || ch === '{') d++; else if (ch === ']' || ch === '}') d--; else if (ch === ',' && d === 2) { fc++; if (fc === 11) { debugSplit = i + 1; break; } } }
+    }
+  }
+  log(`  Split point: ${debugSplit}, cdBody content length: ${debugPayload.length - debugSplit}`);
+  log(`  cdBody padded: ${Math.ceil((debugPayload.length - debugSplit) / 8) * 8}`);
+  log(`  cdBody base64: ${Math.ceil(Math.ceil((debugPayload.length - debugSplit) / 8) * 8 / 3) * 4}`);
+
   // Run through full generateCollect with Chrome's cd (cleaned) and sd
   const fullToken = generateCollect({}, xteaParams, {
     cdArrayOverride: cleanCd,
@@ -632,8 +674,10 @@ function comparisonC(chromeCollect, parsed, xteaParams, hashContent) {
     log(`    Diff is in segment: ${diffSegment}`);
     result.diffSegment = diffSegment;
 
-    // Chunk-level comparison
-    const ourCdString = buildCdString(parsed.cd);
+    // Chunk-level comparison — use cleanCd (spliced, 59 fields) not parsed.cd (60)
+    const cleanCdForChunks = [...parsed.cd];
+    if (cleanCdForChunks.length === 60) cleanCdForChunks.splice(11, 1);
+    const ourCdString = buildCdString(cleanCdForChunks);
     const ourSdString = buildSdString(parsed.sd);
     const ourChunks = buildInputChunks(ourCdString, ourSdString, chromeTimestamp);
     const encryptFn = createEncryptFn(xteaParams);

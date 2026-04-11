@@ -41,6 +41,13 @@ const HEADER_SIZE = 144;
  */
 const HASH_SIZE = 48;
 
+/**
+ * Number of cd array fields in the header chunk.
+ * Chrome's VM puts the first 11 fields (indices 0-10) in the header,
+ * then pads with spaces to HEADER_SIZE. Fields 11+ go in cdBody.
+ */
+const HEADER_FIELD_COUNT = 11;
+
 // ═══════════════════════════════════════════════════════════════════════
 // Chunk Construction
 // ═══════════════════════════════════════════════════════════════════════
@@ -79,7 +86,7 @@ function buildHashChunk(timestamp) {
  *
  * Chunk layout:
  *   [0] hash    (48 bytes)  — session metadata, space-padded
- *   [1] header  (144 bytes) — first 144 bytes of payload body, space-padded
+ *   [1] header  (144 bytes) — payload body up to last cd-array field boundary within 144 bytes, space-padded
  *   [2] cd-body (variable)  — remaining payload body, space-padded to 8-byte alignment
  *   [3] sig     (variable)  — sdString, unpadded (encrypt handles block alignment)
  *
@@ -103,12 +110,47 @@ function buildInputChunks(cdString, sdString, timestamp) {
   //      {"cd":[...],"sd":{...}}
   const payloadBody = cdString.slice(0, -1) + ',';
 
-  // 3. Header chunk: first 144 bytes of payload body, space-padded
-  const headerContent = payloadBody.substring(0, HEADER_SIZE);
+  // 3. Header chunk: payload body split after the first HEADER_FIELD_COUNT
+  //    cd array elements, space-padded to HEADER_SIZE.
+  //    Chrome's VM serializes the cd array and puts the first 11 fields
+  //    (indices 0-10) in the header, then pads with spaces to 144 bytes.
+  //    Fields 11+ go into the cdBody chunk.
+  //    We count top-level cd array commas (at depth 2 in the JSON) to find
+  //    the boundary after the 11th field.
+  let splitPos = Math.min(payloadBody.length, HEADER_SIZE);
+  if (payloadBody.length > HEADER_SIZE) {
+    let fieldCount = 0;
+    let depth = 0;
+    let inStr = false;
+    for (let i = 0; i < payloadBody.length; i++) {
+      const ch = payloadBody[i];
+      if (inStr) {
+        if (ch === '\\') { i++; }
+        else if (ch === '"') { inStr = false; }
+      } else {
+        if (ch === '"') { inStr = true; }
+        else if (ch === '[' || ch === '{') { depth++; }
+        else if (ch === ']' || ch === '}') { depth--; }
+        else if (ch === ',' && depth === 2) {
+          fieldCount++;
+          if (fieldCount === HEADER_FIELD_COUNT) {
+            splitPos = i + 1;  // position AFTER the comma (comma stays in header)
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  const headerContent = payloadBody.substring(0, splitPos);
   const header = headerContent.padEnd(HEADER_SIZE, ' ');
 
   // 4. CD body chunk: remaining payload body, space-padded to 8-byte alignment
-  const cdContent = payloadBody.substring(HEADER_SIZE);
+  //    Chrome's VM duplicates the comma at the split point: the header ends
+  //    with a comma AND the cdBody starts with a comma. This produces one
+  //    extra comma in the total plaintext, which JSON.parse handles as valid
+  //    whitespace-like separator.
+  const cdContent = payloadBody.substring(splitPos - 1);
   let cdBody = '';
   if (cdContent.length > 0) {
     const paddedLen = Math.ceil(cdContent.length / 8) * 8;
@@ -210,4 +252,5 @@ module.exports = {
   // Constants
   HEADER_SIZE,
   HASH_SIZE,
+  HEADER_FIELD_COUNT,
 };
