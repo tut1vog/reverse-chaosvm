@@ -36,13 +36,13 @@ class TemplateCache {
   }
 
   /**
-   * Look up cached XTEA params by TDC_NAME.
+   * Look up cached XTEA params by cache key (source hash or legacy TDC_NAME).
    * Normalizes legacy entries by adding keyMods if only keyModConstants is present.
-   * @param {string} tdcName
+   * @param {string} key - Source hash or TDC_NAME
    * @returns {object|null} Entry with {template, key, delta, rounds, keyModConstants, keyMods, caseCount, cdFieldOrder?} or null
    */
-  lookup(tdcName) {
-    const entry = this._cache[tdcName] || null;
+  lookup(key) {
+    const entry = this._cache[key] || null;
     if (entry) {
       return TemplateCache._normalizeEntry(entry);
     }
@@ -68,10 +68,10 @@ class TemplateCache {
   /**
    * Add or update an entry, set lastSeen timestamp, and save.
    * Accepts keyMods (4-element) or keyModConstants (2-element) or both.
-   * @param {string} tdcName
+   * @param {string} key - Source hash or legacy TDC_NAME
    * @param {object} params - {template, key, delta, rounds, keyModConstants?, keyMods?, caseCount, cdFieldOrder?}
    */
-  store(tdcName, params) {
+  store(key, params) {
     const entry = Object.assign({}, params, {
       lastSeen: new Date().toISOString()
     });
@@ -86,7 +86,7 @@ class TemplateCache {
         entry.keyMods = [0, entry.keyModConstants[0], 0, entry.keyModConstants[1]];
       }
     }
-    this._cache[tdcName] = entry;
+    this._cache[key] = entry;
     this.save();
   }
 
@@ -107,23 +107,17 @@ class TemplateCache {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       if (!config.xteaParams) continue;
 
-      // Derive target file path to extract TDC_NAME
+      // Derive target file path to compute source hash
       const targetFile = path.join(__dirname, '..', 'targets', config.target);
       if (!fs.existsSync(targetFile)) continue;
 
-      // Read just the first line to get TDC_NAME
-      const fd = fs.openSync(targetFile, 'r');
-      const buf = Buffer.alloc(256);
-      fs.readSync(fd, buf, 0, 256, 0);
-      fs.closeSync(fd);
-      const firstLine = buf.toString('utf8').split('\n')[0];
-
-      const { extractTdcName } = require('./tdc-utils');
-      const tdcName = extractTdcName(firstLine);
-      if (!tdcName) continue;
+      // Read full source for hashing
+      const { computeSourceHash } = require('./tdc-utils');
+      const targetSource = fs.readFileSync(targetFile, 'utf8');
+      const sourceHash = computeSourceHash(targetSource);
 
       // If entry exists, merge new structure params into it; otherwise create new
-      const existing = this._cache[tdcName];
+      const existing = this._cache[sourceHash];
       if (existing && !config.structureParams) continue; // nothing new to add
 
       const cacheEntry = existing || {
@@ -171,7 +165,7 @@ class TemplateCache {
           cacheEntry.serializationDiffs = config.structureParams.serializationDiffs;
         }
       }
-      this._cache[tdcName] = cacheEntry;
+      this._cache[sourceHash] = cacheEntry;
     }
     this.save();
   }

@@ -1,5 +1,24 @@
 'use strict';
 
+const crypto = require('crypto');
+
+/**
+ * Compute a stable SHA-256 hash of the tdc.js source, with per-session
+ * eks values stripped so that identical VM code always produces the same hash.
+ * @param {string} source - Full tdc.js source code
+ * @returns {string} First 16 hex chars of the SHA-256 digest (64 bits)
+ */
+function computeSourceHash(source) {
+  // Strip the eks assignment value (varies per session)
+  // Pattern: window.<32-char-identifier> = '<base64>' (literal property form)
+  let stripped = source.replace(/window\.[A-Za-z]{32}\s*=\s*'[^']*'/g, 'window.__EKS_STRIPPED__');
+  // Pattern: window[TDC_NAME] = '<base64>' (variable reference form)
+  stripped = stripped.replace(/window\[TDC_NAME\]\s*=\s*'[^']*'/g, 'window.__EKS_STRIPPED__');
+
+  const hash = crypto.createHash('sha256').update(stripped).digest('hex');
+  return hash.slice(0, 16); // 64 bits, sufficient for uniqueness
+}
+
 /**
  * Extract TDC_NAME from tdc.js source.
  * Line 1 contains: window.TDC_NAME = "<32-char-string>"
@@ -42,4 +61,4 @@ function extractEks(source) {
   return null;
 }
 
-module.exports = { extractTdcName, extractEks };
+module.exports = { extractTdcName, extractEks, computeSourceHash };

@@ -21,7 +21,7 @@ const { CaptchaClient, httpRequest, parseJSONP } = require('../puppeteer/captcha
 const { solveSlider } = require('../puppeteer/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
-const { extractTdcName, extractEks } = require('./tdc-utils');
+const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
 const { parseVmFunction } = require('../pipeline/vm-parser');
 const { execFile } = require('child_process');
@@ -82,14 +82,14 @@ class Scraper {
    * `node pipeline/run.js <tempfile> --skip-verify`, reads the resulting
    * pipeline-config.json, and stores the extracted params in the template cache.
    *
-   * @param {string} tdcName - TDC_NAME identifier
+   * @param {string} sourceHash - SHA-256 source hash (cache key)
    * @param {string} tdcSource - Full tdc.js source code
    * @returns {Promise<Object|null>} Cached template entry, or null on failure
    */
-  async _autoPort(tdcName, tdcSource) {
-    this._log('Auto-porting unknown template: ' + tdcName);
+  async _autoPort(sourceHash, tdcSource) {
+    this._log('Auto-porting unknown template: ' + sourceHash);
 
-    const tempFile = path.join(os.tmpdir(), 'tdc-autoport-' + tdcName + '.js');
+    const tempFile = path.join(os.tmpdir(), 'tdc-autoport-' + sourceHash + '.js');
 
     try {
       // (a) Write tdc source to temp file
@@ -151,13 +151,13 @@ class Scraper {
       }
 
       // (e) Store in cache and return normalized entry
-      this._templateCache.store(tdcName, params);
-      this._log('Auto-port succeeded for ' + tdcName + ' (template ' + config.template + ')');
-      return this._templateCache.lookup(tdcName);
+      this._templateCache.store(sourceHash, params);
+      this._log('Auto-port succeeded for ' + sourceHash + ' (template ' + config.template + ')');
+      return this._templateCache.lookup(sourceHash);
 
     } catch (err) {
       const msg = err.stderr || err.message || String(err);
-      this._log('Auto-port failed for ' + tdcName + ': ' + msg);
+      this._log('Auto-port failed for ' + sourceHash + ': ' + msg);
       return null;
 
     } finally {
@@ -397,25 +397,27 @@ class Scraper {
         const tdcSource = await client.downloadTdc(sig);
         this._log(`  tdc source: ${tdcSource.length} chars`);
 
-        // (e) Extract TDC_NAME and look up template cache
+        // (e) Extract TDC_NAME (for logging) and source hash (cache key)
         const tdcName = extractTdcName(tdcSource);
         if (!tdcName) {
           throw new Error('Could not extract TDC_NAME from tdc.js source');
         }
+        const sourceHash = computeSourceHash(tdcSource);
         this._log(`  TDC_NAME: ${tdcName}`);
+        this._log(`  Source hash: ${sourceHash}`);
 
-        let cached = this._templateCache.lookup(tdcName);
+        let cached = this._templateCache.lookup(sourceHash);
         if (!cached) {
-          // TDC_NAME rotates per session — fall back to structural matching
+          // Source hash not in cache — fall back to structural matching
           // by running the VM parser to identify template by opcode count
-          this._log(`  TDC_NAME not in cache, running structural lookup...`);
+          this._log(`  Source hash not in cache, running structural lookup...`);
           try {
             const vmInfo = parseVmFunction(tdcSource);
             this._log(`  Parsed VM: ${vmInfo.caseCount} opcodes`);
             cached = this._templateCache.lookupByStructure(vmInfo.caseCount);
             if (cached) {
-              // Cache this TDC_NAME for faster future lookups
-              this._templateCache.store(tdcName, cached);
+              // Cache this source hash for faster future lookups
+              this._templateCache.store(sourceHash, cached);
               this._log(`  Matched template ${cached.template} by structure (${vmInfo.caseCount} opcodes)`);
             }
           } catch (parseErr) {
@@ -424,10 +426,10 @@ class Scraper {
         }
         if (!cached) {
           this._log('  No structural match — attempting auto-port via pipeline...');
-          cached = await this._autoPort(tdcName, tdcSource);
+          cached = await this._autoPort(sourceHash, tdcSource);
         }
         if (!cached) {
-          throw new Error(`Unknown template ${tdcName}, auto-port failed`);
+          throw new Error(`Unknown template (hash=${sourceHash}), auto-port failed`);
         }
         this._log(`  Template: ${cached.template}, opcodes: ${cached.caseCount}`);
 
