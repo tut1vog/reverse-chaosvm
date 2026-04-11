@@ -210,6 +210,7 @@ async function main() {
   let standaloneCollectLen = null;
   let tdcName = null;
   let templateMatched = false;
+  let swapPerformed = false;
   let verifyTimer;
   let verifyResolve;
   let verifyReject;
@@ -450,6 +451,7 @@ async function main() {
         log('========== SWAP COMPLETE ==========');
         log('');
 
+        swapPerformed = true;
         request.continue({ postData: newBody });
       } catch (err) {
         log(`  ERROR during swap: ${err.message}`);
@@ -673,6 +675,11 @@ async function main() {
       log(`CONCLUSION: Control test FAILED (errorCode ${errorCode}).`);
       log('  Chrome flow itself is broken. Fix this before testing token swap.');
     }
+  } else if (!swapPerformed) {
+    log('CONCLUSION: SWAP DID NOT HAPPEN.');
+    log(`  Template "${tdcName}" not in cache — could not generate standalone token.`);
+    log('  The original browser token went through unmodified.');
+    log('  This result tells us nothing about our token. Re-run until a known template is served.');
   } else {
     if (errorCode === 0) {
       log('CONCLUSION: Standalone token ACCEPTED (errorCode 0).');
@@ -694,6 +701,7 @@ async function main() {
   const result = {
     errorCode,
     mode: noSwap ? 'no-swap' : 'swap',
+    swapPerformed,
     originalCollectLen,
     standaloneCollectLen: noSwap ? null : standaloneCollectLen,
     tdcName,
