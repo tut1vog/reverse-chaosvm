@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 25
-Current task: 25.4 — Compare pre-encryption cd strings to find serialization divergence
+Current task: 25.5 — Strip ALL hash artifacts from Chrome's cd (not just the first)
 
 ---
 
@@ -27,7 +27,9 @@ Current task: 25.4 — Compare pre-encryption cd strings to find serialization d
 | 25.1 | cdArrayOverride live test with Chrome's exact cd values | done |
 | 25.2 | Analyze results and identify remaining gaps | done |
 | 25.3 | Decrypt and diff cdBody plaintext between standalone and Chrome | done |
-| 25.4 | Compare pre-encryption cd strings to find serialization divergence | pending |
+| 25.4 | Compare pre-encryption cd strings to find serialization divergence | done |
+| 25.5 | Strip ALL hash artifacts from Chrome's cd (not just the first) | pending |
+| 25.6 | Live re-test with double hash strip + cdArrayOverride | pending |
 
 ### Phase 26: Realistic Fingerprint Profile
 > If Phase 25 confirms that Chrome's exact cd values pass, build a more realistic default profile that matches Chrome's typical value sizes. Key areas: strip/truncate oversized fields (plugin lists, font lists, canvas data), remove behavioral events from pre-solve token, match Chrome's sd structure.
@@ -52,33 +54,34 @@ Current task: 25.4 — Compare pre-encryption cd strings to find serialization d
 
 ## Current Task
 
-**ID**: 25.4
-**Title**: Compare pre-encryption cd strings to find serialization divergence
+**ID**: 25.5
+**Title**: Strip ALL hash artifacts from Chrome's cd (not just the first)
 **Phase**: Chrome cd Injection — Validate Token Structure
 **Status**: pending
 
 ### Goal
-Compare `buildCdString(strippedCd)` output against Chrome's cd string (from `fullDecrypt.plaintext`) to find where the serialization diverges. The cdBody segment comparison showed divergence at position 0 because the total cd string is different-length (16-40 bytes shorter in standalone), shifting the header split point. We need to find WHERE in the cd string the content first diverges.
+Fix `detectHashPosition` to return ALL matching positions, and strip ALL `[[4,-1,-1,ts,0,0,0,0]]` entries from Chrome's cd before passing to cdArrayOverride. Currently only the first is stripped, leaving a second one that adds ~123 chars and shifts all subsequent fields.
 
 ### Context
-- 25.3 finding: cdBody diverges at position 0 — meaningless in isolation because the header consumes different amounts of the cd string
-- The real fix: compare FULL cd strings BEFORE encryption (pre-encryption plaintext)
-- Chrome's cd string = `fullDecrypt.plaintext` from Step 6 (already available, contains `{"cd":[...]},...`)
-- Our cd string = `buildCdString(strippedCd, serializationOverrides)` — can be computed separately before `generateCollect()`
-- `buildCdString` is in `token/outer-pipeline.js`, already imported via collect-generator
-- Key: same VALUES, different SERIALIZATION → find which field serializes differently
+- 25.4 found: Chrome's cd has TWO `[[4,-1,-1,ts,0,0,0,0]]` entries at different positions
+- `detectHashPosition()` in `pipeline/structure-extractor.js` returns on FIRST match (line 145: `return i;`)
+- In `live-captcha-submit.js` line ~489: `strippedCd.splice(hashPosition, 1)` — only removes one
+- History 20.2 already noted: "Chrome[55]=hash artifact... second hash artifact at cd[55] not stripped"
+- The second hash entry accounts for 123 chars of extra content in Chrome's cd
+- After stripping both, the cd strings should be identical (same values, same serialization)
+- Files: `pipeline/structure-extractor.js` (detectHashPosition), `scripts/live-captcha-submit.js` (stripping logic)
 
 ### Implementation Steps
-1. After Step 6, compute `ourCdString = buildCdString(strippedCd, serializationOverrides)` 
-2. Extract Chrome's cd string from `fullDecrypt.plaintext` (it starts with `{"cd":[` and ends before the sd part)
-3. Diff the two strings char-by-char, find first divergence
-4. Log: position, field index, context showing what Chrome serializes differently
-5. Run live and report
+1. Add `detectAllHashPositions(cdArray)` to `pipeline/structure-extractor.js` — same logic as `detectHashPosition` but returns an array of ALL matching indices instead of just the first
+2. Export it alongside `detectHashPosition` (keep the original for backward compatibility)
+3. In `scripts/live-captcha-submit.js`, import `detectAllHashPositions` and use it instead of `detectHashPosition` for the stripping logic
+4. Strip ALL matching positions (iterate in REVERSE order to avoid index shifting issues during splice)
+5. Log how many were stripped
 
 ### Verification
-- [ ] Pre-encryption cd string comparison for at least one attempt
-- [ ] First divergence position and field index identified
-- [ ] Specific serialization difference documented (e.g., object key ordering, array format, number format)
+- [ ] `node -c pipeline/structure-extractor.js` and `node -c scripts/live-captcha-submit.js` pass
+- [ ] `npm test` passes at baseline (248/250)
+- [ ] `detectAllHashPositions` returns array of all matching indices (test with array containing 2 hash artifacts)
 
 ### Suggested Agent
 general-purpose
