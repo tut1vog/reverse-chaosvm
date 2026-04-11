@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 34
-Current task: 34.3 — Re-run survey to verify all builds port
+Current task: none — Phase 34 complete, awaiting direction
 
 ---
 
@@ -85,7 +85,7 @@ Current task: 34.3 — Re-run survey to verify all builds port
 |----|------|--------|
 | 34.1 | Fix extractThisCtx and extractCatchVars for obfuscated builds | done |
 | 34.2 | Tests for vm-parser obfuscation fixes | done |
-| 34.3 | Re-run survey to verify all builds port | pending |
+| 34.3 | Re-run survey to verify all builds port | done |
 
 ---
 
@@ -96,15 +96,30 @@ Current task: 34.3 — Re-run survey to verify all builds port
 **Phase**: Fix VM Parser for Bracket-Notation Builds
 **Status**: in-progress
 
-### Goal
-Re-run survey to confirm all 10 builds now port successfully (vm-parser fixed). Director runs directly.
+## Survey Results (Phase 34 — post-fix)
 
-### Verification
-- [ ] Survey completes, 0 FAIL:vm-parse builds
-- [ ] Report updated
+20 attempts → **10/10 builds port OK** (was 7/10 before fix).
 
-### Suggested Agent
-none (director runs directly)
+| Hash | Opcodes | Mapped | XTEA Key | Solves | errorCodes |
+|------|---------|--------|----------|--------|------------|
+| 0e2b306a | 94 | 91/94 | OK | 2 | -1,12 |
+| 27dda893 | 103 | 43/103 | OK | 1 | 12 |
+| 3e77d189 | 98 | 92/98 | OK | 1 | -1 |
+| 83d7be69 | 95 | 91/95 | OK | 4 | -1,-1,12,12 |
+| e6a45ba6 | 98 | 92/98 | OK | 4 | -1,12,12,12 |
+| 79dd6b41 | 94 | 92/94 | OK | 1 | 12 |
+| 5cc91a7d | 94 | 90/94 | OK | 1 | -1 |
+| e2170903 | 93 | 48/93 | **null** | 1 | 12 |
+| 3429444f | 91 | 41/91 | **null** | 2 | 12,12 |
+| e5341ccb | 96 | 94/96 | OK | 3 | 12,12,12 |
+
+**New finding**: 2 obfuscated builds (e2170903, 3429444f) pass vm-parse but fail opcode mapping
+(~50% mapped) and produce null XTEA keys. The opcode-mapper's pattern matching doesn't
+handle obfuscated case handler code. These builds need opcode-mapper improvements.
+
+**Next priorities**:
+1. Fix opcode-mapper for obfuscated builds (low mapping rate, null XTEA key)
+2. Investigate errorCode 12 inconsistency
 
 ### Suggested Agent
 general-purpose
