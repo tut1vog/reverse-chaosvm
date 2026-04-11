@@ -461,7 +461,7 @@ class Scraper {
 
         this._log(`  errorCode: ${result.errorCode}, ticket: ${result.ticket ? result.ticket.slice(0, 30) + '...' : 'none'}`);
 
-        if (result.errorCode === 0) {
+        if (result.errorCode === 0 || (result.errorCode === -1 && result.ticket)) {
           return {
             errorCode: result.errorCode,
             ticket: result.ticket,

@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 28
-Current task: 28.3 — Fix ans computation in scraper pipeline
+Current task: 28.5 — Investigate errorCode -1 ticket validity and errorCode 12 root cause
 
 ---
 
@@ -11,7 +11,6 @@ Current task: 28.3 — Fix ans computation in scraper pipeline
 ### Phases 1-24: Foundation through End-to-End Live Verification (all done)
 
 ### Phase 25: Chrome cd Injection — Validate Token Structure (done)
-> **CONCLUSIVE**: errorCode 9 is NOT token generation. Chrome's own `TDC.getData(true)` forwarded verbatim also returns errorCode 9. Issue is slider solve coordinates.
 
 ### Phase 26: Realistic Fingerprint Profile (deprioritized)
 
@@ -19,42 +18,75 @@ Current task: 28.3 — Fix ans computation in scraper pipeline
 
 ### Phase 28: End-to-End CAPTCHA Solve (No Puppeteer Drag)
 > **BREAKTHROUGH**: `captcha-solver.js` (actual browser drag) gets errorCode 0 — CAPTCHA solved!
+> Scraper with corrected ans gets errorCode -1 (with ticket!) and errorCode 12 (no ticket).
+> errorCode 9 is gone — the ans fix worked.
 >
-> Key findings:
-> - Dynamic ratio from #slideBg is 1.8557 (NOT 0.5 — UI changed)
-> - raw=478, page computes ans=477,30; (X ≈ rawOffset, Y = server-provided `spt`)
-> - Manual POST approach failed due to wrong ans Y, wrong field order, wrong vData
+> **ans formula** (from `t_captcha_slide.js`):
+> - X = rawOffset (natural space, no ratio/calibration)
+> - Y = parseInt(spt) from getsig response
 >
-> **ans formula** (from `t_captcha_slide.js` source):
-> - **X** = `Math.floor((imgSlide.offset().left - operation.offset().left) / _.rate)` → effectively rawOffset in natural space
-> - **Y** = `Math.floor(parseInt(_.spt, 10))` → the `spt` field from the getsig/show response (`inity` in the raw JSON)
+> **Live scraper results** (9 attempts):
+> - 1× errorCode -1 WITH ticket (live-extracted 96 ops template)
+> - 7× errorCode 12, no ticket (various templates)
+> - 1× VM parse failure (unknown template)
 >
-> The `spt` field is already parsed by `captcha-client.js` (line 476/589/669/735). It just needs to be plumbed into the ans computation.
->
-> **Strategy**: Fix the scraper pipeline to use correct ans (X=rawOffset, Y=spt), then test without Puppeteer drag.
+> Hypothesis: errorCode 12 may be collect token validation failure (wrong XTEA params for template). The -1 ticket may be valid.
 
 | ID | Task | Status |
 |----|------|--------|
 | 28.1 | Fix ans coordinate space and calibration in chrome-passthrough | done |
-| 28.2 | Live re-test with chrome-passthrough (manual POST still fails) | done (failed — but root cause now understood) |
+| 28.2 | Live re-test with chrome-passthrough (manual POST still fails) | done |
 | 28.2.1 | Run captcha-solver.js with real drag | done (errorCode 0 — success!) |
 | 28.3 | Fix ans computation in scraper pipeline (X=rawOffset, Y=spt) | done |
 | 28.4 | Tests for ans computation | done |
-| 28.4.1 | Fix captcha-solver.js CALIBRATION_OFFSET for non-drag scripts | pending |
-| 28.5 | Live test: scraper with corrected ans (no Puppeteer) | pending |
-| 28.6 | If TLS blocks verify: investigate workarounds | pending |
+| 28.5 | Investigate errorCode -1 ticket validity and errorCode 12 root cause | in-progress |
+| 28.6 | Fix based on 28.5 findings | pending |
 
 ---
 
 ## Current Task
 
 **ID**: 28.5
-**Title**: Live test: scraper with corrected ans (no Puppeteer)
+**Title**: Investigate errorCode -1 ticket validity and errorCode 12 root cause
 **Phase**: End-to-End CAPTCHA Solve (No Puppeteer Drag)
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
-Run the headless scraper (`scraper/cli.js`) live with the corrected ans computation to see if CAPTCHA passes without Puppeteer.
+Two questions to answer:
+1. Is the errorCode -1 ticket valid? Test it against `queryUrlSec()`.
+2. What causes errorCode 12? Correlate with template type — is it a bad collect token?
+
+### Investigation Plan
+
+#### Part A: Validate the errorCode -1 ticket
+Modify the scraper's success check at line 464 to also accept errorCode -1 when a ticket is present. Then run `node scraper/cli.js --verbose https://example.com` (full flow: CAPTCHA + urlsec query). If the ticket is accepted by urlsec.qq.com, errorCode -1 is a valid success.
+
+Alternatively, write a quick one-off script that calls `queryUrlSec()` with a fresh -1 ticket.
+
+#### Part B: Correlate errorCode 12 with template
+From the live run, the pattern was:
+- errorCode -1: live-extracted 96 ops template (SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk)
+- errorCode 12: Template B (SUOP...), live-extracted 95 ops, unknown 98 ops
+
+Possible causes of errorCode 12:
+1. **Bad collect token** — wrong XTEA params for the template → server can't decrypt → errorCode 12
+2. **TLS fingerprinting** on verify endpoint (Node.js HTTP rejected)
+3. **Collect token structure mismatch** — template has different field count or layout
+
+To distinguish:
+- If TLS were the issue, ALL attempts would fail (including the -1 one). Since one succeeded, TLS is probably not the blocker.
+- Run the scraper several more times and log: TDC_NAME, template type, opcode count, errorCode. If errorCode 12 correlates with specific templates (especially "unknown" ones where XTEA extraction may be unreliable), it's a token issue.
+
+### Implementation Steps
+1. Patch `scraper/scraper.js` line 464: accept errorCode -1 with ticket as success
+2. Run `node scraper/cli.js --captcha-only --verbose` several times, logging template → errorCode mapping
+3. If a -1 ticket is obtained, test it with `queryUrlSec()`
+4. Analyze the correlation data
+
+### Verification
+- [ ] Determine if errorCode -1 tickets are valid (queryUrlSec accepts them)
+- [ ] Identify which templates produce errorCode 12 vs -1 vs 0
+- [ ] Formulate a theory for errorCode 12 root cause
 
 ### Suggested Agent
-Director runs this directly (interactive live test)
+Director runs this directly — interactive investigation
