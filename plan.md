@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 23
-Current task: 23.3 — Tests for header split logic
+Current phase: Phase 24
+Current task: 24.1 — Live test: decrypt Chrome token + field-by-field comparison
 
 ---
 
@@ -29,7 +29,7 @@ Current task: 23.3 — Tests for header split logic
 |----|------|--------|
 | 23.1 | Fix analyzeHeaderSplit for full-token decrypted plaintext | done |
 | 23.2 | Wire headerSplit through to buildInputChunks | done |
-| 23.3 | Tests for header split logic | pending |
+| 23.3 | Tests for header split logic | done |
 
 ### Phase 24: End-to-End Live Verification
 > With reliable key extraction (Phase 22) and correct header splitting (Phase 23), run live tests to validate: cdFieldOrder produces correct reordering, serialization overrides reduce diffs, full token matches Chrome's output. Target: 0 field-level diffs on at least one live template.
@@ -44,31 +44,37 @@ Current task: 23.3 — Tests for header split logic
 
 ## Current Task
 
-**ID**: 23.3
-**Title**: Tests for header split logic
-**Phase**: Header Split Strategy Application
+**ID**: 24.1
+**Title**: Live test: decrypt Chrome token + field-by-field comparison
+**Phase**: End-to-End Live Verification
 **Status**: pending
 
 ### Goal
-Add tests covering the `buildInputChunks` headerSplit wiring: field-boundary splitting with padding and comma duplication, byte-boundary default behavior, and the full passthrough from collect-generator.
+Run a live test against Tencent's CAPTCHA service: capture Chrome's collect token, extract XTEA key from the live tdc.js via pipeline, decrypt Chrome's token, generate a standalone token with all fixes (keyMods, headerSplit, serialization overrides, cdFieldOrder), and compare field-by-field. Target: identify any remaining diffs.
 
 ### Context
-- `token/generate-token.js` — `buildInputChunks()` now accepts `options.headerSplit`
-- `scraper/collect-generator.js` — passes `opts.headerSplit` through
-- Existing tests: `tests/test-outer-pipeline.js` has buildInputChunks tests (read to find exact location)
+- Phase 22 fixed keyMods extraction (no more lossy serialization)
+- Phase 23 fixed headerSplit detection and wired it through
+- `scripts/chrome-cd-inject.js` — existing live test script with pipeline key extraction
+- `scripts/token-forensics.js` — forensic comparison script
+- All previous live tests failed because of stale keys or wrong keyMods
 
 ### Implementation Steps
-1. Add tests in the existing test file for `buildInputChunks`:
-   - Default (no headerSplit): header is 144 bytes, split at position 144
-   - field-boundary with contentLength=50: header has 94 trailing spaces, cdBody starts with `,`
-   - field-boundary with contentLength=133: header has 11 trailing spaces (Template A pattern)
-   - byte-boundary explicit: same as default
-   - No headerSplit option: no regression vs current behavior
-2. Run `npm test` to verify
+1. Update `scripts/chrome-cd-inject.js` (or create a new focused script) to:
+   a. Fetch live tdc.js, save source to temp file
+   b. Run pipeline: vm-parser → opcode-mapper → key-extractor → structure-extractor
+   c. Extract all params: key, keyMods, headerSplit, cdFieldOrder, serializationDiffs
+   d. Capture Chrome's collect token (TDC.getData)
+   e. Decrypt Chrome's token with extracted params
+   f. Generate standalone token with same params
+   g. Compare field-by-field: header, hash, cdBody, sig segments
+2. Output results to `output/live-comparison.json`
 
 ### Verification
-- [ ] `npm test` passes with new tests (2 known failures only)
-- [ ] Tests cover both strategies and comma duplication
+- [ ] Script runs to completion without errors
+- [ ] Chrome token decrypts to valid JSON (proves key extraction works for live template)
+- [ ] Field-by-field diff output shows which fields match/differ
+- [ ] Report generated at `output/live-comparison.json`
 
 ### Suggested Agent
 general-purpose
