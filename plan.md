@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 25
-Current task: 25.5 — Strip ALL hash artifacts from Chrome's cd (not just the first)
+Current task: 25.7 — Pad hash field in buildCdString to match Chrome's space-padded format
 
 ---
 
@@ -29,7 +29,9 @@ Current task: 25.5 — Strip ALL hash artifacts from Chrome's cd (not just the f
 | 25.3 | Decrypt and diff cdBody plaintext between standalone and Chrome | done |
 | 25.4 | Compare pre-encryption cd strings to find serialization divergence | done |
 | 25.5 | Strip ALL hash artifacts from Chrome's cd (not just the first) | done |
-| 25.6 | Live re-test with double hash strip + cdArrayOverride | pending |
+| 25.6 | Keep full Chrome cd array in cdArrayOverride (no hash stripping) | done |
+| 25.7 | Pad hash field in buildCdString to match Chrome's space-padded format | pending |
+| 25.8 | Live re-test with hash padding fix | pending |
 
 ### Phase 26: Realistic Fingerprint Profile
 > If Phase 25 confirms that Chrome's exact cd values pass, build a more realistic default profile that matches Chrome's typical value sizes. Key areas: strip/truncate oversized fields (plugin lists, font lists, canvas data), remove behavioral events from pre-solve token, match Chrome's sd structure.
@@ -54,34 +56,33 @@ Current task: 25.5 — Strip ALL hash artifacts from Chrome's cd (not just the f
 
 ## Current Task
 
-**ID**: 25.5
-**Title**: Strip ALL hash artifacts from Chrome's cd (not just the first)
+**ID**: 25.7
+**Title**: Pad hash field in buildCdString to match Chrome's space-padded format
 **Phase**: Chrome cd Injection — Validate Token Structure
-**Status**: in-progress
+**Status**: pending
 
 ### Goal
-Fix `detectHashPosition` to return ALL matching positions, and strip ALL `[[4,-1,-1,ts,0,0,0,0]]` entries from Chrome's cd before passing to cdArrayOverride. Currently only the first is stripped, leaving a second one that adds ~123 chars and shifts all subsequent fields.
+Chrome's VM pads the hash field `[[4,-1,-1,ts,0,0,0,0]]` with trailing spaces when serializing it as a cd field. Our `buildCdString` uses `JSON.stringify(entry)` which produces compact output (no spaces). This causes an -88 char gap in the cd string. Fix `buildCdString` to detect and pad hash-like fields.
 
 ### Context
-- 25.4 found: Chrome's cd has TWO `[[4,-1,-1,ts,0,0,0,0]]` entries at different positions
-- `detectHashPosition()` in `pipeline/structure-extractor.js` returns on FIRST match (line 145: `return i;`)
-- In `live-captcha-submit.js` line ~489: `strippedCd.splice(hashPosition, 1)` — only removes one
-- History 20.2 already noted: "Chrome[55]=hash artifact... second hash artifact at cd[55] not stripped"
-- The second hash entry accounts for 123 chars of extra content in Chrome's cd
-- After stripping both, the cd strings should be identical (same values, same serialization)
-- Files: `pipeline/structure-extractor.js` (detectHashPosition), `scripts/live-captcha-submit.js` (stripping logic)
+- 25.6 result: keeping full 60-field cd reduced cdBody gap to -8 chars, but cd string still -88 chars shorter
+- Hash chunk (separate segment) is padded to 48 bytes (`buildHashChunk` in generate-token.js)
+- Hash in cd string: Chrome likely pads similarly (to a fixed width like 56 chars)
+- buildCdString is in `token/outer-pipeline.js` line 61
+- The hash pattern: single-element array containing an 8-element array `[4,-1,-1,any,0,0,0,0]`
+- Need to determine exact padding width from Chrome's decrypted cd string
 
 ### Implementation Steps
-1. Add `detectAllHashPositions(cdArray)` to `pipeline/structure-extractor.js` — same logic as `detectHashPosition` but returns an array of ALL matching indices instead of just the first
-2. Export it alongside `detectHashPosition` (keep the original for backward compatibility)
-3. In `scripts/live-captcha-submit.js`, import `detectAllHashPositions` and use it instead of `detectHashPosition` for the stripping logic
-4. Strip ALL matching positions (iterate in REVERSE order to avoid index shifting issues during splice)
-5. Log how many were stripped
+1. First: add logging to live-captcha-submit.js to print Chrome's raw serialization of the hash field (extract the exact chars from `fullDecrypt.plaintext` at the hash position)
+2. Determine padding width from Chrome's output
+3. Update `buildCdString` in `token/outer-pipeline.js` to detect hash-like entries and pad to matching width
+4. Run live and verify cd string gap is 0
 
 ### Verification
-- [ ] `node -c pipeline/structure-extractor.js` and `node -c scripts/live-captcha-submit.js` pass
-- [ ] `npm test` passes at baseline (248/250)
-- [ ] `detectAllHashPositions` returns array of all matching indices (test with array containing 2 hash artifacts)
+- [ ] Chrome's exact hash field serialization captured and padding width determined
+- [ ] buildCdString pads hash fields to correct width
+- [ ] cd string length diff is 0 or near-0
+- [ ] npm test passes (248/250)
 
 ### Suggested Agent
 general-purpose
