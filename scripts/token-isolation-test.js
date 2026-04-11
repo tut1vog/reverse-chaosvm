@@ -387,6 +387,57 @@ async function main() {
         log(`  Standalone collect first 80 chars: ${collectDecoded.slice(0, 80)}...`);
         log(`  New tlg: ${newTlg}`);
 
+        // ── Dump both tokens to output/token-isolation/ ──
+        try {
+          const isoDir = path.join(PROJECT_ROOT, 'output', 'token-isolation');
+          fs.mkdirSync(isoDir, { recursive: true });
+
+          // Parse all POST fields for the original dump
+          const postFields = {};
+          for (const pair of postData.split('&')) {
+            const eqIdx = pair.indexOf('=');
+            if (eqIdx === -1) continue;
+            const k = decodeURIComponent(pair.slice(0, eqIdx));
+            const v = pair.slice(eqIdx + 1);
+            postFields[k] = v;
+          }
+
+          const nowMs = Date.now();
+
+          fs.writeFileSync(
+            path.join(isoDir, 'original.json'),
+            JSON.stringify({
+              tdcName: tdcName || null,
+              collectRaw: originalCollectDecoded,
+              collectLength: originalCollectDecoded.length,
+              timestamp: nowMs,
+              postFields: postFields,
+            }, null, 2),
+            'utf8'
+          );
+
+          fs.writeFileSync(
+            path.join(isoDir, 'standalone.json'),
+            JSON.stringify({
+              tdcName: tdcName || null,
+              collectRaw: collectDecoded,
+              collectLength: collectDecoded.length,
+              timestamp: nowMs,
+              xteaParams: {
+                key: xteaParams.key,
+                delta: xteaParams.delta,
+                rounds: xteaParams.rounds,
+                keyMods: xteaParams.keyMods || xteaParams.keyModConstants,
+              },
+            }, null, 2),
+            'utf8'
+          );
+
+          log(`  Dumped tokens to ${isoDir}/`);
+        } catch (dumpErr) {
+          log(`  WARNING: Failed to dump tokens: ${dumpErr.message}`);
+        }
+
         // Replace collect and tlg in the POST body.
         // The real POST body contains raw base64 for collect (with literal +, /, =).
         // Our generateCollect returns URL-encoded form (%2B, %2F, %3D), so we must
