@@ -28,7 +28,7 @@ Current task: 29.1 — Audit and refresh stale template cache entries
 
 | ID | Task | Status |
 |----|------|--------|
-| 29.1 | Audit and refresh stale template cache entries | pending |
+| 29.1 | Audit and refresh stale template cache entries | done |
 | 29.2 | Tests for refreshed cache entries | pending |
 | 29.3 | Verify TLS fingerprinting as cause of 403 on cap_union_new_show | pending |
 | 29.4 | Act on 29.3 results | pending |
@@ -37,51 +37,32 @@ Current task: 29.1 — Audit and refresh stale template cache entries
 
 ## Current Task
 
-**ID**: 29.1
-**Title**: Audit and refresh stale template cache entries
+**ID**: 29.3
+**Title**: Verify TLS fingerprinting as cause of 403 on cap_union_new_show
 **Phase**: Cache Refresh & TLS Verification
 **Status**: pending
 
 ### Goal
-Identify which template cache entries have bad/missing keyMods, re-run the porting pipeline on fresh tdc.js builds for those templates, and update the cache. After this, all cached templates should have correct XTEA params that can decrypt browser-generated tokens.
+Determine whether TLS fingerprinting (JA3/JA4) is the real reason `cap_union_new_show` returns HTTP 403 for Node.js HTTP clients. If so, identify what TLS characteristics are being checked and potential workarounds.
 
 ### Context
+- `cap_union_new_show` serves the CAPTCHA page HTML (the iframe src)
+- Node.js `https` / `fetch` / `got` all get 403
+- Puppeteer with Chrome works fine (Chrome TLS fingerprint)
+- CLAUDE.md notes: "cap_union_new_show returns HTTP 403 for non-browser TLS clients (JA3/JA4 fingerprinting)"
+- This is the main blocker for the headless scraper — it can't fetch the show page to get tdc.js, images, etc.
 
-**Cache state** (from `scraper/cache/templates.json`):
-- 10 entries total, keyed by TDC_NAME
-- Some entries have `keyMods: [0,0,0,0]` (likely wrong — defaulted during extraction)
-- Some have no `cdFieldOrder` (needed for correct field reordering)
-- `MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn` was just refreshed via pipeline — has correct params now
-- `SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk` worked in the isolation test — params are correct
-
-**User insight**: Same TDC_NAME always has the same XTEA key/keyMods/cdFieldOrder. Only `eks` differs per build. So the cache model (TDC_NAME → params) is correct — we just need to fix entries that were initially extracted with wrong keyMods.
-
-**How to refresh**: For each stale entry:
-1. Fetch a fresh tdc.js build with that TDC_NAME (use `node scraper/cli.js` or `fetch-latest` skill)
-2. Run `node pipeline/run.js <tdc-file>` to extract correct params
-3. Update the cache entry
-
-**Alternative** (simpler): The isolation test already captures tdc.js sources. We can also use `scripts/token-isolation-test.js` repeatedly — each run captures a different template's source. Run the pipeline on each captured source.
-
-**Simplest approach**: Write a script that:
-1. Reads all cache entries
-2. For each entry with suspicious keyMods (all zeros, or missing cdFieldOrder):
-   - Try to fetch a fresh tdc.js build (or use already-captured sources)
-   - Run the pipeline to extract correct params
-   - Update the cache
-3. For entries that already have non-zero keyMods AND cdFieldOrder, skip
-
-### Implementation Steps
-1. Audit current cache: list each entry with its keyMods and cdFieldOrder status
-2. Identify which entries need refreshing
-3. For each stale entry, run pipeline on a fresh/captured tdc.js source
-4. Update cache with correct params
-5. Verify by decrypting a known browser token
+### Approach
+1. Make a direct Node.js HTTPS request to `cap_union_new_show` and capture the 403
+2. Compare the TLS fingerprint (JA3/JA4) of Node.js vs Chrome
+3. Test with `curl` and different TLS options (--ciphers, --tls13-ciphers, etc.)
+4. Test with `undici` or `node-fetch` with custom TLS options
+5. Test if a TLS proxy or `tls-client` library can bypass the check
 
 ### Verification
-- [ ] All 10 cache entries have non-trivial keyMods (not all zeros unless genuinely zero)
-- [ ] All entries have cdFieldOrder arrays
-- [ ] At least one browser token decrypts correctly with refreshed params
+- [ ] Confirmed: Node.js HTTPS gets 403 on cap_union_new_show
+- [ ] Identified: what TLS characteristic triggers the 403
+- [ ] Evaluated: potential workarounds (proxy, custom TLS, etc.)
 
 ### Suggested Agent
-general-purpose — to create the audit/refresh script
+general-purpose
