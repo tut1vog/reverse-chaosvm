@@ -112,47 +112,16 @@ function buildInputChunks(cdString, sdString, timestamp, options) {
   //      {"cd":[...],"sd":{...}}
   const payloadBody = cdString.slice(0, -1) + ',';
 
-  // 3. Header chunk: payload body split after headerFieldCount cd array
-  //    elements, space-padded to HEADER_SIZE.
-  //    Chrome's VM serializes cd fields and puts the first N fields in the
-  //    header (N depends on the template). The comma after the Nth field
-  //    stays in the header AND is duplicated at the start of cdBody.
-  //    Default is HEADER_FIELD_COUNT (11) but can be overridden via options.
-  const headerFieldCount = (options && options.headerFieldCount) || HEADER_FIELD_COUNT;
-  let splitPos = Math.min(payloadBody.length, HEADER_SIZE);
-  if (payloadBody.length > HEADER_SIZE) {
-    let fieldCount = 0;
-    let depth = 0;
-    let inStr = false;
-    for (let i = 0; i < payloadBody.length && i < HEADER_SIZE; i++) {
-      const ch = payloadBody[i];
-      if (inStr) {
-        if (ch === '\\') { i++; }
-        else if (ch === '"') { inStr = false; }
-      } else {
-        if (ch === '"') { inStr = true; }
-        else if (ch === '[' || ch === '{') { depth++; }
-        else if (ch === ']' || ch === '}') { depth--; }
-        else if (ch === ',' && depth === 2) {
-          fieldCount++;
-          if (fieldCount === headerFieldCount) {
-            splitPos = i + 1;  // position AFTER the comma (comma stays in header)
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  const headerContent = payloadBody.substring(0, splitPos);
+  // 3. Header chunk: first HEADER_SIZE (144) bytes of payload body.
+  //    Chrome's VM takes exactly 144 bytes of the payload body as the header,
+  //    regardless of field boundaries. If the payload is shorter than 144,
+  //    it's space-padded. No field-boundary splitting — the cut can fall
+  //    mid-field, mid-string, or mid-number.
+  const headerContent = payloadBody.substring(0, HEADER_SIZE);
   const header = headerContent.padEnd(HEADER_SIZE, ' ');
 
   // 4. CD body chunk: remaining payload body, space-padded to 8-byte alignment
-  //    Chrome's VM duplicates the comma at the split point: the header ends
-  //    with a comma AND the cdBody starts with a comma. This produces one
-  //    extra comma in the total plaintext, which JSON.parse handles as valid
-  //    whitespace-like separator.
-  const cdContent = payloadBody.substring(splitPos - 1);
+  const cdContent = payloadBody.substring(HEADER_SIZE);
   let cdBody = '';
   if (cdContent.length > 0) {
     const paddedLen = Math.ceil(cdContent.length / 8) * 8;

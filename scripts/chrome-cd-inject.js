@@ -510,6 +510,46 @@ async function solve(opts) {
             log(`  Decrypted Chrome cd: ${capturedCd.length} fields`);
             log(`  First 5: ${JSON.stringify(capturedCd.slice(0, 5))}`);
             log(`  Last 5: ${JSON.stringify(capturedCd.slice(-5))}`);
+
+            // ── Diagnostic: determine Chrome's headerFieldCount ──
+            // Split Chrome's token into segments and decrypt the header to find
+            // the actual field count Chrome uses for the header chunk.
+            try {
+              const diagB64 = chromeCollect.replace(/%2B/g, '+').replace(/%2F/g, '/').replace(/%3D/g, '=');
+              const headerB64 = diagB64.substring(0, 192);  // header = first 192 base64 chars = 144 bytes
+              const headerEnc = Buffer.from(headerB64, 'base64').toString('binary');
+              const headerDec = decryptXtea(headerEnc, xteaParams);
+              const headerTrimmed = headerDec.replace(/[\0\s]+$/, '');
+              log(`  [DIAG] Header trimmed: ${headerTrimmed.length} bytes`);
+              log(`  [DIAG] Header content: ${JSON.stringify(headerTrimmed.substring(0, 80))}...`);
+              log(`  [DIAG] Header ends with: ${JSON.stringify(headerTrimmed.slice(-20))}`);
+
+              // Count depth-2 commas in header to determine field count
+              let diagDepth = 0, diagInStr = false, diagFieldCount = 0;
+              for (let di = 0; di < headerTrimmed.length; di++) {
+                const ch = headerTrimmed[di];
+                if (diagInStr) {
+                  if (ch === '\\') di++;
+                  else if (ch === '"') diagInStr = false;
+                } else {
+                  if (ch === '"') diagInStr = true;
+                  else if (ch === '[' || ch === '{') diagDepth++;
+                  else if (ch === ']' || ch === '}') diagDepth--;
+                  else if (ch === ',' && diagDepth === 2) diagFieldCount++;
+                }
+              }
+              log(`  [DIAG] Header field count: ${diagFieldCount} (commas between cd fields)`);
+              log(`  [DIAG] → headerFieldCount should be ${diagFieldCount} for this template`);
+
+              // Also check cdBody start
+              const hashB64 = diagB64.substring(192, 256);
+              const cdBodyB64Start = diagB64.substring(256, 256 + 64);
+              const cdBodyEncStart = Buffer.from(cdBodyB64Start, 'base64').toString('binary');
+              const cdBodyDecStart = decryptXtea(cdBodyEncStart, xteaParams);
+              log(`  [DIAG] cdBody starts: ${JSON.stringify(cdBodyDecStart.substring(0, 40))}`);
+            } catch (diagErr) {
+              log(`  [DIAG] Diagnostic failed: ${diagErr.message}`);
+            }
           } else {
             log('  WARNING: Decryption succeeded but no cd field in parsed result');
             if (decryptResult.plaintext) {
