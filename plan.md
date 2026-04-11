@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 25
-Current task: 25.3 — Decrypt and diff cdBody plaintext between standalone and Chrome
+Current task: 25.4 — Compare pre-encryption cd strings to find serialization divergence
 
 ---
 
@@ -26,7 +26,8 @@ Current task: 25.3 — Decrypt and diff cdBody plaintext between standalone and 
 |----|------|--------|
 | 25.1 | cdArrayOverride live test with Chrome's exact cd values | done |
 | 25.2 | Analyze results and identify remaining gaps | done |
-| 25.3 | Decrypt and diff cdBody plaintext between standalone and Chrome | pending |
+| 25.3 | Decrypt and diff cdBody plaintext between standalone and Chrome | done |
+| 25.4 | Compare pre-encryption cd strings to find serialization divergence | pending |
 
 ### Phase 26: Realistic Fingerprint Profile
 > If Phase 25 confirms that Chrome's exact cd values pass, build a more realistic default profile that matches Chrome's typical value sizes. Key areas: strip/truncate oversized fields (plugin lists, font lists, canvas data), remove behavioral events from pre-solve token, match Chrome's sd structure.
@@ -51,34 +52,33 @@ Current task: 25.3 — Decrypt and diff cdBody plaintext between standalone and 
 
 ## Current Task
 
-**ID**: 25.3
-**Title**: Decrypt and diff cdBody plaintext between standalone and Chrome
+**ID**: 25.4
+**Title**: Compare pre-encryption cd strings to find serialization divergence
 **Phase**: Chrome cd Injection — Validate Token Structure
 **Status**: pending
 
 ### Goal
-The 40-52 char cdBody difference is the ONLY remaining gap between standalone and Chrome tokens. With Chrome's exact cd values (via cdArrayOverride), header/hash/sig are identical. Decrypt both cdBody segments and diff the plaintext to find exactly what serialization difference causes the gap.
+Compare `buildCdString(strippedCd)` output against Chrome's cd string (from `fullDecrypt.plaintext`) to find where the serialization diverges. The cdBody segment comparison showed divergence at position 0 because the total cd string is different-length (16-40 bytes shorter in standalone), shifting the header split point. We need to find WHERE in the cd string the content first diverges.
 
 ### Context
-- 25.2 results: header=0, hash=0, sig=0, cdBody=-40 to -52 chars
-- We use Chrome's exact cd values, so the diff must be in HOW we serialize them (buildCdString in outer-pipeline.js)
-- Previous Phase 19 forensics showed cdBody was IDENTICAL for Template A reference build, so the diff is template-specific
-- Live templates: 94-opcode (Template B) and 98-opcode observed
-- Key serialization: `token/outer-pipeline.js` `buildCdString()` — hand-rolled JSON concatenation
-- The VM's func_276 does custom object serialization that may differ from our buildCdString for certain field types
-- Files: `scripts/live-captcha-submit.js`, `token/outer-pipeline.js`, `token/crypto-core.js`
+- 25.3 finding: cdBody diverges at position 0 — meaningless in isolation because the header consumes different amounts of the cd string
+- The real fix: compare FULL cd strings BEFORE encryption (pre-encryption plaintext)
+- Chrome's cd string = `fullDecrypt.plaintext` from Step 6 (already available, contains `{"cd":[...]},...`)
+- Our cd string = `buildCdString(strippedCd, serializationOverrides)` — can be computed separately before `generateCollect()`
+- `buildCdString` is in `token/outer-pipeline.js`, already imported via collect-generator
+- Key: same VALUES, different SERIALIZATION → find which field serializes differently
 
 ### Implementation Steps
-1. After generating standalone collect, decrypt its cdBody segment using the same XTEA params
-2. Decrypt Chrome's cdBody segment 
-3. Diff the two plaintext strings char-by-char, find first divergence point
-4. Log: divergence position, context around it, field index where it diverges
-5. Run live and report findings
+1. After Step 6, compute `ourCdString = buildCdString(strippedCd, serializationOverrides)` 
+2. Extract Chrome's cd string from `fullDecrypt.plaintext` (it starts with `{"cd":[` and ends before the sd part)
+3. Diff the two strings char-by-char, find first divergence
+4. Log: position, field index, context showing what Chrome serializes differently
+5. Run live and report
 
 ### Verification
-- [ ] cdBody plaintext from both standalone and Chrome available for at least one attempt
-- [ ] First divergence point identified with surrounding context
-- [ ] Specific cd field or serialization pattern causing the diff identified
+- [ ] Pre-encryption cd string comparison for at least one attempt
+- [ ] First divergence position and field index identified
+- [ ] Specific serialization difference documented (e.g., object key ordering, array format, number format)
 
 ### Suggested Agent
 general-purpose
