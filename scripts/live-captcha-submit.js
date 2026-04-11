@@ -143,7 +143,11 @@ function decryptCollect(collectStr, params) {
 
   const HEADER_LEN = 192;  // segment[1]
   const HASH_LEN = 64;     // segment[0]
-  const SIG_LEN = 120;     // segment[3]
+  // NOTE: SIG_LEN varies by sd content. 120 is for the standard 4-field sd
+  // ({od, appid, nonce, token} → ~85 chars → 88 encrypted → 120 b64).
+  // Full decryption works regardless because XTEA ECB blocks are independent
+  // and the concatenated plaintext is the same regardless of split position.
+  const SIG_LEN = 120;     // segment[3] — approximate, see note above
 
   let encrypted;
   if (b64.length > HEADER_LEN + HASH_LEN + SIG_LEN) {
@@ -762,6 +766,7 @@ async function solve(opts) {
       let fieldOrderMatchCount = null;
       let strippedCd = null;
       let hashPadding = null;
+      let chromeSdStringLen = null;
 
       if (chromeCollect) {
         const fullDecrypt = decryptCollect(chromeCollect, xteaParams);
@@ -798,6 +803,8 @@ async function solve(opts) {
 
           if (fullDecrypt.parsed.sd) {
             log(`  Chrome sd keys: ${Object.keys(fullDecrypt.parsed.sd).join(', ')}`);
+            chromeSdStringLen = buildSdString(fullDecrypt.parsed.sd).length;
+            log(`  Chrome sdString length: ${chromeSdStringLen}`);
           }
         } else {
           log(`  Full decryption FAILED -- not valid JSON`);
@@ -1045,17 +1052,19 @@ async function solve(opts) {
       log(`  Collect length: ${collectVal.length} chars`);
 
       // Size comparison with Chrome's collect (total + per-segment)
-      // Compute sdString length for sig segment sizing
+      // Compute sdString length for sig segment sizing — use each token's own sd length
       const sdStringForSizing = buildSdString(slideSd);
-      const sdStringLen = sdStringForSizing.length;
-      log(`  sdString length for segment parsing: ${sdStringLen} ("${sdStringForSizing.substring(0, 40)}...")`);
+      const standaloneSdStringLen = sdStringForSizing.length;
+      // Chrome's sd may differ (e.g., includes appid/nonce/token) — use its actual length
+      const chromeSdLen = chromeSdStringLen || standaloneSdStringLen;
+      log(`  sdString length — standalone: ${standaloneSdStringLen}, chrome: ${chromeSdLen}`);
 
-      const standaloneSegments = parseSegmentSizes(collectVal, sdStringLen);
+      const standaloneSegments = parseSegmentSizes(collectVal, standaloneSdStringLen);
       log(`  Standalone segments (b64): header=${standaloneSegments.header}, hash=${standaloneSegments.hash}, cdBody=${standaloneSegments.cdBody}, sig=${standaloneSegments.sig}, total=${standaloneSegments.total}`);
 
       let segmentComparison = null;
       if (chromeCollect) {
-        const chromeSegments = parseSegmentSizes(chromeCollect, sdStringLen);
+        const chromeSegments = parseSegmentSizes(chromeCollect, chromeSdLen);
         log(`  Chrome segments (b64):     header=${chromeSegments.header}, hash=${chromeSegments.hash}, cdBody=${chromeSegments.cdBody}, sig=${chromeSegments.sig}, total=${chromeSegments.total}`);
 
         segmentComparison = {
@@ -1064,7 +1073,8 @@ async function solve(opts) {
           cdBody: { standalone: standaloneSegments.cdBody, chrome: chromeSegments.cdBody, diff: standaloneSegments.cdBody - chromeSegments.cdBody },
           sig: { standalone: standaloneSegments.sig, chrome: chromeSegments.sig, diff: standaloneSegments.sig - chromeSegments.sig },
           total: { standalone: standaloneSegments.total, chrome: chromeSegments.total, diff: standaloneSegments.total - chromeSegments.total },
-          sdStringLength: sdStringLen,
+          standaloneSdStringLength: standaloneSdStringLen,
+          chromeSdStringLength: chromeSdLen,
         };
 
         log('  Segment comparison:');
@@ -1077,8 +1087,8 @@ async function solve(opts) {
         // ── cdBody plaintext diff ──
         log('  cdBody plaintext diff:');
         try {
-          const standaloneCdB64 = extractCdBodyB64(collectVal, sdStringLen);
-          const chromeCdB64 = extractCdBodyB64(chromeCollect, sdStringLen);
+          const standaloneCdB64 = extractCdBodyB64(collectVal, standaloneSdStringLen);
+          const chromeCdB64 = extractCdBodyB64(chromeCollect, chromeSdLen);
 
           const standalonePlain = decryptSegment(standaloneCdB64, xteaParams);
           const chromePlain = decryptSegment(chromeCdB64, xteaParams);
