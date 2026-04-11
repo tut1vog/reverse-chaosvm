@@ -24,6 +24,8 @@ const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
 const { extractTdcName, extractEks } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
 const { parseVmFunction } = require('../pipeline/vm-parser');
+const { execFile } = require('child_process');
+const os = require('os');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 
@@ -71,6 +73,99 @@ class Scraper {
   _log(msg) {
     if (this.verbose) {
       process.stderr.write(`[scraper] ${msg}\n`);
+    }
+  }
+
+  /**
+   * Auto-port an unknown TDC template by running the porting pipeline as a
+   * child process.  Writes tdcSource to a temp file, invokes
+   * `node pipeline/run.js <tempfile> --skip-verify`, reads the resulting
+   * pipeline-config.json, and stores the extracted params in the template cache.
+   *
+   * @param {string} tdcName - TDC_NAME identifier
+   * @param {string} tdcSource - Full tdc.js source code
+   * @returns {Promise<Object|null>} Cached template entry, or null on failure
+   */
+  async _autoPort(tdcName, tdcSource) {
+    this._log('Auto-porting unknown template: ' + tdcName);
+
+    const tempFile = path.join(os.tmpdir(), 'tdc-autoport-' + tdcName + '.js');
+
+    try {
+      // (a) Write tdc source to temp file
+      fs.writeFileSync(tempFile, tdcSource, 'utf8');
+
+      // (b) Run pipeline as child process
+      const { stdout, stderr } = await new Promise((resolve, reject) => {
+        execFile(
+          process.execPath,
+          [path.join(PROJECT_ROOT, 'pipeline', 'run.js'), tempFile, '--skip-verify'],
+          { cwd: PROJECT_ROOT, timeout: 120000 },
+          (err, stdout, stderr) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({ stdout, stderr });
+            }
+          }
+        );
+      });
+
+      if (this.verbose && stdout) {
+        for (const line of stdout.split('\n')) {
+          if (line.trim()) this._log('  pipeline: ' + line.trim());
+        }
+      }
+
+      // (c) Read pipeline-config.json
+      const stem = path.basename(tempFile, '.js');
+      const configPath = path.join(PROJECT_ROOT, 'output', stem, 'pipeline-config.json');
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+      // (d) Build cache entry from pipeline output
+      const params = {
+        template: config.template,
+        key: config.xteaParams.key,
+        delta: config.xteaParams.delta,
+        rounds: config.xteaParams.rounds,
+        keyModConstants: config.xteaParams.keyModConstants,
+        keyMods: config.xteaParams.keyMods,
+        caseCount: config.caseCount,
+      };
+
+      // Add structure params if available
+      if (config.structureParams) {
+        if (config.structureParams.fieldOrder) {
+          params.cdFieldOrder = config.structureParams.fieldOrder;
+          params.fieldOrder = config.structureParams.fieldOrder;
+        }
+        if (config.structureParams.hashPosition !== undefined) {
+          params.hashPosition = config.structureParams.hashPosition;
+        }
+        if (config.structureParams.serializationDiffs) {
+          params.serializationDiffs = config.structureParams.serializationDiffs;
+        }
+        if (config.structureParams.headerSplit) {
+          params.headerSplit = config.structureParams.headerSplit;
+        }
+      }
+
+      // (e) Store in cache and return normalized entry
+      this._templateCache.store(tdcName, params);
+      this._log('Auto-port succeeded for ' + tdcName + ' (template ' + config.template + ')');
+      return this._templateCache.lookup(tdcName);
+
+    } catch (err) {
+      const msg = err.stderr || err.message || String(err);
+      this._log('Auto-port failed for ' + tdcName + ': ' + msg);
+      return null;
+
+    } finally {
+      try {
+        fs.unlinkSync(tempFile);
+      } catch (_) {
+        // Ignore — file may already be removed
+      }
     }
   }
 
