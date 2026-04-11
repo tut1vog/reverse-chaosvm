@@ -1,229 +1,280 @@
 {
   "attempts": [
     {
-      "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
-      "caseCount": 96,
-      "template": "unknown-96",
-      "keyExtracted": true,
-      "key": [
-        "0x4e49314a",
-        "0x67666c43",
-        "0x44576b4e",
-        "0x592e4d42"
-      ],
-      "keyMods": [
-        1052701,
-        0,
-        0,
-        1644806
-      ],
-      "chromeCollectLength": 4240,
-      "decryptionSuccess": true,
-      "chromeCdFieldCount": 60,
-      "headerSplit": {
-        "strategy": "byte-boundary",
-        "contentLength": 144,
-        "paddingLength": 0
-      },
-      "standaloneCollectLength": 4076,
-      "segmentComparison": {
-        "headerMatch": true,
-        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: byte-boundary (content=144, padding=0)",
-        "fieldCountMatch": false,
-        "fieldDiffs": 58,
-        "totalFields": 60,
-        "fieldDiffDetails": [
-          {
-            "index": 0,
-            "chrome": "",
-            "standalone": 1
-          },
-          {
-            "index": 1,
-            "chrome": 0,
-            "standalone": "windows"
-          },
-          {
-            "index": 2,
-            "chrome": "",
-            "standalone": 2
-          },
-          {
-            "index": 3,
-            "chrome": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-            "standalone": 800
-          },
-          {
-            "index": 4,
-            "chrome": 1775884264,
-            "standalone": "7448307515255877632"
-          },
-          {
-            "index": 5,
-            "chrome": 8,
-            "standalone": ""
-          },
-          {
-            "index": 6,
-            "chrome": {
-              "timeZone": "Asia/Shanghai",
-              "calendar": "gregory",
-              "numberingSystem": "latn",
-              "locale": "en-US"
-            },
-            "standalone": [
-              "en-US",
-              "en"
-            ]
-          },
-          {
-            "index": 7,
-            "chrome": 1,
-            "standalone": ""
-          },
-          {
-            "index": 8,
-            "chrome": 8955392,
-            "standalone": 8
-          },
-          {
-            "index": 9,
-            "chrome": "",
-            "standalone": [
-              1280,
-              1400
-            ]
-          }
-        ]
-      },
-      "error": null
+      "tdcName": "BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ",
+      "caseCount": null,
+      "template": null,
+      "keyExtracted": false,
+      "key": null,
+      "keyMods": null,
+      "chromeCollectLength": 4216,
+      "decryptionSuccess": false,
+      "chromeCdFieldCount": null,
+      "cdFieldOrder": null,
+      "hashPosition": null,
+      "fieldOrderMatchCount": null,
+      "headerSplit": null,
+      "standaloneCollectLength": null,
+      "segmentComparison": null,
+      "error": "VM parser failed: Could not identify thisCtx variable"
     },
     {
-      "tdcName": "MClHbUcgSaZZVmDPBMgnkbnJHKWAEidn",
-      "caseCount": 98,
-      "template": "unknown-98",
+      "tdcName": "hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig",
+      "caseCount": 95,
+      "template": "A",
       "keyExtracted": true,
       "key": [
-        "0x693c303a",
-        "0x41445741",
-        "0x481f394c",
-        "0x4f475943"
+        "0x6a4f4b4d",
+        "0x4f3d3841",
+        "0x6c656741",
+        "0x47434743"
       ],
       "keyMods": [
-        1579040,
         0,
-        2829060,
+        1579012,
+        460551,
         0
       ],
-      "chromeCollectLength": 4188,
+      "chromeCollectLength": 4190,
       "decryptionSuccess": true,
       "chromeCdFieldCount": 60,
+      "cdFieldOrder": [
+        0,
+        4,
+        23,
+        44,
+        21,
+        11,
+        1,
+        26,
+        -1,
+        28,
+        5,
+        49,
+        47,
+        24,
+        27,
+        8,
+        46,
+        12,
+        30,
+        -1,
+        31,
+        6,
+        15,
+        16,
+        3,
+        18,
+        7,
+        19,
+        38,
+        17,
+        48,
+        25,
+        -1,
+        45,
+        2,
+        35,
+        53,
+        42,
+        54,
+        52,
+        9,
+        29,
+        20,
+        51,
+        43,
+        41,
+        34,
+        -1,
+        33,
+        57,
+        56,
+        10,
+        14,
+        32,
+        13,
+        37,
+        -1,
+        -1,
+        22,
+        50
+      ],
+      "hashPosition": 56,
+      "fieldOrderMatchCount": 55,
       "headerSplit": {
         "strategy": "byte-boundary",
         "contentLength": 144,
         "paddingLength": 0
       },
-      "standaloneCollectLength": 4156,
+      "standaloneCollectLength": 4028,
       "segmentComparison": {
-        "headerMatch": true,
-        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: byte-boundary (content=144, padding=0)",
-        "fieldCountMatch": false,
-        "fieldDiffs": 57,
+        "headerMatch": false,
+        "headerDiffSummary": "Chrome: byte-boundary (content=144, padding=0), standalone: field-boundary (content=143, padding=1)",
+        "fieldCountMatch": true,
+        "fieldDiffs": 20,
         "totalFields": 60,
         "fieldDiffDetails": [
           {
-            "index": 0,
-            "chrome": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-            "standalone": 1
-          },
-          {
             "index": 1,
-            "chrome": "srgb",
-            "standalone": "windows"
-          },
-          {
-            "index": 2,
-            "chrome": "Linux x86_64",
-            "standalone": 2
-          },
-          {
-            "index": 3,
-            "chrome": "UTF-8",
-            "standalone": 800
-          },
-          {
-            "index": 4,
-            "chrome": "7448598508026916864",
+            "chrome": "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
             "standalone": "7448307515255877632"
           },
           {
-            "index": 5,
-            "chrome": 1775884272,
-            "standalone": ""
-          },
-          {
-            "index": 6,
+            "index": 2,
             "chrome": [
               {
-                "codec": "H.264",
-                "support": "probably"
+                "name": "PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
               },
               {
-                "codec": "H.264 High",
-                "support": "probably"
+                "name": "Chrome PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
               },
               {
-                "codec": "H.265/HEVC",
-                "support": ""
+                "name": "Chromium PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
               },
               {
-                "codec": "VP8",
-                "support": "probably"
+                "name": "Microsoft Edge PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
               },
               {
-                "codec": "VP9",
-                "support": "probably"
-              },
-              {
-                "codec": "AV1",
-                "support": "probably"
-              },
-              {
-                "codec": "Theora",
-                "support": ""
-              },
-              {
-                "codec": "MPEG-4",
-                "support": ""
+                "name": "WebKit built-in PDF",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
               }
             ],
             "standalone": [
-              "en-US",
-              "en"
+              {
+                "name": "PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
+              },
+              {
+                "name": "Chrome [[4,-1,-1,1775884623783,0,0,0,0]]               PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
+              },
+              {
+                "name": "Chromium PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
+              },
+              {
+                "name": "Microsoft Edge PDF Viewer",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
+              },
+              {
+                "name": "WebKit built-in PDF",
+                "description": "Portable Document Format",
+                "filename": "internal-pdf-viewer"
+              }
             ]
           },
           {
-            "index": 7,
+            "index": 3,
+            "chrome": 800,
+            "standalone": 600
+          },
+          {
+            "index": 6,
             "chrome": "unknown",
-            "standalone": ""
+            "standalone": "windows"
           },
           {
             "index": 8,
-            "chrome": "",
-            "standalone": 8
+            "chrome": "windows",
+            "standalone": []
           },
           {
-            "index": 9,
-            "chrome": 0,
-            "standalone": [
-              1280,
-              1400
-            ]
+            "index": 19,
+            "chrome": "7448599960025284608",
+            "standalone": []
+          },
+          {
+            "index": 22,
+            "chrome": 1218346587,
+            "standalone": 991783254
+          },
+          {
+            "index": 23,
+            "chrome": 1775884613,
+            "standalone": 1775062183
+          },
+          {
+            "index": 24,
+            "chrome": 600,
+            "standalone": 800
+          },
+          {
+            "index": 25,
+            "chrome": {
+              "nt_vc_output": {
+                "ac-baseLatency": 0.011609977324263039,
+                "ac-outputLatency": 0,
+                "ac-sampleRate": 44100,
+                "ac-maxChannelCount": 2,
+                "ac-numberOfInputs": 1,
+                "ac-numberOfOutputs": 0,
+                "ac-channelCount": 2,
+                "ac-channelCountMode": "explicit",
+                "ac-channelInterpretation": "speakers",
+                "an-fftSize": 2048,
+                "an-frequencyBinCount": 1024,
+                "an-minDecibels": -100,
+                "an-maxDecibels": -30,
+                "an-smoothingTimeConstant": 0.8,
+                "an-numberOfInputs": 1,
+                "an-numberOfOutputs": 1,
+                "an-channelCount": 2,
+                "an-channelCountMode": "max",
+                "an-channelInterpretation": "speakers"
+              },
+              "pxi_output": 11888.616780045351
+            },
+            "standalone": {
+              "nt_vc_output": {
+                "ac-baseLatency": 0.01,
+                "ac-outputLatency": 0,
+                "ac-sampleRate": 44100,
+                "ac-maxChannelCount": 2,
+                "ac-numberOfInputs": 1,
+                "ac-numberOfOutputs": 0,
+                "ac-channelCount": 2,
+                "ac-channelCountMode": "explicit",
+                "ac-channelInterpretation": "speakers",
+                "an-fftSize": 2048,
+                "an-frequencyBinCount": 1024,
+                "an-minDecibels": -100,
+                "an-maxDecibels": -30,
+                "an-smoothingTimeConstant": 0.8,
+                "an-numberOfInputs": 1,
+                "an-numberOfOutputs": 1,
+                "an-channelCount": 2,
+                "an-channelCountMode": "max",
+                "an-channelInterpretation": "speakers"
+              },
+              "pxi_output": 10240
+            }
           }
         ]
       },
-      "error": null
+      "error": null,
+      "serializationDiffs": [
+        {
+          "index": 56,
+          "chromeRaw": "            [[4,-1,-1,1775884619133,0,0,0,0]]               ",
+          "jsonStringify": "[[4,-1,-1,1775884619133,0,0,0,0]]",
+          "diffType": "serialization"
+        }
+      ]
     }
   ],
-  "timestamp": "2026-04-11T05:11:03.188Z"
+  "timestamp": "2026-04-11T05:16:51.318Z"
 }

@@ -28,6 +28,7 @@ const TemplateCache = require('../scraper/template-cache');
 const { parseVmFunction } = require('../pipeline/vm-parser');
 const { mapOpcodes } = require('../pipeline/opcode-mapper');
 const { extractKey } = require('../pipeline/key-extractor');
+const { matchFieldOrder, detectHashPosition, detectSerializationDiffs } = require('../pipeline/structure-extractor');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 
@@ -233,6 +234,9 @@ async function runAttempt(browser, opts) {
     chromeCollectLength: null,
     decryptionSuccess: false,
     chromeCdFieldCount: null,
+    cdFieldOrder: null,
+    hashPosition: null,
+    fieldOrderMatchCount: null,
     headerSplit: null,
     standaloneCollectLength: null,
     segmentComparison: null,
@@ -433,6 +437,30 @@ async function runAttempt(browser, opts) {
       if (fullDecrypt.parsed.sd) {
         log(`  Chrome sd keys: ${Object.keys(fullDecrypt.parsed.sd).join(', ')}`);
       }
+
+      // ── Step 6b: Detect field order and hash position ──
+      if (fullDecrypt.parsed.cd) {
+        log('Step 6b: Detect field order from Chrome cd...');
+
+        const fieldResult = matchFieldOrder(fullDecrypt.parsed.cd);
+        result.cdFieldOrder = fieldResult.fieldOrder;
+        result.fieldOrderMatchCount = fieldResult.fieldOrder.length - fieldResult.unmatchedCount;
+        log(`  Field order: matched ${result.fieldOrderMatchCount}/${fieldResult.fieldOrder.length} fields (${fieldResult.unmatchedCount} unmatched)`);
+
+        const hashPos = detectHashPosition(fullDecrypt.parsed.cd);
+        result.hashPosition = hashPos;
+        log(`  Hash position: ${hashPos >= 0 ? hashPos : 'not found'}`);
+
+        // Detect serialization diffs
+        const serDiffs = detectSerializationDiffs(fullDecrypt.plaintext, fullDecrypt.parsed.cd);
+        if (serDiffs.length > 0) {
+          log(`  Serialization diffs: ${serDiffs.length} fields differ`);
+          result.serializationDiffs = serDiffs;
+        } else {
+          log('  Serialization diffs: none');
+          result.serializationDiffs = [];
+        }
+      }
     } else {
       log(`  Full decryption FAILED — not valid JSON`);
       log(`  Plaintext preview: ${fullDecrypt.plaintext.substring(0, 100)}`);
@@ -464,7 +492,12 @@ async function runAttempt(browser, opts) {
     const cached = cache.lookup(tdcName);
 
     const genOpts = {};
-    if (cached && cached.cdFieldOrder) {
+
+    // Prefer live-detected cdFieldOrder from Chrome's actual token (step 6b)
+    if (result.cdFieldOrder) {
+      genOpts.cdFieldOrder = result.cdFieldOrder;
+      log(`  Using cdFieldOrder from live detection (${result.cdFieldOrder.length} entries, ${result.fieldOrderMatchCount} matched)`);
+    } else if (cached && cached.cdFieldOrder) {
       genOpts.cdFieldOrder = cached.cdFieldOrder;
       log(`  Using cdFieldOrder from cache (${cached.cdFieldOrder.length} entries)`);
     } else if (vmInfo.caseCount === 95) {
@@ -473,7 +506,11 @@ async function runAttempt(browser, opts) {
       log('  Using default Template A cdFieldOrder');
     }
 
-    if (cached && cached.serializationDiffs) {
+    // Prefer live-detected serialization diffs from step 6b
+    if (result.serializationDiffs && result.serializationDiffs.length > 0) {
+      genOpts.serializationDiffs = result.serializationDiffs;
+      log(`  Using serializationDiffs from live detection (${result.serializationDiffs.length} diffs)`);
+    } else if (cached && cached.serializationDiffs) {
       genOpts.serializationDiffs = cached.serializationDiffs;
       log(`  Using serializationDiffs from cache`);
     }
@@ -628,6 +665,8 @@ async function main() {
     } else {
       log(`  Attempt ${i + 1}: tdcName=${a.tdcName} template=${a.template} ` +
         `decrypt=${a.decryptionSuccess} fields=${a.chromeCdFieldCount} ` +
+        `fieldOrderMatched=${a.fieldOrderMatchCount !== null ? a.fieldOrderMatchCount : 'N/A'} ` +
+        `hashPos=${a.hashPosition !== null ? a.hashPosition : 'N/A'} ` +
         `headerStrategy=${a.headerSplit ? a.headerSplit.strategy : 'N/A'} ` +
         `fieldDiffs=${a.segmentComparison ? a.segmentComparison.fieldDiffs : 'N/A'}`);
     }
