@@ -29,6 +29,7 @@ puppeteer.use(StealthPlugin());
 const { CaptchaClient } = require('../puppeteer/captcha-client');
 const { solveSlider } = require('../puppeteer/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray } = require('../scraper/collect-generator');
+const { buildSdString } = require('../token/outer-pipeline');
 const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const { parseVmFunction } = require('../pipeline/vm-parser');
 const { mapOpcodes } = require('../pipeline/opcode-mapper');
@@ -172,6 +173,61 @@ function decryptCollect(collectStr, params) {
   }
 
   return { plaintext, parsed };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Segment Parsing
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * URL-decode a collect token string back to raw base64.
+ * Reverses: + → %2B, / → %2F, = → %3D
+ */
+function urlDecodeCollect(encoded) {
+  return encoded
+    .replace(/%2B/gi, '+')
+    .replace(/%2F/gi, '/')
+    .replace(/%3D/gi, '=');
+}
+
+/**
+ * Parse a collect token (raw base64 or URL-encoded) into its 4 segments.
+ *
+ * Token layout: header(192) + hash(64) + cdBody(variable) + sig(variable)
+ * Assembly order from generate-token.js: btoaSegments[1] + [0] + [2] + [3]
+ *   = header + hash + cdBody + sig
+ *
+ * The sig length depends on the sdString content. The encrypted sig is
+ * sdString padded to 8-byte boundary, then base64-encoded.
+ *
+ * @param {string} collectStr - URL-encoded or raw base64 collect token
+ * @param {number} sdStringLength - Length of the sd string (for computing sig size)
+ * @returns {{header: number, hash: number, cdBody: number, sig: number, total: number}}
+ */
+function parseSegmentSizes(collectStr, sdStringLength) {
+  const b64 = collectStr.includes('%')
+    ? urlDecodeCollect(collectStr)
+    : collectStr;
+
+  const HEADER_LEN = 192;
+  const HASH_LEN = 64;
+
+  // Sig: sdString is padded to 8-byte boundary before encryption, then base64-encoded
+  const sigEncryptedLen = Math.ceil(sdStringLength / 8) * 8;
+  const sigB64Len = Math.ceil(sigEncryptedLen / 3) * 4;
+
+  const headerLen = Math.min(HEADER_LEN, b64.length);
+  const hashLen = Math.min(HASH_LEN, Math.max(0, b64.length - HEADER_LEN));
+  const sigLen = Math.min(sigB64Len, Math.max(0, b64.length - HEADER_LEN - HASH_LEN));
+  const cdBodyLen = Math.max(0, b64.length - HEADER_LEN - HASH_LEN - sigLen);
+
+  return {
+    header: headerLen,
+    hash: hashLen,
+    cdBody: cdBodyLen,
+    sig: sigLen,
+    total: b64.length,
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -593,11 +649,35 @@ async function solve(opts) {
       }
       log(`  Collect length: ${collectVal.length} chars`);
 
-      // Size comparison with Chrome's collect
+      // Size comparison with Chrome's collect (total + per-segment)
+      // Compute sdString length for sig segment sizing
+      const sdStringForSizing = buildSdString(slideSd);
+      const sdStringLen = sdStringForSizing.length;
+      log(`  sdString length for segment parsing: ${sdStringLen} ("${sdStringForSizing.substring(0, 40)}...")`);
+
+      const standaloneSegments = parseSegmentSizes(collectVal, sdStringLen);
+      log(`  Standalone segments (b64): header=${standaloneSegments.header}, hash=${standaloneSegments.hash}, cdBody=${standaloneSegments.cdBody}, sig=${standaloneSegments.sig}, total=${standaloneSegments.total}`);
+
+      let segmentComparison = null;
       if (chromeCollect) {
-        const chromeLen = chromeCollect.length;
-        const diff = collectVal.length - chromeLen;
-        log(`  Standalone collect: ${collectVal.length} chars, Chrome collect: ${chromeLen} chars, Diff: ${diff > 0 ? '+' : ''}${diff}`);
+        const chromeSegments = parseSegmentSizes(chromeCollect, sdStringLen);
+        log(`  Chrome segments (b64):     header=${chromeSegments.header}, hash=${chromeSegments.hash}, cdBody=${chromeSegments.cdBody}, sig=${chromeSegments.sig}, total=${chromeSegments.total}`);
+
+        segmentComparison = {
+          header: { standalone: standaloneSegments.header, chrome: chromeSegments.header, diff: standaloneSegments.header - chromeSegments.header },
+          hash: { standalone: standaloneSegments.hash, chrome: chromeSegments.hash, diff: standaloneSegments.hash - chromeSegments.hash },
+          cdBody: { standalone: standaloneSegments.cdBody, chrome: chromeSegments.cdBody, diff: standaloneSegments.cdBody - chromeSegments.cdBody },
+          sig: { standalone: standaloneSegments.sig, chrome: chromeSegments.sig, diff: standaloneSegments.sig - chromeSegments.sig },
+          total: { standalone: standaloneSegments.total, chrome: chromeSegments.total, diff: standaloneSegments.total - chromeSegments.total },
+          sdStringLength: sdStringLen,
+        };
+
+        log('  Segment comparison:');
+        for (const name of ['header', 'hash', 'cdBody', 'sig', 'total']) {
+          const s = segmentComparison[name];
+          const diffStr = s.diff > 0 ? `+${s.diff}` : String(s.diff);
+          log(`    ${name.padEnd(8)}: standalone=${String(s.standalone).padEnd(5)}, chrome=${String(s.chrome).padEnd(5)}, diff=${diffStr}`);
+        }
       }
 
       // ── Step 9: Generate vData via Chrome ──
@@ -831,6 +911,7 @@ async function solve(opts) {
         collectLength: collectVal.length,
         chromeCollectLength: chromeCollect ? chromeCollect.length : null,
         collectSizeDiff: chromeCollect ? collectVal.length - chromeCollect.length : null,
+        segmentComparison: segmentComparison,
         usedCdArrayOverride: !!strippedCd,
         vDataLength: vData.length,
         httpStatus: verifyResult.status,
