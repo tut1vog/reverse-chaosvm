@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 20.2 — Store cdFieldOrder + live verification test
+Current task: 20.3 — Inject reference tdc.js + submit to verify endpoint
 
 ---
 
@@ -207,9 +207,9 @@ Current task: 20.2 — Store cdFieldOrder + live verification test
 | ID | Task | Status |
 |----|------|--------|
 | 20.1 | Create field order discovery script | done |
-| 20.2 | Store cdFieldOrder + live verification test | in-progress |
-| 20.3 | Store cdFieldOrder in cache + verify token | pending |
-| 20.4 | Live re-test with correct field ordering | pending |
+| 20.2 | Store cdFieldOrder + live verification test | done |
+| 20.3 | Inject reference tdc.js + submit to verify endpoint | in-progress |
+| 20.4 | Analysis + next steps based on result | pending |
 
 ---
 
