@@ -37,7 +37,7 @@ Current task: 21.2 — Create structure-extractor pipeline module
 |----|------|--------|
 | 21.1 | Map all object serialization differences (diagnostic tool) | done |
 | 21.2 | Create structure-extractor pipeline module | done |
-| 21.3 | Tests for structure-extractor | pending |
+| 21.3 | Tests for structure-extractor | done |
 | 21.4 | Integrate into pipeline/run.js and template cache | pending |
 | 21.5 | Tests for pipeline integration | pending |
 | 21.6 | Use extracted structure params in collect-generator | pending |
@@ -47,50 +47,45 @@ Current task: 21.2 — Create structure-extractor pipeline module
 
 ## Current Task
 
-**ID**: 21.3
-**Title**: Tests for structure-extractor
+**ID**: 21.4
+**Title**: Integrate structure-extractor into pipeline/run.js and template cache
 **Phase**: Automated Template Structure Extraction
 **Status**: pending
 
 ### Goal
-Write unit tests for the 4 synchronous helper functions in `pipeline/structure-extractor.js`. The `extractStructure` async function (Puppeteer-based) is NOT tested here — it will be validated in live integration (task 21.7).
+Add structure extraction as Stage 5 of the automated porting pipeline (`pipeline/run.js`). After XTEA key extraction (Stage 3), run `extractStructure()` to capture cd structure parameters. Store the results in the template cache alongside XTEA params.
 
-### What to test
+### Implementation Steps
+1. **pipeline/run.js**: Add Stage 5 after Stage 3 (key extraction) or Stage 4 (token verification):
+   - Import `extractStructure` from `./structure-extractor`
+   - Call `await extractStructure(tdcPath, keyResult)` with the path and extracted XTEA params
+   - Save structure result to `output/<stem>/structure-params.json`
+   - Include structure params in `pipeline-config.json`
+   - Add `--skip-structure` flag to skip this stage (like `--skip-verify`)
 
-1. **detectHashPosition**
-   - Returns correct index for hash at various positions (0, 11, 51, 59)
-   - Returns -1 when no hash present
-   - Returns -1 for similar-but-wrong patterns (wrong length, wrong sentinel values)
-   - Handles empty array, single-element array
+2. **scraper/template-cache.js**: Extend the cache entry schema to include structure params:
+   - `hashPosition` (number)
+   - `fieldOrder` (number[])  
+   - `serializationDiffs` (array)
+   - `headerSplit` (object: { strategy, contentLength, paddingLength })
+   - Update `store()` to accept these fields
+   - Update `seed()` to load structure params from pipeline-config.json
 
-2. **matchFieldOrder**
-   - Correctly identifies signature fields: userAgent (by "Mozilla/5.0"), languages (locale array), videoCodecs (codec+support), audioCodecs, intlOptions (timeZone+calendar), etc.
-   - Skips hash position (field at hash index gets -1)
-   - Returns correct unmatchedCount
-   - Handles edge case: all-null array, empty array
-
-3. **detectSerializationDiffs**
-   - Returns 0 diffs for identical serialization
-   - Detects diff when Chrome's cd string has fewer keys in an object field
-   - Detects diff when field count differs (Chrome 60 vs ours 59)
-   - Handles plaintext with both cd and sd sections
-
-4. **analyzeHeaderSplit**
-   - Returns "field-boundary" with correct padding count when spaces present
-   - Returns "byte-boundary" when no trailing spaces in first 144 chars
-   - Returns "unknown" for malformed input
+3. **scraper/collect-generator.js**: (preparation only — actual usage is task 21.6)
+   - No changes needed yet, but ensure headerFieldCount is still passable via options
 
 ### Context
-- `pipeline/structure-extractor.js` — the module under test
-- `token/collector-schema.js` — COLLECTOR_SCHEMA used by matchFieldOrder
-- `tests/` directory — existing test files follow Node.js test runner (`node:test` + `node:assert`)
-- Convention: test file named `tests/test-structure-extractor.js`
+- `pipeline/run.js` — current 4-stage pipeline (parse → map → extract key → verify token)
+- `pipeline/structure-extractor.js` — the new module (just created)
+- `scraper/template-cache.js` — stores per-TDC_NAME params
+- `output/*/pipeline-config.json` — combined pipeline output
 
 ### Verification
-- [ ] `node --test tests/test-structure-extractor.js` passes all tests
-- [ ] `npm test` still passes with the new test file included (current: 173/175)
-- [ ] At least 15 test cases covering all 4 functions
-- [ ] No mocking of the module — tests use real function calls with crafted inputs
+- [ ] `node -c pipeline/run.js` passes
+- [ ] `npm test` passes 209/211
+- [ ] `pipeline/run.js` exports or accepts `--skip-structure` flag
+- [ ] Template cache `store()` accepts and persists structure params
+- [ ] Template cache `seed()` loads structure params from pipeline-config.json
 
 ### Suggested Agent
 general-purpose
