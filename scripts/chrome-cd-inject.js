@@ -43,6 +43,7 @@ puppeteer.use(StealthPlugin());
 const { CaptchaClient } = require('../puppeteer/captcha-client');
 const { solveSlider } = require('../puppeteer/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray } = require('../scraper/collect-generator');
+const { buildCdString, buildSdString } = require('../token/outer-pipeline');
 const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const TemplateCache = require('../scraper/template-cache');
 
@@ -544,12 +545,67 @@ async function solve(opts) {
               log(`  [DIAG] Header field count: ${diagFieldCount} (commas between cd fields)`);
               log(`  [DIAG] → headerFieldCount should be ${diagFieldCount} for this template`);
 
-              // Also check cdBody start
+              // Decrypt ALL segments for full cd string comparison
               const hashB64 = diagB64.substring(192, 256);
-              const cdBodyB64Start = diagB64.substring(256, 256 + 64);
-              const cdBodyEncStart = Buffer.from(cdBodyB64Start, 'base64').toString('binary');
-              const cdBodyDecStart = decryptXtea(cdBodyEncStart, xteaParams);
-              log(`  [DIAG] cdBody starts: ${JSON.stringify(cdBodyDecStart.substring(0, 40))}`);
+
+              // Determine sig size from Chrome's sd
+              const chromeSdStr = buildSdString(decryptResult.parsed.sd);
+              const sigEncLen = Math.ceil(chromeSdStr.length / 8) * 8;
+              const sigB64Len = Math.ceil(sigEncLen / 3) * 4;
+              const cdBodyB64 = diagB64.substring(256, diagB64.length - sigB64Len);
+              const cdBodyEnc = Buffer.from(cdBodyB64, 'base64').toString('binary');
+              const cdBodyDec = decryptXtea(cdBodyEnc, xteaParams);
+              const cdBodyTrimmed = cdBodyDec.replace(/[\0\s]+$/, '');
+              log(`  [DIAG] cdBody: ${cdBodyDec.length}b, trimmed ${cdBodyTrimmed.length}b`);
+              log(`  [DIAG] cdBody starts: ${JSON.stringify(cdBodyTrimmed.substring(0, 60))}`);
+
+              // Reconstruct Chrome's payload body from header + cdBody
+              // The payload body = headerContent(144) + cdBodyContent
+              // Since header may have trailing padding, we use the full 144 bytes
+              const chromePayloadBody = headerDec + cdBodyTrimmed;
+              // Extract the cd string: payloadBody ends with ',' → remove it, add '}'
+              // But the payload actually includes padding from headerDec at positions
+              // headerTrimmed.length to 143. Let's reconstruct properly:
+              // payloadBody = headerDec[0:144] + cdBodyContent
+              // The actual cd JSON = remove trailing comma + add '}'
+              const fullPayload = headerDec.substring(0, 144) + cdBodyTrimmed;
+              // Strip trailing comma if present
+              let chromeCdStr2 = fullPayload.endsWith(',')
+                ? fullPayload.slice(0, -1) + '}'
+                : fullPayload + '}';
+
+              // Now build our cd string from the SAME cd array (after hash strip)
+              const chromeCleanCd = [...decryptResult.parsed.cd];
+              // Strip hash artifacts
+              const ourCleanCd = chromeCleanCd.filter(field => {
+                if (!Array.isArray(field) || field.length !== 1) return true;
+                const inner = field[0];
+                if (!Array.isArray(inner) || inner.length !== 8) return true;
+                return !(inner[0] === 4 && inner[1] === -1 && inner[2] === -1 &&
+                         inner[4] === 0 && inner[5] === 0 && inner[6] === 0 && inner[7] === 0);
+              });
+              const ourCdStr = buildCdString(ourCleanCd);
+
+              log(`  [DIAG] Chrome cd string: ${chromeCdStr2.length} chars`);
+              log(`  [DIAG] Our buildCdString: ${ourCdStr.length} chars`);
+              log(`  [DIAG] Diff: ${ourCdStr.length - chromeCdStr2.length} chars`);
+
+              // Character-by-character comparison
+              const minLen = Math.min(chromeCdStr2.length, ourCdStr.length);
+              let firstDiff = -1;
+              for (let ci = 0; ci < minLen; ci++) {
+                if (chromeCdStr2[ci] !== ourCdStr[ci]) { firstDiff = ci; break; }
+              }
+              if (firstDiff === -1 && chromeCdStr2.length !== ourCdStr.length) firstDiff = minLen;
+
+              if (firstDiff === -1) {
+                log('  [DIAG] cd strings: IDENTICAL ✓');
+              } else {
+                log(`  [DIAG] cd strings DIFFER at position ${firstDiff}`);
+                const ctx = 40;
+                log(`  [DIAG]   Chrome: ${JSON.stringify(chromeCdStr2.substring(Math.max(0, firstDiff - ctx), firstDiff + ctx))}`);
+                log(`  [DIAG]   Ours:   ${JSON.stringify(ourCdStr.substring(Math.max(0, firstDiff - ctx), firstDiff + ctx))}`);
+              }
             } catch (diagErr) {
               log(`  [DIAG] Diagnostic failed: ${diagErr.message}`);
             }
