@@ -28,7 +28,7 @@ Current task: 25.5 — Strip ALL hash artifacts from Chrome's cd (not just the f
 | 25.2 | Analyze results and identify remaining gaps | done |
 | 25.3 | Decrypt and diff cdBody plaintext between standalone and Chrome | done |
 | 25.4 | Compare pre-encryption cd strings to find serialization divergence | done |
-| 25.5 | Strip ALL hash artifacts from Chrome's cd (not just the first) | pending |
+| 25.5 | Strip ALL hash artifacts from Chrome's cd (not just the first) | done |
 | 25.6 | Live re-test with double hash strip + cdArrayOverride | pending |
 
 ### Phase 26: Realistic Fingerprint Profile
@@ -57,7 +57,7 @@ Current task: 25.5 — Strip ALL hash artifacts from Chrome's cd (not just the f
 **ID**: 25.5
 **Title**: Strip ALL hash artifacts from Chrome's cd (not just the first)
 **Phase**: Chrome cd Injection — Validate Token Structure
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
 Fix `detectHashPosition` to return ALL matching positions, and strip ALL `[[4,-1,-1,ts,0,0,0,0]]` entries from Chrome's cd before passing to cdArrayOverride. Currently only the first is stripped, leaving a second one that adds ~123 chars and shifts all subsequent fields.
