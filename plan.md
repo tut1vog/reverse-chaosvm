@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 17
-Current task: 19.3 — Fix identified divergence
+Current task: 19.3 — Deep cd serialization analysis
 
 ---
 
@@ -190,69 +190,56 @@ Current task: 19.3 — Fix identified divergence
 |----|------|--------|
 | 19.1 | Create reference injection forensics script | done |
 | 19.2 | Live test with reference tdc.js injection | done |
-| 19.3 | Fix identified divergence | pending |
-| 19.4 | Live re-test with fix | pending |
+| 19.3 | Deep cd serialization analysis | in-progress |
+| 19.4 | Fix cd serialization to match Chrome | pending |
+| 19.5 | Live re-test with fix | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 19.1
-**Title**: Create reference injection forensics script
+**ID**: 19.3
+**Title**: Deep cd serialization analysis
 **Phase**: Reference tdc.js Injection Forensics
 **Status**: in-progress
 
 ### Goal
-Create `scripts/ref-inject-forensics.js` — a Puppeteer script that:
-1. Launches Chrome, sets up a CAPTCHA session (prehandle → show page)
-2. Intercepts the tdc.js request and replaces the response with our reference build (`targets/tdc.js`) — a file we have the verified XTEA key for
-3. Chrome executes the reference tdc.js, calls `TDC.getData()` → produces encrypted collect token
-4. Decrypts Chrome's token with the known Template A key (guaranteed to work — byte-identical verified)
-5. Generates a standalone token with the same cd/sd/timestamp
-6. Runs the three forensic comparisons (A: plaintext, B: round-trip, C: full reconstruction)
+Modify `ref-inject-forensics.js` to produce a detailed field-by-field comparison of Chrome's cd array serialization vs our `buildCdString()` output. Identify exactly which fields serialize differently and how.
 
-This completely bypasses the key extraction problem. We KNOW the reference key works (all 5 targets verified byte-identical). By injecting it into Chrome's actual CAPTCHA page, we can finally compare our pipeline output vs Chrome's output with a known-good key.
+### What we know from 19.2
+
+**Forensics results**:
+- Chrome's cd has 60 fields, our `buildDefaultCdArray` produces 59
+- `buildCdString(chromeCd)` produces 2897 chars; Chrome's actual cd string is 2864 chars — **33 chars shorter**
+- sd strings: IDENTICAL
+- Encryption: IDENTICAL (round-trip passes)
+- The 33-char difference comes from `buildCdString` using `JSON.stringify()` for nested objects/arrays, while the VM's `func_276` uses hand-rolled serialization that produces shorter output
+
+**Comparison A was misleading**: It compared the cd portion extracted from the raw concatenated plaintext (which includes inter-chunk padding and the hash chunk). The real comparison is: take Chrome's parsed cd array → serialize it with `buildCdString` → compare against what the VM actually produced.
+
+**The fix requires**: 
+1. Extract Chrome's ACTUAL cd string from the decrypted segments (header content + cdBody content, excluding padding and hash)
+2. Run `buildCdString(chromeCd)` to get our version
+3. Compare character-by-character to find where `JSON.stringify` produces different output than `func_276`
 
 ### Context
-
-**Known Template A XTEA params** (from `scraper/cache/` or `CLAUDE.md`):
-- Key: `[0x6257584F, 0x462A4564, 0x636A5062, 0x6D644140]`
-- Delta: `0x9E3779B9`
-- Rounds: `32`
-- keyModConstants: `[2368517, 592130]`
-- keyMods: `[0, 2368517, 0, 592130]`
-
-**Reference tdc.js**: `targets/tdc.js` — fully analyzed, byte-identical token generation verified.
-
-**Implementation approach**:
-- Base on `scripts/token-forensics.js` (already has Puppeteer setup, CAPTCHA flow, forensic comparisons, decryption functions)
-- Replace the tdc.js interception: instead of patching/instrumenting, serve `targets/tdc.js` content as the response
-- Hardcode the Template A XTEA params (no extraction needed)
-- Remove all key extraction logic (pipeline, in-page instrumentation, template cache)
-- Keep the three comparison functions (A, B, C) exactly as they are
-
-**Key concern**: The `eks` token is server-baked into each tdc.js build. By injecting the reference tdc.js, the `eks` extracted from it will be stale/wrong for the current session. This is fine — we're NOT submitting to the server for verification. We're purely comparing token generation.
-
-**Files**:
-- Read: `scripts/token-forensics.js` (clone as base, ~950 lines)
-- Read: `targets/tdc.js` (the reference build to inject)
-- Create: `scripts/ref-inject-forensics.js`
+- `scripts/ref-inject-forensics.js` — already has the forensic comparison infrastructure and successful decryption
+- `token/outer-pipeline.js` — `buildCdString()` at line 58 — uses `JSON.stringify()` for nested types
+- `docs/TOKEN_FORMAT.md` — documents func_276's hand-rolled serialization
+- Comparison B already decrypts each segment separately — we can get clean header_content and cdBody_content
 
 ### Implementation Steps
-1. Clone `scripts/token-forensics.js` as the base
-2. Remove all key extraction code (in-page instrumentation, buildInPageInstrumentCode, parseVmFunction/mapOpcodes imports, CDP Fetch patching logic, trace collection, analyzeTrace)
-3. Replace tdc.js interception with simple injection: when tdc.js is requested, respond with `fs.readFileSync('targets/tdc.js', 'utf8')`
-4. Hardcode Template A XTEA params (no extraction, no cache lookup)
-5. Keep all three comparison functions (A: plaintext, B: round-trip, C: full reconstruction)
-6. Save results to `output/ref-inject-forensics.json`
+1. In the comparison A function, fix the cd string extraction: instead of extracting from raw plaintext (which has inter-chunk artifacts), reconstruct from the decrypted segments:
+   - `cleanCd = headerDecrypted.trimEnd() + cdBodyDecrypted.trimEnd()` (trim trailing spaces/nulls from each)
+   - This gives Chrome's actual cd string without hash or padding artifacts
+2. Compare this clean Chrome cd string with `buildCdString(chromeCd)` char-by-char
+3. For each difference found, log the field index, the Chrome serialization, and our serialization
+4. Also produce a field-by-field JSON.stringify comparison: for each cd[i], compare `JSON.stringify(cd[i])` with what appears in Chrome's string at that position
 
 ### Verification
 - [ ] `node -c scripts/ref-inject-forensics.js` passes
-- [ ] `npm test` still passes 173/175
-- [ ] Script reads `targets/tdc.js` and serves it via interception
-- [ ] Template A XTEA params are hardcoded (not extracted)
-- [ ] No key extraction code remains (no pipeline, no in-page, no cache)
-- [ ] All three comparisons (A, B, C) are present
+- [ ] Script extracts clean cd string from decrypted header+cdBody (no hash/padding artifacts)
+- [ ] Field-by-field diff output shows exactly which fields serialize differently
 
 ### Suggested Agent
 general-purpose
