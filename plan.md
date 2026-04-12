@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 38 — Restructure
-Current task: 38.2 — Create placeholder README.md files for the 5 research tracks
+Current task: 38.3 — Triage `scripts/` one-offs into research tracks or bench
 
 ---
 
@@ -14,8 +14,8 @@ Current task: 38.2 — Create placeholder README.md files for the 5 research tra
 | ID | Task | Status |
 |----|------|--------|
 | 38.1 | Restructure repo into research/ + tools/ layout (git mv + require rewrites + package.json + README) | done |
-| 38.2 | Create placeholder README.md files for the 5 research tracks | in-progress |
-| 38.3 | Triage `scripts/` one-offs into research tracks or bench | pending |
+| 38.2 | Create placeholder README.md files for the 5 research tracks | done |
+| 38.3 | Triage `scripts/` one-offs into research tracks or bench | in-progress |
 
 ### Phase 39: vm-slide stack VM (Stream B — Track 1, top priority)
 > Decompile `sample/vm_slide.js` — stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`). Produce decoder, disassembler, opcode table, architecture doc, and a top-level variants comparison.
@@ -31,51 +31,56 @@ Current task: 38.2 — Create placeholder README.md files for the 5 research tra
 
 ## Current Task
 
-**ID**: 38.2
-**Title**: Create placeholder README.md files for the 5 research tracks
+**ID**: 38.3
+**Title**: Triage `scripts/` one-offs into research tracks or bench
 **Phase**: Phase 38 — Restructure
 **Status**: in-progress
 
 ### Goal
-Create a minimal `README.md` scaffold for each of the five new research tracks so every track is ready to receive work. `research/tdc-register-vm/` already exists via `git mv` and does not need a new README from this task.
+Decide per-file whether each of the 8 one-off exploratory scripts currently under `scripts/` belongs under a research track, as a stable bench tool, or as a dead-end archive. Move each file to its decided home. This closes the "Scripts directory triage" known-unknown from `project-brief.md`.
 
 ### Context
-After task 38.1, the following track directories exist but are empty or do not exist yet (need `mkdir`):
+Current contents of `scripts/` (all 8 files):
 
-- `research/vm-slide-stack-vm/` — top priority, Track 1 (Phase 39). Open question: how does the stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`, ~36 opcodes) used in `sample/vm_slide.js` work?
-- `research/captcha-orchestrator/` — open question: how does `sample/t_captcha_slide.js` orchestrate the slide CAPTCHA end-to-end?
-- `research/eks-payload/` — open question: what is the structure of the 232-byte `eks` payload baked into every `tdc.js` at line 123?
-- `research/template-pool/` — open question: how many distinct `tdc.js` templates does Tencent rotate through, and how often?
-- `research/key-mod/` — open question: are the XTEA key-modification constants identical across Templates A, B, C, or do they differ?
+1. `tdc-survey.js` — 539-line survey tool that fetches N fresh `tdc.js` builds, runs the porting pipeline, classifies templates. Written in Phase 33. Directly feeds the `research/template-pool/` track's definition of done. **Proposed move**: `research/template-pool/survey.js` (renamed).
+2. `tdc-diagnose.js` — enhanced survey script that captures per-attempt diagnostics for errorCode 12 investigation. Written in Phase 36. Feeds Known Unknown #6 (errorCode 12). No active research track owns errorCode 12 yet. **Proposed move**: `research/template-pool/diagnose.js` (co-located with the sibling survey script — both do live CAPTCHA runs and write under `output/tdc-diagnose/` or `output/tdc-survey/`).
+3. `live-comparison.js` — imports `scripts/tdc-survey.js` (and other moved files). Phase 33-era tooling for comparing live runs. **Proposed move**: `research/template-pool/live-comparison.js`.
+4. `discover-field-order.js` — one-off that discovers the collector field-order. Feeds Known Unknown #6 "Collector field count across templates" (deferred/lower priority). **Proposed move**: `research/template-pool/dead-ends/discover-field-order.js` if no longer used, or keep under a new track. Ambiguous — ask the user if uncertain, per the brief's "If the decision is ambiguous for any file, ask the user — do not delete" rule.
+5. `decrypt-collect.js` — one-off decryption tool referenced by `docs/TOKEN_DECRYPTION.md` as an example. This is a stable reference tool, not research. **Proposed move**: `tools/token-generator/decrypt-collect.js` — but this path is under a Protected path (`tools/token-generator/**` is read-only except for new files; adding a new file should be allowed). Confirm with director rules. Alternative: leave it in `scripts/` as a bench tool.
+6. `token-isolation-test.js` — one-off investigation of token-generation isolation. Historical, likely unused now. **Proposed move**: archive it. Ambiguous — ask the user.
+7. `chrome-cd-inject.js` — one-off Chrome DevTools protocol injection experiment. Historical, likely unused. **Proposed move**: archive it. Ambiguous — ask the user.
+8. `live-captcha-submit.js` — one-off live-submit harness. Historical, likely unused. **Proposed move**: archive it. Ambiguous — ask the user.
 
-Each track's README must follow `.claude/rules/research-artifacts.md` requirements: **open question**, **status** (open / partial / closed), **inputs** (which `targets/`/`sample/` files it reads), and **how to reproduce** the latest run from the command line.
+**Director decision for this task**: only move files where the destination is unambiguous (files 1, 2, 3 into `research/template-pool/`). For every ambiguous file (4, 5, 6, 7, 8), the subagent must stop and return a decision matrix to the director — do not guess, do not delete. The brief explicitly forbids deleting ambiguous files.
 
-At this stage every README is a placeholder: status is `open`, and the "how to reproduce" section should simply say "No runnable artifacts yet — see `project-brief.md` for the definition of done."
-
-Full detail for each track (DoD, inputs, permitted outputs) is in `project-brief.md` under "Stream B — Research tracks". The README should cite that as the authoritative source rather than duplicate it.
+Archive convention: abandoned scripts go under `research/<track>/dead-ends/` per `.claude/rules/research-artifacts.md`, with a one-paragraph note in the track's `README.md` explaining why. If the director decides to archive files 6/7/8, they will go under `research/template-pool/dead-ends/` (or another track, depending on the decision).
 
 ### Implementation Steps
-1. Read `.claude/rules/research-artifacts.md` to confirm the README shape.
-2. Read the five track sections in `project-brief.md` (Tracks 1–5) so every README's "open question" and "inputs" match the brief verbatim.
-3. `mkdir -p` each of the five directories under `research/`.
-4. Write a `README.md` in each with this shape:
-   - `# <track-name>`
-   - `## Open question` — one paragraph, taken from `project-brief.md`.
-   - `## Status` — `open` (all tracks are brand-new).
-   - `## Inputs` — bullet list of the `targets/` / `sample/` files the track reads.
-   - `## How to reproduce` — single sentence: "No runnable artifacts yet — see `project-brief.md` §Stream B for the definition of done."
-   - `## Notes` — empty heading, placeholder for working notes.
-5. Do not create any source files yet. Do not create any `dead-ends/` directory yet (rule says "when a script is abandoned", not pre-emptively).
+1. Read `.claude/rules/research-artifacts.md` to confirm archive conventions and research-track discipline.
+2. Read `project-brief.md` Known Unknown #1 ("Scripts directory triage") to confirm the policy.
+3. For files **1, 2, 3** (`tdc-survey.js`, `tdc-diagnose.js`, `live-comparison.js`):
+   a. `git mv scripts/tdc-survey.js research/template-pool/survey.js`
+   b. `git mv scripts/tdc-diagnose.js research/template-pool/diagnose.js`
+   c. `git mv scripts/live-comparison.js research/template-pool/live-comparison.js`
+   d. Fix any `require()` path references inside these three files (depth changes from `scripts/` to `research/template-pool/`) AND any test files under `tests/` that import from `../scripts/tdc-survey`, `../scripts/tdc-diagnose`, etc. (`tests/test-tdc-survey.js` and `tests/test-tdc-diagnose.js` are the known importers.)
+   e. Update `package.json` `scripts.test` list: the two test files reference `scripts/` paths by import — the tests themselves may not need renaming, but confirm that `node --test tests/test-tdc-survey.js` and `tests/test-tdc-diagnose.js` still pass.
+4. Update `research/template-pool/README.md`:
+   - Change `Status` from `open` to `partial` (there are now committed scripts under the track).
+   - Add a `## How to reproduce` section with actual commands for survey, diagnose, live-comparison (replacing the placeholder "No runnable artifacts yet").
+5. For files **4, 5, 6, 7, 8**: **STOP**. Produce a decision matrix in the return report — for each of the five ambiguous files, include: what the file does (1 sentence from reading it), proposed destination, why it is ambiguous, and a specific yes/no question for the director to answer. Do NOT move, delete, or edit these five files in this task.
+6. Run `npm test`. Must still be 296/296. If the move of files 1, 2, 3 broke `test-tdc-survey.js` or `test-tdc-diagnose.js`, the failure is almost certainly a missed `require()` path update.
 
 ### Verification
-- [ ] `ls research/{vm-slide-stack-vm,captcha-orchestrator,eks-payload,template-pool,key-mod}/README.md` — all five files exist.
-- [ ] Each README has the five required sections (`Open question`, `Status`, `Inputs`, `How to reproduce`, `Notes`). `grep -c '^## ' research/<track>/README.md` returns 5 for each.
-- [ ] Each `Open question` paragraph matches the corresponding track description in `project-brief.md` (the subagent should quote the brief, not paraphrase).
-- [ ] No source files (`.js`, `.py`) created in any track directory.
-- [ ] `npm test` still 296/296 (sanity — creating docs shouldn't touch tests, but confirm).
+- [ ] `ls scripts/` shows exactly 5 files remaining: `decrypt-collect.js`, `discover-field-order.js`, `chrome-cd-inject.js`, `live-captcha-submit.js`, `token-isolation-test.js` (the ambiguous ones).
+- [ ] `ls research/template-pool/` shows `README.md`, `survey.js`, `diagnose.js`, `live-comparison.js`.
+- [ ] `git status --short` shows three `R` rename entries (scripts → research/template-pool), not delete+add pairs.
+- [ ] `npm test` → 296/296.
+- [ ] `grep -rE "require\\(['\"]\\.\\.?/scripts/(tdc-survey|tdc-diagnose|live-comparison)" --glob '!history/**' --glob '!node_modules/**' --glob '!docs/WORKFLOW.md' --glob '!project-brief.md' --glob '!plan.md'` returns no matches.
+- [ ] `research/template-pool/README.md` has `Status: partial` and a populated `How to reproduce` section.
+- [ ] Return report includes a decision matrix for the five ambiguous files, with one question per file for the director.
 
 ### Suggested Agent
-`general-purpose` — lightweight documentation scaffolding, no specialized expertise needed.
+`general-purpose` — small mechanical move + path rewrite plus a judgment-required return report. No specialized expertise needed.
 
 ### Context
 Pre-restructure state (verified by the director):
