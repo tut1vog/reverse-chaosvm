@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 42 — vData runtime binding reversal (follow-up from Phase 41 open question)
-Current task: 42.1 — vm-slide vData static trace
+Current task: 42.2 — Cross-reference vm-slide vData finding against FLOW.md §6 + HAR + crypto provenance
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -49,8 +49,8 @@ Current task: 42.1 — vm-slide vData static trace
 
 | ID | Task | Status |
 |----|------|--------|
-| 42.1 | vm-slide vData static trace — locate every `OP_04 OP_10* OP_13` anchor for `"getVData"` / `"vData="` / `"&vData="`, walk surrounding basic blocks, identify property-write vs property-read, extract the installed function body, produce a reproducible script + analysis note | in-progress |
-| 42.2 | Cross-reference against FLOW.md §6 + HAR — confirm the function signature matches `window.getVData(n.join("&"))` and the output shape is consistent with the 152-char HAR value. Verdict: fully resolved → 42.3 auto-continues; partially resolved → plan revision + user pause | pending |
+| 42.1 | vm-slide vData static trace — locate every `OP_04 OP_10* OP_13` anchor for `"getVData"` / `"vData="` / `"&vData="`, walk surrounding basic blocks, identify property-write vs property-read, extract the installed function body, produce a reproducible script + analysis note | done |
+| 42.2 | Cross-reference against FLOW.md §6 + HAR + crypto provenance scan — confirm the function signature matches `window.getVData(n.join("&"))` and characterise where the 152-char HAR value's crypto comes from (candidates: upstream register, second helper installed via separate OP_58+OP_24, or external page-loaded routine). Verdict: fully resolved → 42.3 auto-continues; partially resolved → plan revision + user pause | in-progress |
 | 42.3 | Docs bookkeeping — update `docs/CAPTCHA_ORCHESTRATOR.md` §6/§8, `research/captcha-orchestrator/README.md` status, `FLOW.md` §9 Q1 post-script. Also promote the three Phase 39/40 vm-slide docs (`CHAOSVM_VARIANTS.md`, `VM_SLIDE_ARCHITECTURE.md`, `VM_SLIDE_OPCODES.md`) from CLAUDE.md "new docs planned" list into the main doc table | pending |
 
 ### Phase 41: Minor cleanup + Captcha orchestrator (Stream B Track 2)
@@ -79,141 +79,124 @@ Current task: 42.1 — vm-slide vData static trace
 
 ## Current Task
 
-**ID**: 42.1
-**Title**: vm-slide vData static trace — locate anchors, identify property-write, extract function body
+**ID**: 42.2
+**Title**: Cross-reference 42.1's vData trace against FLOW.md §6 + HAR + crypto provenance scan
 **Phase**: Phase 42 — vData runtime binding reversal
 **Status**: in-progress
 
 ### Goal
-Resolve Phase 41's single unresolved question by statically tracing the `vData` binding inside vm-slide's bytecode. Identify where the three vData-related string constants are used, determine whether each anchor is a property READ or a property WRITE, locate the installed `window.getVData` function body, and characterize its signature (inputs consumed from stack, output emitted). Produce enough structured evidence that 42.2 can cross-reference against FLOW.md §6 and the HAR verify-body value without re-deriving anything.
+Cross-reference 42.1's vm-slide vData static trace against (a) the orchestrator call site documented in `research/captcha-orchestrator/FLOW.md` §6, (b) the HAR verify-body value, and (c) the provenance of the crypto payload that produces the 152-char HAR `vData` value. 42.1 established that `window.getVData` is installed at `OP_24` pc=20066 with the function body at `[19702, 20058]` (one string arg, branches on `document.documentMode`), but its function body does NOT appear to contain the XTEA/base64 crypto — no nested `OP_58`, no crypto-looking `OP_13` resolves. So the 152-char HAR value must come from elsewhere. This task's job is to find out where.
 
-### Context — orient findings the director already confirmed
+Deliverable verdict:
+- **Fully resolved** → the crypto source is unambiguously identified, 42.3 auto-continues into docs bookkeeping.
+- **Partially resolved** → a specific, scoped gap remains; director revises the plan to add a targeted follow-up task (jsdom harness, second static trace, or whatever the gap demands) and pauses for user review.
 
-Director's 5-minute spike before Phase 42 was planned reconstructed all 703 strings from `output/vm-slide/bytecode.json` via the `OP_04` (push `""`) + `(OP_10 <charCode>)*` (append) + `OP_13` (resolve) pattern. Results:
+### Context — what 42.1 already produced
 
-- `getVData` — **1 hit** (exactly one occurrence in the bytecode).
-- `vData=` — **1 hit** (URL-encoded query fragment, pre-baked as a constant).
-- `&vData=` — **1 hit** (URL-encoded query fragment with leading `&`, pre-baked).
-- `ajaxPrefilter` / `ajaxTransport` / `ajaxSettings` / `beforeSend` / `dataFilter` / `prefilter` / `transport` — **0 hits each**. Zero strings containing `jax` anywhere.
+Read these first:
+- `research/vm-slide-stack-vm/VDATA-TRACE.md` — the authoritative 42.1 analysis. 294 lines. Read sections §3 (write identification), §4 (function body), §5 (provisional semantics), §6 (handoff) carefully.
+- `output/vm-slide/vdata-anchors.json` — machine-readable anchor inventory (3 entries: `getVData` write at pc=19681, `vData=` read at pc=19969 inside the function body, `&vData=` read at pc=24210 in a debug-mode branch).
+- `research/vm-slide-stack-vm/vdata-trace.js` — the reproducible tracer. Idempotent.
+- `research/captcha-orchestrator/FLOW.md` §6 — the orchestrator-side call site. Specifically: `o = window.getVData && window.getVData(n.join("&"))`, then `o && (e.vData = o)`. The `n` array is built from the collector fields earlier in module 56.
+- `output/captcha-orchestrator/verify-body-origination.json` — the `vData` row with `sample_value_prefix` (first ~60 chars) and `sample_value_length` (152).
+- `sample/captcha-har.har` — search for the literal `vData=` string in the verify POST body to get the full 152-char value for length/shape analysis.
+- `output/vm-slide/bytecode.json`, `output/vm-slide/disassembly-full.txt`, `output/vm-slide/dispatch-table.json` — the vm-slide primary artifacts.
+- `research/vm-slide-stack-vm/README.md` and the three Phase 40 docs (`docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/CHAOSVM_VARIANTS.md`) — background on the vm-slide stack VM's runtime model.
 
-So the FLOW.md §9 Q1 "jQuery ajax hook" hypothesis is wrong in its mechanism but right in its location — vm-slide installs `window.getVData` directly, and the pre-baked `vData=` / `&vData=` URL fragments suggest the function itself builds the form `...&vData=<computed>...` or returns `vData=<computed>`.
+### Key claim from 42.1 to verify
 
-### Opcode semantics (from `output/vm-slide/dispatch-table.json`)
+Anchors and classification:
+| Anchor | pc | Classification | Role |
+|--------|------|---------------|------|
+| `getVData` | 19681 | **write** | installs `window.getVData` via `OP_24` at pc=20066 |
+| `vData=` | 19969 | **read** | RegExp pattern INSIDE the function body (recursion guard) |
+| `&vData=` | 24210 | **read** | `window.DEBUGMODE` branch dead code elsewhere in the bytecode |
 
-Pre-fetched by director — these are the opcodes you'll need to identify the string-build and resolve pattern:
+Function body: `[19702, 20058]`, 216 instructions, FUNC_CREATE operands `K=19702 A=1 C=1 ...`. Branches on `document.documentMode` twice. Uses `new RegExp("vData=")` to check whether the input already contains `vData=`. Splits on `"&"` and `"="`. Resolved external identifiers inside the body: `Object` (pc=19845), `RegExp` (pc=19955). **No crypto in the body.**
 
-- `OP_04` (0 operands): `n.push("")` — start a new string on TOS.
-- `OP_10 <c>` (1 operand): `n[top] += String.fromCharCode(m[g++])` — append one char.
-- `OP_13` (0 operands): `n[top] = U[n[top]]` — resolve the built string as a key into `U[]`. Given the finding that `getVData` is a global, `U` is almost certainly the global scope (`window`) or an equivalent lookup table. **This is the critical opcode** — OP_13 right after an `OP_04 OP_10* ...` run is "convert this string into a live binding."
-- `OP_39` (0 operands): `n.push(n[top])` — dup TOS.
-- `OP_47 <n>` (1 operand): `n.push([m[g++]])` — push a 1-element array of a numeric literal.
-- `OP_55 <n>` (1 operand): pop `n` args from stack, invoke `n.pop()` as callee — method call with `n` args.
-- `OP_59` (0 operands): `var A = n.pop(); n.push([n[n.pop()][0], A])` — builds a `[receiver, key]` pair for property access.
+### Required investigation (in order)
 
-The full dispatch table has opcodes 0..~60; the subagent can look up any others it encounters at `output/vm-slide/dispatch-table.json`.
+**Step 1 — Trivial cross-check against FLOW.md §6**. Confirm that:
+- Function arg count (1) matches the orchestrator's single-arg call `window.getVData(n.join("&"))`.
+- The `n` array built in module 56 before the call contains URL-encoded key=value pairs joined by `&`, matching the function's internal split on `"&"` and `"="`. Read the relevant module-56 excerpt from FLOW.md §4.2 or §6 to confirm.
+- The `e.vData = o` assignment in the orchestrator stores the function's return value into the verify-body slot. Confirm that `o` is the return value (not a side effect).
 
-### Related inputs (read-only)
+One short paragraph answer, cite FLOW.md line ranges.
 
-- `output/vm-slide/bytecode.json` — the flat bytecode integer array (the primary input).
-- `output/vm-slide/disassembly-full.txt` — 216 KB full-coverage disassembly with pc offsets.
-- `output/vm-slide/dispatch-table.json` — opcode table.
-- `research/vm-slide-stack-vm/decoder.js`, `disassembler.js`, `walker.js` — the Phase 40 tooling. Reuse the existing walker if it helps; otherwise hand-walk.
-- `research/vm-slide-stack-vm/README.md` — Phase 40 context. Status `closed`.
-- `research/captcha-orchestrator/FLOW.md` §4, §6, §9 — where the orchestrator-side call `window.getVData(n.join("&"))` is documented.
-- `sample/captcha-har.har` — HAR verify-body value for cross-reference: `vData=7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4…` (152 chars total).
+**Step 2 — HAR value shape analysis**. Extract the full 152-char `vData` value from `sample/captcha-har.har`. Analyze:
+- Character set (URL-safe base64? hex? a query string? a concatenation of both?).
+- Structure (any obvious delimiters? any pre-baked substrings like `&vData=`? — hint: almost certainly NOT because anchor 3 is debug-mode dead code).
+- Does the value look like XTEA ciphertext encoded in some way? The register-VM `collect` token uses modified XTEA + base64 (see `docs/TOKEN_FORMAT.md` and `docs/CRYPTO_ANALYSIS.md`) so there's prior art for what Tencent-crypto output looks like in this project.
+
+Report: "the 152-char value appears to be <character-set>, structure <structure>, most likely <encoding>."
+
+**Step 3 — Crypto provenance hunt (the substantive work)**. This is where the static trace gets interesting. 42.1 surfaced three candidates for where the crypto happens. Investigate each:
+
+**Candidate (a)**: **upstream register lifted into the function**. The FUNC_CREATE at pc=20059 has `A=1` upvalue (the `1 1 8 3 3` tail), which 42.1 interpreted as `p[1] = n[8]` — one captured value from slot 8 at function-create time. Trace back through the bytecode from pc=20059 to find what `n[8]` contains at that point. Is it a pre-computed crypto result? Look for other bytecode regions earlier than pc=20059 that write to slot 8 and use crypto opcodes. You may need to add a helper pass to `vdata-trace.js` or write a second small script to scan for writes-to-slot-8.
+
+**Candidate (b)**: **second helper installed via separate `OP_58 + OP_24`**. Scan the entire bytecode for all `OP_58 + <something> + OP_24` patterns where the preceding descriptor is `[window, "<key>"]`. Enumerate the keys — look for any that could be crypto helpers. Candidates to flag: anything like `getEks`, `_xtea`, `_crypto`, `sign`, or that looks opaque. **Also check whether `window.getVData` is the *only* `window.*` property vm-slide installs** — this is valuable project-wide information regardless of vData.
+
+**Candidate (c)**: **external page-loaded routine**. Check whether the vm-slide function body resolves any identifiers via `OP_13` that we don't recognize — particularly any that look like they could be imported globals from `tdc.js` (e.g. `TDC`, `TDC_...`). 42.1 found only `Object` and `RegExp` inside the function body, so candidate (c) is probably weak — but confirm by re-reading 42.1's table.
+
+Produce a small helper script if needed — `research/vm-slide-stack-vm/vdata-provenance.js` — that scans for all `window.*` property writes in the bytecode. Emit `output/vm-slide/window-installs.json` with `{key, install_pc, body_start_pc, body_end_pc, body_size}`.
+
+**Step 4 — Reach a verdict**. One of:
+
+- **Fully resolved**: you've identified the crypto source (which candidate? with evidence). The 152-char HAR value can be explained from the static trace. No further work needed; 42.3 can proceed.
+- **Partially resolved (static limit)**: the crypto lives inside another vm-slide function you CAN identify, but full decompilation of it would be a multi-hour task. Document the function's pc range and handoff-state for a future follow-up.
+- **Partially resolved (dynamic needed)**: the crypto depends on runtime state (e.g. a register written at load-time that we can't statically reconstruct). Recommend a small jsdom harness as a follow-up task. Provide a 2-3 bullet sketch of what the harness would need to do.
+- **Blocked**: something about the bytecode shape prevents the scan. Report what broke.
 
 ### Deliverables (exactly these files)
 
-1. **`research/vm-slide-stack-vm/vdata-trace.js`** — CommonJS script that:
-   - Loads `output/vm-slide/bytecode.json`.
-   - Walks the bytecode and identifies every `OP_04 (OP_10 <chr>)* OP_13` run. Record the pc of the `OP_04`, the pc of the terminating `OP_13`, the decoded string value, and the byte length of the run.
-   - Filters to the three vData-related strings: `getVData`, `vData=`, `&vData=`.
-   - For each matching anchor, walks **backward and forward** from the `OP_13` to identify the enclosing basic block boundary. Use the Phase 40 walker's block-detection logic if reusable; otherwise hand-detect via branch/jump opcodes (consult `dispatch-table.json` for jump semantics — opcodes 6, 8, 16, 20 and similar typically encode conditional/unconditional jumps). Report the block's `[startPc, endPc]`.
-   - For each anchor, dump the disassembled opcode sequence of the enclosing block (roughly 20-50 opcodes around the anchor is plenty — don't dump the whole function unless necessary).
-   - Emits a machine-readable summary to `output/vm-slide/vdata-anchors.json` with shape roughly:
-     ```json
-     [
-       {
-         "string": "getVData",
-         "build_pc": <int>,
-         "resolve_pc": <int>,
-         "enclosing_block": [<startPc>, <endPc>],
-         "disasm_excerpt": "<20-50 line text dump>",
-         "classification": "write" | "read" | "unknown",
-         "classification_evidence": "<short sentence explaining how you decided>"
-       },
-       ...
-     ]
-     ```
-   - Must be **idempotent** (running twice produces byte-identical output).
-   - Runs as `node research/vm-slide-stack-vm/vdata-trace.js`. No CLI arguments.
-
-2. **`output/vm-slide/vdata-anchors.json`** — the script's primary output. Schema as above.
-
-3. **`research/vm-slide-stack-vm/VDATA-TRACE.md`** — short analysis note (~100-200 lines, hard cap 300). Required sections:
-   - **§1 Method**: how the trace works (string reconstruction via OP_04/OP_10/OP_13, block walking, classification heuristic). 1-2 paragraphs.
-   - **§2 Anchor inventory**: one subsection per anchor with its pc, classification, and a 10-20-line disassembly excerpt (verbatim from `vdata-anchors.json.disasm_excerpt`).
-   - **§3 Property-write identification**: identify which anchor (likely the `getVData` one) is the property-write that installs `window.getVData`. Explain the evidence — e.g. "`OP_13` resolves `getVData` to a scope slot, the following opcode sequence pushes a function value built via `OP_6 <functionStartPc>` (or whatever vm-slide uses for function-create), and then `OP_XX` assigns TOS into the slot." Be specific and cite the dispatch-table.json opcodes you relied on.
-   - **§4 Function body boundary**: identify the pc range of the installed function. vm-slide probably uses an `OP_6 <absolutePc>` or similar to create a closure that jumps to a known address. Report the function's `[startPc, endPc]` and the calling convention (how many args consumed from stack, what does it push as return value). Use `disassembly-full.txt` for line-range citations.
-   - **§5 Function body semantics — provisional**: reading the disassembly, write a short narrative of what the function does. Specifically: does it consume a single string arg (matching `n.join("&")` from the orchestrator), does it emit strings containing `vData=`, does it reference any external functions via OP_13 (e.g. `window.TDC`, `btoa`, an XTEA routine)? Be honest about what's clear and what's guesswork — you don't need to fully decompile it, just characterize it enough for 42.2 to cross-check.
-   - **§6 Handoff to 42.2**: one paragraph summarizing what 42.2 should verify against FLOW.md §6 and the HAR, plus any ambiguities worth flagging.
+1. `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — the analysis note. Max 250 lines. Sections:
+   - **§1 FLOW.md cross-reference** (step 1 above — short paragraph).
+   - **§2 HAR value shape** (step 2 above — short paragraph with the full 152-char value quoted).
+   - **§3 Crypto provenance hunt** (step 3 above — one subsection per candidate, with evidence and a verdict for each).
+   - **§4 Resolution verdict** (step 4 above — state fully/partially/blocked with the specific sub-category).
+   - **§5 Recommended action for 42.3** — if fully resolved, what the docs bookkeeping needs to say. If partially resolved, what follow-up task the director should plan next. If blocked, what alternative approach to try.
+2. `research/vm-slide-stack-vm/vdata-provenance.js` — if you wrote a window-install scanner for step 3 candidate (b). Only create if needed.
+3. `output/vm-slide/window-installs.json` — output of the scanner if created. Idempotent.
 
 ### Explicit non-goals
-
-- **Do NOT write `docs/CAPTCHA_ORCHESTRATOR.md` edits.** That's 42.3 after 42.2 verifies.
-- **Do NOT edit `research/captcha-orchestrator/FLOW.md` or the public doc.** Record findings in the new VDATA-TRACE.md under `research/vm-slide-stack-vm/`; the director will propagate to the captcha-orchestrator track during 42.3.
-- **Do NOT fully decompile the vm-slide function body.** §5 is a characterization, not a decompilation. If decompiling would take multi-hour work, stop and report — that's a separate task, not 42.1.
-- **Do NOT add npm dependencies.** Use only what's already in `package.json`.
-- **Do NOT write tests.** Research scripts under `research/` follow Phase 41's precedent of idempotent-output + cross-check-in-next-task as the verification model.
-- **Do NOT modify the existing Phase 40 tooling** (`decoder.js`, `disassembler.js`, `walker.js`) unless you find a bug. If you do find a bug, report it separately rather than patching it silently.
-- **Do NOT guess.** If you can't classify an anchor as read/write, mark it `"unknown"` with honest evidence — §3 can still proceed if at least one anchor is unambiguously a write.
+- **Do NOT edit `docs/CAPTCHA_ORCHESTRATOR.md`**, `research/captcha-orchestrator/FLOW.md`, or any other Phase 41 artifact. 42.3 handles all docs edits.
+- **Do NOT modify Phase 40 vm-slide tooling** (`decoder.js`, `disassembler.js`, `walker.js`).
+- **Do NOT modify 42.1's artifacts** (`vdata-trace.js`, `VDATA-TRACE.md`, `vdata-anchors.json`). They're the author's deliverable; you're the verifier.
+- **Do NOT write a jsdom harness in this task.** If the verdict is "dynamic needed," recommend it — don't build it.
+- **Do NOT try to fully decompile any function body.** Characterize enough to reach a verdict; escalate if more is needed.
+- **Do NOT add npm dependencies.**
 - **No emojis.**
 
 ### Allowed file set (exhaustive)
 
-Create:
-- `research/vm-slide-stack-vm/vdata-trace.js`
-- `research/vm-slide-stack-vm/VDATA-TRACE.md`
-- `output/vm-slide/vdata-anchors.json`
+Create (required):
+- `research/vm-slide-stack-vm/VDATA-RESOLUTION.md`
 
-Nothing else. Do not edit any existing file under `research/`, `output/`, `docs/`, `tools/`, `tests/`, `sample/`, or `targets/`.
+Create (conditional on step 3 candidate (b) needing a scanner):
+- `research/vm-slide-stack-vm/vdata-provenance.js`
+- `output/vm-slide/window-installs.json`
 
-### Implementation Steps
-
-1. Read `output/vm-slide/dispatch-table.json` end-to-end to understand the opcode set. Pay particular attention to: string-build (OP_04/OP_10/OP_13), dup/drop (OP_39, OP_05), property access (OP_59), method/function call (OP_55), any jump/branch opcodes, and any function-create opcode. Note the operand count of each.
-2. Read `research/vm-slide-stack-vm/decoder.js`, `disassembler.js`, and particularly `walker.js` to understand how the existing tools walk the bytecode. Decide whether to reuse the walker or hand-walk.
-3. Read `output/vm-slide/disassembly-full.txt` around any pcs you need to reference — it has pre-decoded opcode names and can save you from re-implementing the decoder.
-4. Write `vdata-trace.js` incrementally: string-reconstruction → anchor filter → block boundary detection → classification → JSON emit. Run it repeatedly as you add stages.
-5. For each anchor, inspect the surrounding disassembly manually to confirm the classification is right before trusting the automated verdict. Don't let the automation lie to you.
-6. Write `VDATA-TRACE.md` — §1 Method, §2 Anchors, §3 Property-write, §4 Function body, §5 Semantics, §6 Handoff.
-7. Run `vdata-trace.js` a second time; confirm `git status --short output/vm-slide/vdata-anchors.json` shows no diff (idempotence).
-8. Run `npm test` — must stay at 353/353.
+Nothing else. Do not edit any existing file.
 
 ### Verification — report all of these
-
-1. `ls -la research/vm-slide-stack-vm/vdata-trace.js research/vm-slide-stack-vm/VDATA-TRACE.md output/vm-slide/vdata-anchors.json` — all three files present, reasonable sizes.
-2. `node research/vm-slide-stack-vm/vdata-trace.js` — first run, report total anchor count (should be exactly 3 if the orient finding is correct).
-3. Idempotence — run a second time, show `git status --short output/vm-slide/vdata-anchors.json` is empty (or `md5sum` matches across runs).
-4. `wc -l research/vm-slide-stack-vm/VDATA-TRACE.md` — report.
-5. `jq '.[] | {string, classification}' output/vm-slide/vdata-anchors.json` — show the classification verdict per anchor.
-6. `head -80 research/vm-slide-stack-vm/VDATA-TRACE.md` — first portion so the director can sanity-check tone and method.
-7. `npm test` — 353/353.
-8. **Key findings summary** — in the report, state: (a) which anchor is the property-write that installs `window.getVData`; (b) the function body's `[startPc, endPc]`; (c) the function's apparent calling convention (how many args, return type); (d) a one-sentence provisional semantics. This is the input 42.2 will verify against.
+1. `ls -la research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — file present.
+2. `wc -l research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — should be ≤250.
+3. If you wrote `vdata-provenance.js`: show it's idempotent (md5 before/after second run).
+4. If you wrote `window-installs.json`: show a few entries (`head -30` or equivalent).
+5. Full 152-char HAR `vData` value quoted verbatim in §2.
+6. `npm test` — 353/353.
+7. **Verdict summary in the report**: state the verdict category (fully / partially / blocked) and the one-line justification.
 
 ### Constraints
-
 - **Do not make any git commits.** The director handles all commits after verification.
-- **Only touch the three files in the allowed set.**
+- **Only touch the files in the allowed set.**
 - **No new npm dependencies.**
-- **CommonJS + 2-space + single-quote + semicolon** per `.claude/rules/coding-style.md`.
-- **Honor all project rules**: `targets-readonly.md`, `verify-dont-assume.md`, `research-artifacts.md`, `output-versioning.md`, `coding-style.md`.
-- **If the task is too difficult or impossible to complete** — e.g. the block walker can't resolve the basic block around an anchor, the function-create opcode is non-obvious, the function body is obfuscated beyond static characterization — stop immediately and report back cleanly. Explain what you attempted, which step broke, and what a different approach (jsdom harness? full decompile? different anchor?) might look like. Do not leave partial scripts or half-written markdown in the tree.
+- **CommonJS + 2-space + single-quote + semicolon.**
+- **Different agent from 42.1** per the author/verifier separation — you're the second set of eyes on the vData question.
+- **If the task is too difficult or impossible to complete** — e.g. the bytecode has too many `OP_58 + OP_24` patterns to enumerate sensibly, the crypto provenance can't be determined without runtime execution, or 42.1's analysis has a flaw you can't work around — stop immediately and report back cleanly. Explain what you attempted, which step broke, and what a different approach might look like. Do not leave partial files in the tree.
 
 ### Suggested Agent
-`general-purpose` — static bytecode analysis. Needs familiarity with stack VMs and comfort walking a dispatch table. After it returns, 42.2 cross-checks with a different agent per the author/verifier separation.
-
----
-
+`general-purpose` — static analysis + cross-reference. Different from 42.1's agent.
 ### Prior: 41.6 (completed)
 Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md`. Director added the new doc to CLAUDE.md's main doc table.
 
