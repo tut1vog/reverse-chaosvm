@@ -3,7 +3,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
-const Scraper = require('../scraper/scraper');
+const Scraper = require('../tools/scraper/scraper');
 
 describe('Scraper: constructor defaults', () => {
   const s = new Scraper();
@@ -216,7 +216,7 @@ describe('Scraper: methods exist', () => {
 describe('CLI: module loads without executing', () => {
   it('require does not throw', () => {
     assert.doesNotThrow(() => {
-      require('../scraper/cli');
+      require('../tools/scraper/cli');
     });
   });
 });

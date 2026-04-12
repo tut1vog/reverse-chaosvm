@@ -21,7 +21,7 @@ const { createCanvas } = require('canvas');
 const path = require('path');
 const fs = require('fs');
 
-const { solveSlider } = require('../puppeteer/slide-solver.js');
+const { solveSlider } = require('../tools/captcha-solver/slide-solver.js');
 
 let passed = 0;
 let failed = 0;
@@ -221,7 +221,7 @@ async function testPerformance() {
 async function testDependencyCheck() {
   console.log('\n=== Test Group 5: Dependency Check (subprocess wrapper) ===');
 
-  const src = fs.readFileSync(path.join(__dirname, '..', 'puppeteer', 'slide-solver.js'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'tools', 'captcha-solver', 'slide-solver.js'), 'utf8');
 
   // The wrapper should only use Node.js stdlib modules
   const requireMatches = src.match(/require\(['"](.*?)['"]\)/g) || [];
@@ -245,7 +245,7 @@ async function testDependencyCheck() {
 async function testCodeReview() {
   console.log('\n=== Test Group 6: Code Review — Subprocess Wrapper ===');
 
-  const src = fs.readFileSync(path.join(__dirname, '..', 'puppeteer', 'slide-solver.js'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'tools', 'captcha-solver', 'slide-solver.js'), 'utf8');
 
   // 1. Uses execFile (NOT exec) — prevents shell injection
   //    Check that `exec(` never appears except as part of `execFile(`
@@ -333,7 +333,7 @@ async function testPythonScriptAlignment() {
   console.log('\n=== Test Group 9: Python Script vs bot.py Alignment ===');
 
   const pySrc = fs.readFileSync(
-    path.join(__dirname, '..', 'puppeteer', 'slide-solver.py'), 'utf8'
+    path.join(__dirname, '..', 'tools', 'captcha-solver', 'slide-solver.py'), 'utf8'
   );
 
   // Verify the Python script matches bot.py's solve_slider() algorithm exactly:

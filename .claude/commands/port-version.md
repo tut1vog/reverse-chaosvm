@@ -18,10 +18,10 @@ Report progress at each stage. If any stage fails, halt immediately and report d
 Run the decoder on the target file:
 
 ```
-node decompiler/decoder.js $ARGUMENTS
+node research/tdc-register-vm/decoder.js $ARGUMENTS
 ```
 
-Or use the decoder module directly in a script. The decoder (`decompiler/decoder.js`) works on ALL tdc.js builds unchanged — it handles the base64 -> varint/zigzag -> integer array transformation, which is invariant across all templates. This stage should always succeed if the file is a valid tdc.js build.
+Or use the decoder module directly in a script. The decoder (`research/tdc-register-vm/decoder.js`) works on ALL tdc.js builds unchanged — it handles the base64 -> varint/zigzag -> integer array transformation, which is invariant across all templates. This stage should always succeed if the file is a valid tdc.js build.
 
 Verify the output: the decoded integer array should contain tens of thousands of integers. Report the array length.
 
@@ -92,7 +92,7 @@ Output location: output/<target-stem>/
 The agent will:
 1. Capture a live `collect` token from the target tdc.js via Puppeteer
 2. Capture the `eks` token from `TDC.getInfo().info`
-3. Generate a standalone token using extracted parameters via `token/generate-token.js`
+3. Generate a standalone token using extracted parameters via `tools/token-generator/generate-token.js`
 4. Byte-compare each segment (hash, header, cdBody, sig) between live and standalone
 5. Diagnose any mismatches (XTEA key, collector schema, assembly order, timestamp drift)
 

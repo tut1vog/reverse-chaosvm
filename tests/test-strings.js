@@ -57,12 +57,12 @@ test('strings.json is valid JSON array', () => {
 });
 
 test('extractStrings is exported as a function', () => {
-  const mod = require('../decompiler/string-extractor');
+  const mod = require('../research/tdc-register-vm/string-extractor');
   assert(typeof mod.extractStrings === 'function', 'extractStrings should be a function');
 });
 
 test('extractStrings is a pure function (deterministic)', () => {
-  const { extractStrings } = require('../decompiler/string-extractor');
+  const { extractStrings } = require('../research/tdc-register-vm/string-extractor');
   const r1 = extractStrings(disasmLines);
   const r2 = extractStrings(disasmLines);
   assert.strictEqual(r1.length, r2.length, 'Two calls should return same count');
@@ -350,7 +350,7 @@ test('Common JS property names present', () => {
 });
 
 test('strings.json matches extractStrings() live output', () => {
-  const { extractStrings } = require('../decompiler/string-extractor');
+  const { extractStrings } = require('../research/tdc-register-vm/string-extractor');
   const live = extractStrings(disasmLines);
   assert.strictEqual(live.length, strings.length, `Count mismatch: live=${live.length} vs json=${strings.length}`);
   // Spot check first 20

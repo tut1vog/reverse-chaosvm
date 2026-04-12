@@ -8,7 +8,7 @@
  */
 
 const path = require('path');
-const { COLLECTOR_SCHEMA, validateCollectorData, buildDefaultCdArray } = require('../token/collector-schema');
+const { COLLECTOR_SCHEMA, validateCollectorData, buildDefaultCdArray } = require('../tools/token-generator/collector-schema');
 const collectorMap = require('../output/dynamic/collector-map.json');
 
 let pass = 0;

@@ -19,7 +19,7 @@ const childProcess = require('child_process');
 const originalExecFile = childProcess.execFile;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const SCRAPER_PATH = require.resolve('../scraper/scraper');
+const SCRAPER_PATH = require.resolve('../tools/scraper/scraper');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -76,7 +76,7 @@ function setupScraper(mockFn) {
   const scraper = new Scraper({ verbose: false });
 
   // Replace the init() flow with a minimal TemplateCache (in-memory, no disk save)
-  const TemplateCache = require('../scraper/template-cache');
+  const TemplateCache = require('../tools/scraper/template-cache');
   const tmpCache = path.join(os.tmpdir(), 'test-autoport-cache-' + Date.now() + '.json');
   scraper._templateCache = new TemplateCache(tmpCache);
   scraper._templateCache.load();
@@ -377,7 +377,7 @@ describe('Scraper._autoPort()', () => {
 
     assert.strictEqual(capturedCmd, process.execPath, 'should use process.execPath as command');
     assert.strictEqual(capturedArgs.length, 3, 'should pass 3 arguments');
-    assert.strictEqual(capturedArgs[0], path.join(PROJECT_ROOT, 'pipeline', 'run.js'));
+    assert.strictEqual(capturedArgs[0], path.join(PROJECT_ROOT, 'tools', 'porting-pipeline', 'run.js'));
     assert.strictEqual(capturedArgs[1], tempFilePath(tdcName));
     assert.strictEqual(capturedArgs[2], '--skip-verify');
     assert.strictEqual(capturedOpts.cwd, PROJECT_ROOT, 'should set cwd to PROJECT_ROOT');

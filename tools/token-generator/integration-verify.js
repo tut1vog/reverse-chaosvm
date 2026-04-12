@@ -21,7 +21,7 @@ const { buildInputChunks, generateTokenFromStrings, HEADER_SIZE, HASH_SIZE } = r
 const { encryptSegments } = require('./crypto-core.js');
 const { urlEncode } = require('./outer-pipeline.js');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const TRACE_PATH = path.join(PROJECT_ROOT, 'output', 'dynamic', 'payload-trace.json');
 const OUTPUT_DIR = path.join(PROJECT_ROOT, 'output', 'token');
 const OUTPUT_PATH = path.join(OUTPUT_DIR, 'integration-verify.json');

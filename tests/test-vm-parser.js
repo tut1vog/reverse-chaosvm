@@ -11,7 +11,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { parseVmFunction } = require('../pipeline/vm-parser');
+const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
 
 const TARGETS = path.join(__dirname, '..', 'targets');
 

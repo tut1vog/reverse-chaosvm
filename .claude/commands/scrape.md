@@ -9,5 +9,5 @@ The scraper solves the Tencent CAPTCHA without Puppeteer (using jsdom for vData 
 and submits the ticket to urlsec.qq.com to get URL security results.
 
 ```bash
-node scraper/cli.js --verbose $ARGUMENTS
+node tools/scraper/cli.js --verbose $ARGUMENTS
 ```

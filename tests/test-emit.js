@@ -60,9 +60,9 @@ console.log('=== Task 4.1 Test Suite: Per-Function Structured Code Emitter ===\n
 
 console.log('Loading artifacts...');
 
-const codeEmitter = require('../decompiler/code-emitter');
-const { foldAll } = require('../decompiler/expression-folder');
-const { reconstructAll } = require('../decompiler/method-reconstructor');
+const codeEmitter = require('../research/tdc-register-vm/code-emitter');
+const { foldAll } = require('../research/tdc-register-vm/expression-folder');
+const { reconstructAll } = require('../research/tdc-register-vm/method-reconstructor');
 
 const cfg = require('../output/cfg.json');
 const patterns = require('../output/patterns.json');

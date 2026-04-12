@@ -16,14 +16,14 @@
  * behavioral event generation for slide CAPTCHAs.
  */
 
-const { buildDefaultCdArray } = require('../token/collector-schema.js');
+const { buildDefaultCdArray } = require('../token-generator/collector-schema.js');
 const {
   buildCdString,
   buildSdString,
   assembleToken,
   urlEncode,
-} = require('../token/outer-pipeline.js');
-const { buildInputChunks } = require('../token/generate-token.js');
+} = require('../token-generator/outer-pipeline.js');
+const { buildInputChunks } = require('../token-generator/generate-token.js');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Parameterized XTEA Cipher

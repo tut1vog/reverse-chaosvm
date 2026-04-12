@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const TemplateCache = require('../scraper/template-cache');
+const TemplateCache = require('../tools/scraper/template-cache');
 
 // ============================================================================
 // Shared fixtures
@@ -196,7 +196,7 @@ describe('TemplateCache seed() with structureParams', () => {
     cache.seed();
 
     // Compute the source hash from targets/tdc.js so we know what key to look up
-    const { computeSourceHash } = require('../scraper/tdc-utils');
+    const { computeSourceHash } = require('../tools/scraper/tdc-utils');
     const tdcSource = fs.readFileSync(
       path.join(__dirname, '..', 'targets', 'tdc.js'),
       'utf8'
@@ -215,7 +215,7 @@ describe('TemplateCache seed() with structureParams', () => {
   });
 
   it('seed() sets cdFieldOrder from fieldOrder for backward compat', () => {
-    const { computeSourceHash } = require('../scraper/tdc-utils');
+    const { computeSourceHash } = require('../tools/scraper/tdc-utils');
     const tdcSource = fs.readFileSync(
       path.join(__dirname, '..', 'targets', 'tdc.js'),
       'utf8'

@@ -583,8 +583,8 @@ node token/cli.js --timestamp 1700000000000
 ### Programmatic Usage
 
 ```javascript
-const { generateToken } = require('./token/generate-token.js');
-const { buildDefaultCdArray } = require('./token/collector-schema.js');
+const { generateToken } = require('./tools/token-generator/generate-token.js');
+const { buildDefaultCdArray } = require('./tools/token-generator/collector-schema.js');
 
 // 1. Build collector data (59 fields)
 const cdEntries = buildDefaultCdArray({
@@ -613,9 +613,9 @@ const token = generateToken(cdEntries, sdObject, Date.now());
 For maximum control, you can invoke each pipeline stage individually:
 
 ```javascript
-const { buildCdString, buildSdString, urlEncode } = require('./token/outer-pipeline.js');
-const { encryptSegments } = require('./token/crypto-core.js');
-const { buildInputChunks } = require('./token/generate-token.js');
+const { buildCdString, buildSdString, urlEncode } = require('./tools/token-generator/outer-pipeline.js');
+const { encryptSegments } = require('./tools/token-generator/crypto-core.js');
+const { buildInputChunks } = require('./tools/token-generator/generate-token.js');
 
 // Step 1: Serialize collector data
 const cdString = buildCdString(cdEntries);    // '{"cd":[1,"linux",2,800,...]}'
@@ -669,7 +669,7 @@ ikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MP
 To reverse the encoding and inspect a token:
 
 ```javascript
-const { decryptSegments } = require('./token/crypto-core.js');
+const { decryptSegments } = require('./tools/token-generator/crypto-core.js');
 
 // 1. URL-decode
 let raw = token.replace(/%2B/g, '+').replace(/%2F/g, '/').replace(/%3D/g, '=');

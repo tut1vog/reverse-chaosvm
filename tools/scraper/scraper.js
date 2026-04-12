@@ -8,7 +8,7 @@
  * URL security checking flow.
  *
  * Usage:
- *   const Scraper = require('./scraper/scraper');
+ *   const Scraper = require('./tools/scraper/scraper');
  *   const s = new Scraper({ verbose: true });
  *   await s.init();
  *   const result = await s.solve('https://example.com');
@@ -17,8 +17,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const { CaptchaClient, httpRequest, parseJSONP } = require('../puppeteer/captcha-client');
-const { solveSlider } = require('../puppeteer/slide-solver');
+const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/captcha-client');
+const { solveSlider } = require('../captcha-solver/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
@@ -26,7 +26,7 @@ const TemplateCache = require('./template-cache');
 const { execFile } = require('child_process');
 const os = require('os');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 const DEFAULT_AID = '2046626881';
 const DEFAULT_USER_AGENT =
@@ -78,7 +78,7 @@ class Scraper {
   /**
    * Auto-port an unknown TDC template by running the porting pipeline as a
    * child process.  Writes tdcSource to a temp file, invokes
-   * `node pipeline/run.js <tempfile> --skip-verify`, reads the resulting
+   * `node tools/porting-pipeline/run.js <tempfile> --skip-verify`, reads the resulting
    * pipeline-config.json, and stores the extracted params in the template cache.
    *
    * @param {string} sourceHash - SHA-256 source hash (cache key)
@@ -98,7 +98,7 @@ class Scraper {
       const { stdout, stderr } = await new Promise((resolve, reject) => {
         execFile(
           process.execPath,
-          [path.join(PROJECT_ROOT, 'pipeline', 'run.js'), tempFile, '--skip-verify'],
+          [path.join(PROJECT_ROOT, 'tools', 'porting-pipeline', 'run.js'), tempFile, '--skip-verify'],
           { cwd: PROJECT_ROOT, timeout: 120000 },
           (err, stdout, stderr) => {
             if (err) {

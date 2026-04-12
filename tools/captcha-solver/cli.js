@@ -95,7 +95,7 @@ async function main() {
           console.error(`  Attempt ${attempt}: ${ticket.errorCode === 0 ? 'SUCCESS' : `errorCode ${ticket.errorCode}`}`);
           if (ticket.errorCode === 0) {
             // Write captured artifacts on success
-            const captureDir = path.resolve(__dirname, '..', 'output', 'puppeteer-capture');
+            const captureDir = path.resolve(__dirname, '..', '..', 'output', 'puppeteer-capture');
             fs.mkdirSync(captureDir, { recursive: true });
             if (ticket._capture) {
               if (ticket._capture.tdcSource) {

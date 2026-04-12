@@ -26,12 +26,12 @@ The tdc.js script is served by Tencent's CAPTCHA endpoint at `https://t.captcha.
 
 To obtain a fresh build:
 
-1. Study the fetch mechanism in `puppeteer/captcha-client.js` (specifically the `downloadTdc` method and the `getSig` flow that provides the `dcFileName` URL).
+1. Study the fetch mechanism in `tools/captcha-solver/captcha-client.js` (specifically the `downloadTdc` method and the `getSig` flow that provides the `dcFileName` URL).
 2. Reference `sample/captcha-har.har` for the full network flow and endpoint sequence.
-3. Use the `CaptchaClient` class from `puppeteer/captcha-client.js` to perform the prehandle -> getSig -> downloadTdc flow programmatically:
+3. Use the `CaptchaClient` class from `tools/captcha-solver/captcha-client.js` to perform the prehandle -> getSig -> downloadTdc flow programmatically:
 
 ```javascript
-const CaptchaClient = require('./puppeteer/captcha-client');
+const CaptchaClient = require('./tools/captcha-solver/captcha-client');
 const client = new CaptchaClient({ appId: '...', domain: '...' });
 const prehandle = await client.prehandle();
 const sig = await client.getSig(prehandle);
@@ -49,7 +49,7 @@ Alternatively, use Puppeteer to load the CAPTCHA page and intercept the tdc.js n
 Run the decoder to verify the fetched file is a valid tdc.js build:
 
 ```bash
-node decompiler/decoder.js targets/tdc-vN.js
+node research/tdc-register-vm/decoder.js targets/tdc-vN.js
 ```
 
 The decoder works on all builds unchanged. If it succeeds and produces a decoded integer array, the file is valid. Report the decoded array length.

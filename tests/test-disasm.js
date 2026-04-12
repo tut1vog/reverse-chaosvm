@@ -13,8 +13,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { disassemble, OPCODES, OPERAND_TYPES } = require('../decompiler/disassembler');
-const { decode } = require('../decompiler/decoder');
+const { disassemble, OPCODES, OPERAND_TYPES } = require('../research/tdc-register-vm/disassembler');
+const { decode } = require('../research/tdc-register-vm/decoder');
 
 // --- Load bytecode ---
 const mainBytecode = JSON.parse(

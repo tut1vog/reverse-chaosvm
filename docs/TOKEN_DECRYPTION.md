@@ -211,7 +211,7 @@ The trajectory ends with a sentinel: `[-1, 0, 259]` followed by `[0, 0, 0]`.
 ### Decrypt a token from a saved payload file
 
 ```js
-const { decrypt } = require('./token/crypto-core');
+const { decrypt } = require('./tools/token-generator/crypto-core');
 
 const payload = require('fs').readFileSync('payload.txt', 'utf8').trim();
 const collectRaw = payload.match(/collect=([^&]+)/)[1];

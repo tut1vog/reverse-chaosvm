@@ -8,7 +8,7 @@ const {
   matchFieldOrder,
   detectSerializationDiffs,
   analyzeHeaderSplit,
-} = require('../pipeline/structure-extractor');
+} = require('../tools/porting-pipeline/structure-extractor');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Helper: build a valid hash sentinel value

@@ -95,7 +95,7 @@ class TemplateCache {
    * Extracts xteaParams and template fields from each config.
    */
   seed() {
-    const outputDir = path.join(__dirname, '..', 'output');
+    const outputDir = path.join(__dirname, '..', '..', 'output');
     if (!fs.existsSync(outputDir)) return;
 
     const entries = fs.readdirSync(outputDir, { withFileTypes: true });
@@ -108,7 +108,7 @@ class TemplateCache {
       if (!config.xteaParams) continue;
 
       // Derive target file path to compute source hash
-      const targetFile = path.join(__dirname, '..', 'targets', config.target);
+      const targetFile = path.join(__dirname, '..', '..', 'targets', config.target);
       if (!fs.existsSync(targetFile)) continue;
 
       // Read full source for hashing

@@ -15,8 +15,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { foldAll, foldBlock, foldFunction, renderStatement, renderExpr, collectReads } = require('../decompiler/expression-folder');
-const { parseDisasmToIR } = require('../decompiler/opcode-semantics');
+const { foldAll, foldBlock, foldFunction, renderStatement, renderExpr, collectReads } = require('../research/tdc-register-vm/expression-folder');
+const { parseDisasmToIR } = require('../research/tdc-register-vm/opcode-semantics');
 
 // ============================================================================
 // Load data
@@ -598,7 +598,7 @@ section('12. Global string match rate');
 section('13. Module exports');
 
 {
-  const mod = require('../decompiler/expression-folder');
+  const mod = require('../research/tdc-register-vm/expression-folder');
   assert(typeof mod.foldBlock === 'function', 'foldBlock exported');
   assert(typeof mod.foldFunction === 'function', 'foldFunction exported');
   assert(typeof mod.foldAll === 'function', 'foldAll exported');

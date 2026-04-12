@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { decode, base64Decode } = require('../decompiler/decoder');
+const { decode, base64Decode } = require('../research/tdc-register-vm/decoder');
 
 // --- Extract bytecode strings from tdc.js ---
 
@@ -166,7 +166,7 @@ if (failed > 0) {
 // --- Test 5: ZigZag edge cases ---
 
 console.log('\n--- Test 5: ZigZag edge cases ---');
-const { zigzagDecode } = require('../decompiler/decoder');
+const { zigzagDecode } = require('../research/tdc-register-vm/decoder');
 assert(zigzagDecode(0) === 0, 'zigzag(0) should be 0');
 assert(zigzagDecode(1) === -1, 'zigzag(1) should be -1');
 assert(zigzagDecode(2) === 1, 'zigzag(2) should be 1');

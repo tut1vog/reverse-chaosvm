@@ -26,14 +26,14 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../puppeteer/captcha-client');
-const { solveSlider } = require('../puppeteer/slide-solver');
-const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray, buildSerializationOverrides } = require('../scraper/collect-generator');
-const { buildSdString, buildCdString } = require('../token/outer-pipeline');
-const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
-const { parseVmFunction } = require('../pipeline/vm-parser');
-const { mapOpcodes } = require('../pipeline/opcode-mapper');
-const { extractKey } = require('../pipeline/key-extractor');
+const { CaptchaClient } = require('../tools/captcha-solver/captcha-client');
+const { solveSlider } = require('../tools/captcha-solver/slide-solver');
+const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray, buildSerializationOverrides } = require('../tools/scraper/collect-generator');
+const { buildSdString, buildCdString } = require('../tools/token-generator/outer-pipeline');
+const { extractTdcName, extractEks } = require('../tools/scraper/tdc-utils');
+const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
+const { mapOpcodes } = require('../tools/porting-pipeline/opcode-mapper');
+const { extractKey } = require('../tools/porting-pipeline/key-extractor');
 const {
   matchFieldOrder,
   detectHashPosition,
@@ -41,7 +41,7 @@ const {
   detectSerializationDiffs,
   decryptHeaderSegment,
   analyzeHeaderSplit,
-} = require('../pipeline/structure-extractor');
+} = require('../tools/porting-pipeline/structure-extractor');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 

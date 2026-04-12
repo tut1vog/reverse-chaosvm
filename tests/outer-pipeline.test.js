@@ -16,7 +16,7 @@ const {
   assembleToken,
   urlEncode,
   buildToken,
-} = require('../token/outer-pipeline');
+} = require('../tools/token-generator/outer-pipeline');
 
 // ---------------------------------------------------------------------------
 // Load ground truth data

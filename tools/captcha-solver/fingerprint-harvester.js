@@ -29,7 +29,7 @@ const path = require('path');
 // Default output path
 // ═══════════════════════════════════════════════════════════════════════
 
-const DEFAULT_OUTPUT = path.resolve(__dirname, '../profiles/chrome-fingerprint.json');
+const DEFAULT_OUTPUT = path.resolve(__dirname, '../../profiles/chrome-fingerprint.json');
 
 // ═══════════════════════════════════════════════════════════════════════
 // In-page harvesting script

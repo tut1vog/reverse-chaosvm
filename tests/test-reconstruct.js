@@ -15,7 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { foldAll, renderStatement, renderExpr, collectReads } = require('../decompiler/expression-folder');
+const { foldAll, renderStatement, renderExpr, collectReads } = require('../research/tdc-register-vm/expression-folder');
 const {
   reconstructBlock,
   reconstructFunction,
@@ -25,7 +25,7 @@ const {
   exprsEqual,
   resolveMethodName,
   normalizeCompoundPropCall,
-} = require('../decompiler/method-reconstructor');
+} = require('../research/tdc-register-vm/method-reconstructor');
 
 // ============================================================================
 // Load data

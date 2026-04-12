@@ -13,9 +13,9 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { parseVmFunction } = require('../pipeline/vm-parser');
-const { mapOpcodes } = require('../pipeline/opcode-mapper');
-const { extractKey } = require('../pipeline/key-extractor');
+const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
+const { mapOpcodes } = require('../tools/porting-pipeline/opcode-mapper');
+const { extractKey } = require('../tools/porting-pipeline/key-extractor');
 
 const TARGETS = path.join(__dirname, '..', 'targets');
 const TDC_PATH = path.join(TARGETS, 'tdc.js');

@@ -339,7 +339,7 @@ assert(mainB0Mnemonics.includes('JMP'), 'Main b0 ends with JMP');
 // Test 11: Module exports check
 // ============================================================
 console.log('\n=== Test 11: Module exports ===');
-const cfgBuilder = require('../decompiler/cfg-builder');
+const cfgBuilder = require('../research/tdc-register-vm/cfg-builder');
 assert(typeof cfgBuilder.buildCFG === 'function', 'buildCFG is exported as function');
 assert(typeof cfgBuilder.parseDisasmLine === 'function', 'parseDisasmLine is exported');
 assert(typeof cfgBuilder.getControlFlowInfo === 'function', 'getControlFlowInfo is exported');

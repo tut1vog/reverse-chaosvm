@@ -15,8 +15,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const { buildInputChunks } = require('../token/generate-token.js');
-const { urlEncode } = require('../token/outer-pipeline.js');
+const { buildInputChunks } = require('../token-generator/generate-token.js');
+const { urlEncode } = require('../token-generator/outer-pipeline.js');
 
 // Frozen deterministic values — must match comparison-harness.js
 const FROZEN_TIMESTAMP = 1700000000000;

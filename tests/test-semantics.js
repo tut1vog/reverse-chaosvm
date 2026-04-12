@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { OPCODE_TABLE, OPERAND_TYPES, MNEMONIC_TO_OPCODE, getSemantics, parseDisasmToIR, parseOperand } = require('../decompiler/opcode-semantics');
+const { OPCODE_TABLE, OPERAND_TYPES, MNEMONIC_TO_OPCODE, getSemantics, parseDisasmToIR, parseOperand } = require('../research/tdc-register-vm/opcode-semantics');
 
 // Load disassembly for real instruction testing
 const disasmPath = path.join(__dirname, '..', 'output', 'disasm-full.txt');
@@ -544,7 +544,7 @@ console.log(`  Round-trip: ${roundTripPass}/${roundTripTotal} (${roundTripPct}%)
 
 console.log('\n=== 9. Module purity check ===');
 
-const semanticsSource = fs.readFileSync(path.join(__dirname, '..', 'decompiler', 'opcode-semantics.js'), 'utf-8');
+const semanticsSource = fs.readFileSync(path.join(__dirname, '..', 'research', 'tdc-register-vm', 'opcode-semantics.js'), 'utf-8');
 assert(!semanticsSource.match(/\bfs\b.*require/), 'opcode-semantics.js should not require fs');
 assert(!semanticsSource.match(/readFileSync|writeFileSync|readFile|writeFile/),
   'opcode-semantics.js should not use file I/O functions');

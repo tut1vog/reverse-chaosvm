@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { generateVData, parseVmSlideUrl } = require('../scraper/vdata-generator');
+const { generateVData, parseVmSlideUrl } = require('../tools/scraper/vdata-generator');
 
 // Cache source reads at module level (jsdom execution is slow)
 const jquerySource = fs.readFileSync(path.join(__dirname, '..', 'sample', 'slide-jy.js'), 'utf8');

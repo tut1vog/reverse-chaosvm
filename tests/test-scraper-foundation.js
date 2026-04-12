@@ -13,8 +13,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const { extractTdcName, extractEks, computeSourceHash } = require('../scraper/tdc-utils');
-const TemplateCache = require('../scraper/template-cache');
+const { extractTdcName, extractEks, computeSourceHash } = require('../tools/scraper/tdc-utils');
+const TemplateCache = require('../tools/scraper/template-cache');
 const {
   generateCollect,
   createEncryptFn,
@@ -22,12 +22,12 @@ const {
   convertWordToBytes,
   cipherRound,
   encrypt,
-} = require('../scraper/collect-generator');
+} = require('../tools/scraper/collect-generator');
 
 // Reference modules for byte-identical comparison
-const { encryptFn: refEncryptFn } = require('../token/crypto-core');
-const { generateToken, buildInputChunks } = require('../token/generate-token');
-const { buildDefaultCdArray } = require('../token/collector-schema');
+const { encryptFn: refEncryptFn } = require('../tools/token-generator/crypto-core');
+const { generateToken, buildInputChunks } = require('../tools/token-generator/generate-token');
+const { buildDefaultCdArray } = require('../tools/token-generator/collector-schema');
 
 // ============================================================================
 // Shared fixtures
@@ -573,7 +573,7 @@ describe('collect-generator: cdArrayOverride skips reorderCdArray', () => {
 // 10. TemplateCache._normalizeEntry: keyModConstants/keyMods normalization
 // ============================================================================
 
-const { normalizeKeyMods } = require('../scraper/collect-generator');
+const { normalizeKeyMods } = require('../tools/scraper/collect-generator');
 
 describe('TemplateCache._normalizeEntry: keyModConstants/keyMods normalization', () => {
   it('4-element keyModConstants preserved as keyMods', () => {

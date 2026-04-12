@@ -22,9 +22,9 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../puppeteer/captcha-client');
-const { buildCdString } = require('../token/outer-pipeline');
-const { COLLECTOR_SCHEMA } = require('../token/collector-schema');
+const { CaptchaClient } = require('../captcha-solver/captcha-client');
+const { buildCdString } = require('../token-generator/outer-pipeline');
+const { COLLECTOR_SCHEMA } = require('../token-generator/collector-schema');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Constants

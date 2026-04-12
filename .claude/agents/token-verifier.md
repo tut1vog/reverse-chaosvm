@@ -27,15 +27,15 @@ Read, Grep, Glob, Bash, Write.
 
 Using the extracted configuration:
 
-1. Load the appropriate XTEA key parameters into `token/crypto-core.js`.
-2. Run the `token/generate-token.js` pipeline to produce a token from the same fingerprint profile.
+1. Load the appropriate XTEA key parameters into `tools/token-generator/crypto-core.js`.
+2. Run the `tools/token-generator/generate-token.js` pipeline to produce a token from the same fingerprint profile.
 3. Ensure the fingerprint profile matches what the live VM would collect (use `profiles/default.json` as baseline, adjust if needed).
 
 Key files:
-- `token/generate-token.js` — entry point
-- `token/collector-schema.js` — 59-field fingerprint schema
-- `token/outer-pipeline.js` — segment assembly, btoa, URL encoding
-- `token/crypto-core.js` — modified XTEA encryption
+- `tools/token-generator/generate-token.js` — entry point
+- `tools/token-generator/collector-schema.js` — 59-field fingerprint schema
+- `tools/token-generator/outer-pipeline.js` — segment assembly, btoa, URL encoding
+- `tools/token-generator/crypto-core.js` — modified XTEA encryption
 
 ### Step 3 — Compare byte-by-byte
 
@@ -60,7 +60,7 @@ If the tokens do not match, investigate these potential causes in order:
 
 1. **XTEA key correctness**: Attempt to decrypt the live token's encrypted segments using the extracted key. If decryption produces valid JSON, the key is correct; if garbage, the key is wrong.
 
-2. **Collector schema correctness**: Compare field count and field order between the live token's decrypted payload and the schema in `token/collector-schema.js`. Check:
+2. **Collector schema correctness**: Compare field count and field order between the live token's decrypted payload and the schema in `tools/token-generator/collector-schema.js`. Check:
    - Are all 59 fields present?
    - Is the field order identical?
    - Do any field values differ (especially time-sensitive fields like timestamps)?
@@ -107,12 +107,12 @@ Write a comparison report JSON to the location specified in the dispatch prompt:
 
 ## Key References
 
-- `token/generate-token.js` — token generation entry point
-- `token/outer-pipeline.js` — segment assembly and encoding
-- `token/crypto-core.js` — XTEA encryption
-- `token/collector-schema.js` — 59-field fingerprint schema
+- `tools/token-generator/generate-token.js` — token generation entry point
+- `tools/token-generator/outer-pipeline.js` — segment assembly and encoding
+- `tools/token-generator/crypto-core.js` — XTEA encryption
+- `tools/token-generator/collector-schema.js` — 59-field fingerprint schema
 - `docs/TOKEN_FORMAT.md` — authoritative token structure documentation
-- `dynamic/comparison-harness.js` — existing comparison approach (study for reference)
+- `tools/dynamic-tracers/comparison-harness.js` — existing comparison approach (study for reference)
 
 ---
 

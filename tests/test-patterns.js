@@ -357,7 +357,7 @@ console.log('\n=== 7. Output Format ===');
   assert(formatErrors === 0, `Output format errors: ${formatErrors}`);
 
   // Verify files exist
-  assert(fs.existsSync(path.join(ROOT, 'decompiler/pattern-recognizer.js')), 'pattern-recognizer.js exists');
+  assert(fs.existsSync(path.join(ROOT, 'research/tdc-register-vm/pattern-recognizer.js')), 'pattern-recognizer.js exists');
   assert(fs.existsSync(path.join(ROOT, 'output/patterns.json')), 'patterns.json exists');
   assert(fs.existsSync(path.join(ROOT, 'output/patterns-summary.txt')), 'patterns-summary.txt exists');
 }
@@ -367,7 +367,7 @@ console.log('\n=== 7. Output Format ===');
 // =============================================================================
 console.log('\n=== 8. Module Exports & Pure Function ===');
 {
-  const mod = require(path.join(ROOT, 'decompiler/pattern-recognizer'));
+  const mod = require(path.join(ROOT, 'research/tdc-register-vm/pattern-recognizer'));
   assert(typeof mod.recognizePatterns === 'function', 'recognizePatterns exported');
   assert(typeof mod.recognizeAllPatterns === 'function', 'recognizeAllPatterns exported');
 

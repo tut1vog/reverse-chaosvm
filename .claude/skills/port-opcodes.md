@@ -47,7 +47,7 @@ Create a table with columns: `case number`, `raw handler code`, `normalized hand
 
 ## Part 2 — Pattern Matching Reference Table
 
-All 95 known operations from the reference build (`decompiler/disassembler.js` lines 27-123), organized by category. For each operation: the mnemonic, operand count, pseudocode, and the code pattern to match in a normalized handler.
+All 95 known operations from the reference build (`research/tdc-register-vm/disassembler.js` lines 27-123), organized by category. For each operation: the mnemonic, operand count, pseudocode, and the code pattern to match in a normalized handler.
 
 ### Arithmetic (14 operations)
 
