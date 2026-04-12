@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 37
-Current task: 37.6 — Fix test-emit.js quality thresholds
+Current task: 37.7 — Archive project-brief.md and docs/PROGRESS.md
 
 ---
 
@@ -12,8 +12,7 @@ Current task: 37.6 — Fix test-emit.js quality thresholds
 > See `history/` for detailed records.
 
 ### Phase 37: Project Cleanup
-> Audit and clean up scripts, documentation, and tests. Remove obsolete files,
-> fix inaccurate docs, update stale references, fix the last failing test.
+> Audit and clean up scripts, documentation, and tests.
 
 | ID | Task | Status |
 |----|------|--------|
@@ -22,8 +21,8 @@ Current task: 37.6 — Fix test-emit.js quality thresholds
 | 37.3 | Fix test-scraper-foundation.js template-cache lookup | done (resolved by 37.2) |
 | 37.4 | Tests for template-cache fix | done (unnecessary) |
 | 37.5 | Fix test-cfg.js func 272 edge case | done |
-| 37.6 | Fix test-emit.js quality thresholds | in-progress |
-| 37.7 | Archive project-brief.md and docs/PROGRESS.md | pending |
+| 37.6 | Fix test-emit.js quality thresholds | done |
+| 37.7 | Archive project-brief.md and docs/PROGRESS.md | in-progress |
 | 37.8 | Update docs/WORKFLOW.md with Phase 11-36 epilogue | pending |
 | 37.9 | Update README.md (template count, test count, phase references) | pending |
 | 37.10 | Update CLAUDE.md — correct Phase 36 conclusion and add cleanup notes | pending |
@@ -34,29 +33,35 @@ Current task: 37.6 — Fix test-emit.js quality thresholds
 
 ## Current Task
 
-**ID**: 37.6
-**Title**: Fix test-emit.js quality thresholds
+**ID**: 37.7
+**Title**: Archive project-brief.md and docs/PROGRESS.md
 **Phase**: Project Cleanup
 **Status**: in-progress
 
 ### Goal
-Fix the 2 remaining test-emit.js failures so all 296 tests pass.
+Mark two legacy documentation files as archived so they're not mistaken for current-state descriptions.
 
 ### Context
-Two failures in `tests/test-emit.js`:
-1. **Return count**: 434 `return` keywords emitted vs 665 actual return stmts. Threshold is ≥90% (599). Gap is large (65%).
-2. **Brace imbalance**: func 276 has 32 `{` but 31 `}` — 1 missing closing brace.
+- `project-brief.md` — initial project brief, now superseded by CLAUDE.md's richer project description
+- `docs/PROGRESS.md` — 1,262 lines of detailed task history from Phases 1-10, valuable as historical reference but misleading as "current state"
 
-The brace imbalance is a real emitter bug. The return count gap is likely too ambitious a threshold for the current emitter quality.
+Neither should be deleted — they contain historical information. They just need clear ARCHIVED headers.
 
 ### Implementation Steps
-1. Read `tests/test-emit.js` to understand the exact assertions
-2. For the brace bug: investigate func 276 in the emitted output (`output/tdc/emitted/`) to find where the closing brace is missing, then fix the emitter (`decompiler/code-emitter.js`)
-3. For the return count: investigate whether the emitter can reasonably emit more return keywords, or if the threshold should be lowered to match current reality (with a comment noting the gap)
+1. Read the first ~30 lines of `project-brief.md`. Add a prominent header at the top:
+   ```markdown
+   > **ARCHIVED** — This is the original project brief. Current project state and architecture are described in `CLAUDE.md`. This file is preserved for historical reference.
+   ```
+2. Read the first ~30 lines of `docs/PROGRESS.md`. Add a prominent header at the top:
+   ```markdown
+   > **ARCHIVED** — This file documents Phases 1-10 in detail. For Phases 11-36 see `history/` day-files and `docs/WORKFLOW.md`. Preserved for historical reference.
+   ```
+3. Do not modify any other content in these files.
 
 ### Verification
-- [ ] `node --test tests/test-emit.js` passes with 0 failures
-- [ ] `npm test` shows 296/296
+- [ ] `head -5 project-brief.md` shows the ARCHIVED header
+- [ ] `head -5 docs/PROGRESS.md` shows the ARCHIVED header
+- [ ] Neither file was otherwise modified (check with `git diff --stat`)
 
 ### Suggested Agent
-general-purpose — requires emitter investigation and potentially code fix
+general-purpose — simple two-file edit
