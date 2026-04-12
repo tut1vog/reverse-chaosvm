@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 34
-Current task: 35.2 — Tests for deobfuscator
+Current task: 35.3 — Integrate deobfuscator into pipeline
 
 ---
 
@@ -127,7 +127,7 @@ handle obfuscated case handler code. These builds need opcode-mapper improvement
 | ID | Task | Status |
 |----|------|--------|
 | 35.1 | Create source deobfuscator module | done |
-| 35.2 | Tests for deobfuscator | pending |
+| 35.2 | Tests for deobfuscator | done |
 | 35.3 | Integrate deobfuscator into pipeline | pending |
 | 35.4 | Tests for pipeline integration | pending |
 | 35.5 | Re-run survey to verify obfuscated builds port | pending |
@@ -136,25 +136,29 @@ handle obfuscated case handler code. These builds need opcode-mapper improvement
 
 ## Current Task
 
-**ID**: 35.2
-**Title**: Tests for deobfuscator
+**ID**: 35.3
+**Title**: Integrate deobfuscator into pipeline
 **Phase**: Source Deobfuscator for Opcode Mapper
 **Status**: in-progress
 
 ### Goal
-Write unit tests for `pipeline/deobfuscator.js`.
+Wire `deobfuscate()` into `pipeline/run.js` so the porting pipeline automatically
+deobfuscates before opcode mapping and key extraction.
 
 ### Context
-- `pipeline/deobfuscator.js` — 817 lines, exports `deobfuscate(source)` → `{ deobfuscated, isObfuscated, stats }`
-- Test files: `output/tdc-survey/3429444f324c6110.js` (obfuscated), `targets/tdc.js` (not obfuscated)
-- Existing test pattern: `tests/test-*.js` using `node:test` + `node:assert`
+- `pipeline/run.js` — orchestrates: vm-parser → opcode-mapper → key-extractor → token-verifier → structure-extractor
+- `pipeline/deobfuscator.js` — `deobfuscate(source)` → `{ deobfuscated, isObfuscated, stats }`
+- The deobfuscator should run after vm-parsing confirms it's a valid VM build, and the deobfuscated source should be used for all subsequent pipeline steps
 
 ### Implementation Steps
-1. Create `tests/test-deobfuscator.js`
-2. Test: non-obfuscated passthrough, obfuscated detection, deobfuscated parses, decoder/helper stats, resolved names present, mapping rate improvement
+1. In `pipeline/run.js`, after Stage 1 (vm-parser), call `deobfuscate(src)`
+2. If `isObfuscated`, log the stats and use `deobfuscated` source for subsequent stages
+3. Re-run vm-parser on deobfuscated source (variables may resolve differently)
+4. Pass deobfuscated source to opcode-mapper, key-extractor, etc.
 
 ### Verification
-- [ ] `node --test tests/test-deobfuscator.js` passes
+- [ ] `node pipeline/run.js output/tdc-survey/3429444f324c6110.js --skip-verify` produces non-null XTEA key
+- [ ] `node pipeline/run.js targets/tdc.js --skip-verify` still works (non-obfuscated)
 - [ ] `npm test` — no regressions
 
 ### Suggested Agent
