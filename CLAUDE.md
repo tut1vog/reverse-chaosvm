@@ -171,6 +171,7 @@ For the current research phase — intent, scope, director permissions, and prio
 | `docs/CRYPTO_ANALYSIS.md` | Modified XTEA key derivation and round constants |
 | `docs/TOKEN_DECRYPTION.md` | How to decrypt a captured token |
 | `docs/HAR_ANALYSIS.md` | Network flow analysis of the CAPTCHA protocol |
+| `docs/CAPTCHA_ORCHESTRATOR.md` | `t_captcha_slide.js` end-to-end flow + verify-body origination table (vm-slide track, Phase 41) |
 | `docs/VERSION_DIFFERENCES.md` | Opcode shuffle analysis and porting strategy across templates |
 | `docs/ERRORCODE_12_INVESTIGATION.md` | Phase 36 findings on verify-endpoint errorCode 12 |
 | `docs/CONVENTIONS.md` | Code style, naming, disassembly format |
@@ -180,7 +181,6 @@ For the current research phase — intent, scope, director permissions, and prio
 - `docs/CHAOSVM_VARIANTS.md` — top-level comparison of register-based (`tdc.js`) vs stack-based (`vm-slide`) ChaosVM variants.
 - `docs/VM_SLIDE_ARCHITECTURE.md` — stack-based ChaosVM internals.
 - `docs/VM_SLIDE_OPCODES.md` — opcode table for `__TENCENT_CHAOS_STACK`.
-- `docs/CAPTCHA_ORCHESTRATOR.md` — `t_captcha_slide.js` flow + verify-body construction.
 - `docs/TEMPLATE_POOL.md` — live template pool survey results.
 
 **All documentation should be treated as reference — verify against live behavior before trusting.** See `.claude/rules/verify-dont-assume.md`.
