@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 36
-Current task: 36.2 — Tests for diagnostic script
+Current task: 36.3 — Run diagnostic experiments and analyze
 
 ---
 
@@ -148,35 +148,35 @@ Build 0e2b306a got errorCode=-1 (success) — proving the full pipeline works en
 | ID | Task | Status |
 |----|------|--------|
 | 36.1 | Create errorCode 12 diagnostic survey script | done |
-| 36.2 | Tests for diagnostic script | in-progress |
-| 36.3 | Run diagnostic experiments and analyze | pending |
+| 36.2 | Tests for diagnostic script | done |
+| 36.3 | Run diagnostic experiments and analyze | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 36.2
-**Title**: Tests for diagnostic script
+**ID**: 36.3
+**Title**: Run diagnostic experiments and analyze
 **Phase**: Investigate errorCode 12 Pattern
 **Status**: in-progress
 
 ### Goal
-Write unit tests for `scripts/tdc-diagnose.js` — test the `parseArgs` function and verify the module loads correctly.
+Run `scripts/tdc-diagnose.js` with 30+ attempts, analyze the results to identify
+what differentiates successful (errorCode -1) from failed (errorCode 12) attempts.
 
 ### Context
-- `scripts/tdc-diagnose.js` exports `{ parseArgs }` when not the main module
-- Follow the pattern of existing test files in `tests/`
-- The script's main logic requires network access so only test pure functions
+- Script is ready at `scripts/tdc-diagnose.js`
+- 10 cached pipeline configs available in `output/tdc-survey-*/`
+- Need to run live against Tencent's servers
 
 ### Implementation Steps
-1. Create `tests/test-tdc-diagnose.js`
-2. Test `parseArgs` defaults (attempts=30, verbose=false, delay=3000, hash=null)
-3. Test `parseArgs` with all flags specified
-4. Test module loads without error
+1. Run `node scripts/tdc-diagnose.js --attempts 30 --verbose`
+2. Analyze the output: timing patterns, token sizes, per-hash success rates
+3. Form conclusions about what causes errorCode 12
 
 ### Verification
-- [ ] `node --test tests/test-tdc-diagnose.js` passes
-- [ ] `npm test` — no regressions
+- [ ] Results saved to `output/tdc-diagnose/results.json`
+- [ ] Summary analysis documented
 
 ### Suggested Agent
 general-purpose
