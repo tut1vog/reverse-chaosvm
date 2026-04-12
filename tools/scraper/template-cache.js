@@ -109,6 +109,7 @@ class TemplateCache {
 
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
       if (!config.xteaParams) continue;
+      if (typeof config.target !== 'string') continue;
 
       // Derive target file path to compute source hash
       const targetFile = path.join(__dirname, '..', '..', 'targets', config.target);
