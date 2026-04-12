@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 41 — minor cleanup + Captcha orchestrator (Stream B Track 2)
-Current task: 41.2 — Tests for the TemplateCache.seed() type guard
+Current task: 41.3 — Clean up stale describe-block text at tests/test-auto-port.js:358
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -50,8 +50,8 @@ Current task: 41.2 — Tests for the TemplateCache.seed() type guard
 | ID | Task | Status |
 |----|------|--------|
 | 41.1 | Add `config.target` type guard to `TemplateCache.seed()` (impl only — 1-line defensive check noted as a secondary finding in 40.4) | done |
-| 41.2 | Tests for the type guard | in-progress |
-| 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` (says "pipeline/run.js" but the assertion underneath uses the post-restructure path) | pending |
+| 41.2 | Tests for the type guard | done |
+| 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` (says "pipeline/run.js" but the assertion underneath uses the post-restructure path) | in-progress |
 | 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | pending |
 | 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | pending |
 | 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | pending |
@@ -70,56 +70,42 @@ Current task: 41.2 — Tests for the TemplateCache.seed() type guard
 
 ## Current Task
 
-**ID**: 41.2
-**Title**: Tests for the `TemplateCache.seed()` `config.target` type guard
+**ID**: 41.3
+**Title**: Clean up stale describe-block text at `tests/test-auto-port.js:358`
 **Phase**: Phase 41 — Minor cleanup + Captcha orchestrator (Stream B Track 2)
 **Status**: in-progress
 
 ### Goal
-Add test coverage for the one-line guard added by 41.1. Must exercise both the defective-config case (missing `target`, non-string `target`) and confirm `seed()` no longer throws when such a config exists under the override directory, while still correctly processing well-formed sibling configs in the same scan.
+Fix the stale test name at `tests/test-auto-port.js:358`. It says `'invokes node with pipeline/run.js, temp file, and --skip-verify'` but the assertion on line 380 has already been updated to the post-restructure path `tools/porting-pipeline/run.js`. The test title lies about what it asserts. Trivial string fix.
 
 ### Context
-41.1 added this guard at `tools/scraper/template-cache.js:112`, immediately after the `xteaParams` guard and before `path.join(__dirname, '..', '..', 'targets', config.target)`:
-
-```js
-if (typeof config.target !== 'string') continue;
-```
-
-Before the guard, a `pipeline-config.json` containing `xteaParams` but missing `target` would blow up the entire `seed()` call with `TypeError: The "path" argument must be of type string. Received undefined` — taking out any sibling configs that would have been processed after the faulty one.
-
-**Test file**: extend `tests/test-scraper-foundation.js` (this is where the existing `TemplateCache.seed()` tests live). Use the `seed(outputDirOverride)` parameter with a temp directory — do NOT touch the real `output/` directory. The existing tests in that file show the established pattern for temp-dir fixtures; follow it.
-
-**Minimum required cases** (pick concise names):
-1. **missing target**: seed a temp output dir with one `bad-v/pipeline-config.json` whose body has `xteaParams: {...}` but no `target` key. Call `seed(tempDir)`. Assert it does not throw and the cache remains empty for that entry.
-2. **non-string target**: same as above but `target: 123` (or `null`). Assert no throw, no cache entry.
-3. **mixed dir**: temp dir with both a faulty config (missing `target`) AND a well-formed sibling config that points to a real `targets/` file (reuse whichever target the existing tests in `test-scraper-foundation.js` already use — likely `tdc.js`). Assert the well-formed sibling is still cached; the faulty one is silently skipped. This is the regression case — proves one broken config no longer takes out the rest of the scan.
-
-Keep the xteaParams body minimal but valid enough for `seed()` to proceed past the first guard (key/delta/rounds/keyModConstants/keyMods/caseCount) — copy the shape from an existing test fixture in the same file.
+- Line 358 (`it(...)`) — test name uses pre-restructure path `pipeline/run.js`.
+- Line 380 — assertion uses post-restructure path `path.join(PROJECT_ROOT, 'tools', 'porting-pipeline', 'run.js')`.
+- No other references to `pipeline/run.js` should exist in this file; check with a grep at the end.
+- This is the second of the two deferred 40.4 cleanups (the first was 41.1's type guard).
 
 ### Implementation Steps
-1. Read `tests/test-scraper-foundation.js` end-to-end to understand the existing `TemplateCache.seed()` test pattern: how temp dirs are created, how fixture configs are written, how the test asserts on cache contents, and how cleanup is done. Match that pattern exactly.
-2. Read `tools/scraper/template-cache.js` `seed()` (post-41.1) to confirm the guard location and the full list of fields copied from `config.xteaParams` into the cache entry — so the fixture configs have enough fields to reach the cache-write path when `target` is valid.
-3. Add the three test cases above under the existing `TemplateCache.seed` describe-block (or create one if none exists — but one almost certainly already exists). No refactoring of existing tests.
-4. Run `node --test tests/test-scraper-foundation.js` — must pass including your new cases.
-5. Run `npm test` — must be 353/353 (350 + 3 new) or whatever count the 3 new cases produce. Report the exact count.
+1. Read `tests/test-auto-port.js:358` to confirm the current text.
+2. Change the `it(...)` string from `'invokes node with pipeline/run.js, temp file, and --skip-verify'` to `'invokes node with tools/porting-pipeline/run.js, temp file, and --skip-verify'`. Only the path substring changes.
+3. `grep -n "pipeline/run.js" tests/test-auto-port.js` — after the fix, must return zero hits (or only hits that are clearly intentional, in which case stop and report).
+4. Run `node --test tests/test-auto-port.js` — all cases still pass.
+5. Run `npm test` — must stay at 353/353.
 
 ### Verification — report all of these
-1. `git diff --stat tests/test-scraper-foundation.js` — only this file changed, only additions (no deletions or deletions should be limited to whitespace inside the describe block).
-2. `git diff tools/scraper/template-cache.js` — must be EMPTY (this task is tests only — 41.1 already committed the production change).
-3. `node --test tests/test-scraper-foundation.js` — new cases pass.
-4. `npm test` — report the full `# tests / # pass / # fail` block. Should be 350 + N where N is the number of new test cases.
-5. **Negative sanity check**: temporarily revert the 41.1 guard locally in a scratch way (e.g. comment out line 112 of `template-cache.js`), rerun just the new tests, confirm at least one fails with a `TypeError` from `path.join`, then restore line 112 and confirm all pass again. Report this back. This is the critical proof that the new tests actually exercise the guard. DO NOT leave the guard commented out.
+1. `git diff tests/test-auto-port.js` — shows only the `it(...)` title change, +1/-1 at line 358. No other edits.
+2. `grep -n "pipeline/run.js" tests/test-auto-port.js` — zero hits after the fix.
+3. `grep -n "porting-pipeline/run.js" tests/test-auto-port.js` — should show hits at both the test name (line 358) and the assertion (line 380).
+4. `npm test` — 353/353.
 
 ### Constraints
-- **Do not make any git commits.** The director handles all commits after verification.
-- **Do not modify `tools/scraper/template-cache.js`** (41.1's production change is already in). The only file you may edit is `tests/test-scraper-foundation.js`.
-- **Do not modify any other test file**, any fixture under `targets/`, or any production code.
-- **Do not use the real `output/` directory** — always pass a temp dir via `seed(tempDir)`. Clean it up in `afterEach` / `after` the same way existing tests do.
-- **Follow the existing test style** in `tests/test-scraper-foundation.js` — CommonJS, node:test, node:assert, 2-space indent, single quotes, semicolons.
-- **If the task is too difficult or impossible to complete**, stop immediately and report. Do not leave partial or broken tests in the tree.
+- **Do not make any git commits.** The director handles all commits.
+- **Do not modify any file other than `tests/test-auto-port.js`**, and only the single `it(...)` string on line 358.
+- **Do not rename, reformat, or refactor** any existing test — purely the one string substitution.
+- **Do not change assertions.** The test body stays identical.
+- If the task is too difficult (extremely unlikely — this is a single-string edit), stop and report.
 
 ### Suggested Agent
-`general-purpose` — standard test authoring against an existing test file with a well-defined guard contract. Different agent than the one that did 41.1, per the impl/tests separation rule.
+`general-purpose` — trivial string fix.
 
 ---
 
