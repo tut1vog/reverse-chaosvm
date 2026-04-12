@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 38 — Restructure
-Current task: 38.1 — Restructure repo into research/ + tools/ layout
+Current task: 38.2 — Create placeholder README.md files for the 5 research tracks
 
 ---
 
@@ -13,8 +13,8 @@ Current task: 38.1 — Restructure repo into research/ + tools/ layout
 
 | ID | Task | Status |
 |----|------|--------|
-| 38.1 | Restructure repo into research/ + tools/ layout (git mv + require rewrites + package.json + README) | in-progress |
-| 38.2 | Create placeholder README.md files for the 5 research tracks | pending |
+| 38.1 | Restructure repo into research/ + tools/ layout (git mv + require rewrites + package.json + README) | done |
+| 38.2 | Create placeholder README.md files for the 5 research tracks | in-progress |
 | 38.3 | Triage `scripts/` one-offs into research tracks or bench | pending |
 
 ### Phase 39: vm-slide stack VM (Stream B — Track 1, top priority)
@@ -31,13 +31,51 @@ Current task: 38.1 — Restructure repo into research/ + tools/ layout
 
 ## Current Task
 
-**ID**: 38.1
-**Title**: Restructure repo into research/ + tools/ layout
+**ID**: 38.2
+**Title**: Create placeholder README.md files for the 5 research tracks
 **Phase**: Phase 38 — Restructure
 **Status**: in-progress
 
 ### Goal
-Reorganize the tree from the legacy flat layout (`decompiler/`, `token/`, `pipeline/`, `scraper/`, `puppeteer/`, `dynamic/` at the root) into the research-phase layout (`research/tdc-register-vm/`, `tools/token-generator/`, `tools/porting-pipeline/`, `tools/scraper/`, `tools/captcha-solver/`, `tools/dynamic-tracers/`). Git history must be preserved via `git mv`. All `require()` paths, `package.json` script targets, and documentation command examples must be rewritten in lockstep so `npm test` stays at 296/296 as the hard gate.
+Create a minimal `README.md` scaffold for each of the five new research tracks so every track is ready to receive work. `research/tdc-register-vm/` already exists via `git mv` and does not need a new README from this task.
+
+### Context
+After task 38.1, the following track directories exist but are empty or do not exist yet (need `mkdir`):
+
+- `research/vm-slide-stack-vm/` — top priority, Track 1 (Phase 39). Open question: how does the stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`, ~36 opcodes) used in `sample/vm_slide.js` work?
+- `research/captcha-orchestrator/` — open question: how does `sample/t_captcha_slide.js` orchestrate the slide CAPTCHA end-to-end?
+- `research/eks-payload/` — open question: what is the structure of the 232-byte `eks` payload baked into every `tdc.js` at line 123?
+- `research/template-pool/` — open question: how many distinct `tdc.js` templates does Tencent rotate through, and how often?
+- `research/key-mod/` — open question: are the XTEA key-modification constants identical across Templates A, B, C, or do they differ?
+
+Each track's README must follow `.claude/rules/research-artifacts.md` requirements: **open question**, **status** (open / partial / closed), **inputs** (which `targets/`/`sample/` files it reads), and **how to reproduce** the latest run from the command line.
+
+At this stage every README is a placeholder: status is `open`, and the "how to reproduce" section should simply say "No runnable artifacts yet — see `project-brief.md` for the definition of done."
+
+Full detail for each track (DoD, inputs, permitted outputs) is in `project-brief.md` under "Stream B — Research tracks". The README should cite that as the authoritative source rather than duplicate it.
+
+### Implementation Steps
+1. Read `.claude/rules/research-artifacts.md` to confirm the README shape.
+2. Read the five track sections in `project-brief.md` (Tracks 1–5) so every README's "open question" and "inputs" match the brief verbatim.
+3. `mkdir -p` each of the five directories under `research/`.
+4. Write a `README.md` in each with this shape:
+   - `# <track-name>`
+   - `## Open question` — one paragraph, taken from `project-brief.md`.
+   - `## Status` — `open` (all tracks are brand-new).
+   - `## Inputs` — bullet list of the `targets/` / `sample/` files the track reads.
+   - `## How to reproduce` — single sentence: "No runnable artifacts yet — see `project-brief.md` §Stream B for the definition of done."
+   - `## Notes` — empty heading, placeholder for working notes.
+5. Do not create any source files yet. Do not create any `dead-ends/` directory yet (rule says "when a script is abandoned", not pre-emptively).
+
+### Verification
+- [ ] `ls research/{vm-slide-stack-vm,captcha-orchestrator,eks-payload,template-pool,key-mod}/README.md` — all five files exist.
+- [ ] Each README has the five required sections (`Open question`, `Status`, `Inputs`, `How to reproduce`, `Notes`). `grep -c '^## ' research/<track>/README.md` returns 5 for each.
+- [ ] Each `Open question` paragraph matches the corresponding track description in `project-brief.md` (the subagent should quote the brief, not paraphrase).
+- [ ] No source files (`.js`, `.py`) created in any track directory.
+- [ ] `npm test` still 296/296 (sanity — creating docs shouldn't touch tests, but confirm).
+
+### Suggested Agent
+`general-purpose` — lightweight documentation scaffolding, no specialized expertise needed.
 
 ### Context
 Pre-restructure state (verified by the director):
