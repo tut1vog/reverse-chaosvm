@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 37
-Current task: 37.2 — Remove obsolete dynamic tracers and targets
+Current task: 37.5 — Fix test-cfg.js func 272 edge case
 
 ---
 
@@ -15,15 +15,15 @@ Current task: 37.2 — Remove obsolete dynamic tracers and targets
 
 ### Phase 37: Project Cleanup
 > Audit and clean up scripts, documentation, and tests. Remove obsolete files,
-> fix inaccurate docs, update stale references, fix the 3 permanently-failing tests.
+> fix inaccurate docs, update stale references, fix the 2 permanently-failing tests.
 
 | ID | Task | Status |
 |----|------|--------|
 | 37.1 | Remove obsolete scripts | done |
-| 37.2 | Remove obsolete dynamic tracers and targets | in-progress |
-| 37.3 | Fix test-scraper-foundation.js template-cache lookup | pending |
-| 37.4 | Tests for template-cache fix | pending |
-| 37.5 | Fix test-cfg.js func 272 edge case | pending |
+| 37.2 | Remove obsolete dynamic tracers and targets | done |
+| 37.3 | Fix test-scraper-foundation.js template-cache lookup | done (resolved by 37.2) |
+| 37.4 | Tests for template-cache fix | done (unnecessary — 37.3 resolved by cleanup) |
+| 37.5 | Fix test-cfg.js func 272 edge case | in-progress |
 | 37.6 | Fix test-emit.js quality thresholds | pending |
 | 37.7 | Archive project-brief.md and docs/PROGRESS.md | pending |
 | 37.8 | Update docs/WORKFLOW.md with Phase 11-36 epilogue | pending |
@@ -36,36 +36,33 @@ Current task: 37.2 — Remove obsolete dynamic tracers and targets
 
 ## Current Task
 
-**ID**: 37.2
-**Title**: Remove obsolete dynamic tracers and targets
+**ID**: 37.5
+**Title**: Fix test-cfg.js func 272 edge case
 **Phase**: Project Cleanup
 **Status**: in-progress
 
 ### Goal
-Delete 4 superseded dynamic tracers and 4 ad-hoc target files that have no ongoing value.
+Fix the 1 failing assertion in test-cfg.js: function 272 block b3 has a JMP with 0 successors (expected 1). Target address 41580 isn't resolved as a valid block boundary.
 
 ### Context
-The `dynamic/` directory has versioned tracers where older versions are superseded. The `targets/` directory has ad-hoc captures that aren't canonical versions.
+- Test file: `tests/test-cfg.js`
+- CFG builder: `decompiler/cfg-builder.js`
+- The test asserts that every JMP instruction should have exactly 1 successor (its target block)
+- Function 272 block b3 has a JMP whose target address (41580) doesn't resolve to a block start
+- This is the only failure out of 584 assertions in the file
+- Current baseline: 294/296 tests pass, 2 known failures (test-cfg.js and test-emit.js)
 
 ### Implementation Steps
-1. Delete the following 4 dynamic tracers:
-   - `dynamic/v2-token-capture.js` (0 references, superseded by pipeline)
-   - `dynamic/chunk-tracer.js` (0 references, one-off tracer)
-   - `dynamic/crypto-tracer.js` (superseded by crypto-tracer-v3.js)
-   - `dynamic/crypto-tracer-v2.js` (superseded by crypto-tracer-v3.js)
-2. Delete the following 4 target files:
-   - `targets/tdc-capture.js` (ad-hoc capture, only referenced from output/)
-   - `targets/tdc-captured.js` (duplicate concept)
-   - `targets/tdc-diag.js` (untracked diagnostic copy)
-   - `targets/tdc-live-test.js` (untracked test copy — this is a file, not a directory)
-3. Also check if `targets/tdc-live-test` (directory) exists and remove if so.
-4. Verify no remaining files import or reference the deleted files.
-5. Run `npm test`.
+1. Read `tests/test-cfg.js` to find the exact assertion for func 272
+2. Read `decompiler/cfg-builder.js` to understand how JMP targets are resolved to block boundaries
+3. Investigate what's at address 41580 in the disassembly — is it a valid instruction? Past the function boundary? An unreachable dead code target?
+4. Either:
+   - (a) Fix the CFG builder to handle this edge case correctly, OR
+   - (b) If the JMP target is genuinely outside the function (dead code / unreachable), document this as a known limitation and adjust the test assertion with a comment explaining why
 
 ### Verification
-- [ ] All 8 files deleted
-- [ ] grep for each deleted filename returns no hits in active code
-- [ ] `npm test` still 293/296
+- [ ] `node --test tests/test-cfg.js` passes with 0 failures
+- [ ] No other test regressions: `npm test` ≥ 294/296
 
 ### Suggested Agent
-general-purpose — straightforward file deletion
+general-purpose — requires investigation of disassembly output and CFG builder logic
