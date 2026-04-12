@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 38 — Restructure
-Current task: 38.4 — Fix latent string-literal path misses from 38.1 (PAUSED — awaiting user review of plan revision)
+Current task: 38.4 — Fix latent string-literal path misses from 38.1
 
 ---
 
@@ -16,8 +16,8 @@ Current task: 38.4 — Fix latent string-literal path misses from 38.1 (PAUSED �
 | 38.1 | Restructure repo into research/ + tools/ layout (git mv + require rewrites + package.json + README) | done |
 | 38.2 | Create placeholder README.md files for the 5 research tracks | done |
 | 38.3 | Triage `scripts/` one-offs into research tracks or bench | done |
-| 38.4 | Fix latent string-literal path misses from 38.1 (survey.js, diagnose.js) | pending |
-| 38.5 | Resolve Half B ambiguous scripts — decide + move files 4–8 | pending |
+| 38.4 | Fix latent string-literal path misses from 38.1 (survey.js, diagnose.js) | in-progress |
+| 38.5 | Move the 5 previously-ambiguous scripts to their decided homes (user-confirmed 2026-04-12) | pending |
 
 ### Phase 39: vm-slide stack VM (Stream B — Track 1, top priority)
 > Decompile `sample/vm_slide.js` — stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`). Produce decoder, disassembler, opcode table, architecture doc, and a top-level variants comparison.
@@ -36,7 +36,7 @@ Current task: 38.4 — Fix latent string-literal path misses from 38.1 (PAUSED �
 **ID**: 38.4
 **Title**: Fix latent string-literal path misses from 38.1 (survey.js, diagnose.js)
 **Phase**: Phase 38 — Restructure
-**Status**: pending — awaiting user confirmation of plan revision
+**Status**: in-progress
 
 ### Goal
 Rewrite two latent string-literal path references that task 38.1 missed because its rewriter only handled `require()` calls, not path literals inside `path.join()` invocations. Both files were moved (as `scripts/tdc-survey.js` → `research/template-pool/survey.js` and `scripts/tdc-diagnose.js` → `research/template-pool/diagnose.js`) and both still reference `pipeline/run.js` where they should now reference `tools/porting-pipeline/run.js`. These are latent runtime bugs, not test failures — tests don't cover the live-run scripts, so `npm test` stays green despite the bugs.
