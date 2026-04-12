@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 41 — minor cleanup + Captcha orchestrator (Stream B Track 2)
-Current task: 41.7 — Update research/captcha-orchestrator/README.md (status bump after docs shipped)
+Current phase: Phase 41 COMPLETE — captcha-orchestrator track substantively closed (one open question: vData runtime binding)
+Current task: none — Phase 41 done, awaiting next user direction
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -55,7 +55,7 @@ Current task: 41.7 — Update research/captcha-orchestrator/README.md (status bu
 | 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | done |
 | 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | done |
 | 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | done |
-| 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | in-progress |
+| 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | done |
 
 ---
 
@@ -70,130 +70,37 @@ Current task: 41.7 — Update research/captcha-orchestrator/README.md (status bu
 
 ## Current Task
 
-**ID**: 41.7
-**Title**: Update `research/captcha-orchestrator/README.md` — promote status after 41.6 ships the public doc
-**Phase**: Phase 41 — Minor cleanup + Captcha orchestrator (Stream B Track 2)
-**Status**: in-progress
+**none — Phase 41 complete.**
 
-### Goal
-Final bookkeeping for Phase 41 Track 2: update `research/captcha-orchestrator/README.md` to reflect that `docs/CAPTCHA_ORCHESTRATOR.md` has shipped, status moves from `partial` to `partial (track substantively closed; one open question — vData runtime binding)` or similar honest framing. List all produced documents (FLOW.md, SURVEY.md, MODULE-41-NOTES.md, the public doc, the JSON artifacts). Add the single remaining open question (vData runtime binding) as a prominent "Open questions" bullet with pointers to the three follow-up options from FLOW.md §9 Q1. Do NOT promote to `closed` — `vData` is still unresolved.
+Phase 41 closed:
+- 41.1/41.2: `TemplateCache.seed()` config.target type guard + tests (both deferred 40.4 cleanups closed).
+- 41.3: stale `tests/test-auto-port.js:358` describe-block text synced to post-restructure path.
+- 41.4: webpack structural survey of `sample/t_captcha_slide.js` (50 live modules, entry 64, 91 edges, no dynamic requires).
+- 41.5: end-to-end flow trace across modules 8/56/76 + 39-field verify-body origination. Overturned two 41.4 hypotheses (module 8 is NOT the vm-slide loader — vm-slide.enc.js is hardcoded `<script>` in show-page HTML; module 76 is Zepto while `sample/slide-jy.js` is jQuery 1.11.3, different libraries). Module 41 parked as the i18n caption table. `vData` is the single unresolved static question — hypothesis: `vm-slide.e201876f.enc.js` installs a runtime binding.
+- 41.6: shipped `docs/CAPTCHA_ORCHESTRATOR.md` (607 lines, 9 sections, full 39-row origination table, honest `vData` framing). Promoted into CLAUDE.md doc table.
+- 41.7: `research/captcha-orchestrator/README.md` reflects the substantively-closed state with the single `vData` open question.
 
-### Context
-The 41.5 deep analysis resolved 38/39 verify-body fields, parked module 41 (i18n caption table, not on critical path), correctly overturned the 41.4 hypotheses that module 8 was the vm-slide loader and that module 76 = slide-jy.js (they're Zepto vs jQuery 1.11.3 — different libraries). 41.6 shipped `docs/CAPTCHA_ORCHESTRATOR.md` with all nine required sections, full 39-row origination table, and honest framing of `vData` as the single unresolved question.
+Tests: 350 → 353 (41.2 added three) → 353 throughout the rest. Stayed green every step.
 
-The track's current README.md was written at the end of 41.4 and says status `partial`. It lists FLOW.md indirectly (via the planned-inputs section) but predates FLOW.md / MODULE-41-NOTES.md / the public doc. The README needs to catch up.
+**Captcha-orchestrator track status**: `partial — flow traced end-to-end, public doc shipped, one open question remaining (vData runtime binding)`. Not `closed` — the `vData` runtime-binding question is well-scoped and delegable to a dedicated follow-up task whenever the user wants to pursue it.
 
-### Implementation Steps
-1. Read the current `research/captcha-orchestrator/README.md` end-to-end.
-2. Update the Status section to reflect post-41.6 reality: track is substantively closed except for `vData`, which has a clear path forward. Do not use the word "closed" alone — be honest that `vData` remains open. Suggested wording: `partial — flow traced, public doc shipped, one open question (vData runtime binding)`.
-3. Add a "Documents" section (if not already present, or extend it) listing every committed artifact:
-   - `SURVEY.md` — 41.4 structural survey
-   - `FLOW.md` — 41.5 end-to-end flow trace
-   - `MODULE-41-NOTES.md` — 41.5 module 41 gate-2 spike
-   - `docs/CAPTCHA_ORCHESTRATOR.md` — public reference (41.6)
-   - `output/captcha-orchestrator/modules.json` — per-module inventory
-   - `output/captcha-orchestrator/module-graph.json` — require graph
-   - `output/captcha-orchestrator/dynamic-requires.json` — gate 1 audit
-   - `output/captcha-orchestrator/verify-body-origination.json` — 39-field origination table
-   - `output/captcha-orchestrator/slide-jy-diff.md` — Zepto vs jQuery classification
-4. Add an "Open questions" section naming exactly one question — `vData` runtime binding — with the three follow-up options from FLOW.md §9 Q1 (jsdom harness / stack-VM bytecode decode / Puppeteer property-write breakpoints) summarized to one sentence each.
-5. Update the "How to reproduce" section to include the two new scripts (`trace-flow.js`, `slide-jy-diff.js`) alongside `parse-bundle.js`.
+**Open research tracks the user may want to tackle next** (per `project-brief.md` priority backlog):
+- **vData runtime binding** — follow-up from Phase 41. Three proposed approaches: jsdom harness for `vm-slide.e201876f.enc.js`, stack-VM bytecode decode via `research/vm-slide-stack-vm/` tooling, Puppeteer property-write breakpoints.
+- **eks payload structural reversal** — `research/eks-payload/` still `open`. Phase 41 confirmed `eks` is transport-only for the vm-slide flow (just passes `TDC.getInfo().info` through), but its internal structure is still unknown.
+- **Template pool survey** — `research/template-pool/` still `open`. Classify many live `tdc.js` builds and measure Tencent's template rotation.
+- **Key-modification constants** — `research/key-mod/` still `open`. Cross-template diff of XTEA key-mod constants between Templates A, B, C (register-VM only; Phase 40 confirmed this does NOT apply to vm-slide).
+- **Collector field count** — is 59 template-specific or constant?
+- **errorCode 12** — confirm whether verify-endpoint 12 is fingerprint/behavioral scoring. Phase 41 found module 56 treats it as soft-retryable via a cover error, consistent with existing `docs/ERRORCODE_12_INVESTIGATION.md` but still not fully characterized.
 
-### Verification
-1. `git diff research/captcha-orchestrator/README.md` — shows only the expected section updates.
-2. `grep -c "vData\|FLOW.md\|CAPTCHA_ORCHESTRATOR\|MODULE-41" research/captcha-orchestrator/README.md` — non-trivial count.
-3. `wc -l research/captcha-orchestrator/README.md` — report line count.
-4. `npm test` — stays at 353/353.
-5. No files outside `research/captcha-orchestrator/README.md` are modified.
-
-### Constraints
-- **Do not make any git commits.** The director handles all commits.
-- **Only edit `research/captcha-orchestrator/README.md`.** Do not touch any other file.
-- **Do not mark status `closed`.** `vData` is still unresolved.
-- **Do not re-analyze.** Transcribe from existing artifacts (SURVEY.md, FLOW.md, MODULE-41-NOTES.md, the public doc).
-- **No emojis.**
-- If the task is too difficult (extremely unlikely — this is a README update), stop and report.
-
-### Suggested Agent
-`general-purpose` — trivial README update.
+No task in progress. Awaiting next user direction.
 
 ---
 
 ### Prior: 41.6 (completed)
-Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md` — per FLOW.md §8, which left the four existing docs unedited. Director also added `docs/CAPTCHA_ORCHESTRATOR.md` to the CLAUDE.md main doc table and removed it from the "new docs planned" list. 353/353 tests green.
+Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md`. Director added the new doc to CLAUDE.md's main doc table.
 
-### Context — what 41.5 already produced
-- **`research/captcha-orchestrator/FLOW.md`** (612 lines) — the research-side narrative. Every section 41.6 needs already exists there. Use it as the primary input.
-- **`output/captcha-orchestrator/verify-body-origination.json`** — 39-field origination table in machine-readable form. Can be pretty-printed or embedded as a table in the doc.
-- **`output/captcha-orchestrator/slide-jy-diff.md`** — slide-jy.js vs module 76 classification.
-- **`research/captcha-orchestrator/MODULE-41-NOTES.md`** — i18n caption table finding (park note; probably a single-sentence footnote in the public doc).
-- **`research/captcha-orchestrator/SURVEY.md`** — the structural baseline.
-
-### Key findings to surface in the public doc
-1. **Bundle shape**: standard webpack 4, 50 live modules, entry 64, no dynamic requires. Static require graph is complete.
-2. **Module 8 is NOT the vm-slide loader** — it's a generic script-injector, and its only call site fetches `/slide-jy.js`. `vm-slide.e201876f.enc.js` is loaded by a hardcoded `<script>` tag in the show-page HTML, not by the orchestrator bundle. (41.4 survey hypothesis correctly overturned by 41.5.)
-3. **Module 56** (8 KB, fanout 21) is the orchestrator core. Every DoD keyword appears exactly once in its source, and the doc should show the one-liner write for each (`e[_.collectdata]=decodeURIComponent(C())`, `d.eks=R()`, etc.).
-4. **`collect` and `eks` are transport-only** — module 56 reads them from `window.TDC.getData(true)` and `window.TDC.getInfo().info` respectively, via the tdc adapter module 38. This confirms `docs/TOKEN_FORMAT.md` and `docs/EKS_FORMAT.md` are still authoritative.
-5. **`nonce` and `sess` are server-baked** into the show-page inline `window.captchaConfig`. `sess` is rotated mid-session by module 30 `updateSession` on both verify and getsig success responses.
-6. **`vsig` and `websig`** are separate fields (no free-floating `sig=` field). Both read from `captchaConfig`.
-7. **`vData` is the single unresolved static question** — only lexical write is inside `if (a.isLowIE()) { window.getVData(...) }` but HAR was captured on Chrome 146 (not lowIE) and `vData` is still present in the POST. Hypothesis: `vm-slide.e201876f.enc.js` installs a runtime binding (jQuery `ajaxPrefilter`/`ajaxTransport` or a `window.getVData` write). The doc must state this honestly as an open question, not paper over it.
-8. **`cdata`/`ans`** are a client-side md5 PoW driven by module 72 (`$.challenge`). `pow_answer`/`pow_calc_time` are a SEPARATE md5 PoW driven by `captchaConfig.powCfg` via a WebWorker (module 48). Both empty in this HAR because `powCfg` is unset.
-9. **Ticket return via `window.postMessage`**, not as an HTTP response. On `errorCode === 0`, module 56 calls module 45's `parent.send(JSON.stringify({type:3, ticket, randstr, errorCode, errorMessage, ret}))`.
-10. **Module 76 is Zepto, `sample/slide-jy.js` is jQuery 1.11.3** — they are different libraries, not the same code minified differently. Module 64 picks between them at load time: Zepto for mobile, jQuery for desktop.
-11. **Module 41** is the i18n caption table (`c1..c23`, `puzzle1..puzzle10`, language map). Parked as a footnote.
-
-### Deliverable
-- `docs/CAPTCHA_ORCHESTRATOR.md` — new file. Required sections:
-  1. Overview (bundle shape, entry, module count, how webpack wraps modules)
-  2. End-to-end flow (show-page load → vm-slide fetch → vData compute → verify POST → ticket return) — transcribed from FLOW.md §6
-  3. Verify POST origination table — embedded from `verify-body-origination.json` or equivalent
-  4. Critical fields in detail: `collect`, `eks`, `vData` (with the honest "open question" framing), `nonce`, `sess`, `vsig`/`websig`
-  5. Ticket return via postMessage
-  6. Library note (Zepto vs jQuery, module 76 vs slide-jy.js)
-  7. Known limitations / open questions (vData runtime binding, module 41 parked, any other unresolved items from FLOW.md §9)
-  8. Reconciliation footnotes against `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md` — the research found no contradictions, so these should be short "consistent with" footnotes unless FLOW.md §8 records specific discrepancies.
-- **Also update `docs/HAR_ANALYSIS.md`** if and only if FLOW.md §8 records a concrete contradiction with it. Otherwise leave it alone. Same for TOKEN_FORMAT.md and EKS_FORMAT.md.
-
-### Explicit non-goals
-- **No new research.** If FLOW.md doesn't cover it, 41.6 doesn't cover it. Escalate open questions as follow-up tasks rather than inventing new findings.
-- **No code changes.** No tests, no scripts, no helper files. Pure documentation.
-- **Do not update `plan.md` / `history/` / `SURVEY.md` / `FLOW.md`.** The director owns those.
-
-### Verification
-1. `docs/CAPTCHA_ORCHESTRATOR.md` exists and covers all eight required sections.
-2. Every major claim cites its source (module id + line range, or FLOW.md §N).
-3. The verify-POST origination table matches `verify-body-origination.json` for at least the six DoD fields.
-4. `vData` is framed as an open question, not as a resolved flow.
-5. `npm test` — still 353/353 (no code changes expected).
-6. `git diff --stat docs/` — shows only `CAPTCHA_ORCHESTRATOR.md` as added (plus reconciliation edits to the three existing docs if and only if FLOW.md §8 required them).
-
-### Suggested Agent
-`general-purpose` — documentation task. Needs care with provenance (cite FLOW.md / module IDs / line ranges) but the analytical work is done. Different agent than the one that did 41.5, to keep the "author vs transcriber" separation honest.
-
----
-
-### Prior: 41.5 survey outcome (headline, archived from mid-phase check-in)
-
-`sample/t_captcha_slide.js` is a standard webpack 4 IIFE bundle. Single-root require graph (entry = module 64), 110 slots / **50 live modules** / 60 sparse holes, 91 static edges, max fanout 21, avg 1.82, 24 leaves. **No dynamic `n(var)` require patterns observed in the static pass.** All five Track 2 DoD origination concepts are anchored to a small, structurally obvious set of candidates:
-
-| Concept | Candidate | Evidence |
-|---|---|---|
-| vm-slide loading | **module 8** | exports `getScript`/`getScriptUrl`/`isIframeSupportCdnDomain`, one `document.createElement('script')` call |
-| vData / collect / eks / nonce / sess / sig / cap_union | **module 56** (8 KB, fanout 21) | all 7 DoD keyword strings literally present in its source range — confirmed by independent grep |
-| jQuery/Zepto ajax layer | **module 76** (27 KB) | Zepto-shaped, 43 exports including `ajax`, `ajaxJSONP`, `Event` — diff vs `sample/slide-jy.js` in 41.5 |
-| (risk) 62 KB opaque blob | **module 41** | 29% of the bundle, 1 outgoing edge, zero `exports.<name>` — main obfuscation risk |
-
-XTEA delta `0x9E3779B9` is **not present** anywhere in `t_captcha_slide.js` (scanned) — vm-slide's XTEA lives in `sample/vm_slide.js`, not here. Confirms orchestrator layer is transport-only with respect to XTEA.
-
-**Tractability verdict** (from `research/captcha-orchestrator/SURVEY.md`):
-
-> The bundle is a clean, flat webpack 4 module array with 50 live modules, a single-root require graph rooted at module 64, and no dynamic-require patterns observed in the static pass. Every Track 2 DoD concept (vData, collect, eks, nonce, sess, sig, cap_union, prehandle) is anchored to a small and structurally obvious set of candidates — module 56 alone contains every keyword, and module 8 is unambiguously the script loader. An acorn-based deep-analysis pass in 41.5 is very likely to succeed for mapping the show-page-load → vm-slide-fetch → vData-compute → verify-POST flow and for identifying the origination points of the verify-body fields. The two real risks are (i) module 41's 62 KB opaque blob, which may be obfuscated enough to resist static analysis and need a small dynamic harness, and (ii) potential dynamic `n(var)` requires that the current pass cannot see — neither of which is disqualifying, but both should be sanity-checked early in 41.5 before committing to a pure-static approach.
-
-### Decision for the user
-
-41.5's proposed scope: trace show-page → vm-slide fetch → vData compute → verify POST across modules 8, 56, 76, and their required subgraphs; cross-reference `sample/captcha-har.har` for network endpoints; confirm `sample/slide-jy.js` is vanilla jQuery/Zepto via diff against module 76; document verify-body origination per field. Module 41 deferred — sanity-check upfront whether static analysis can make progress; if not, park it for a dedicated follow-up task rather than blocking 41.5.
-
-User confirmed option (a) — proceed as scoped. 41.5 ran; findings recorded in `research/captcha-orchestrator/FLOW.md`. 41.6 auto-continues.
+### Prior: 41.5 (completed — user confirmed option (a))
+Full static end-to-end flow trace via `research/captcha-orchestrator/FLOW.md` (612 lines) + `trace-flow.js` → 39-field `verify-body-origination.json` + `slide-jy-diff.js` → library classification. Both 41.4 candidate hypotheses overturned (module 8 only fetches `/slide-jy.js`; module 76 is Zepto, `slide-jy.js` is jQuery 1.11.3 — different libraries). Module 41 parked as i18n caption table. 38/39 verify-body fields traced cleanly; `vData` is the single unresolved static question.
 
 ---
 
