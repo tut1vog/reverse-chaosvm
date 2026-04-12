@@ -8,11 +8,28 @@ and talking to the captcha endpoints?
 
 ## Status
 
-partial — flow traced end-to-end, public doc shipped, one open question
-remaining (`vData` runtime binding). Structural survey complete (task 41.4),
-end-to-end flow trace complete (task 41.5), and the public reference
-`docs/CAPTCHA_ORCHESTRATOR.md` landed in task 41.6. The only unresolved
-item is `vData` origination on modern browsers — see "Open questions" below.
+closed (mechanism) — full flow documented end-to-end. `vData` runtime
+binding resolved in Phase 42 via static decode of `sample/vm_slide.js`:
+on modern browsers vm-slide's `proxyXHR` installs an
+`XMLHttpRequest.prototype` monkey-patch that encrypts payload data via
+modified XTEA + a custom 64-char base64 alphabet and injects
+`vData=<ciphertext>` into the verify POST body; on IE9 and below vm-slide
+installs `window.getVData` directly and the orchestrator's
+`if (a.isLowIE())` branch calls it. See
+`research/vm-slide-stack-vm/{VDATA-TRACE,VDATA-RESOLUTION}.md` and the
+rewritten `docs/CAPTCHA_ORCHESTRATOR.md` §6 for the full narrative.
+
+**Narrower follow-up still available** (not required by the Track 2 DoD):
+extract the exact XTEA key bytes used for the vData pipeline, characterise
+the plaintext structure, and produce a standalone byte-identical `vData`
+generator. Phase 42 resolved mechanism, not reproducibility.
+
+Track history: structural survey 41.4 (`SURVEY.md`), end-to-end flow
+trace 41.5 (`FLOW.md`), public reference 41.6 (`docs/CAPTCHA_ORCHESTRATOR.md`),
+README bump 41.7, `vData` static trace 42.1
+(`research/vm-slide-stack-vm/VDATA-TRACE.md`), cross-reference +
+provenance 42.2 (`research/vm-slide-stack-vm/VDATA-RESOLUTION.md`), docs
+bookkeeping 42.3.
 
 ## Inputs
 
@@ -89,20 +106,18 @@ Machine-readable artifacts (under `output/captcha-orchestrator/`):
 
 ## Open questions
 
-- **`vData` runtime binding.** The only lexical write to `vData` in the
-  orchestrator is inside `if (a.isLowIE()) { ... window.getVData(...) }`,
-  but the HAR was captured on Chrome 146 (`isLowIE() === false`) and
-  `vData` is still present in the verify POST body. Hypothesis:
-  `vm-slide.e201876f.enc.js` installs a runtime binding. Three follow-up
-  options (full detail in `FLOW.md` section 9 Q1 and
-  `docs/CAPTCHA_ORCHESTRATOR.md` section 8):
-  1. jsdom harness that executes `vm-slide.e201876f.enc.js` and logs
-     `window.*` writes and `$.ajaxSettings` mutations.
-  2. Stack-VM bytecode decode of `sample/vm_slide.js` via
-     `research/vm-slide-stack-vm/`, then grep for `getVData` / `vData` /
-     `ajaxPrefilter` / `ajaxTransport` / `ajaxSettings`.
-  3. Puppeteer + `chrome.debugger` break-on-property-write against
-     `window.getVData` and `$.ajax`.
+- **Byte-identical `vData` reproducibility (narrower follow-up)**. Phase 42
+  resolved the vData mechanism statically (see `research/vm-slide-stack-vm/
+  VDATA-RESOLUTION.md`). What remains is extracting the exact XTEA key
+  bytes used by the vData pipeline (distinct from the register-VM `collect`
+  key), characterising the plaintext structure being encrypted, and
+  producing a standalone byte-identical `vData` generator under `tools/`.
+  The ingredients are known: XTEA delta `0x9E3779B9` at bytecode indices
+  15352 (encrypt) / 15530 (decrypt), a 64-char custom base64 alphabet at
+  pc 16932, and a char-set validation regex at pc 17677. The productive
+  follow-up would decompile the XHR proxy body (bytecode pcs roughly
+  15000..20700) and use the Phase 40 vm-slide decoder to extract the key
+  schedule.
 
 ## Notes
 

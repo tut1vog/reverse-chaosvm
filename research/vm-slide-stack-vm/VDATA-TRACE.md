@@ -292,3 +292,49 @@ Ambiguities for 42.2:
    `window.getVData` on every run. The `isLowIE` branch is a belt-and-
    braces fallback for environments where vm-slide bytecode is never
    executed.
+
+---
+
+## Correction from 42.2
+
+The handoff paragraph above says "vm-slide pre-installs `window.getVData`
+on every run" and calls the orchestrator's `isLowIE` branch "redundant on
+non-IE browsers." **Both statements are incorrect.** Task 42.2 traced one
+block up from this document's anchors and found the enclosing gate: at
+bytecode pc 19636, vm-slide calls `<state>.isIE9Below()` and takes a
+two-way branch. On Chrome 146 (the HAR) the branch evaluates false and
+vm-slide falls through to call `<state>.proxyXHR(p[3])` at pc 19662, then
+`OP_06 20070` at pc 19663 **skips the entire `getVData` install block**.
+On the IE9-true branch vm-slide takes the jump target at pc 19666 and
+reaches the install sequence this document traces. The two paths are
+mutually exclusive, joined at pc 20070, and `window.getVData` is
+**never installed at all** on Chrome 146.
+
+The orchestrator's `if (a.isLowIE())` branch is **not redundant** — it
+mirrors vm-slide's own IE9 gate and is the exclusive path on IE9 and
+below. On Chrome, `vData` reaches the verify POST via vm-slide's
+`proxyXHR` routine, which installs an `XMLHttpRequest.prototype` monkey
+patch that encrypts payload data with modified XTEA + a custom 64-char
+base64 alphabet (ingredients at bytecode indices 15352/15530 and pc
+16932/17677) and injects `vData=<ciphertext>` into the outgoing POST
+body before `send()` completes.
+
+The physical opcode identification in §3 and §4 of this document is
+unchanged — anchor 1 at pc=19681 really does build the `[window,
+"getVData"]` descriptor, `OP_58 19702 1 1 8 3 3` at pc 20059 really
+does FUNC_CREATE the body at `[19702, 20058]`, and `OP_24` at pc 20066
+really is the property write. What was wrong was the characterisation
+of the enclosing control-flow block in §3's "The `classification_evidence`
+field..." narrative and in §6's handoff paragraph — neither traced the
+outer branch.
+
+See `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` §3 candidate (a/b)
+and §4 "Partially resolved (static limit reached)" for the corrected
+mechanism, the full `window-installs.json` enumeration, and the HAR
+character-set verification against the custom alphabet.
+
+(One minor operand-order note: 42.1 read the OP_58 tail `8 3 3` as `p[1]
+= n[8]`; 42.2 reads it as `p[8] = n[3]`. The semantic conclusion — one
+upvalue captured — is unchanged; the captured value is the outer
+initializer's argument 0, a shared state handle, not a pre-computed
+crypto blob. 42.2 is the correct reading.)

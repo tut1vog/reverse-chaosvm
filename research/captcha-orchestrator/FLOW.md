@@ -589,6 +589,57 @@ set-breakpoint-on-property-write against `window.getVData` / `$.ajax`.
 This is the single open question exposed by 41.5 and does not block
 41.6 from writing the public doc.
 
+**Resolution post-script (Phase 42, 2026-04-13)**. Q1 is now resolved in
+mechanism. Hypothesis 1 is wrong in its specific hook (it is NOT a jQuery
+`ajaxPrefilter`/`ajaxTransport`) but right in its location
+(`vm-slide.e201876f.enc.js`). Follow-up option (b) — stack-VM bytecode
+decode via `research/vm-slide-stack-vm/` — was the productive path.
+
+Tasks 42.1 and 42.2 statically traced vm-slide's bytecode and established:
+
+1. vm-slide has a two-way runtime branch at bytecode pc 19636 (`OP_60
+   19666`) calling `<state>.isIE9Below()`. The two branches are mutually
+   exclusive and join at pc 20070.
+2. **Chrome path** (fall-through on non-IE): vm-slide builds the property
+   descriptor `[<state>, "proxyXHR"]` and invokes it with one argument at
+   pc 19662 (`OP_02 1`). The `proxyXHR` routine installs an
+   `XMLHttpRequest.prototype` monkey-patch — `"XMLHttpRequest"` appears 5×
+   at pcs 20154 / 20220 / 20290 / 20476 / 20621 inside vm-slide, with
+   `"send"`/`"open"` references. The patched `send` intercepts the
+   orchestrator's later verify POST and injects `vData=<ciphertext>` into
+   the body. `window.getVData` is **never installed** on Chrome — the
+   jump `OP_06 20070` at pc 19663 skips the entire install block.
+3. **IE9 fallback** (jump target): vm-slide builds `[window, "getVData"]`
+   and installs the closure at `OP_24` pc 20066 with body brackets
+   `[19702, 20058]`. This is what Hypothesis 2 pointed at — but only for
+   IE9 browsers; the orchestrator's `if (a.isLowIE())` branch then calls
+   the installed function explicitly. The branch is not redundant; it
+   mirrors vm-slide's own IE9 gate.
+4. **Crypto pipeline ingredients all present in vm-slide**: XTEA delta
+   `0x9E3779B9` as `OP_08` immediate at bytecode indices 15352 (encrypt)
+   and 15530 (decrypt), a custom 64-char base64 alphabet at pc 16932
+   (`GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` —
+   contains `-_*`), and a char-set validation regex `[^A-Za-z0-9\-\_\*]`
+   at pc 17677. The full 152-char HAR `vData` value's character set is a
+   strict subset of the alphabet (zero outliers), confirming the
+   alphabet-to-HAR-value linkage.
+5. **Window-install enumeration**: the full-bytecode scan in
+   `research/vm-slide-stack-vm/vdata-provenance.js` →
+   `output/vm-slide/window-installs.json` found exactly **one**
+   `window.*` property that vm-slide installs — `getVData`, on the IE9
+   branch. The Chrome-path crypto stays entirely inside the XHR proxy
+   closure.
+
+See `research/vm-slide-stack-vm/VDATA-TRACE.md` (task 42.1) for the
+property-write trace and `research/vm-slide-stack-vm/VDATA-RESOLUTION.md`
+(task 42.2) for the cross-reference, IE-gate discovery, and full crypto
+provenance scan. The public doc `docs/CAPTCHA_ORCHESTRATOR.md` §6 `vData`
+was rewritten with the resolved mechanism.
+
+What remains open (narrower follow-up, not Phase 42 scope): exact XTEA
+key bytes, exact plaintext structure, and byte-identical reproducibility
+via a standalone vData generator. Track 2's DoD did not require this.
+
 ### Q2. subcapclass dropped between prehandle and show
 
 Prehandle JSONP returned `subcapclass:"15"`; show-page URL query

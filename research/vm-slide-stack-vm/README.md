@@ -28,11 +28,26 @@ node research/vm-slide-stack-vm/walker.js
 # Reproduce the XTEA finding with annotated disassembly windows (40.6)
 node research/vm-slide-stack-vm/xtea-hunt.js
 
+# Phase 42.1 vData anchor trace (OP_04 OP_10* OP_13 runs for "getVData", "vData=", "&vData=")
+#   -> output/vm-slide/vdata-anchors.json
+node research/vm-slide-stack-vm/vdata-trace.js
+
+# Phase 42.2 window-install enumeration ([window, <key>] + FUNC_CREATE + OP_24 patterns)
+#   -> output/vm-slide/window-installs.json
+node research/vm-slide-stack-vm/vdata-provenance.js
+
 # Run regression tests (39.2 + 40.2, 37 total)
 node --test tests/test-vm-slide-decoder.js tests/test-vm-slide-walker.js
 ```
 
-Authoritative reference: `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/CHAOSVM_VARIANTS.md`.
+Authoritative reference: `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/CHAOSVM_VARIANTS.md`, `docs/CAPTCHA_ORCHESTRATOR.md` §6 (`vData`).
+
+Phase 42 research artifacts under this track:
+
+- `VDATA-TRACE.md` — task 42.1 static trace of the `getVData` property-write anchor, with a 42.2 correction post-script.
+- `VDATA-RESOLUTION.md` — task 42.2 cross-reference against FLOW.md §6 + HAR + crypto provenance scan. Identifies the Chrome-vs-IE9 branch at bytecode pc 19636 and the `proxyXHR` XHR-interceptor path.
+- `vdata-trace.js` + `output/vm-slide/vdata-anchors.json` — reproducible anchor extractor.
+- `vdata-provenance.js` + `output/vm-slide/window-installs.json` — reproducible `[window, <key>]` property-write enumerator. Finds exactly 1 install (`getVData`, on the IE9 branch).
 
 ## Notes
 
@@ -47,5 +62,12 @@ Authoritative reference: `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES
 - Both closures are instantiated by a single outer factory at entry PC `15220`, spawned via `FUNC_CREATE 15220 0 3 3 4 5` near PC 16835 from inside a CommonJS-style `__esModule` bootstrap routine; the factory takes 3 arguments including key material in local slot 4
 - Module-export indirection blocks static identification of the real-world callers — the encrypt/decrypt closures are stored into Tencent's module-export table and invoked indirectly
 
-**Remaining open:**
-- Pinning the real-world XTEA caller arguments (who supplies the key? what plaintext blocks are encrypted and on which request path?) is blocked by module-export indirection and is the natural handoff to the `captcha-orchestrator` and `eks-payload` research tracks.
+**Phase 42 findings (vData runtime binding):**
+- Task 42.1: statically identified the `window.getVData` property-write at bytecode pc 20066 via `OP_04 OP_10* OP_13` anchor walk. Function body brackets `[19702, 20058]` (216 instructions, one string arg, two `OP_16` exits). Anchors `vData=` at pc 19969 and `&vData=` at pc 24210 confirmed as unrelated (RegExp recursion guard inside the function body, and `window.DEBUGMODE` dead code respectively).
+- Task 42.2: traced one block up from 42.1's anchor and found the enclosing IE-gate at pc 19636 (`OP_60 19666` — `if (<state>.isIE9Below()) install getVData else <state>.proxyXHR(p[3])`). Mutually exclusive branches joined at pc 20070. Resolves 42.1's incorrect "installs unconditionally" framing: on Chrome 146 `window.getVData` is **never installed**; the Chrome path goes through the `proxyXHR` XMLHttpRequest monkey-patch (strings `"XMLHttpRequest"` ×5, `"send"`, `"open"`, `"proxyXHR"` at pcs 19641/20119), which intercepts the orchestrator's verify POST and injects `vData=<ciphertext>` into the body.
+- Task 42.2 crypto provenance scan: the `getVData` function body itself contains NO crypto. The pipeline ingredients live elsewhere in the bytecode — XTEA delta `0x9E3779B9` as `OP_08` immediate at bytecode indices 15352 (encrypt) and 15530 (decrypt), a custom 64-char base64 alphabet at pc 16932, and a char-set validation regex at pc 17677. Each character in the full 152-char HAR `vData` value is a member of the custom alphabet (zero outliers), confirming the linkage.
+- Window-install enumeration: vm-slide installs exactly **1** `window.*` property (`getVData`). No secondary crypto helper exists anywhere in the bytecode. `output/vm-slide/window-installs.json` has one entry.
+
+**Remaining open (narrower follow-up — not Phase 40/42 scope):**
+- Pinning the real-world XTEA caller arguments on the Chrome path: who supplies the key used by `proxyXHR`? What plaintext blocks are being encrypted and in what layout? Phase 42 resolved the mechanism but not byte-identical reproducibility. The productive follow-up would decompile the XHR proxy body (bytecode pcs roughly 15000..20700) and use the Phase 40 decoder to extract the key schedule, then build a standalone `vData` generator under `tools/`.
+- The register-VM caller handoff flagged in Phase 40 (real-world XTEA caller arguments via module-export indirection) also remains, and is a sibling follow-up.
