@@ -330,4 +330,21 @@ Phases 1–8: ✅ Complete | 28 tasks total | 28 test rounds | All passing
 Phase 9: ✅ Complete (9.1–9.6 all passing)
 Phase 10: ✅ Complete (conditional) — Puppeteer solver works, jsdom solver gets errorCode 9
 
-**Summary**: 51 test rounds across 10 phases. The Puppeteer-based CAPTCHA solver is the production path. The jsdom path generates valid-looking tokens but the server rejects them due to fingerprint quality differences.
+**Summary**: Initial 10 phases completed. The Puppeteer-based CAPTCHA solver is the production path. The jsdom path generates valid-looking tokens but the server rejects them due to fingerprint quality differences. See the Epilogue below for subsequent phases.
+
+---
+
+## Epilogue: Phases 11–36
+
+After the initial 10 phases, work continued through 26 more phases focused on multi-version support, automated porting, and live validation. Each phase is recorded in day-files under `history/` (e.g. `history/20260409.md`). Summary by phase:
+
+- **Phase 11–20**: Automated porting pipeline (vm-parser, opcode-mapper, key-extractor, token-verifier); support for Templates A, B, C; multi-build verification
+- **Phase 21–27**: Headless scraper (`scraper/`); jsdom vData generation; slide CAPTCHA HTTP flow; template cache with source-hash keys
+- **Phase 28–32**: Live testing; corrected documentation (TLS 403 was sess-missing, not TLS fingerprinting); source-hash cache key (replacing TDC_NAME)
+- **Phase 33**: TDC survey — collected 10 unique builds from live rotation, documented errorCode distribution
+- **Phase 34**: vm-parser obfuscation support (bracket-notation thisCtx extraction, catch-var fallback heuristic)
+- **Phase 35**: Source deobfuscator for string-decoder + helper-wrapper obfuscation; all 10 builds now port successfully
+- **Phase 36**: errorCode 12 diagnostic survey — determined token rejection correlates with fingerprint/rate-limit, not token generation
+- **Phase 37**: Project cleanup — removed 20 obsolete files, fixed all test failures (296/296), archived legacy docs
+
+For task-level detail see `history/YYYYMMDD.md` day-files.

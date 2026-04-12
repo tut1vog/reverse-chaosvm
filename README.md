@@ -24,7 +24,7 @@ working token generator (byte-identical, no manual work)
 
 3. **Solves Tencent slide CAPTCHAs** — Puppeteer-based bot that intercepts CAPTCHA images, solves the slide puzzle with OpenCV (Canny edge detection + normalized cross-correlation), performs a realistic mouse drag, and captures the verification ticket.
 
-4. **Automated porting pipeline** — `pipeline/` takes any new tdc.js build through 4 stages (parse VM → map opcodes → extract XTEA key → verify token). Tested on 5 builds across 3 distinct templates — all produce byte-identical tokens.
+4. **Automated porting pipeline** — `pipeline/` takes any new tdc.js build through 4 stages (parse VM → map opcodes → extract XTEA key → verify token). Tested on 10+ live builds across multiple template architectures — all produce byte-identical tokens.
 
 ## Quick Start
 
@@ -113,7 +113,7 @@ reverse-chaosvm/
 │   ├── default.json            # Default profile for token generation
 │   └── chrome-fingerprint.json # Harvested real Chrome fingerprint
 │
-├── tests/                      # Test suite (90 passing, 2 known issues)
+├── tests/                      # Test suite (296 passing, all green)
 ├── docs/                       # Technical documentation (13 files)
 ├── sample/                     # Reference files (HAR capture, bot.py)
 └── archive/                    # Historical test reports (51 rounds)
@@ -182,7 +182,7 @@ All 5 targets produce byte-identical tokens:
 | tdc-v4.js | A | 95 | 95/95 | byte-identical |
 | tdc-v5.js | C | 100 | 91/100 | byte-identical |
 
-3 distinct templates observed. Each has a unique XTEA key. Unmapped opcodes are novel compound operations that don't affect token generation.
+10+ distinct builds observed in live rotation across multiple template architectures. Each build has a unique XTEA key. Unmapped opcodes are novel compound operations that don't affect token generation.
 
 ### CAPTCHA Solver (Puppeteer)
 
@@ -217,7 +217,7 @@ python3 -m venv .venv
 | [TOKEN_DECRYPTION.md](docs/TOKEN_DECRYPTION.md) | How to decode and decrypt captured tokens |
 | [HAR_ANALYSIS.md](docs/HAR_ANALYSIS.md) | Network flow analysis of the CAPTCHA protocol |
 | [VERSION_DIFFERENCES.md](docs/VERSION_DIFFERENCES.md) | Differences between tdc.js template versions |
-| [WORKFLOW.md](docs/WORKFLOW.md) | 10-phase development workflow (51 test rounds) |
+| [WORKFLOW.md](docs/WORKFLOW.md) | Multi-phase development workflow — see history/ for per-phase day-files |
 | [CONVENTIONS.md](docs/CONVENTIONS.md) | Code style and project conventions |
 | [TOKEN_PIPELINE.md](docs/TOKEN_PIPELINE.md) | Early token pipeline notes (superseded by TOKEN_FORMAT.md) |
 | [PROGRESS.md](docs/PROGRESS.md) | Detailed task-by-task progress log |
@@ -268,9 +268,7 @@ node --test tests/test-vm-parser.js
 node --test tests/test-opcode-mapper.js
 ```
 
-90 of 92 tests pass. The 2 failures are known pre-existing issues:
-- `test-cfg.js`: 583/584 assertions pass (1 edge case in func 272)
-- `test-emit.js`: Code quality threshold assertions (cosmetic, not functional)
+All 296 tests pass.
 
 ## Requirements
 
