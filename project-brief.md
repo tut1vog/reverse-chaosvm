@@ -1,3 +1,5 @@
+> **ARCHIVED** — This is the original project brief. Current project state and architecture are described in `CLAUDE.md`. This file is preserved for historical reference.
+
 # Project Brief
 
 ## Project Overview

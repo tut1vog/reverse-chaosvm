@@ -1,3 +1,5 @@
+> **ARCHIVED** — This file documents Phases 1-10 in detail. For Phases 11-36 see `history/` day-files and `docs/WORKFLOW.md`. Preserved for historical reference.
+
 # Progress & Task Tracker
 
 ## Current State
