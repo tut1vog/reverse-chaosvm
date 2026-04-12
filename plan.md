@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 39 — vm-slide stack VM
-Current task: 39.4 — Write docs/CHAOSVM_VARIANTS.md — top-level register-vs-stack comparison
+Current task: 39.5 — Update project-brief.md + refresh research/vm-slide-stack-vm/README.md
 
 ---
 
@@ -27,8 +27,8 @@ Current task: 39.4 — Write docs/CHAOSVM_VARIANTS.md — top-level register-vs-
 | 39.1 | Implement vm-slide decoder + disassembler under `research/vm-slide-stack-vm/` | done |
 | 39.2 | Write tests for vm-slide decoder + disassembler | done |
 | 39.3 | Write `docs/VM_SLIDE_ARCHITECTURE.md` + `docs/VM_SLIDE_OPCODES.md` from source inspection (first-pass, admits ~2% coverage) | done |
-| 39.4 | Write `docs/CHAOSVM_VARIANTS.md` — top-level register-vs-stack comparison | in-progress |
-| 39.5 | Update `project-brief.md` with corrected vm-slide facts (53 opcodes, 24K bytecode, XTEA finding) + refresh `research/vm-slide-stack-vm/README.md` status to `partial` | pending |
+| 39.4 | Write `docs/CHAOSVM_VARIANTS.md` — top-level register-vs-stack comparison | done |
+| 39.5 | Update `project-brief.md` with corrected vm-slide facts (53 opcodes, 24K bytecode, XTEA finding) + refresh `research/vm-slide-stack-vm/README.md` status to `partial` | in-progress |
 
 ### Phase 40: Phase-39 follow-ups + session cleanup (planned, not yet started)
 > Addresses the deferred issues surfaced during Phase 38-39 and upgrades the vm-slide disassembler to full coverage. Each task is independent; they can be dispatched in any order the user prefers.
@@ -45,96 +45,113 @@ Current task: 39.4 — Write docs/CHAOSVM_VARIANTS.md — top-level register-vs-
 ---
 
 
+
 ## Current Task
 
-**ID**: 39.4
-**Title**: Write `docs/CHAOSVM_VARIANTS.md` — top-level register-vs-stack comparison
+**ID**: 39.5
+**Title**: Update project-brief.md with corrected vm-slide facts + refresh research/vm-slide-stack-vm/README.md
 **Phase**: Phase 39 — vm-slide stack VM
 **Status**: in-progress
 
 ### Goal
-Produce a single top-level reference document, `docs/CHAOSVM_VARIANTS.md`, that compares the two ChaosVM variants known to the project: the register-based `tdc.js` VM (fully understood) and the stack-based `vm-slide` VM (first-pass understanding as of 39.3). The doc is a side-by-side comparison — not a re-derivation of either VM's internals. It points readers at the authoritative per-variant docs for details.
+Close Phase 39 Track 1 by reconciling two stale documents with the verified findings from 39.1–39.4:
+
+1. **`project-brief.md`** — the research-phase backlog. Track 1's description says "~36 opcodes" but the verified count is **53 non-null handlers + 16 holes across 69 dispatch slots**. Bytecode length estimate was rough — actual is **24,273 elements**. The XTEA delta finding and the FUNC_CREATE closure mechanism aren't mentioned at all. These need to land in the brief so the backlog reflects reality.
+
+2. **`research/vm-slide-stack-vm/README.md`** — the track's scaffold README created in 38.2. Status is still `open`. It needs promotion to `partial` and a populated "How to reproduce" section with real commands for the decoder and disassembler built in 39.1.
+
+Both updates are documentation-only director-style edits. They are the final task of Phase 39 — after this, Track 1 checkpoints cleanly and Phase 40 can pick up the control-flow walker upgrade and follow-ups.
 
 ### Context
 
-**Prerequisite docs** (all committed by this point):
-- Register VM: `docs/VM_ARCHITECTURE.md`, `docs/OPCODE_REFERENCE.md`, `docs/CRYPTO_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/CONVENTIONS.md`.
-- Stack VM: `docs/VM_SLIDE_ARCHITECTURE.md` (written in 39.3), `docs/VM_SLIDE_OPCODES.md` (written in 39.3).
-- High-level project memory: `CLAUDE.md` ("Key VM Internals" table) and `project-brief.md` (~36 opcodes claim — **stale**, actual is 53).
+**`project-brief.md` current state** — read the existing Track 1 section under "Stream B — Research tracks" first. Current claims to verify and update:
+- "stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`, ~36 opcodes)" — **update to 53 non-null handlers + 16 holes**.
+- Definition of done items 1-6 — these were speculative pre-39.1. Items 1-5 (decoder, disassembler, architecture doc, opcodes doc, tests) are **now done**; item 6 (variants comparison doc) is **also done**. The brief should either mark Track 1 as `partial` (not `closed`, because Phase 40 still owes full coverage) or leave the DoD intact but prepend a `**Status as of 2026-04-12**:` note pointing at the committed artifacts.
+- Decoder/disassembler/tests references — the brief doesn't mention they exist. Add a short "Committed artifacts" subsection listing paths.
 
-**Why this doc exists**: the two VM families share a name ("ChaosVM") but have different architectures. A reader landing on the project needs a one-stop guide for "which variant is where, why they differ, what they share". Without it, readers have to diff two separate architecture docs by hand, and the shared cryptography and toolchain touchpoints get lost.
+**`research/vm-slide-stack-vm/README.md` current state** — read it first. It should be the 38.2 scaffold:
+- `# vm-slide-stack-vm`
+- `## Open question` — one paragraph quoted from brief (verbatim)
+- `## Status` — `open`
+- `## Inputs` — `sample/vm_slide.js` and "Optional: fresh vm-slide.*.enc.js"
+- `## How to reproduce` — "No runnable artifacts yet — see `project-brief.md` §Stream B for the definition of done."
+- `## Notes` — empty
 
-**Director-verified key differences** (from Phases 1-37 + Phase 39 findings):
+This task's update:
+- Status: `open` → `partial` (track has committed code and committed docs; full-coverage walker pending Phase 40).
+- How to reproduce: replace the placeholder with real CLI commands for the decoder and disassembler plus pointers to the authoritative docs and tests.
+- Notes: add a short bulleted summary of key findings (53 handlers, 24K bytecode, FUNC_CREATE variable-width finding, XTEA delta in bytecode). Each finding one line, each citing a doc filename.
+- Open question, Inputs: **do not rewrite**. They are still accurate.
 
-| Dimension | Register VM (`tdc.js` family) | Stack VM (`vm-slide`) |
-|---|---|---|
-| Execution model | Register file (r0-r20+), in-register computation | Operand stack (`n = [[this],[{}]]`), stack-based computation |
-| Dispatch | `switch`-style (95-100 cases per template) inside a loop | Dispatch table `Q[m[g++]]()` with 69 slots, 53 non-null handlers |
-| Opcode count | Template A: 95, Template B: 94, Template C: 100 | 53 non-null (+ 16 null holes in the dispatch table) |
-| Bytecode format | `Y[]` int array, ~7K elements | `m[]` number array, 24,273 elements |
-| Operand width | Fixed per opcode (encoded in handler) | Mostly fixed; **one variable-width opcode (58 FUNC_CREATE)** with width `3 + 2·A + C` |
-| PC register | `C` (canonical `pc`) | `g` (canonical `pc`) |
-| Exception handling | `F[]` catch-addr stack | `C = []` catch stack + `K = null` exception slot |
-| Return protocol | Single return via register | `.shift()[0]` FIFO from operand stack (the `.g` helper) |
-| Closures / first-class functions | Opcodes manipulate `E` (closure vars) | Opcode 58 `FUNC_CREATE` instantiates a nested `__TENCENT_CHAOS_VM(...)` call with captured locals + arg-mapping array; nested VM runs in the same bytecode stream at a different entry PC |
-| Constant pool | Per-template tables in `U[]` | `U = window` (property access as constant lookup) |
-| Crypto | Modified XTEA: delta `0x9E3779B9`, 32 rounds, per-template STATE_A keys | XTEA delta `0x9E3779B9` **appears twice in the bytecode** — suggests the stack VM also runs XTEA on some payload (likely eks). Full picture unresolved (Phase 40 task 40.6). |
-| Toolchain status | Fully decompiled, byte-identical token generator, automated porting pipeline | First-pass decoder + disassembler + opcode classifications; ~2% linear disassembly coverage; Phase 40 task 40.1 will upgrade to full coverage |
-| Observed in | `targets/tdc.js` (and 4 other `tdc-v*.js` variants) | `sample/vm_slide.js` (single sample) |
-| Carrier script | Served directly as the `tdc.js` script | Embedded inside `sample/t_captcha_slide.js` (the CAPTCHA orchestrator — separate research track, `research/captcha-orchestrator/`) |
+**Facts that must appear in both updates** (pulled from 39.1-39.4 verified state):
+- Dispatch table: 69 slots, **53 non-null handlers**, 16 null holes at indices `[9,14,18,19,22,26,27,29,30,34,43,44,48,53,57,65]`.
+- Bytecode: 24,273 numeric elements, one non-integer (`0.5`), contains XTEA delta `0x9E3779B9` exactly twice.
+- Operand count distribution: `{0, 1, 2, 6}` statically; opcode 58 `FUNC_CREATE` is variable-width at runtime (`3 + 2·A + C` bytes) — a latent bug in 39.1's static count that Phase 40 task 40.1 will fix.
+- Linear disassembly coverage: 312 instructions (pc 0..512), ~2% of the bytecode, halts legitimately on opcode 65 (a dispatch hole) which may itself be data from a mis-parsed FUNC_CREATE.
+- FUNC_CREATE instantiates nested `__TENCENT_CHAOS_VM(...)` invocations — this is how vm-slide does closures / first-class functions, and it resolves where the outer-supplied F/Y/c helper arguments are consumed.
+- Committed artifacts: `research/vm-slide-stack-vm/{decoder.js, disassembler.js}`, `output/vm-slide/{dispatch-table.json, bytecode.json, disassembly.txt}`, `tests/test-vm-slide-decoder.js` (16 tests), `docs/{VM_SLIDE_ARCHITECTURE.md, VM_SLIDE_OPCODES.md, CHAOSVM_VARIANTS.md}`.
 
-**Shared touchpoints**:
-1. **Identical XTEA delta** (`0x9E3779B9`) — strong signal of shared crypto lineage.
-2. **Both VMs are minified IIFEs** with obfuscated variable names — identified by structural role, not name.
-3. **Both are Tencent ChaosVM family** — same security team, likely shared ancestry, possibly shared code-generator backend.
-
-**Do NOT**:
-- Repeat content from `docs/VM_ARCHITECTURE.md` or `docs/VM_SLIDE_ARCHITECTURE.md` verbatim. Cross-reference them instead.
-- Claim any cross-variant finding that isn't already in the existing per-variant docs. This is a synthesis doc, not a place for new analysis. Every table cell must be backed by something already written in a referenced doc.
-- Write out full opcode tables. Link to `docs/OPCODE_REFERENCE.md` and `docs/VM_SLIDE_OPCODES.md` instead.
-- Forward-reference Phase 40 results that haven't happened yet. Use "Phase 40 task N.M will resolve..." phrasing where relevant but do NOT speculate on outcomes.
+**Phase 40 forward-references that must NOT appear as commitments in this task**:
+- Do not rewrite Phase 40's scope. Phase 40 is already enumerated in `plan.md`; project-brief.md can cite task IDs by number (e.g. "Phase 40 task 40.1 will...") but must not claim the tasks are done or alter their contents.
+- Do not promise specific Phase 40 completion dates or outcomes.
 
 ### Implementation Steps
 
-1. Read `docs/VM_ARCHITECTURE.md`, `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/OPCODE_REFERENCE.md`, `docs/CRYPTO_ANALYSIS.md`, `docs/CONVENTIONS.md`. Note what each doc authoritatively owns.
-2. Also read `CLAUDE.md` "Key VM Internals" table so your register VM column matches the existing project memory.
-3. Write `docs/CHAOSVM_VARIANTS.md`. Required structure:
-   - **Overview** — one paragraph. What the ChaosVM family is, that two variants are currently known, that both ship from Tencent's CAPTCHA stack, and that this doc is the entry point for understanding the family before diving into variant-specific docs.
-   - **The two variants at a glance** — a very short table (2-3 columns, ~10 rows) summarizing the most distinctive differences (execution model, dispatch, bytecode size, status). This is the reader's "which variant am I looking at" quick-reference.
-   - **Detailed comparison table** — the big side-by-side table from the Context section above. Include every row. Use concise cell content; cite doc file paths in the cell or in a footnote.
-   - **What they share** — bulleted subsection covering shared touchpoints (XTEA delta, IIFE obfuscation pattern, same-vendor ancestry). Each bullet cites the specific source doc.
-   - **When you'll encounter each variant** — short subsection explaining where each VM appears in Tencent's CAPTCHA flow. Register VM is `tdc.js` (served directly by the CDN); stack VM is inside `t_captcha_slide.js` (the slide-CAPTCHA orchestrator). Cross-reference `research/captcha-orchestrator/`.
-   - **Open cross-variant questions** — bulleted list, each with a Phase 40 task ID or "open — no task yet":
-     - Does vm-slide run XTEA on eks or another payload? → Phase 40 task 40.6
-     - Are the two VMs compiled from a shared source (same code generator with different output modes)? → open
-     - Is vm-slide's `0.5` bytecode operand (non-integer) a quirk of one build or a feature? → open — no task yet
-     - Anything else the doc naturally surfaces.
-   - **Document map** — final section, bulleted list of every variant-specific doc with a one-line description. Acts as a jumping-off point.
-4. **Do NOT modify any other file**. No edits to the variant-specific docs, no updates to `CLAUDE.md`, no edits to `project-brief.md` (that's task 39.5).
-5. Run `npm test` as a sanity check. Must be 312/312. The `template-cache: lookup` flake is now deterministic in full-suite runs during this session and clears only on ~1 in 4 attempts. Re-run up to 3 times; if it still fails, report but proceed — the flake is tracked as Phase 40 task 40.4.
+1. Read `project-brief.md` in full to locate the Track 1 (vm-slide-stack-vm) section and understand the surrounding structure. Note the exact phrasing of the "~36 opcodes" claim so you know what you're replacing.
+2. Read `research/vm-slide-stack-vm/README.md` to confirm the 38.2 scaffold shape.
+3. Read `docs/VM_SLIDE_ARCHITECTURE.md` and `docs/VM_SLIDE_OPCODES.md` to confirm the facts you're about to land in the brief and README match those docs verbatim — any phrasing you use should either quote or closely paraphrase the authoritative docs.
+4. **Edit `project-brief.md`**:
+   - Update the "~36 opcodes" claim to "53 non-null handlers + 16 holes across 69 dispatch slots".
+   - Update the bytecode size, if mentioned in a rough form, to 24,273 elements.
+   - Prepend or append a `**Status as of 2026-04-12**:` paragraph to the Track 1 section summarizing what is done (decoder, disassembler, tests, architecture doc, opcodes doc, variants doc) and what is still outstanding (full-coverage disassembly — Phase 40 task 40.1). Name the committed artifact paths.
+   - Cite the XTEA delta cross-track finding and the FUNC_CREATE variable-width finding as Phase 39 outcomes. These should go in the Status paragraph.
+   - Do NOT rewrite the Open Question, Definition of Done, or Inputs subsections — they are historical planning artifacts. Add a status overlay, don't revise the underlying plan text.
+5. **Edit `research/vm-slide-stack-vm/README.md`**:
+   - Change `## Status` body from `open` to `partial`.
+   - Replace `## How to reproduce` body with real commands. Match the shape used by `research/template-pool/README.md` (which was similarly promoted from `open` → `partial` in task 38.3). Include:
+     ```
+     # Run the decoder (acorn-parses sample/vm_slide.js, writes output/vm-slide/)
+     node research/vm-slide-stack-vm/decoder.js
+
+     # Run the disassembler (reads output/vm-slide/*.json, writes output/vm-slide/disassembly.txt)
+     node research/vm-slide-stack-vm/disassembler.js
+
+     # Run regression tests
+     node --test tests/test-vm-slide-decoder.js
+     ```
+   - Replace the empty `## Notes` body with a short bulleted summary of key findings — each one line, each citing a doc filename. At minimum:
+     - 53 non-null handlers across 69 dispatch slots, classified in `docs/VM_SLIDE_OPCODES.md`
+     - 24,273-element bytecode with XTEA delta `0x9E3779B9` twice (cross-track finding, `docs/VM_SLIDE_ARCHITECTURE.md` → Phase 40 task 40.6)
+     - Opcode 58 `FUNC_CREATE` is variable-width (runtime `3 + 2·A + C` bytes, not 6); instantiates nested VM invocations for closures (`docs/VM_SLIDE_OPCODES.md`)
+     - Linear disassembly covers ~2% (pc 0..512); full coverage pending Phase 40 task 40.1 (`docs/VM_SLIDE_ARCHITECTURE.md`)
+   - Do NOT touch the `# vm-slide-stack-vm` header, `## Open question` body, or `## Inputs` body.
+6. Run `npm test`. Must be 312/312. If the `template-cache: lookup` flake hits (it's been reliable through the whole session), re-run up to 3 times. Docs edits should not affect tests.
 
 ### Verification — report all of these
 
-1. `ls docs/CHAOSVM_VARIANTS.md` — exists.
-2. `wc -l docs/CHAOSVM_VARIANTS.md` — roughly 100-250 lines.
-3. `grep -c '^## ' docs/CHAOSVM_VARIANTS.md` — at least 6 top-level sections.
-4. `grep -n 'VM_ARCHITECTURE.md\|VM_SLIDE_ARCHITECTURE.md\|OPCODE_REFERENCE.md\|VM_SLIDE_OPCODES.md\|CRYPTO_ANALYSIS.md' docs/CHAOSVM_VARIANTS.md` — cross-references present to every major variant doc.
-5. `grep -n 'Phase 40\|40\.[0-9]' docs/CHAOSVM_VARIANTS.md` — open-question section forward-references Phase 40 tasks where applicable.
-6. `grep -n '0x9E3779B9\|2654435769\|XTEA' docs/CHAOSVM_VARIANTS.md` — crypto shared-touchpoint is documented.
-7. `grep -n 'FUNC_CREATE\|58\|variable.*width\|3 + 2' docs/CHAOSVM_VARIANTS.md` — the nested-VM/closure difference between the two variants is documented (one of the most interesting structural findings).
-8. `npm test` — 312/312. Note flake hits.
-9. Quote the **"The two variants at a glance"** table verbatim.
-10. List every "open cross-variant question" with its Phase 40 task ID or "open — no task".
+1. `ls project-brief.md research/vm-slide-stack-vm/README.md` — both exist.
+2. `grep -n '~36\|36 opcodes\|36 non-null' project-brief.md` — **must return no matches** (the stale claim is gone).
+3. `grep -n '53 non-null\|53 handlers' project-brief.md` — updated count present.
+4. `grep -n '24.273\|24273' project-brief.md` — bytecode length mentioned.
+5. `grep -n '2026-04-12\|Status as of' project-brief.md` — status overlay added to Track 1.
+6. `grep -n 'Phase 40\|40\.[0-9]' project-brief.md` — forward-references Phase 40 tasks.
+7. `grep '^## Status' research/vm-slide-stack-vm/README.md -A 2` — shows `partial`.
+8. `grep -A 10 '^## How to reproduce' research/vm-slide-stack-vm/README.md` — has the real decoder/disassembler/tests commands.
+9. `grep -A 10 '^## Notes' research/vm-slide-stack-vm/README.md` — has the findings bullets.
+10. `grep -c '^## ' research/vm-slide-stack-vm/README.md` — still exactly 5 sections.
+11. Diff summary: `git diff project-brief.md research/vm-slide-stack-vm/README.md` — paste the stat line; changes must be additive (overlay + section body edits) and must NOT rewrite Open Question, Inputs, or the Track 1 definition of done.
+12. `npm test` — 312/312. Note any flake.
 
 ### Constraints
 
 - **Do not make any git commits.** The director handles all commits.
-- **No code, no tests, no module edits.** Documentation only.
-- **Do not modify `docs/VM_ARCHITECTURE.md`, `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/OPCODE_REFERENCE.md`, `CLAUDE.md`, or `project-brief.md`.** This task creates one new file only.
-- **Do not modify `sample/**`, `targets/**`, `.claude/rules/**`, `history/**`, `docs/WORKFLOW.md`.**
-- **Do not claim new findings.** This is a synthesis doc; every cell in the comparison table must cite an existing authoritative doc or a committed fixture.
-- **Do not speculate on Phase 40 outcomes.** Use "will resolve" / "will investigate" phrasing, not "is expected to show".
-- If the task is too difficult or impossible (e.g. the existing docs disagree with each other and you can't resolve), stop and report.
+- **No code, no tests, no new docs.** This task edits two existing files only.
+- **Do not rewrite `project-brief.md`'s Open Question, Definition of Done, or Inputs** for Track 1. Those are historical planning artifacts — overlay a status paragraph, don't revise the plan.
+- **Do not modify `sample/**`, `targets/**`, `.claude/rules/**`, `history/**`, `docs/WORKFLOW.md`, `CLAUDE.md`, or any file under `docs/`, `tools/`, `tests/`, `research/` other than `research/vm-slide-stack-vm/README.md`.**
+- **Do not touch other tracks' READMEs** (`research/{captcha-orchestrator,eks-payload,template-pool,key-mod,collector-fields,errorcode-12,tdc-register-vm}/README.md`). Only the `vm-slide-stack-vm` README.
+- **Every fact you land in either file must be traceable** to a committed artifact, the 39.1-39.4 history entries, or the authoritative per-variant docs. No speculation.
+- **Do not claim Phase 40 tasks are done or will resolve X by Y date.** Forward-reference them with "Phase 40 task N.M will investigate/upgrade/resolve" phrasing.
+- If the project-brief.md Track 1 section has been materially rewritten since the director last read it (i.e. you find it doesn't contain "~36 opcodes"), STOP and report what you see.
 
 ### Suggested Agent
-`general-purpose` — reading + synthesis + judgment-driven technical writing. Same shape as 39.3.
+`general-purpose` — short, precise documentation edit task. Low risk.
