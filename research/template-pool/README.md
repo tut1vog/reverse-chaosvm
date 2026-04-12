@@ -6,7 +6,7 @@ How many distinct ChaosVM templates does Tencent rotate through in the live tdc.
 
 ## Status
 
-open
+partial
 
 ## Inputs
 
@@ -15,6 +15,9 @@ open
 
 ## How to reproduce
 
-No runnable artifacts yet — see `project-brief.md` §Stream B for the definition of done.
+```
+node research/template-pool/survey.js --attempts 30 --verbose --save-sources
+node research/template-pool/diagnose.js --attempts 30 --verbose
+```
 
 ## Notes

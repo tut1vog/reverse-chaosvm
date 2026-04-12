@@ -16,14 +16,14 @@ const path = require('path');
 const os = require('os');
 const { execFile } = require('child_process');
 
-const { CaptchaClient } = require('../tools/captcha-solver/captcha-client');
-const { solveSlider } = require('../tools/captcha-solver/slide-solver');
-const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('../tools/scraper/collect-generator');
-const { generateVData, parseVmSlideUrl } = require('../tools/scraper/vdata-generator');
-const { extractTdcName, extractEks, computeSourceHash } = require('../tools/scraper/tdc-utils');
-const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
+const { CaptchaClient } = require('../../tools/captcha-solver/captcha-client');
+const { solveSlider } = require('../../tools/captcha-solver/slide-solver');
+const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('../../tools/scraper/collect-generator');
+const { generateVData, parseVmSlideUrl } = require('../../tools/scraper/vdata-generator');
+const { extractTdcName, extractEks, computeSourceHash } = require('../../tools/scraper/tdc-utils');
+const { parseVmFunction } = require('../../tools/porting-pipeline/vm-parser');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const SURVEY_DIR = path.join(PROJECT_ROOT, 'output', 'tdc-survey');
 
 const DEFAULT_AID = '2046626881';

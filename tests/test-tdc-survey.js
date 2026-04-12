@@ -7,7 +7,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 
-const { parseArgs, buildPostFields } = require('../scripts/tdc-survey');
+const { parseArgs, buildPostFields } = require('../research/template-pool/survey');
 
 // ============================================================================
 // Helpers

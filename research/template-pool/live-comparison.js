@@ -21,16 +21,16 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../tools/captcha-solver/captcha-client');
-const { generateCollect } = require('../tools/scraper/collect-generator');
-const { extractTdcName, extractEks } = require('../tools/scraper/tdc-utils');
-const TemplateCache = require('../tools/scraper/template-cache');
-const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
-const { mapOpcodes } = require('../tools/porting-pipeline/opcode-mapper');
-const { extractKey } = require('../tools/porting-pipeline/key-extractor');
-const { matchFieldOrder, detectHashPosition, detectSerializationDiffs } = require('../tools/porting-pipeline/structure-extractor');
+const { CaptchaClient } = require('../../tools/captcha-solver/captcha-client');
+const { generateCollect } = require('../../tools/scraper/collect-generator');
+const { extractTdcName, extractEks } = require('../../tools/scraper/tdc-utils');
+const TemplateCache = require('../../tools/scraper/template-cache');
+const { parseVmFunction } = require('../../tools/porting-pipeline/vm-parser');
+const { mapOpcodes } = require('../../tools/porting-pipeline/opcode-mapper');
+const { extractKey } = require('../../tools/porting-pipeline/key-extractor');
+const { matchFieldOrder, detectHashPosition, detectSerializationDiffs } = require('../../tools/porting-pipeline/structure-extractor');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Constants

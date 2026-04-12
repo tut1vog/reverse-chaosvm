@@ -7,7 +7,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 
-const mod = require('../scripts/tdc-diagnose');
+const mod = require('../research/template-pool/diagnose');
 const { parseArgs } = mod;
 
 // ============================================================================
