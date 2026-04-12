@@ -1,143 +1,121 @@
-# CLAUDE.md
+# reverse-chaosvm
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Research platform for reverse-engineering Tencent's **ChaosVM** (JSVMP) — a family of JavaScript bytecode virtual machines used in Tencent's CAPTCHA stack for browser fingerprinting and behavioral protection. The project started as a `tdc.js` decompiler + token generator + headless scraper; it is now a **research lab** for the full ChaosVM variant family (register-based `tdc.js` + stack-based `vm-slide.enc.js` + whatever else Tencent ships).
 
-## What This Project Does
+Current working deliverables (all stable, preserved through the restructure):
 
-Reverse engineering Tencent's ChaosVM (JSVMP) — a JavaScript bytecode virtual machine used for browser fingerprinting. The primary goal is building an **automated porting pipeline** that can take any new tdc.js build and produce a working opcode table, decompiled output, and token generator without manual intervention.
+1. **Register-machine ChaosVM decompiler** — 12-step pipeline transforming obfuscated `tdc.js` → readable JS.
+2. **Standalone `collect` token generator** — byte-identical XTEA reimplementation for all known `tdc.js` templates.
+3. **Automated `tdc.js` porting pipeline** — parse → opcode-map → key-extract → verify, one command per new build.
+4. **Puppeteer CAPTCHA solver** — OpenCV slide-puzzle solver, captures real verification tickets.
+5. **Headless scraper** — Puppeteer-free urlsec scraper using jsdom for `vData` generation.
 
-Current deliverables:
+All `targets/*.js` and `sample/*.js` files are **read-only** analysis targets (Tencent's property). Never modify them.
 
-1. **Decompiler** (`decompiler/`): 12-step pipeline transforming obfuscated `tdc.js` → readable JS
-2. **Token generator** (`token/`): Standalone XTEA reimplementation producing byte-identical tokens
-3. **CAPTCHA solver** (`puppeteer/`): Puppeteer + OpenCV slide solver
-4. **Headless scraper** (`scraper/`): No-Puppeteer CAPTCHA solver using jsdom for vData generation
+## Research Phase (current)
 
-All `targets/*.js` files are **read-only** analysis targets (Tencent's property). Never modify them.
+**Goal**: reverse-engineer the ChaosVM variants we have not yet decompiled, close the open technical unknowns, and restructure the repo so research tracks live alongside each other as first-class citizens.
 
-## Commands
+**Priority backlog** (see `project-brief.md` for full detail):
+
+1. **vm-slide stack VM** — decompile `sample/vm_slide.js` / `vm-slide.enc.js`. Stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`, ~36 opcodes). Never ported through the existing register-machine pipeline.
+2. **Captcha orchestrator** — analyze `sample/t_captcha_slide.js` (213 KB): how it loads `vm-slide`, constructs verify POST bodies, triggers vData injection.
+3. **eks payload** — 232 bytes, server-baked into `tdc.js` at line 123. Structure, fields, relationship to session still unknown.
+4. **Template pool survey** — classify many fresh live `tdc.js` builds and measure Tencent's template rotation.
+5. **Key-modification constants** — cross-template diff of the XTEA key-mod constants between Templates A, B, C.
+6. **Collector field count** — is 59 template-specific, or constant?
+7. **errorCode 12** — confirm whether verify-endpoint 12 is fingerprint/behavioral scoring.
+
+Planning artifacts: `project-brief.md` (research phase intent + director permissions), `plan.md` (live task state), `history/<YYYYMMDD>.md` (per-day research log).
+
+## Stack
+- **Language / runtime**: Node.js ≥18, CommonJS (`'use strict';`, `require()`, `module.exports`).
+- **Python**: 3.x, only for `tools/captcha-solver/slide-solver.py` (OpenCV).
+- **Key deps**: `acorn` ^8 (AST parsing for porting pipeline), `jsdom` ^29 (vData environment for the scraper), `puppeteer` ^24 + `puppeteer-extra-plugin-stealth` (dynamic tracing and CAPTCHA solver), `canvas` ^3 (jsdom DOM rendering).
+
+## Directory Layout
+
+```
+reverse-chaosvm/
+├── targets/                     # read-only — Tencent's obfuscated tdc.js builds
+├── sample/                      # read-only — reference captures (HAR, vm-slide, t_captcha_slide)
+│
+├── research/                    # one subdir per VM variant or open question
+│   ├── tdc-register-vm/         # register-machine decompile pipeline (was decompiler/)
+│   ├── vm-slide-stack-vm/       # top priority — stack-based ChaosVM decoder/disassembler
+│   ├── captcha-orchestrator/    # t_captcha_slide.js flow analysis
+│   ├── eks-payload/             # eks structure reversal
+│   ├── template-pool/           # live survey + template classifier
+│   └── key-mod/                 # cross-template key-mod constant comparison
+│
+├── tools/                       # runnable utilities (stable working code)
+│   ├── token-generator/         # standalone tdc.js token generator (was token/)
+│   ├── porting-pipeline/        # automated tdc.js porting pipeline (was pipeline/)
+│   ├── scraper/                 # headless urlsec scraper (was scraper/)
+│   ├── captcha-solver/          # Puppeteer CAPTCHA solver (was puppeteer/)
+│   └── dynamic-tracers/         # runtime instrumentation (was dynamic/)
+│
+├── scripts/                     # exploratory one-off scripts — triaged into research/ over time
+├── output/                      # pipeline and tracer artifacts — always output/<target-stem>/
+├── profiles/                    # browser fingerprint profiles for token generation
+├── tests/                       # node --test suite (currently 296/296 green)
+├── docs/                        # technical reference + per-track research docs
+├── history/                     # per-day research logs
+├── project-brief.md             # research phase intent and backlog
+├── plan.md                      # live task state
+└── README.md                    # public overview
+```
+
+**Directory semantics**:
+- `research/<track>/` owns the analysis artifacts, notes, and source code for one ChaosVM variant or open question. Each track is self-contained.
+- `tools/<tool>/` owns runnable utilities that the scraper/decompiler path depends on. These are stable — research extends them, does not rewrite them.
+- `targets/` and `sample/` never change. `.claude/rules/targets-readonly.md` enforces this.
+
+## Canonical Commands
 
 ```bash
-# Install dependencies
+# Install
 npm install
 python3 -m venv .venv && .venv/bin/pip install opencv-python-headless numpy
 
-# Run full test suite (163/165 pass; 2 known failures in test-cfg.js and test-emit.js)
+# Test suite (must stay green — currently 296/296)
 npm test
+node --test tests/test-decoder.js          # single file
 
-# Run a single test file
-node --test tests/test-decoder.js
-
-# Full decompiler pipeline — always pass --input and --output explicitly
-node decompiler/run.js --input targets/tdc.js --output output/tdc
-# or via npm (runs against reference build):
+# tdc.js decompile pipeline (register-machine VM)
+node research/tdc-register-vm/run.js --input targets/tdc.js --output output/tdc
 npm run decompile
 
-# Individual pipeline steps:
-node decompiler/run.js --input targets/tdc.js --output output/tdc --step decode
-node decompiler/run.js --input targets/tdc.js --output output/tdc --step disasm
-node decompiler/run.js --input targets/tdc.js --output output/tdc --step cfg
-# ... (decode → disasm → strings → functions → cfg → patterns → semantics → fold → reconstruct → emit → polish → analyze)
+# Standalone collect token generator
+node tools/token-generator/cli.js --profile profiles/default.json
+node tools/token-generator/cli.js --profile profiles/default.json --verbose
 
-# Token generation — standalone (byte-identical reimplementation)
-node token/cli.js --profile profiles/default.json
-node token/cli.js --profile profiles/default.json --verbose
+# Automated porting pipeline (new tdc.js build → working token generator)
+node tools/porting-pipeline/run.js targets/tdc-vN.js
+node tools/porting-pipeline/run.js targets/tdc-vN.js --skip-verify
 
-# CAPTCHA solver (requires Python + OpenCV)
-node puppeteer/cli.js --domain example.com
-node puppeteer/cli.js --domain example.com --headful   # visible browser for debug
+# CAPTCHA solver (Puppeteer + OpenCV)
+node tools/captcha-solver/cli.js --domain example.com
+node tools/captcha-solver/cli.js --domain example.com --headful
 
-# Headless scraper (no Puppeteer required)
-node scraper/cli.js --captcha-only --verbose      # CAPTCHA solve only
-node scraper/cli.js --verbose https://example.com  # Full flow: CAPTCHA + urlsec query
-node scraper/cli.js --ratio 1.0 --retries 5 https://example.com
+# Headless urlsec scraper (no Puppeteer)
+node tools/scraper/cli.js --captcha-only --verbose
+node tools/scraper/cli.js --verbose https://example.com
 ```
 
-## Project Structure
+> **Restructure note**: the paths above reflect the target layout. The restructure task (first item in `project-brief.md`) is what moves the files; until it completes, old paths (`decompiler/run.js`, `token/cli.js`, `pipeline/run.js`, `puppeteer/cli.js`, `scraper/cli.js`) are still the live entry points.
 
-```
-targets/              Read-only tdc builds (analysis targets)
-  tdc.js              Reference build — fully analyzed
-  tdc-v2.js           Different template (94 opcodes, not yet ported)
-  tdc-v3.js           Same template as tdc.js (identical bytecode)
-  tdc-v4.js           Not yet ported
-  tdc-v5.js           Not yet ported
+## Rules (load on demand)
 
-decompiler/           12-step decompile pipeline
-token/                Standalone collect token generator (byte-identical)
-puppeteer/            Puppeteer CAPTCHA solver
-scraper/              Headless CAPTCHA scraper (no Puppeteer)
-  cli.js              CLI entry point
-  scraper.js          Main orchestrator class
-  vdata-generator.js  jsdom-based vData generation
-  collect-generator.js Parameterized XTEA token generator
-  template-cache.js   TDC_NAME → XTEA params cache
-  tdc-utils.js        TDC_NAME and eks extraction
-  cache/              Pre-seeded template cache (JSON)
-dynamic/              Runtime tracers (crypto, payload, encoding, chunk, comparison)
-pipeline/             Automated porting pipeline (vm-parser, opcode-mapper, key-extractor, token-verifier, run.js)
-output/tdc/           Decompiler artifacts for reference build
-output/<version>/     Per-version artifacts (create before running pipeline)
-profiles/             Browser fingerprint profiles
-tests/                Test suite
-docs/                 Technical reference documentation
-sample/               Reference files (HAR capture, bot.py)
-```
+Each rule file below is a focused behavioral contract. Read a rule file **when its trigger matches your task** — do not auto-load all rules.
 
-## Architecture
+- `.claude/rules/targets-readonly.md` — read before editing or creating files; enforces the read-only contract for `targets/` and `sample/`.
+- `.claude/rules/verify-dont-assume.md` — read before documenting or modifying anything involving XTEA parameters, opcode semantics, token structure, or docs-derived facts.
+- `.claude/rules/coding-style.md` — read before writing or editing any JavaScript or Python file.
+- `.claude/rules/output-versioning.md` — read before running any pipeline, tracer, or survey script that writes artifacts to disk.
+- `.claude/rules/research-artifacts.md` — read before creating files under `research/` or writing new docs under `docs/` tied to a research track.
 
-### Decompiler Pipeline (`decompiler/`)
-
-Sequential 12-step pipeline — each step reads artifacts written by prior steps.
-`run.js` orchestrates all steps; individual modules are independently importable.
-**The opcode table in `disassembler.js` is hardcoded for `tdc.js`.** A new table
-must be derived for each distinct VM template before the pipeline can run on it.
-
-```
-decoder.js            base64 → varint/zigzag → integer array (invariant across all builds)
-disassembler.js       integer array → text disassembly (opcode table is build-specific)
-string-extractor.js   disassembly → string literals
-function-extractor.js → function boundary table
-cfg-builder.js        → control flow graph
-pattern-recognizer.js → if/while/for/try patterns
-opcode-semantics.js   → semantic annotations
-expression-folder.js  → register ops → expression trees
-method-reconstructor.js → obj.prop + call → obj.method()
-code-emitter.js       → JavaScript AST → source code
-output-polish.js      → rename/inline/dead-store elimination
-program-analyzer.js   → function classification + doc comments
-```
-
-### Token Pipeline (`token/`)
-
-`generate-token.js` wires together `collector-schema.js` (59-field fingerprint schema) →
-`outer-pipeline.js` (segment assembly, btoa, URL encoding) → `crypto-core.js`
-(Modified XTEA encryption). Produces byte-identical output to the real VM for `tdc.js`.
-
-Two tokens are sent in the verify POST:
-- **`collect`** — `TDC.getData()` — fully reimplemented standalone (`token/`)
-- **`eks`** — `TDC.getInfo().info` — server-baked into tdc.js, extracted verbatim (see `docs/EKS_FORMAT.md`)
-
-### CAPTCHA Solver (`puppeteer/`)
-
-`captcha-client.js` implements the 4-endpoint HTTP flow (prehandle → getsig → image download → verify POST). `slide-solver.js` calls Python's `slide-solver.py` (Canny edge detection + normalized cross-correlation via OpenCV) for pixel offset. `captcha-solver.js` drives headless Chrome with stealth plugin.
-
-### Scraper Pipeline (`scraper/`)
-
-Headless CAPTCHA solver that replaces Puppeteer with jsdom for vData generation.
-Reuses `CaptchaClient` (HTTP) from `puppeteer/` and `solveSlider` (OpenCV) from `puppeteer/`.
-All token generation uses parameterized XTEA encryption via `collect-generator.js`.
-
-Flow:
-  prehandle → getSig → downloadImages → downloadTdc → extractTdcName →
-  cache lookup → extractEks → solveSlider → generateCollect →
-  generateVData (jsdom) → verify (with jQuery-serialized body)
-
-vData generation: vm-slide.enc.js (stack-based ChaosVM) executes in jsdom.
-The VM hooks XHR.prototype.send — the module pre-hooks XHR, triggers $.ajax,
-and captures the body with vData appended.
-
-### Key VM Internals Mapping (reference build: `targets/tdc.js`)
+## Key VM Internals (register-machine reference build: `targets/tdc.js`)
 
 | tdc.js symbol | Canonical name | Role |
 |---|---|---|
@@ -148,100 +126,61 @@ and captures the body with vData appended.
 | `F[]` | `catchStack` | Exception handler address stack |
 | `E` | `closureVars` | Captured closure variables |
 
-Variable names differ per build — identify by structural role, not by name.
+Variable names differ per build — identify by structural role, not by name. The stack-based vm-slide variant has **different internals** — do not assume these names apply there.
 
-## Multi-Version Pipeline
+## Planning Context
 
-Tencent serves from a pool of VM templates with fully reshuffled opcodes per template.
-`decoder.js` works on all builds unchanged. Everything else requires a new opcode table.
+For the current research phase — intent, scope, director permissions, and priority backlog — see **`project-brief.md`**. For live task state see **`plan.md`**. For per-day research progress see **`history/<YYYYMMDD>.md`**.
 
-The automated porting pipeline is **fully operational**. To port a new build:
+## Project Memory — Established Facts (as of 2026-04-12)
 
-```bash
-# Full pipeline: parse → map opcodes → extract XTEA key → verify token
-node pipeline/run.js targets/tdc-vN.js
+**tdc.js register-machine VM — solved**:
+- Decompiler pipeline fully working for `targets/tdc.js` (Template A, reference build).
+- Standalone byte-identical `collect` token generator for Templates A, B, C.
+- Automated porting pipeline: parse → opcode-map → key-extract → verify. All 5 known targets produce byte-identical tokens.
+- 296/296 tests green. Phase 37 cleanup archived obsolete files and legacy docs.
 
-# Skip token verification (faster, for initial analysis)
-node pipeline/run.js targets/tdc-vN.js --skip-verify
-```
+**Template table** (register-machine `tdc.js`):
 
-Output is saved to `output/<target-stem>/` (opcode-table.json, xtea-params.json, verification-report.json, pipeline-config.json).
+| Target    | Template | TDC_NAME                           | Opcodes | Mapped | XTEA Key                              | Token verified |
+|-----------|----------|-------------------------------------|---------|--------|----------------------------------------|----------------|
+| tdc.js    | A        | `FgTaXfOKnXnnZNVNAFlgbmQWHJNVaSBk` | 95      | 95/95  | `6257584F 462A4564 636A5062 6D644140` | byte-identical |
+| tdc-v2.js | B        | `SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD` | 94      | 92/94  | `6B516842 4D554B69 69655456 452C233E` | byte-identical |
+| tdc-v3.js | A        | (same as tdc.js)                    | 95      | 95/95  | (same as tdc.js)                       | byte-identical |
+| tdc-v4.js | A        | (same as tdc.js)                    | 95      | 95/95  | (same as tdc.js)                       | byte-identical |
+| tdc-v5.js | C        | `WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE` | 100     | 91/100 | `5949415A 454D6265 6D686358 6C66525F` | byte-identical |
 
-See `docs/VERSION_DIFFERENCES.md` for the full porting strategy and what changes vs what stays the same.
+- **XTEA delta and round count are constant across all templates** (`delta = 0x9E3779B9`, `rounds = 32`).
+- **Each template has a unique STATE_A key.** Dynamically extracted by `tools/porting-pipeline/key-extractor.js`.
+- **`eks` token is server-baked** into every `tdc.js` response (line 123). Not generated by the VM — extract via regex or `TDC.getInfo().info`. See `docs/EKS_FORMAT.md`.
 
-## Code Conventions
-
-- **Language**: Node.js CommonJS (`'use strict';`, `require()`/`module.exports`) for all JS. Python only for `slide-solver.py`.
-- **Style**: 2-space indentation, single quotes, semicolons required, `const`/`let` over `var`.
-- **Dependencies**: Minimize external deps — prefer Node.js built-ins.
-- **Disassembly format**: `[PC]  MNEMONIC  r<dst>, r<src1>, r<src2>    ; comment`
-- **Decompiled variable names**: camelCase; `v0`, `v1`... when context unclear; `arg0`, `arg1`... for parameters.
-- **Output directories**: always versioned — `output/<target-stem>/` (see `.claude/rules/output-versioning.md`)
-
-## Known Issues / Limitations
-
-- The decompiler's opcode table is hardcoded for the `tdc.js` template. See `docs/VERSION_DIFFERENCES.md`.
-- `eks` token is server-baked (not generated by the VM). See `docs/EKS_FORMAT.md`.
-- errorCode 12 on token verify: NOT pure IP rate limiting — browser solves work from the same IP. Likely fingerprint/behavioral scoring at the verify endpoint. See `docs/ERRORCODE_12_INVESTIGATION.md`.
-- The scraper is built for slide CAPTCHAs; urlsec.qq.com has switched to click-image-selection CAPTCHAs.
-- `cap_union_new_show` returns HTTP 403 when called without a valid `sess` parameter from prehandle (NOT TLS fingerprinting — verified 2026-04-11). With valid sess, plain Node.js works fine.
+**Known limitations**:
+- `urlsec.qq.com` now serves click-image CAPTCHAs for some endpoints — the scraper currently handles slide only.
+- `cap_union_new_show` returns HTTP 403 when called without a valid `sess` from prehandle (NOT TLS fingerprinting — verified 2026-04-11).
+- errorCode 12 on token verify: not pure IP rate limiting; likely fingerprint/behavioral scoring. See `docs/ERRORCODE_12_INVESTIGATION.md`.
 
 ## Documentation
 
 | Doc | Owns |
 |-----|------|
-| `docs/VM_ARCHITECTURE.md` | Register machine internals, opcode dispatch |
-| `docs/OPCODE_REFERENCE.md` | All 95 opcodes with operands and stack effects |
-| `docs/TOKEN_FORMAT.md` | collect token spec — encoding layers, XTEA, segment layout (**authoritative**) |
-| `docs/EKS_FORMAT.md` | eks token — known facts and investigation findings |
+| `docs/VM_ARCHITECTURE.md` | Register-machine internals, opcode dispatch (`tdc.js` family) |
+| `docs/OPCODE_REFERENCE.md` | All 95 opcodes for `tdc.js` with operands and stack effects |
+| `docs/TOKEN_FORMAT.md` | `collect` token spec — encoding layers, XTEA, segment layout (authoritative) |
+| `docs/EKS_FORMAT.md` | `eks` token — current facts + open questions |
 | `docs/COLLECTOR_SCHEMA.md` | 59-field browser fingerprint schema |
 | `docs/CRYPTO_ANALYSIS.md` | Modified XTEA key derivation and round constants |
 | `docs/TOKEN_DECRYPTION.md` | How to decrypt a captured token |
 | `docs/HAR_ANALYSIS.md` | Network flow analysis of the CAPTCHA protocol |
-| `docs/VERSION_DIFFERENCES.md` | Opcode shuffle analysis and porting strategy |
+| `docs/VERSION_DIFFERENCES.md` | Opcode shuffle analysis and porting strategy across templates |
+| `docs/ERRORCODE_12_INVESTIGATION.md` | Phase 36 findings on verify-endpoint errorCode 12 |
 | `docs/CONVENTIONS.md` | Code style, naming, disassembly format |
 | `docs/WORKFLOW.md` | Development phase log |
-| `docs/PROGRESS.md` | Task-by-task progress (51 rounds) |
 
-All documentation should be treated as **reference — verify against live behavior before trusting**. When discrepancies are found between docs and actual behavior, update the docs and note the correction.
+**New docs planned for the research phase** (written as each track produces verified findings):
+- `docs/CHAOSVM_VARIANTS.md` — top-level comparison of register-based (`tdc.js`) vs stack-based (`vm-slide`) ChaosVM variants.
+- `docs/VM_SLIDE_ARCHITECTURE.md` — stack-based ChaosVM internals.
+- `docs/VM_SLIDE_OPCODES.md` — opcode table for `__TENCENT_CHAOS_STACK`.
+- `docs/CAPTCHA_ORCHESTRATOR.md` — `t_captcha_slide.js` flow + verify-body construction.
+- `docs/TEMPLATE_POOL.md` — live template pool survey results.
 
-## Project Memory
-
-### Current State (2026-04-12)
-
-**Solved**:
-- `collect` token: byte-identical standalone reimplementation in `token/`
-- Decompiler pipeline: fully working for `targets/tdc.js` (reference build)
-- CAPTCHA solver: Puppeteer-based, functional via `puppeteer/`
-- `eks` token: server-baked into every `tdc.js` response — no crypto to reverse, extract via
-  regex on fetched source or `TDC.getInfo().info`. See `docs/EKS_FORMAT.md`.
-- **Automated porting pipeline**: fully operational — `node pipeline/run.js` ports any tdc.js build
-- **All 5 targets ported**: byte-identical token generation verified for all builds
-- **Headless scraper** (`scraper/`): Complete architecture for slide CAPTCHAs — parameterized
-  XTEA, jsdom vData generation, template cache. All unit tests pass (163/165).
-- **Phase 37 cleanup**: removed 20 obsolete files (scripts, dynamic tracers, ad-hoc targets), fixed all test failures — 296/296 green. Legacy docs (project-brief.md, docs/PROGRESS.md) archived.
-
-**Version status**:
-| Target | Template | Opcodes | Mapped | XTEA Key | Token verified |
-|--------|----------|---------|--------|----------|----------------|
-| tdc.js | A | 95 | 95/95 | 6257584F 462A4564 636A5062 6D644140 | yes (byte-identical) |
-| tdc-v2.js | B | 94 | 92/94 | 6B516842 4D554B69 69655456 452C233E | yes (byte-identical) |
-| tdc-v3.js | A | 95 | 95/95 | same as tdc.js | yes (byte-identical) |
-| tdc-v4.js | A | 95 | 95/95 | same as tdc.js | yes (byte-identical) |
-| tdc-v5.js | C | 100 | 91/100 | 5949415A 454D6265 6D686358 6C66525F | yes (byte-identical) |
-
-**Answered questions** (formerly "Open questions"):
-- **XTEA key differs between templates**: YES — each template has a unique STATE_A key. Templates A, B, C all have different keys. Dynamically extracted by the pipeline.
-- **How many distinct templates?** At least 3 observed (A=95 ops, B=94 ops, C=100 ops). tdc.js/v3/v4 share Template A.
-- **Delta and round count**: Constant across all templates (delta=0x9E3779B9, rounds=32).
-- **What is inside the eks payload?** Still unknown — server-baked, not generated by the VM.
-
-**Remaining unknowns**:
-- Key modification constants for Templates B and C (extracted but not yet compared)
-- Whether the collector field count (59) varies between templates
-- Full pool size of Tencent's VM template rotation
-
-**Known limitations**:
-- **urlsec.qq.com now serves click-image CAPTCHAs** (not slide) — the scraper handles slide only
-- **cap_union_new_show 403**: Requires valid `sess` from prehandle (not TLS fingerprinting — corrected 2026-04-11)
-- All 10 known templates ported with correct XTEA params, cdFieldOrder, singleBlob encryption
+**All documentation should be treated as reference — verify against live behavior before trusting.** See `.claude/rules/verify-dont-assume.md`.
