@@ -8,6 +8,7 @@ const { mapOpcodes } = require('./opcode-mapper');
 const { extractKey } = require('./key-extractor');
 const { verifyToken } = require('./token-verifier');
 const { extractStructure } = require('./structure-extractor');
+const { deobfuscate } = require('./deobfuscator');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -93,8 +94,9 @@ async function portVersion(tdcPath, options) {
   // Stage 1: Parse VM
   // =========================================================================
   let parsed;
+  let src;
   try {
-    const src = fs.readFileSync(resolvedPath, 'utf8');
+    src = fs.readFileSync(resolvedPath, 'utf8');
     parsed = parseVmFunction(src);
     result.parsed = parsed;
 
@@ -118,11 +120,21 @@ async function portVersion(tdcPath, options) {
   }
 
   // =========================================================================
+  // Stage 1.5: Deobfuscate if needed
+  // =========================================================================
+  const deobResult = deobfuscate(src);
+  if (deobResult.isObfuscated) {
+    log(`Stage 1.5/5: Deobfuscating... ${deobResult.stats.decoderReplacements} decoder replacements, ${deobResult.stats.helperReplacements} helper replacements`);
+    src = deobResult.deobfuscated;
+    // Re-parse with deobfuscated source for accurate variable extraction
+    parsed = parseVmFunction(src);
+  }
+
+  // =========================================================================
   // Stage 2: Map Opcodes
   // =========================================================================
   let mapped;
   try {
-    const src = fs.readFileSync(resolvedPath, 'utf8');
     mapped = mapOpcodes(parsed, src);
     result.mapped = mapped;
 
