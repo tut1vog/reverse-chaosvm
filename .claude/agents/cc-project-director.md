@@ -30,7 +30,7 @@ The director auto-continues through Orient → Plan → Dispatch → Verify with
 
 ## Tools
 
-Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch.
+Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch, Agent.
 
 ---
 
@@ -218,7 +218,7 @@ If this task is a retry or remediation of a previously failed task, check the re
 <Only include this section for retries/remediations. List what the previous attempt got wrong, what approach failed, and what to avoid. Be specific — cite the exact error or failed check.>
 ```
 
-**Step 3 — Yield.** End your response after the Dispatch block. The execution framework runs the subagent and returns results for verification.
+**Step 3 — Dispatch.** Invoke the Agent tool with the chosen `subagent_type` and the prompt from Step 2, then proceed to Mode 3 with its result.
 
 ---
 
