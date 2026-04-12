@@ -91,11 +91,14 @@ class TemplateCache {
   }
 
   /**
-   * Scan all output/<version>/pipeline-config.json files to populate cache.
+   * Scan all <outputDir>/<version>/pipeline-config.json files to populate cache.
    * Extracts xteaParams and template fields from each config.
+   * @param {string} [outputDirOverride] - Optional alternate output directory.
+   *   Defaults to the project output/. Tests should pass an isolated temp dir
+   *   to avoid cross-process races on the real output/.
    */
-  seed() {
-    const outputDir = path.join(__dirname, '..', '..', 'output');
+  seed(outputDirOverride) {
+    const outputDir = outputDirOverride || path.join(__dirname, '..', '..', 'output');
     if (!fs.existsSync(outputDir)) return;
 
     const entries = fs.readdirSync(outputDir, { withFileTypes: true });

@@ -148,6 +148,7 @@ describe('TemplateCache structure params via store/lookup', () => {
 describe('TemplateCache seed() with structureParams', () => {
   let cache;
   let tmpCachePath;
+  let tmpOutputDir;
   let tmpConfigDir;
 
   before(() => {
@@ -155,8 +156,13 @@ describe('TemplateCache seed() with structureParams', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tc-seed-'));
     tmpCachePath = path.join(tmpDir, 'templates.json');
 
-    // Create temp pipeline-config.json in output/_test_struct/
-    tmpConfigDir = path.join(OUTPUT_DIR, '_test_struct');
+    // Create the mock pipeline-config.json in an ISOLATED temp output dir.
+    // This MUST NOT be written under the real project output/ directory:
+    // when run in parallel (`node --test`), other test files call seed()
+    // against the real output/ and would pick up our mock config, overwriting
+    // the real Template A entry with [1,2,3,4]. See seed(outputDirOverride).
+    tmpOutputDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tc-seed-output-'));
+    tmpConfigDir = path.join(tmpOutputDir, '_test_struct');
     fs.mkdirSync(tmpConfigDir, { recursive: true });
 
     const mockConfig = {
@@ -177,11 +183,9 @@ describe('TemplateCache seed() with structureParams', () => {
   });
 
   after(() => {
-    // Clean up temp config dir
-    if (tmpConfigDir && fs.existsSync(tmpConfigDir)) {
-      const configFile = path.join(tmpConfigDir, 'pipeline-config.json');
-      if (fs.existsSync(configFile)) fs.unlinkSync(configFile);
-      fs.rmdirSync(tmpConfigDir);
+    // Clean up temp output dir tree
+    if (tmpOutputDir && fs.existsSync(tmpOutputDir)) {
+      fs.rmSync(tmpOutputDir, { recursive: true, force: true });
     }
     // Clean up temp cache
     if (tmpCachePath && fs.existsSync(tmpCachePath)) {
@@ -191,9 +195,9 @@ describe('TemplateCache seed() with structureParams', () => {
   });
 
   it('seed() picks up structureParams from pipeline-config.json', () => {
-    // The source hash for targets/tdc.js is already in the real cache,
-    // but our fresh temp cache is empty so seed() should populate it.
-    cache.seed();
+    // Pass the isolated temp output dir so seed() reads our mock config
+    // (and only our mock config) without scanning the real project output/.
+    cache.seed(tmpOutputDir);
 
     // Compute the source hash from targets/tdc.js so we know what key to look up
     const { computeSourceHash } = require('../tools/scraper/tdc-utils');
