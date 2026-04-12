@@ -366,16 +366,20 @@ The jsdom approach (running the VM as a black box inside jsdom) was investigated
 
 ## Open Questions
 
-1. **Does the key change between builds?** We only have one build's key verified. The XTEA delta is standard and unlikely to change, but STATE_A could be build-specific. The standalone generator would need its key updated if this changes.
+### Answered
+
+**1. Does the XTEA key change between builds?** — **YES, confirmed.** Each build has a unique `STATE_A` key. The automated pipeline (`pipeline/key-extractor.js`) dynamically extracts the key from the VM source for every new build. Delta (`0x9E3779B9`) and round count (32) are constant across all observed builds.
+
+**6. How many templates exist in the pool?** — **At least 10 distinct builds** observed in live rotation (Phase 33 survey, 2026-04). Template architectures range from 94 to 100+ opcodes. Some builds are obfuscated (string-decoder + helper-wrapper layers), handled by `pipeline/deobfuscator.js`. See `scripts/tdc-survey.js` for survey methodology.
+
+### Still Open
 
 2. **Are compound opcodes stable?** The set of fused operations might vary — one build may fuse STR_APPEND+PROP_SET while another doesn't. Matters for decompilation but not for the standalone generator.
 
 3. **Does the collector count change?** Both builds presumably collect the same browser fingerprint data, but new collectors could be added or old ones removed in future versions. New collectors would require updates to `token/collector-schema.js`.
 
-4. **Is the assembly order fixed?** We confirmed `btoa[1]+btoa[0]+btoa[2]+btoa[3]` for Build B. Build A's old report claimed `btoa[1]+btoa[2]+btoa[0]+btoa[3]` (though this may have been an error in their analysis rather than a real difference).
+4. **Is the assembly order fixed?** We confirmed `btoa[1]+btoa[0]+btoa[2]+btoa[3]` for Build B. Build A's old report claimed `btoa[1]+btoa[2]+btoa[0]+btoa[3]` (though this may have been an error in their analysis rather than a real difference). Verified across 10+ builds in Phase 33 survey — no variation observed.
 
 5. **Could the VM architecture change fundamentally?** Unlikely in the short term — the register-based switch/case design is deeply embedded. A major rewrite (e.g., to a stack machine or WebAssembly) would be a new product, not an update.
-
-6. **How many templates exist in the pool?** We observed 2 distinct templates across 3 requests. The actual pool size is unknown but likely small (2-10). Each template serves any `js_data`, so the variation is not tied to app or user identity.
 
 7. **How long are templates valid?** Unknown. Templates may rotate daily, weekly, or be stable for months. The per-request config string (line 123) changes every time regardless.
