@@ -115,7 +115,7 @@ reverse-chaosvm/
 Each track has an **open question**, a **definition of done**, **inputs**, and **permitted outputs**. Tracks are ordered by user priority; the director may parallelize tracks that have no dependency on each other, but **vm-slide-stack-vm is the top priority and must be started first.**
 
 **Track 1 — `research/vm-slide-stack-vm/`  (TOP PRIORITY)**
-- **Question**: How does the stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`, ~36 opcodes) used in `vm-slide.enc.js` work? What are its opcodes, dispatch loop, and relationship to the register-machine `tdc.js` VM?
+- **Question**: How does the stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`, 53 non-null handlers across 69 dispatch slots (16 null holes)) used in `vm-slide.enc.js` work? What are its opcodes, dispatch loop, and relationship to the register-machine `tdc.js` VM?
 - **Inputs**: `sample/vm_slide.js` (43 KB, already decoded locally). Optional: fresh `vm-slide.*.enc.js` fetched via `curl` from `t.captcha.qq.com`.
 - **Definition of done**:
   1. A decoder that turns the stack-VM bytecode into an integer array (analog of `research/tdc-register-vm/decoder.js`).
@@ -125,6 +125,31 @@ Each track has an **open question**, a **definition of done**, **inputs**, and *
   5. A `tests/test-vm-slide-decoder.js` (and disassembler test) that pins the byte count and a known disassembly slice against the committed `sample/vm_slide.js`.
   6. A top-level `docs/CHAOSVM_VARIANTS.md` comparing register-based vs stack-based ChaosVM side by side.
 - **Notes**: reuse AST techniques from `tools/porting-pipeline/vm-parser.js` where possible; the stack VM has a different dispatch shape so the opcode-mapper's register-machine pattern library will not apply directly.
+
+  **Status as of 2026-04-12**: Phase 39 delivered a first-pass decompile of vm-slide via static source analysis. Full-coverage disassembly is deferred to Phase 40.
+
+  Committed artifacts:
+  - `research/vm-slide-stack-vm/decoder.js` — extracts dispatch table and bytecode from `sample/vm_slide.js`
+  - `research/vm-slide-stack-vm/disassembler.js` — linear text disassembler over the decoded bytecode
+  - `output/vm-slide/dispatch-table.json` — 69-slot dispatch table with 53 non-null handler source strings
+  - `output/vm-slide/bytecode.json` — 24,273-element bytecode array
+  - `output/vm-slide/disassembly.txt` — current 312-instruction linear disassembly (halts at pc=512)
+  - `tests/test-vm-slide-decoder.js` — 16 regression tests pinning decoder/disassembler output
+  - `docs/VM_SLIDE_ARCHITECTURE.md` — authoritative stack-VM internals reference
+  - `docs/VM_SLIDE_OPCODES.md` — opcode table for all 53 non-null handlers
+  - `docs/CHAOSVM_VARIANTS.md` — register-vs-stack ChaosVM family comparison
+
+  Key findings:
+  - Dispatch table has 69 slots, 53 non-null handlers, 16 sparse-array null holes at indices `[9, 14, 18, 19, 22, 26, 27, 29, 30, 34, 43, 44, 48, 53, 57, 65]` (see `docs/VM_SLIDE_OPCODES.md`).
+  - Bytecode is 24,273 numeric elements, contains one non-integer (`0.5`), and contains the XTEA delta `0x9E3779B9` exactly twice — a cross-track signal linking vm-slide to the `eks-payload` and `key-mod` tracks (see `docs/VM_SLIDE_ARCHITECTURE.md` "Unresolved findings").
+  - Static operand-count distribution is `{0, 1, 2, 6}`; opcode 58 `FUNC_CREATE` is variable-width at runtime (`3 + 2·A + C` bytes, not the static count of 6) and instantiates nested `__TENCENT_CHAOS_VM(...)` invocations as the closure / first-class-function mechanism (see `docs/VM_SLIDE_OPCODES.md` "Unresolved entries").
+  - Linear disassembly covers 312 instructions over pc range [0, 513), roughly ~2% of the 24,273-element bytecode, halting legitimately on dispatch hole opcode 65 at pc=512 (see `docs/VM_SLIDE_ARCHITECTURE.md` "Observed coverage and limitations").
+  - `F`, `Y`, `c` outer helper parameters are forwarded by `FUNC_CREATE` into nested VM invocations but not consumed by any of the 53 handlers in this build (see `docs/VM_SLIDE_ARCHITECTURE.md`).
+
+  Deferred to Phase 40:
+  - Phase 40 task 40.1 — control-flow-aware vm-slide disassembler walker upgrade, special-casing `FUNC_CREATE` variable width first to prevent walker desync.
+  - Phase 40 task 40.3 — refresh `docs/VM_SLIDE_ARCHITECTURE.md` and `docs/VM_SLIDE_OPCODES.md` using the full-coverage disassembly produced by 40.1.
+  - Phase 40 task 40.6 — cross-track investigation of whether vm-slide runs an XTEA round function on eks or other payload data, driven by the `0x9E3779B9` finding.
 
 **Track 2 — `research/captcha-orchestrator/`**
 - **Question**: How does `t_captcha_slide.js` (213 KB) orchestrate the slide CAPTCHA — loading `vm-slide`, constructing the verify POST body, triggering `vData` injection, and talking to the captcha endpoints?
