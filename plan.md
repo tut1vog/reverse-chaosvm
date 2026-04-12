@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 41 — minor cleanup + Captcha orchestrator (Stream B Track 2)
-Current task: 41.5 — Captcha orchestrator deep flow analysis (user confirmed option (a) — proceed as scoped)
+Current task: 41.7 — Update research/captcha-orchestrator/README.md (status bump after docs shipped)
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -54,8 +54,8 @@ Current task: 41.5 — Captcha orchestrator deep flow analysis (user confirmed o
 | 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` (says "pipeline/run.js" but the assertion underneath uses the post-restructure path) | done |
 | 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | done |
 | 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | done |
-| 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | pending |
-| 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | pending |
+| 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | done |
+| 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | in-progress |
 
 ---
 
@@ -70,13 +70,57 @@ Current task: 41.5 — Captcha orchestrator deep flow analysis (user confirmed o
 
 ## Current Task
 
-**ID**: 41.6
-**Title**: Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings
+**ID**: 41.7
+**Title**: Update `research/captcha-orchestrator/README.md` — promote status after 41.6 ships the public doc
 **Phase**: Phase 41 — Minor cleanup + Captcha orchestrator (Stream B Track 2)
-**Status**: pending (ready to dispatch)
+**Status**: in-progress
 
 ### Goal
-Transcribe `research/captcha-orchestrator/FLOW.md` + `output/captcha-orchestrator/verify-body-origination.json` into the public-facing `docs/CAPTCHA_ORCHESTRATOR.md` per the Track 2 DoD. The heavy analytical work is done; this is a documentation task, not a research task. Required sections (per `project-brief.md`): show-page load → vm-slide fetch → vData compute → verify POST assembly → ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. Must also reconcile against `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md` using the §8 reconciliation already recorded in FLOW.md.
+Final bookkeeping for Phase 41 Track 2: update `research/captcha-orchestrator/README.md` to reflect that `docs/CAPTCHA_ORCHESTRATOR.md` has shipped, status moves from `partial` to `partial (track substantively closed; one open question — vData runtime binding)` or similar honest framing. List all produced documents (FLOW.md, SURVEY.md, MODULE-41-NOTES.md, the public doc, the JSON artifacts). Add the single remaining open question (vData runtime binding) as a prominent "Open questions" bullet with pointers to the three follow-up options from FLOW.md §9 Q1. Do NOT promote to `closed` — `vData` is still unresolved.
+
+### Context
+The 41.5 deep analysis resolved 38/39 verify-body fields, parked module 41 (i18n caption table, not on critical path), correctly overturned the 41.4 hypotheses that module 8 was the vm-slide loader and that module 76 = slide-jy.js (they're Zepto vs jQuery 1.11.3 — different libraries). 41.6 shipped `docs/CAPTCHA_ORCHESTRATOR.md` with all nine required sections, full 39-row origination table, and honest framing of `vData` as the single unresolved question.
+
+The track's current README.md was written at the end of 41.4 and says status `partial`. It lists FLOW.md indirectly (via the planned-inputs section) but predates FLOW.md / MODULE-41-NOTES.md / the public doc. The README needs to catch up.
+
+### Implementation Steps
+1. Read the current `research/captcha-orchestrator/README.md` end-to-end.
+2. Update the Status section to reflect post-41.6 reality: track is substantively closed except for `vData`, which has a clear path forward. Do not use the word "closed" alone — be honest that `vData` remains open. Suggested wording: `partial — flow traced, public doc shipped, one open question (vData runtime binding)`.
+3. Add a "Documents" section (if not already present, or extend it) listing every committed artifact:
+   - `SURVEY.md` — 41.4 structural survey
+   - `FLOW.md` — 41.5 end-to-end flow trace
+   - `MODULE-41-NOTES.md` — 41.5 module 41 gate-2 spike
+   - `docs/CAPTCHA_ORCHESTRATOR.md` — public reference (41.6)
+   - `output/captcha-orchestrator/modules.json` — per-module inventory
+   - `output/captcha-orchestrator/module-graph.json` — require graph
+   - `output/captcha-orchestrator/dynamic-requires.json` — gate 1 audit
+   - `output/captcha-orchestrator/verify-body-origination.json` — 39-field origination table
+   - `output/captcha-orchestrator/slide-jy-diff.md` — Zepto vs jQuery classification
+4. Add an "Open questions" section naming exactly one question — `vData` runtime binding — with the three follow-up options from FLOW.md §9 Q1 (jsdom harness / stack-VM bytecode decode / Puppeteer property-write breakpoints) summarized to one sentence each.
+5. Update the "How to reproduce" section to include the two new scripts (`trace-flow.js`, `slide-jy-diff.js`) alongside `parse-bundle.js`.
+
+### Verification
+1. `git diff research/captcha-orchestrator/README.md` — shows only the expected section updates.
+2. `grep -c "vData\|FLOW.md\|CAPTCHA_ORCHESTRATOR\|MODULE-41" research/captcha-orchestrator/README.md` — non-trivial count.
+3. `wc -l research/captcha-orchestrator/README.md` — report line count.
+4. `npm test` — stays at 353/353.
+5. No files outside `research/captcha-orchestrator/README.md` are modified.
+
+### Constraints
+- **Do not make any git commits.** The director handles all commits.
+- **Only edit `research/captcha-orchestrator/README.md`.** Do not touch any other file.
+- **Do not mark status `closed`.** `vData` is still unresolved.
+- **Do not re-analyze.** Transcribe from existing artifacts (SURVEY.md, FLOW.md, MODULE-41-NOTES.md, the public doc).
+- **No emojis.**
+- If the task is too difficult (extremely unlikely — this is a README update), stop and report.
+
+### Suggested Agent
+`general-purpose` — trivial README update.
+
+---
+
+### Prior: 41.6 (completed)
+Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md` — per FLOW.md §8, which left the four existing docs unedited. Director also added `docs/CAPTCHA_ORCHESTRATOR.md` to the CLAUDE.md main doc table and removed it from the "new docs planned" list. 353/353 tests green.
 
 ### Context — what 41.5 already produced
 - **`research/captcha-orchestrator/FLOW.md`** (612 lines) — the research-side narrative. Every section 41.6 needs already exists there. Use it as the primary input.
