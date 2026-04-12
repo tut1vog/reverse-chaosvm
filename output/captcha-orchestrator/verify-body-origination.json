@@ -1,0 +1,426 @@
+{
+  "source_har": "sample/captcha-har.har",
+  "source_bundle": "sample/t_captcha_slide.js",
+  "har_request": "/cap_union_new_verify (POST, application/x-www-form-urlencoded)",
+  "har_response_status": 200,
+  "har_response_shape": "{errorCode, randstr, ticket, errMessage, sess}",
+  "notes": [
+    "line numbers are {line, startCol, endCol} relative to the single-line bundle.",
+    "upstream fields are copied wholesale from the show-URL query via module 30 queryMap(); the iframe URL query was itself populated by the show-page server.",
+    "vData origination could not be resolved statically — see FLOW.md section 9."
+  ],
+  "fields": [
+    {
+      "name": "aid",
+      "sample_value_prefix": "2046626881",
+      "sample_value_length": 10,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Copied verbatim from the show-page iframe URL query into `d` via `a.queryMap()` (module 30 line 1), then POSTed."
+    },
+    {
+      "name": "protocol",
+      "sample_value_prefix": "https",
+      "sample_value_length": 5,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "accver",
+      "sample_value_prefix": "1",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "showtype",
+      "sample_value_prefix": "popup",
+      "sample_value_length": 5,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "ua",
+      "sample_value_prefix": "TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBw...",
+      "sample_value_length": 148,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query; server-collected at show time, not re-derived by the orchestrator."
+    },
+    {
+      "name": "noheader",
+      "sample_value_prefix": "1",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "fb",
+      "sample_value_prefix": "1",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "aged",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "enableAged",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "enableDarkMode",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "grayscale",
+      "sample_value_prefix": "1",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "dyeid",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "clientype",
+      "sample_value_prefix": "2",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "fwidth",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "sid",
+      "sample_value_prefix": "7446039806946242560",
+      "sample_value_length": 19,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "wxLang",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "tcScale",
+      "sample_value_prefix": "1",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "uid",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "cap_cd",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "rnd",
+      "sample_value_prefix": "482076",
+      "sample_value_length": 6,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "prehandleLoadTime",
+      "sample_value_prefix": "154",
+      "sample_value_length": 3,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "createIframeStart",
+      "sample_value_prefix": "1775274230429",
+      "sample_value_length": 13,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "global",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "subsid",
+      "sample_value_prefix": "10",
+      "sample_value_length": 2,
+      "origin_module": "upstream",
+      "origin_lines": null,
+      "assembly_method": "show-URL query passthrough via module 30 queryMap()",
+      "provenance": "Passthrough from the show-page iframe URL query."
+    },
+    {
+      "name": "sess",
+      "sample_value_prefix": "s1LCqg-Z2OZiIDOktcwDJ4mtzyDd91soncHQX79sPMuyqb5noaX6jB_lzSqX...",
+      "sample_value_length": 322,
+      "origin_module": 30,
+      "origin_lines": [
+        1,
+        72222,
+        72235
+      ],
+      "assembly_method": "server-baked into cap_union_prehandle JSONP, carried in iframe URL ?sess=, then rotated by /cap_union_new_getsig responses via updateSession()",
+      "provenance": "Module 30 caches sess in a module-private `a.sess` slot, seeds it from window.captchaConfig.sess, exposes queryMap() that copies it into `d`, and exposes updateSession() which module 56 calls from the getsig + verify success handlers (`e.sess && w(e.sess)`) to rotate the value mid-session."
+    },
+    {
+      "name": "cdata",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162440,
+        162449
+      ],
+      "assembly_method": "module 56 IIFE (`function(e,t,n){...e.cdata=n}(d,n)`) using l.challenge() from module 72",
+      "provenance": "Module 72 (n(73) = md5) brute-forces a PoW challenge (t.randstr||n for n < t.M) when window.captchaConfig.capChallenge is populated, returns the counter as a number; module 56 stores that number in `d.cdata`."
+    },
+    {
+      "name": "ans",
+      "sample_value_prefix": "484,46;",
+      "sample_value_length": 7,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162512,
+        162519
+      ],
+      "assembly_method": "module 56 (`d.ans=c`) after concatenating slide-drag coord string c",
+      "provenance": "Built by iterating the per-step coordinate array produced by the slide drag handler (module 67) and concatenating `Math.floor(left)+\",\"+Math.floor(top)+\";\"` for each point. In the HAR this reduces to a single \"484,46;\" — one coarse-grained drop point."
+    },
+    {
+      "name": "vsig",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162520,
+        162533
+      ],
+      "assembly_method": "module 56 (`d.vsig=_.vsig`) reading window.captchaConfig.vsig",
+      "provenance": "vsig is a server-provided per-challenge token carried in captchaConfig and refreshed by /cap_union_new_getsig responses (`t&&(_.vsig=t)`). In this HAR it is empty."
+    },
+    {
+      "name": "websig",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162534,
+        162551
+      ],
+      "assembly_method": "module 56 (`d.websig=_.websig`) reading window.captchaConfig.websig",
+      "provenance": "Server-baked in the show-page captchaConfig block; empty in this HAR."
+    },
+    {
+      "name": "subcapclass",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162552,
+        162579
+      ],
+      "assembly_method": "module 56 (`d.subcapclass=_.subcapclass`) reading window.captchaConfig.subcapclass",
+      "provenance": "Server-baked in the show-page captchaConfig block; empty in this HAR."
+    },
+    {
+      "name": "pow_answer",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162580,
+        162593
+      ],
+      "assembly_method": "module 56 (`d.pow_answer=...`) set from the WebWorker PoW result object M.ans",
+      "provenance": "When window.captchaConfig.powCfg.md5 and .prefix are present, module 56 runs a WebWorker (module 48 -> worker in module 49 -> hash in module 52) to brute-force an md5 prefix, then sets `d.pow_answer = P.nonce + M.ans`. Empty in this HAR because powCfg is absent."
+    },
+    {
+      "name": "pow_calc_time",
+      "sample_value_prefix": "0",
+      "sample_value_length": 1,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162653,
+        162679
+      ],
+      "assembly_method": "module 56 (`d.pow_calc_time=M.duration`)",
+      "provenance": "Duration (ms) of the PoW WebWorker run, captured alongside the result. Zero in this HAR."
+    },
+    {
+      "name": "collect",
+      "sample_value_prefix": "7kNjUPia0j76nra/Tpik+hZK9DftzSpurs2y2OKR3MO4Fq1Cuqw2pvk9vKmx...",
+      "sample_value_length": 8128,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162692,
+        162732
+      ],
+      "assembly_method": "module 56 (`e[_.collectdata]=decodeURIComponent(C())`) using tdc.getData() from module 38/70",
+      "provenance": "Module 38 wraps `window.TDC.getData(true)` (tdc.js register-VM output); module 70 re-exports it as `tdc.getData`; module 56 reads it through `C = E.getData` and URL-decodes into the field whose name is whatever the server chose for `_.collectdata` (here \"collect\"). This is the same `collect` token produced by the register-VM tdc.js described in docs/TOKEN_FORMAT.md."
+    },
+    {
+      "name": "tlg",
+      "sample_value_prefix": "8128",
+      "sample_value_length": 4,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162733,
+        162762
+      ],
+      "assembly_method": "module 56 (`e.tlg=e[_.collectdata].length`)",
+      "provenance": "Length in characters of the URL-decoded collect-token string — cheap client-side integrity tag."
+    },
+    {
+      "name": "fpinfo",
+      "sample_value_prefix": "",
+      "sample_value_length": 0,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162823,
+        162833
+      ],
+      "assembly_method": "module 56 (`d.fpinfo=i`) from the vm.run callback `o => i` chain; `i` is the outer `fpinfo` wrapped in the run callback",
+      "provenance": "In the vm.run completion handler module 56 receives per-drag fingerprint data as `i` and stores it on `d.fpinfo`. Empty in this HAR because vm is not armed (vmAvailable empty, vmByteCode empty)."
+    },
+    {
+      "name": "eks",
+      "sample_value_prefix": "+dIC7DOymyJE6Xf1wlsyPi7PrW+JPX8NXGBs23csIVcQkvBvn9mjSBDJvqyS...",
+      "sample_value_length": 312,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162834,
+        162843
+      ],
+      "assembly_method": "module 56 (`d.eks=R()`) calling tdc.getEks() from module 38/70",
+      "provenance": "Module 38 exposes `getEks: function(){ return (window.TDC.getInfo()||{}).info || \"\"; }`; module 70 re-exports as `tdc.getEks`; module 56 reads via `R = E.getEks`. This is exactly the `eks` string server-baked into tdc.js line 123 and surfaced through `TDC.getInfo().info`, consistent with docs/EKS_FORMAT.md."
+    },
+    {
+      "name": "nonce",
+      "sample_value_prefix": "eda1152f11f1daf0",
+      "sample_value_length": 16,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        162854,
+        162869
+      ],
+      "assembly_method": "module 56 (`_.nonce && (d.nonce=_.nonce)`)",
+      "provenance": "Module 56 reads `window.captchaConfig.nonce`, which is server-baked into the show-page HTML alongside sess (confirmed in the HAR show-page body: `nonce:\"eda1152f11f1daf0\"`). The orchestrator never mutates it; it is passed through from the captchaConfig block into the verify body."
+    },
+    {
+      "name": "vlg",
+      "sample_value_prefix": "0_0_1",
+      "sample_value_length": 5,
+      "origin_module": 71,
+      "origin_lines": [
+        1,
+        179149,
+        179155
+      ],
+      "assembly_method": "module 71 (`t.vlg=[vmAvailable?1:0, vmByteCode?1:0, 1].join(\"_\")`), merged into `d` via `$.extend(d, o)` in module 56",
+      "provenance": "vlg is a three-digit availability signal for the stack-VM integration: \"vmAvailable flag _ vmByteCode-nonempty flag _ 1\". In this HAR both flags are 0 because captchaConfig.vmAvailable and captchaConfig.vmByteCode are empty strings."
+    },
+    {
+      "name": "vData",
+      "sample_value_prefix": "7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4...",
+      "sample_value_length": 152,
+      "origin_module": 56,
+      "origin_lines": [
+        1,
+        163090,
+        163099
+      ],
+      "assembly_method": "ORIGIN UNRESOLVED STATICALLY (see FLOW.md §9)",
+      "provenance": "The only textual `vData` write in the orchestrator bundle is inside the isLowIE() branch: `o=window.getVData && window.getVData(n.join(\"&\")); o && (e.vData=o)`. `getVData` is not defined in t_captcha_slide.js (this bundle), tdc.js (grep: 0 hits), or vm_slide.js (grep: 0 hits — but vm_slide.js is the stack-VM encoded blob, so runtime behavior is opaque). On the HAR (Chrome 146, isLowIE false) vData is nevertheless present in the POST body. The static trace ends here; either vm-slide.enc.js installs window.getVData at runtime, or it installs a $.ajaxSettings data-filter / jQuery 1.11.3 prefilter that rewrites POST bodies before they hit the network."
+    }
+  ],
+  "leftover_har_fields": []
+}

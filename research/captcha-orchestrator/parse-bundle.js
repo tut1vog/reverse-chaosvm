@@ -275,6 +275,126 @@ function analyzeModule(id, fnNode, src) {
 }
 
 /**
+ * Gate 1 (task 41.5): scan every module for calls of the form
+ * `<requireParam>(<non-numeric>)` and report them. Webpack module wrappers
+ * have `require` as the third positional parameter; if a module redefines
+ * the identifier with the same name as an inner function or local variable
+ * (as Zepto does inside module 76), any `n(...)` call below that shadow is
+ * NOT a real webpack require. This audit emits every suspect call site along
+ * with whether the callee identifier is shadowed at that point, so a reader
+ * can confirm no real dynamic-require edges were missed.
+ */
+function auditDynamicRequires(modules, arrayExpr) {
+  const suspects = [];
+  const byModule = {};
+
+  // Collect all identifiers bound by `var` / function declarations / params
+  // in a given function scope (ignoring nested functions — `var` in ES5 is
+  // function-scoped, so any nested var still binds here unless the nested
+  // function re-declares it as a param or var of its own).
+  function collectHoistedVars(fnNode) {
+    const set = new Set();
+    if (fnNode.params) {
+      for (const p of fnNode.params) {
+        if (p && p.type === 'Identifier') set.add(p.name);
+      }
+    }
+    function walkBody(n) {
+      if (!n || typeof n !== 'object') return;
+      if (n.type === 'FunctionDeclaration' || n.type === 'FunctionExpression' ||
+          n.type === 'ArrowFunctionExpression') {
+        // Do NOT descend into nested function bodies for var hoisting, but
+        // a named FunctionDeclaration at this level still adds its id here.
+        if (n.type === 'FunctionDeclaration' && n.id) set.add(n.id.name);
+        return;
+      }
+      if (n.type === 'VariableDeclarator' && n.id && n.id.type === 'Identifier') {
+        set.add(n.id.name);
+      }
+      for (const k of Object.keys(n)) {
+        if (k === 'type' || k === 'start' || k === 'end' || k === 'loc' || k === 'range') continue;
+        const v = n[k];
+        if (Array.isArray(v)) {
+          for (const c of v) if (c && typeof c === 'object' && c.type) walkBody(c);
+        } else if (v && typeof v === 'object' && v.type) {
+          walkBody(v);
+        }
+      }
+    }
+    if (fnNode.body) walkBody(fnNode.body);
+    return set;
+  }
+
+  for (let i = 0; i < modules.length; i++) {
+    const mod = modules[i];
+    if (mod.isEmpty) continue;
+    const fnNode = arrayExpr.elements[i];
+    if (!fnNode || fnNode.type !== 'FunctionExpression') continue;
+    const nParam = fnNode.params[2] && fnNode.params[2].name;
+    if (!nParam) continue;
+
+    // Scope stack: each entry is the set of names bound by that scope.
+    // A call `n(...)` is a real webpack require only if no inner scope binds `n`.
+    const scopeChain = [collectHoistedVars(fnNode)];
+
+    function enter(node) {
+      if (!node || typeof node !== 'object') return;
+      const isFn = node !== fnNode && (
+        node.type === 'FunctionDeclaration' ||
+        node.type === 'FunctionExpression' ||
+        node.type === 'ArrowFunctionExpression'
+      );
+      if (isFn) {
+        const binds = collectHoistedVars(node);
+        // Named FunctionExpression's own name is in scope inside its body.
+        if (node.type === 'FunctionExpression' && node.id) binds.add(node.id.name);
+        scopeChain.push(binds);
+      }
+      if (node.type === 'CallExpression' &&
+          node.callee && node.callee.type === 'Identifier' && node.callee.name === nParam) {
+        // Shadowed if any inner scope (i.e. any frame except the outermost
+        // wrapper one) binds `nParam`.
+        let shadowed = false;
+        for (let s = 1; s < scopeChain.length; s++) {
+          if (scopeChain[s].has(nParam)) { shadowed = true; break; }
+        }
+        const arg0 = node.arguments[0];
+        const isNumericLiteral = arg0 && arg0.type === 'Literal' && typeof arg0.value === 'number';
+        if (!isNumericLiteral) {
+          suspects.push({
+            module: i,
+            shadowed,
+            argType: arg0 ? arg0.type : 'none',
+            argValue: arg0 && arg0.type === 'Literal' ? arg0.value : null,
+            start: node.start,
+            end: node.end
+          });
+          byModule[i] = (byModule[i] || 0) + 1;
+        }
+      }
+      for (const k of Object.keys(node)) {
+        if (k === 'type' || k === 'start' || k === 'end' || k === 'loc' || k === 'range') continue;
+        const v = node[k];
+        if (Array.isArray(v)) {
+          for (const c of v) if (c && typeof c === 'object' && c.type) enter(c);
+        } else if (v && typeof v === 'object' && v.type) {
+          enter(v);
+        }
+      }
+      if (isFn) scopeChain.pop();
+    }
+    enter(fnNode.body);
+  }
+  const real = suspects.filter((s) => !s.shadowed);
+  return {
+    totalSuspects: suspects.length,
+    realDynamicRequires: real.length,
+    byModule,
+    suspects
+  };
+}
+
+/**
  * Build a static module graph from the inventory.
  */
 function buildGraph(modules) {
@@ -356,11 +476,13 @@ function main() {
   const entryId = findEntryId(ast);
   const graph = buildGraph(modules);
   graph.entryId = entryId;
+  const audit = auditDynamicRequires(modules, moduleArray);
 
   if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
   writeJson(path.join(OUT_DIR, 'modules.json'), modules);
   writeJson(path.join(OUT_DIR, 'module-graph.json'), graph);
+  writeJson(path.join(OUT_DIR, 'dynamic-requires.json'), audit);
 
   // Console summary — useful when running by hand.
   const nonEmpty = modules.filter((m) => !m.isEmpty);
@@ -368,7 +490,8 @@ function main() {
   process.stdout.write(
     `parse-bundle: ${modules.length} slots, ${nonEmpty.length} non-empty, ` +
     `${graph.stats.emptySlots} empty, ${graph.stats.totalEdges} edges, ` +
-    `${totalBytes} module bytes, entryId=${entryId}\n`
+    `${totalBytes} module bytes, entryId=${entryId}, ` +
+    `dynRequires=${audit.realDynamicRequires}/${audit.totalSuspects}\n`
   );
 }
 

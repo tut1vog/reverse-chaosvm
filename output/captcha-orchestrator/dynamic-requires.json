@@ -1,0 +1,44 @@
+{
+  "totalSuspects": 4,
+  "realDynamicRequires": 0,
+  "byModule": {
+    "39": 1,
+    "59": 1,
+    "67": 1,
+    "76": 1
+  },
+  "suspects": [
+    {
+      "module": 39,
+      "shadowed": true,
+      "argType": "Identifier",
+      "argValue": null,
+      "start": 77664,
+      "end": 77670
+    },
+    {
+      "module": 59,
+      "shadowed": true,
+      "argType": "none",
+      "argValue": null,
+      "start": 170197,
+      "end": 170200
+    },
+    {
+      "module": 67,
+      "shadowed": true,
+      "argType": "none",
+      "argValue": null,
+      "start": 175047,
+      "end": 175050
+    },
+    {
+      "module": 76,
+      "shadowed": true,
+      "argType": "none",
+      "argValue": null,
+      "start": 210792,
+      "end": 210795
+    }
+  ]
+}

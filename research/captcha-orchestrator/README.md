@@ -8,9 +8,11 @@ and talking to the captcha endpoints?
 
 ## Status
 
-partial — structural survey of `sample/t_captcha_slide.js` complete (task
-41.4). Deep flow analysis and `docs/CAPTCHA_ORCHESTRATOR.md` are deferred to
-41.5 and 41.6.
+partial (flow traced, public doc pending) — structural survey complete
+(task 41.4) and end-to-end flow trace complete (task 41.5, see FLOW.md).
+`docs/CAPTCHA_ORCHESTRATOR.md` is still deferred to 41.6. One scoped open
+question remains: `vData` origination on modern browsers cannot be
+resolved statically — see FLOW.md section 9.
 
 ## Inputs
 
@@ -27,26 +29,46 @@ partial — structural survey of `sample/t_captcha_slide.js` complete (task
 
 ```
 # 41.4 structural survey: emits modules.json + module-graph.json
+# plus 41.5 gate-1 dynamic-require audit: dynamic-requires.json
 node research/captcha-orchestrator/parse-bundle.js
+
+# 41.5 verify-body origination table (reads modules.json + HAR):
+node research/captcha-orchestrator/trace-flow.js
+
+# 41.5 slide-jy.js vs module 76 classification:
+node research/captcha-orchestrator/slide-jy-diff.js
 ```
 
-The script is idempotent — running it twice produces byte-identical output
-under `output/captcha-orchestrator/`. No CLI arguments; the input path is
-hard-coded at `sample/t_captcha_slide.js`.
+All three scripts are idempotent — running each twice produces byte-
+identical output under `output/captcha-orchestrator/`. No CLI arguments;
+the input paths are hard-coded to `sample/t_captcha_slide.js`,
+`sample/captcha-har.har`, and `sample/slide-jy.js`.
 
 Outputs:
 
-- `output/captcha-orchestrator/modules.json` — per-module inventory
-  (byte range, source lines, byte length, static require edges, best-effort
-  exports, conservative structural hint, raw signal flags).
+- `output/captcha-orchestrator/modules.json` — per-module inventory.
 - `output/captcha-orchestrator/module-graph.json` — `{nodes, edges, roots,
-  leaves, stats, entryId}` static graph derived from the inventory.
+  leaves, stats, entryId}` static graph.
+- `output/captcha-orchestrator/dynamic-requires.json` — task 41.5 gate-1
+  audit. Reports 0 real dynamic requires out of 4 suspect call sites
+  (all four shadowed by local bindings).
+- `output/captcha-orchestrator/verify-body-origination.json` — task 41.5
+  deliverable. Machine-readable origination table for all 39 fields in
+  the `/cap_union_new_verify` POST body in `sample/captcha-har.har`.
+- `output/captcha-orchestrator/slide-jy-diff.md` — task 41.5 deliverable.
+  Short classification of module 76 vs `sample/slide-jy.js` (verdict:
+  different libraries — module 76 is Zepto, slide-jy.js is jQuery 1.11.3).
 
 ## Documents
 
 - `SURVEY.md` — structural findings from task 41.4: bundle shape, module
   size distribution, graph shape, candidate modules for each Track 2 DoD
   concept, open questions for 41.5, and the tractability verdict.
+- `FLOW.md` — task 41.5 end-to-end flow analysis: scope, early-gate
+  results, module 8 / 56 / 76 deep reads, end-to-end numbered flow,
+  verify POST origination table, doc reconciliation, open questions.
+- `MODULE-41-NOTES.md` — task 41.5 gate-2 bounded spike on module 41.
+  Verdict: i18n caption table, parked (not on critical path).
 
 ## Notes
 
