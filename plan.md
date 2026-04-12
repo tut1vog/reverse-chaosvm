@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 42 — vData runtime binding reversal (follow-up from Phase 41 open question)
-Current task: 42.2 — Cross-reference vm-slide vData finding against FLOW.md §6 + HAR + crypto provenance
+Current task: 42.3 — Director-owned docs bookkeeping (vData mechanism resolved on Chrome via XHR proxy)
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -50,8 +50,8 @@ Current task: 42.2 — Cross-reference vm-slide vData finding against FLOW.md §
 | ID | Task | Status |
 |----|------|--------|
 | 42.1 | vm-slide vData static trace — locate every `OP_04 OP_10* OP_13` anchor for `"getVData"` / `"vData="` / `"&vData="`, walk surrounding basic blocks, identify property-write vs property-read, extract the installed function body, produce a reproducible script + analysis note | done |
-| 42.2 | Cross-reference against FLOW.md §6 + HAR + crypto provenance scan — confirm the function signature matches `window.getVData(n.join("&"))` and characterise where the 152-char HAR value's crypto comes from (candidates: upstream register, second helper installed via separate OP_58+OP_24, or external page-loaded routine). Verdict: fully resolved → 42.3 auto-continues; partially resolved → plan revision + user pause | in-progress |
-| 42.3 | Docs bookkeeping — update `docs/CAPTCHA_ORCHESTRATOR.md` §6/§8, `research/captcha-orchestrator/README.md` status, `FLOW.md` §9 Q1 post-script. Also promote the three Phase 39/40 vm-slide docs (`CHAOSVM_VARIANTS.md`, `VM_SLIDE_ARCHITECTURE.md`, `VM_SLIDE_OPCODES.md`) from CLAUDE.md "new docs planned" list into the main doc table | pending |
+| 42.2 | Cross-reference against FLOW.md §6 + HAR + crypto provenance scan — confirm the function signature matches `window.getVData(n.join("&"))` and characterise where the 152-char HAR value's crypto comes from | done — mechanism resolved: vm-slide installs an XHR proxy on Chrome (not `window.getVData`), crypto is modified-XTEA + custom 64-char base64, window-installs=1 (only getVData on IE9 fallback) |
+| 42.3 | Docs bookkeeping — update `docs/CAPTCHA_ORCHESTRATOR.md` §6/§8, `research/captcha-orchestrator/README.md` status, `FLOW.md` §9 Q1 post-script with the resolved mechanism. Also correct 42.1's VDATA-TRACE.md framing that the install is "unconditional" (it isn't — it's IE9-gated). Promote the three Phase 39/40 vm-slide docs from CLAUDE.md "new docs planned" list into the main doc table. | in-progress |
 
 ### Phase 41: Minor cleanup + Captcha orchestrator (Stream B Track 2)
 > Two tiny cleanups from 40.4's deferred findings, then Stream B Track 2 — analyze `sample/t_captcha_slide.js` (213 KB webpack bundle) to document the end-to-end CAPTCHA flow. Track 2's DoD from `project-brief.md`: `docs/CAPTCHA_ORCHESTRATOR.md` with show-page load → vm-slide fetch → vData compute → verify POST → ticket, identifying every origination point for `collect`, `eks`, `vData`, `nonce`, `sess`, `sig`. The file is a standard webpack bundle with a module array, which makes static analysis via acorn tractable (same approach as `tools/porting-pipeline/vm-parser.js`).
@@ -79,124 +79,56 @@ Current task: 42.2 — Cross-reference vm-slide vData finding against FLOW.md §
 
 ## Current Task
 
-**ID**: 42.2
-**Title**: Cross-reference 42.1's vData trace against FLOW.md §6 + HAR + crypto provenance scan
+**ID**: 42.3
+**Title**: Director-owned docs bookkeeping — propagate vData mechanism resolution to public docs + CLAUDE.md
 **Phase**: Phase 42 — vData runtime binding reversal
 **Status**: in-progress
 
-### Goal
-Cross-reference 42.1's vm-slide vData static trace against (a) the orchestrator call site documented in `research/captcha-orchestrator/FLOW.md` §6, (b) the HAR verify-body value, and (c) the provenance of the crypto payload that produces the 152-char HAR `vData` value. 42.1 established that `window.getVData` is installed at `OP_24` pc=20066 with the function body at `[19702, 20058]` (one string arg, branches on `document.documentMode`), but its function body does NOT appear to contain the XTEA/base64 crypto — no nested `OP_58`, no crypto-looking `OP_13` resolves. So the 152-char HAR value must come from elsewhere. This task's job is to find out where.
 
-Deliverable verdict:
-- **Fully resolved** → the crypto source is unambiguously identified, 42.3 auto-continues into docs bookkeeping.
-- **Partially resolved** → a specific, scoped gap remains; director revises the plan to add a targeted follow-up task (jsdom harness, second static trace, or whatever the gap demands) and pauses for user review.
+### Summary of what 42.1 + 42.2 established
 
-### Context — what 42.1 already produced
+The vData runtime binding is **mechanism-resolved** on Chrome (non-IE):
 
-Read these first:
-- `research/vm-slide-stack-vm/VDATA-TRACE.md` — the authoritative 42.1 analysis. 294 lines. Read sections §3 (write identification), §4 (function body), §5 (provisional semantics), §6 (handoff) carefully.
-- `output/vm-slide/vdata-anchors.json` — machine-readable anchor inventory (3 entries: `getVData` write at pc=19681, `vData=` read at pc=19969 inside the function body, `&vData=` read at pc=24210 in a debug-mode branch).
-- `research/vm-slide-stack-vm/vdata-trace.js` — the reproducible tracer. Idempotent.
-- `research/captcha-orchestrator/FLOW.md` §6 — the orchestrator-side call site. Specifically: `o = window.getVData && window.getVData(n.join("&"))`, then `o && (e.vData = o)`. The `n` array is built from the collector fields earlier in module 56.
-- `output/captcha-orchestrator/verify-body-origination.json` — the `vData` row with `sample_value_prefix` (first ~60 chars) and `sample_value_length` (152).
-- `sample/captcha-har.har` — search for the literal `vData=` string in the verify POST body to get the full 152-char value for length/shape analysis.
-- `output/vm-slide/bytecode.json`, `output/vm-slide/disassembly-full.txt`, `output/vm-slide/dispatch-table.json` — the vm-slide primary artifacts.
-- `research/vm-slide-stack-vm/README.md` and the three Phase 40 docs (`docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/CHAOSVM_VARIANTS.md`) — background on the vm-slide stack VM's runtime model.
+- **On Chrome 146**: vm-slide calls `proxyXHR(ctx)` which monkey-patches `XMLHttpRequest.prototype.send/open` globally. The patched send intercepts the verify POST and injects `vData=<ciphertext>` into the body. The orchestrator's `if (isLowIE())` branch **never executes** and `window.getVData` is **never installed** on Chrome at all.
+- **On IE9 and below**: vm-slide installs `window.getVData` at pc=20066 via the classical `[window, "getVData"] + FUNC_CREATE + OP_24` sequence. The orchestrator's `if (isLowIE())` branch calls it explicitly.
+- **Branch gate**: `OP_60 19666` at pc 19636 — `if (obj.isIE9Below()) { install getVData }` else `{ obj.proxyXHR(p[3]) }` then `OP_06 20070` to skip install.
+- **Crypto**: modified-XTEA (delta `0x9E3779B9` as `OP_08` immediate at bytecode indices 15352 and 15530, matching encrypt+decrypt) + custom 64-char base64 alphabet at pc 16932 (`GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`, contains `-_*`) + char-set-validation regex `[^A-Za-z0-9\-\_\*]` at pc 17677.
+- **HAR value verification**: the full 152-char HAR `vData` value `7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY` — every character is a member of the custom alphabet, zero outliers. Conclusive.
+- **Window-installs enumeration**: vm-slide installs exactly **1** `window.*` property — `window.getVData`. No second crypto helper. `output/vm-slide/window-installs.json` has one entry.
 
-### Key claim from 42.1 to verify
+42.1 retroactive correction: 42.1's VDATA-TRACE.md §3-§4 characterised the install as "unconditional". That prose was wrong — 42.2 traced one level up and found the IE-gate. 42.1's physical opcode identification (OP_24 at 20066) was correct; only the "unconditional" word in the narrative needs fixing.
 
-Anchors and classification:
-| Anchor | pc | Classification | Role |
-|--------|------|---------------|------|
-| `getVData` | 19681 | **write** | installs `window.getVData` via `OP_24` at pc=20066 |
-| `vData=` | 19969 | **read** | RegExp pattern INSIDE the function body (recursion guard) |
-| `&vData=` | 24210 | **read** | `window.DEBUGMODE` branch dead code elsewhere in the bytecode |
+The "extract the exact XTEA key and build a byte-identical vData generator" work is a legitimate follow-up but **out of Phase 42 scope**. FLOW.md §9 Q1 and CAPTCHA_ORCHESTRATOR.md §8 asked "where does vData come from"; we now know.
 
-Function body: `[19702, 20058]`, 216 instructions, FUNC_CREATE operands `K=19702 A=1 C=1 ...`. Branches on `document.documentMode` twice. Uses `new RegExp("vData=")` to check whether the input already contains `vData=`. Splits on `"&"` and `"="`. Resolved external identifiers inside the body: `Object` (pc=19845), `RegExp` (pc=19955). **No crypto in the body.**
+### Checklist — files to edit (director-owned)
 
-### Required investigation (in order)
+1. **`docs/CAPTCHA_ORCHESTRATOR.md`**:
+   - §2 End-to-end flow — add a step describing the vm-slide-side `proxyXHR` install on Chrome (between the vm-slide load step and the verify POST step).
+   - §5.2 origination table `vData` row — replace "ORIGIN UNRESOLVED STATICALLY" with the resolved mechanism (XHR proxy injection), short provenance sentence, `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` citation.
+   - §6 critical fields — replace the `vData` subsection with the resolved mechanism narrative: Chrome path (XHR proxy) + IE9 path (direct install), gate at pc 19636, crypto ingredients at bytecode[15352/15530] + pc 16932 + pc 17677.
+   - §8 known limitations — remove `vData` from the open-questions list; replace with a narrower follow-up bullet ("full decompile of the XHR proxy body + XTEA key extraction for byte-identical vData generation").
+2. **`research/captcha-orchestrator/FLOW.md`**:
+   - §9 Q1 — append a resolution post-script citing VDATA-TRACE.md and VDATA-RESOLUTION.md, correcting the jQuery-ajax-hook hypothesis (wrong mechanism; right location: vm-slide) and stating the actual mechanism (XHR proxy on Chrome, direct install on IE9).
+3. **`research/captcha-orchestrator/README.md`**:
+   - Status bump from `partial — flow traced end-to-end, public doc shipped, one open question remaining (vData runtime binding)` to `closed — full flow documented; vData mechanism resolved in Phase 42; follow-up for byte-identical vData generator available but out of scope`.
+   - Remove the `vData` entry from the "Open questions" section (or re-scope it to the narrow follow-up).
+4. **`research/vm-slide-stack-vm/VDATA-TRACE.md`**:
+   - Add a short "**Correction from 42.2**" post-script at the end noting that the install is IE9-gated (not unconditional), with a pointer to VDATA-RESOLUTION.md §3 candidate (b) / §4 verdict.
+5. **`research/vm-slide-stack-vm/README.md`**:
+   - Update to reference the new VDATA-TRACE.md, VDATA-RESOLUTION.md, vdata-trace.js, vdata-provenance.js, window-installs.json artifacts.
+6. **`CLAUDE.md`**:
+   - Promote `docs/CHAOSVM_VARIANTS.md`, `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md` from the "new docs planned for the research phase" list into the main doc table (latent Phase 39/40 bookkeeping gap, was noted in the Phase 42 plan).
 
-**Step 1 — Trivial cross-check against FLOW.md §6**. Confirm that:
-- Function arg count (1) matches the orchestrator's single-arg call `window.getVData(n.join("&"))`.
-- The `n` array built in module 56 before the call contains URL-encoded key=value pairs joined by `&`, matching the function's internal split on `"&"` and `"="`. Read the relevant module-56 excerpt from FLOW.md §4.2 or §6 to confirm.
-- The `e.vData = o` assignment in the orchestrator stores the function's return value into the verify-body slot. Confirm that `o` is the return value (not a side effect).
-
-One short paragraph answer, cite FLOW.md line ranges.
-
-**Step 2 — HAR value shape analysis**. Extract the full 152-char `vData` value from `sample/captcha-har.har`. Analyze:
-- Character set (URL-safe base64? hex? a query string? a concatenation of both?).
-- Structure (any obvious delimiters? any pre-baked substrings like `&vData=`? — hint: almost certainly NOT because anchor 3 is debug-mode dead code).
-- Does the value look like XTEA ciphertext encoded in some way? The register-VM `collect` token uses modified XTEA + base64 (see `docs/TOKEN_FORMAT.md` and `docs/CRYPTO_ANALYSIS.md`) so there's prior art for what Tencent-crypto output looks like in this project.
-
-Report: "the 152-char value appears to be <character-set>, structure <structure>, most likely <encoding>."
-
-**Step 3 — Crypto provenance hunt (the substantive work)**. This is where the static trace gets interesting. 42.1 surfaced three candidates for where the crypto happens. Investigate each:
-
-**Candidate (a)**: **upstream register lifted into the function**. The FUNC_CREATE at pc=20059 has `A=1` upvalue (the `1 1 8 3 3` tail), which 42.1 interpreted as `p[1] = n[8]` — one captured value from slot 8 at function-create time. Trace back through the bytecode from pc=20059 to find what `n[8]` contains at that point. Is it a pre-computed crypto result? Look for other bytecode regions earlier than pc=20059 that write to slot 8 and use crypto opcodes. You may need to add a helper pass to `vdata-trace.js` or write a second small script to scan for writes-to-slot-8.
-
-**Candidate (b)**: **second helper installed via separate `OP_58 + OP_24`**. Scan the entire bytecode for all `OP_58 + <something> + OP_24` patterns where the preceding descriptor is `[window, "<key>"]`. Enumerate the keys — look for any that could be crypto helpers. Candidates to flag: anything like `getEks`, `_xtea`, `_crypto`, `sign`, or that looks opaque. **Also check whether `window.getVData` is the *only* `window.*` property vm-slide installs** — this is valuable project-wide information regardless of vData.
-
-**Candidate (c)**: **external page-loaded routine**. Check whether the vm-slide function body resolves any identifiers via `OP_13` that we don't recognize — particularly any that look like they could be imported globals from `tdc.js` (e.g. `TDC`, `TDC_...`). 42.1 found only `Object` and `RegExp` inside the function body, so candidate (c) is probably weak — but confirm by re-reading 42.1's table.
-
-Produce a small helper script if needed — `research/vm-slide-stack-vm/vdata-provenance.js` — that scans for all `window.*` property writes in the bytecode. Emit `output/vm-slide/window-installs.json` with `{key, install_pc, body_start_pc, body_end_pc, body_size}`.
-
-**Step 4 — Reach a verdict**. One of:
-
-- **Fully resolved**: you've identified the crypto source (which candidate? with evidence). The 152-char HAR value can be explained from the static trace. No further work needed; 42.3 can proceed.
-- **Partially resolved (static limit)**: the crypto lives inside another vm-slide function you CAN identify, but full decompilation of it would be a multi-hour task. Document the function's pc range and handoff-state for a future follow-up.
-- **Partially resolved (dynamic needed)**: the crypto depends on runtime state (e.g. a register written at load-time that we can't statically reconstruct). Recommend a small jsdom harness as a follow-up task. Provide a 2-3 bullet sketch of what the harness would need to do.
-- **Blocked**: something about the bytecode shape prevents the scan. Report what broke.
-
-### Deliverables (exactly these files)
-
-1. `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — the analysis note. Max 250 lines. Sections:
-   - **§1 FLOW.md cross-reference** (step 1 above — short paragraph).
-   - **§2 HAR value shape** (step 2 above — short paragraph with the full 152-char value quoted).
-   - **§3 Crypto provenance hunt** (step 3 above — one subsection per candidate, with evidence and a verdict for each).
-   - **§4 Resolution verdict** (step 4 above — state fully/partially/blocked with the specific sub-category).
-   - **§5 Recommended action for 42.3** — if fully resolved, what the docs bookkeeping needs to say. If partially resolved, what follow-up task the director should plan next. If blocked, what alternative approach to try.
-2. `research/vm-slide-stack-vm/vdata-provenance.js` — if you wrote a window-install scanner for step 3 candidate (b). Only create if needed.
-3. `output/vm-slide/window-installs.json` — output of the scanner if created. Idempotent.
-
-### Explicit non-goals
-- **Do NOT edit `docs/CAPTCHA_ORCHESTRATOR.md`**, `research/captcha-orchestrator/FLOW.md`, or any other Phase 41 artifact. 42.3 handles all docs edits.
-- **Do NOT modify Phase 40 vm-slide tooling** (`decoder.js`, `disassembler.js`, `walker.js`).
-- **Do NOT modify 42.1's artifacts** (`vdata-trace.js`, `VDATA-TRACE.md`, `vdata-anchors.json`). They're the author's deliverable; you're the verifier.
-- **Do NOT write a jsdom harness in this task.** If the verdict is "dynamic needed," recommend it — don't build it.
-- **Do NOT try to fully decompile any function body.** Characterize enough to reach a verdict; escalate if more is needed.
-- **Do NOT add npm dependencies.**
-- **No emojis.**
-
-### Allowed file set (exhaustive)
-
-Create (required):
-- `research/vm-slide-stack-vm/VDATA-RESOLUTION.md`
-
-Create (conditional on step 3 candidate (b) needing a scanner):
-- `research/vm-slide-stack-vm/vdata-provenance.js`
-- `output/vm-slide/window-installs.json`
-
-Nothing else. Do not edit any existing file.
-
-### Verification — report all of these
-1. `ls -la research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — file present.
-2. `wc -l research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — should be ≤250.
-3. If you wrote `vdata-provenance.js`: show it's idempotent (md5 before/after second run).
-4. If you wrote `window-installs.json`: show a few entries (`head -30` or equivalent).
-5. Full 152-char HAR `vData` value quoted verbatim in §2.
-6. `npm test` — 353/353.
-7. **Verdict summary in the report**: state the verdict category (fully / partially / blocked) and the one-line justification.
+### Verification
+- `npm test` — must stay 353/353.
+- `git diff --stat` — should show the six paths above plus plan.md + history.
+- No new research scripts or output artifacts.
 
 ### Constraints
-- **Do not make any git commits.** The director handles all commits after verification.
-- **Only touch the files in the allowed set.**
-- **No new npm dependencies.**
-- **CommonJS + 2-space + single-quote + semicolon.**
-- **Different agent from 42.1** per the author/verifier separation — you're the second set of eyes on the vData question.
-- **If the task is too difficult or impossible to complete** — e.g. the bytecode has too many `OP_58 + OP_24` patterns to enumerate sensibly, the crypto provenance can't be determined without runtime execution, or 42.1's analysis has a flaw you can't work around — stop immediately and report back cleanly. Explain what you attempted, which step broke, and what a different approach might look like. Do not leave partial files in the tree.
+- **Director-owned**, no subagent dispatch (per the "director writes docs updates itself" rule).
+- **Do not edit** the 42.1/42.2 research artifacts (`vdata-trace.js`, `vdata-anchors.json`, `vdata-provenance.js`, `window-installs.json`, `VDATA-RESOLUTION.md`) — only add the correction post-script to `VDATA-TRACE.md`.
+- **Do not promote the captcha-orchestrator track to `closed` if there's any structural doubt.** vData is resolved in mechanism but not in byte-level reproducibility; "closed with a follow-up flagged" is the correct framing.
 
-### Suggested Agent
-`general-purpose` — static analysis + cross-reference. Different from 42.1's agent.
 ### Prior: 41.6 (completed)
 Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md`. Director added the new doc to CLAUDE.md's main doc table.
 
