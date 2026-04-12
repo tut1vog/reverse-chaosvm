@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 36
-Current task: 36.3 — Run diagnostic experiments and analyze
+Current task: none — Phase 36 complete
 
 ---
 
@@ -149,34 +149,30 @@ Build 0e2b306a got errorCode=-1 (success) — proving the full pipeline works en
 |----|------|--------|
 | 36.1 | Create errorCode 12 diagnostic survey script | done |
 | 36.2 | Tests for diagnostic script | done |
-| 36.3 | Run diagnostic experiments and analyze | in-progress |
+| 36.3 | Run diagnostic experiments and analyze | done |
 
 ---
 
-## Current Task
+## Diagnostic Results (Phase 36)
 
-**ID**: 36.3
-**Title**: Run diagnostic experiments and analyze
-**Phase**: Investigate errorCode 12 Pattern
-**Status**: in-progress
+30 attempts → **7 successes (23.3%)**, 22 errorCode 12, 1 errorCode 9.
 
-### Goal
-Run `scripts/tdc-diagnose.js` with 30+ attempts, analyze the results to identify
-what differentiates successful (errorCode -1) from failed (errorCode 12) attempts.
+**Root cause: IP-based rate limiting.**
 
-### Context
-- Script is ready at `scripts/tdc-diagnose.js`
-- 10 cached pipeline configs available in `output/tdc-survey-*/`
-- Need to run live against Tencent's servers
+| Window | Attempts | Successes | Rate |
+|--------|----------|-----------|------|
+| Attempt 1 | 1 | 0 | 0% (cold start penalty) |
+| Attempts 2-9 | 8 | 7 | 87.5% |
+| Attempts 10-30 | 21 | 0 | 0% |
 
-### Implementation Steps
-1. Run `node scripts/tdc-diagnose.js --attempts 30 --verbose`
-2. Analyze the output: timing patterns, token sizes, per-hash success rates
-3. Form conclusions about what causes errorCode 12
+**Ruled out**:
+- Timing: avg 1275ms (success) vs 1291ms (fail) — no correlation
+- Token size: same hash, similar collect sizes → different outcomes
+- Nonce: always `eda1152f11f1daf0` (static per appid, not per session)
+- vData: constant 152 bytes across all attempts
+- Build/template: multiple hashes succeed early, same hashes fail later
 
-### Verification
-- [ ] Results saved to `output/tdc-diagnose/results.json`
-- [ ] Summary analysis documented
-
-### Suggested Agent
-general-purpose
+**Conclusion**: Token generation is correct. The server imposes per-IP rate limiting
+after ~8-10 CAPTCHA solves, rejecting all subsequent tokens with errorCode 12 regardless
+of correctness. First request also penalized (cold start). For production use, IP
+rotation would be needed.
