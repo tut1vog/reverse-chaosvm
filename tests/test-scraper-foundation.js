@@ -352,6 +352,114 @@ describe('template-cache: seed', () => {
     // Clean up
     if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
   });
+
+  // --------------------------------------------------------------------------
+  // Guard against malformed pipeline-config.json: config.target missing/non-string
+  // --------------------------------------------------------------------------
+
+  /** Create an isolated temp output dir containing the given config subdirs. */
+  function makeTempOutputDir(subdirs) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tc-seed-guard-'));
+    for (const [name, config] of Object.entries(subdirs)) {
+      const sub = path.join(dir, name);
+      fs.mkdirSync(sub, { recursive: true });
+      fs.writeFileSync(path.join(sub, 'pipeline-config.json'), JSON.stringify(config));
+    }
+    return dir;
+  }
+
+  /** Recursively remove a temp dir. */
+  function rmTempDir(dir) {
+    if (dir && fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
+  }
+
+  /** A well-formed pipeline-config body pointing at the real tdc.js (Template A). */
+  function wellFormedConfig() {
+    return {
+      target: 'tdc.js',
+      template: 'A',
+      caseCount: 95,
+      xteaParams: {
+        key: XTEA_A.key,
+        delta: XTEA_A.delta,
+        rounds: XTEA_A.rounds,
+        keyModConstants: XTEA_A.keyModConstants,
+      },
+    };
+  }
+
+  it('skips config with missing target without throwing', () => {
+    const tmpPath = tmpCachePath();
+    const tmpOut = makeTempOutputDir({
+      'bad-v': {
+        xteaParams: {
+          key: XTEA_A.key,
+          delta: XTEA_A.delta,
+          rounds: XTEA_A.rounds,
+          keyModConstants: XTEA_A.keyModConstants,
+        },
+      },
+    });
+
+    const cache = new TemplateCache(tmpPath);
+    assert.doesNotThrow(() => cache.seed(tmpOut));
+
+    // Cache should be empty — the faulty config was skipped
+    assert.strictEqual(cache.lookup(HASH_A), null);
+
+    rmTempDir(tmpOut);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('skips config with non-string target without throwing', () => {
+    const tmpPath = tmpCachePath();
+    const tmpOut = makeTempOutputDir({
+      'bad-v': {
+        target: 123,
+        xteaParams: {
+          key: XTEA_A.key,
+          delta: XTEA_A.delta,
+          rounds: XTEA_A.rounds,
+          keyModConstants: XTEA_A.keyModConstants,
+        },
+      },
+    });
+
+    const cache = new TemplateCache(tmpPath);
+    assert.doesNotThrow(() => cache.seed(tmpOut));
+
+    assert.strictEqual(cache.lookup(HASH_A), null);
+
+    rmTempDir(tmpOut);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
+
+  it('faulty sibling does not prevent well-formed config from being seeded', () => {
+    const tmpPath = tmpCachePath();
+    const tmpOut = makeTempOutputDir({
+      'bad-v': {
+        xteaParams: {
+          key: XTEA_A.key,
+          delta: XTEA_A.delta,
+          rounds: XTEA_A.rounds,
+          keyModConstants: XTEA_A.keyModConstants,
+        },
+      },
+      'good-v': wellFormedConfig(),
+    });
+
+    const cache = new TemplateCache(tmpPath);
+    assert.doesNotThrow(() => cache.seed(tmpOut));
+
+    // Well-formed sibling must be present
+    const entry = cache.lookup(HASH_A);
+    assert.ok(entry !== null, 'well-formed sibling should be seeded');
+    assert.deepStrictEqual(entry.key, XTEA_A.key);
+    assert.strictEqual(entry.template, 'A');
+
+    rmTempDir(tmpOut);
+    if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+  });
 });
 
 // ============================================================================
