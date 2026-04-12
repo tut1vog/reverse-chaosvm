@@ -1,0 +1,24 @@
+{
+  "key": [
+    1110584129,
+    1666271060,
+    1665357634,
+    1700417341
+  ],
+  "delta": 2654435769,
+  "rounds": 32,
+  "keyModConstants": [
+    2039556,
+    0,
+    0,
+    526365
+  ],
+  "verified": false,
+  "notes": "Found 7743 sum+=delta at PC 61128; 7743 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x42322B41, 0x63514754, 0x63435742, 0x655A4F3D]; Key mod constants: [2039556, 0, 0, 526365] (key[0]+2039556, key[3]+526365)",
+  "keyMods": [
+    2039556,
+    0,
+    0,
+    526365
+  ]
+}

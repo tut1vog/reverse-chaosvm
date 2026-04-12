@@ -1,0 +1,308 @@
+{
+  "target": "tdc-survey-e2170903e201e018.js",
+  "template": "unknown",
+  "caseCount": 93,
+  "variables": {
+    "bytecode": "_0x40f128",
+    "pc": "_0x4909e2",
+    "regs": "_0x116fb3",
+    "thisCtx": "_0x53b31f",
+    "catchStack": "_0x4b8a48",
+    "excVal": "_0x190dbe"
+  },
+  "opcodeTable": {
+    "0": "ARRAY",
+    "1": "PROP_SET_K",
+    "2": "CALLQ_2",
+    "3": "LT_K",
+    "5": "XOR",
+    "7": "ITER_SHIFT",
+    "8": "RET",
+    "11": "USHR_K",
+    "12": "NEG",
+    "13": "JMP",
+    "14": "CJMP",
+    "15": "SUB",
+    "17": "LT",
+    "20": "MOV",
+    "22": "OR",
+    "24": "EQ_K",
+    "25": "AND_K",
+    "26": "GE_K",
+    "27": "SEQ",
+    "29": "APPLY",
+    "30": "FUNC_CREATE_C",
+    "31": "OR_K",
+    "33": "NEW_0",
+    "34": "NOT",
+    "35": "CALL_1",
+    "36": "SHL_K",
+    "37": "PROP_GET",
+    "38": "CALLQ_1",
+    "39": "DIV",
+    "40": "ADD",
+    "41": "FUNC_CREATE_C",
+    "42": "ADD_K",
+    "43": "NEW_2",
+    "45": "OBJ_NEW",
+    "47": "LOAD_THIS",
+    "48": "CALLQ_0",
+    "49": "CALL_3",
+    "50": "EQ",
+    "51": "TRY_POP",
+    "52": "SHL",
+    "53": "NEW_1",
+    "54": "IN",
+    "55": "DELETE",
+    "56": "DEC",
+    "58": "LOAD_K",
+    "59": "SHR",
+    "60": "SUB_K",
+    "61": "MUL",
+    "62": "LOAD_NULL",
+    "63": "CATCH_PUSH",
+    "64": "CALLQ_3",
+    "65": "THROW",
+    "66": "STR_APPEND",
+    "67": "PROP_SET",
+    "70": "GT_K",
+    "72": "STR_EMPTY",
+    "73": "ENUMERATE",
+    "74": "RET_BARE",
+    "75": "LOAD_EXCEPTION",
+    "76": "SHR_K",
+    "78": "RSUB_K",
+    "79": "SEQ_K",
+    "80": "UPLUS",
+    "81": "TYPEOF",
+    "83": "MOD",
+    "85": "LE_K",
+    "89": "INC",
+    "91": "PROP_GET_K",
+    "92": "GT"
+  },
+  "unmappedOpcodes": [
+    {
+      "caseNumber": 4,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 6,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]),_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 9,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 10,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]].call(_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]);"
+    },
+    {
+      "caseNumber": 16,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]]['call'](_0x116fb3[_0x40f128[++_0x4909e2]]);"
+    },
+    {
+      "caseNumber": 18,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 19,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x270e71.LRRPB==typeof _0x116fb3[_0x40f128[(_0x4909e2+0x1)]]?_0x116fb3[_0x40f128[++_0x4909e2]]:(_0x116fb3[_0x40f128[++_0x4909e2]]-0x0);"
+    },
+    {
+      "caseNumber": 21,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]),_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]);"
+    },
+    {
+      "caseNumber": 23,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x53b31f;"
+    },
+    {
+      "caseNumber": 28,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=~_0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 32,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x521b57=[];\nfor(_0x9b4e89=_0x40f128[++_0x4909e2];_0x9b4e89>0x0;_0x9b4e89--)_0x521b57.push(_0x116fb3[_0x40f128[++_0x4909e2]]);\n_0x116fb3[_0x40f128[++_0x4909e2]]=_0x46fced(_0x4909e2+_0x40f128[++_0x4909e2],_0x521b57,_0x3ce9e3,_0x576d98,_0x53e642);\ntry{Object.defineProperty(_0x116fb3[_0x40f128[(_0x4909e2-0x1)]],_0x270e71['qmrKp'],{'value':_0x40f128[++_0x4909e2],'configurable':!![],'writable':![],'enumerable':![]});}catch(_0x18a917){}"
+    },
+    {
+      "caseNumber": 44,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]),_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]];"
+    },
+    {
+      "caseNumber": 46,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x40f128[++_0x4909e2],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]]['call'](_0x53b31f,_0x116fb3[_0x40f128[++_0x4909e2]]),_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 57,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]+=String['fromCharCode'](_0x40f128[++_0x4909e2]),_0x116fb3[_0x40f128[++_0x4909e2]]={},_0x116fb3[_0x40f128[++_0x4909e2]]='';"
+    },
+    {
+      "caseNumber": 68,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x190dbe,_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x4b8a48.push(_0x4909e2+_0x40f128[++_0x4909e2]);"
+    },
+    {
+      "caseNumber": 69,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]),_0x521b57=[];\nfor(_0x9b4e89=_0x40f128[++_0x4909e2];_0x9b4e89>0x0;_0x9b4e89--)_0x521b57['push'](_0x116fb3[_0x40f128[++_0x4909e2]]);\n_0x116fb3[_0x40f128[++_0x4909e2]]=_0x46fced((_0x4909e2+_0x40f128[++_0x4909e2]),_0x521b57,_0x3ce9e3,_0x576d98,_0x53e642);\ntry{Object.defineProperty(_0x116fb3[_0x40f128[(_0x4909e2-0x1)]],'length',{'value':_0x40f128[++_0x4909e2],'configurable':!![],'writable':![],'enumerable':![]});}catch(_0x55358d){}\n_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]]=_0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 71,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]='',_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]);"
+    },
+    {
+      "caseNumber": 77,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x40f128[++_0x4909e2],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]].call(_0x53b31f,_0x116fb3[_0x40f128[++_0x4909e2]]);"
+    },
+    {
+      "caseNumber": 82,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]),_0x116fb3[_0x40f128[++_0x4909e2]]+=String['fromCharCode'](_0x40f128[++_0x4909e2]),_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]);"
+    },
+    {
+      "caseNumber": 84,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x53b31f;\nreturn _0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 86,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]],_0x116fb3[_0x40f128[++_0x4909e2]]='',_0x116fb3[_0x40f128[++_0x4909e2]]+=String.fromCharCode(_0x40f128[++_0x4909e2]);"
+    },
+    {
+      "caseNumber": 87,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]][_0x116fb3[_0x40f128[++_0x4909e2]]]=_0x116fb3[_0x40f128[++_0x4909e2]];"
+    },
+    {
+      "caseNumber": 88,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]]['call'](_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]);"
+    },
+    {
+      "caseNumber": 90,
+      "reason": "No pattern matched",
+      "bodySource": "_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]][_0x40f128[++_0x4909e2]],_0x116fb3[_0x40f128[++_0x4909e2]]=_0x116fb3[_0x40f128[++_0x4909e2]];"
+    }
+  ],
+  "xteaParams": {
+    "key": [
+      1379284274,
+      1768704847,
+      1649634631,
+      1729961238
+    ],
+    "delta": 2654435769,
+    "rounds": 32,
+    "keyModConstants": [
+      1973780,
+      0,
+      0,
+      2434356
+    ],
+    "keyMods": [
+      1973780,
+      0,
+      0,
+      2434356
+    ]
+  },
+  "tokenVerified": null,
+  "structureParams": {
+    "hashPosition": 18,
+    "fieldOrder": [
+      1,
+      11,
+      32,
+      35,
+      15,
+      48,
+      4,
+      44,
+      23,
+      19,
+      6,
+      24,
+      20,
+      33,
+      0,
+      46,
+      41,
+      38,
+      -1,
+      5,
+      2,
+      17,
+      27,
+      49,
+      7,
+      43,
+      37,
+      26,
+      16,
+      30,
+      45,
+      53,
+      21,
+      57,
+      18,
+      -1,
+      50,
+      -1,
+      29,
+      -1,
+      55,
+      47,
+      10,
+      12,
+      42,
+      3,
+      8,
+      13,
+      51,
+      31,
+      25,
+      56,
+      54,
+      52,
+      28,
+      9,
+      22,
+      -1,
+      34,
+      14
+    ],
+    "serializationDiffs": [
+      {
+        "index": 18,
+        "chromeRaw": "  [[4,-1,-1,1775952765312,0,0,0,0]]               ",
+        "jsonStringify": "[[4,-1,-1,1775952765312,0,0,0,0]]               ",
+        "diffType": "serialization"
+      }
+    ],
+    "headerSplit": {
+      "strategy": "byte-boundary",
+      "contentLength": 144,
+      "paddingLength": 0
+    }
+  },
+  "timestamp": "2026-04-12T00:12:46.708Z"
+}

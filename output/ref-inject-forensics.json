@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-04-11T02:42:53.630Z",
+  "template": "A-reference-injected",
+  "xteaSource": "hardcoded",
+  "comparisonA": {
+    "cdStringsMatch": false,
+    "cdFirstDiffPosition": 133,
+    "cdContext": {
+      "chrome": "i\",\"\",[\"en-US\",\"en\"],\"\",8,[1280,1400],1,           [[4,-1,-1,1775875374192,0,0,0",
+      "ours": "i\",\"\",[\"en-US\",\"en\"],\"\",8,[1280,1400],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\""
+    },
+    "sdStringsMatch": true,
+    "sdFirstDiffPosition": null,
+    "sdContext": null,
+    "chromePlaintextLength": 2981,
+    "chromeHasValidJson": true,
+    "cleanCdMatch": true,
+    "cleanCdLengths": {
+      "chrome": 2862,
+      "ours": 2862
+    },
+    "fieldDiffs": [],
+    "fullBodyMatch": false,
+    "fullBodyFirstDiff": 133,
+    "fullBodyContext": {
+      "chrome": "i\",\"\",[\"en-US\",\"en\"],\"\",8,[1280,1400],1,           [[4,-1,-1,1775875374192,0,0,0",
+      "ours": "i\",\"\",[\"en-US\",\"en\"],\"\",8,[1280,1400],1,0,[{\"codec\":\"H.264\",\"support\":\"probably\""
+    }
+  },
+  "comparisonB": {
+    "roundTripMatch": true,
+    "segmentSizes": {
+      "header": 192,
+      "hash": 64,
+      "cdBody": 3648,
+      "sig": 76,
+      "total": 3980,
+      "original": 3980
+    },
+    "firstDiffSegment": null,
+    "firstDiffByte": null,
+    "hashContent": "[[4,-1,-1,1775875374192,0,0,0,0]]"
+  },
+  "comparisonC": {
+    "fullReconstructionMatch": false,
+    "firstDiffPosition": 170,
+    "diffSegment": "header (b64 0-191)",
+    "segmentComparison": {
+      "header": {
+        "match": false,
+        "oursLen": 192,
+        "chromeLen": 192,
+        "firstDiff": 170
+      },
+      "hash": {
+        "match": true,
+        "oursLen": 64,
+        "chromeLen": 64
+      },
+      "cdBody": {
+        "match": false,
+        "oursLen": 3628,
+        "chromeLen": 3648,
+        "firstDiff": 0
+      },
+      "sig": {
+        "match": true,
+        "oursLen": 76,
+        "chromeLen": 76
+      }
+    }
+  }
+}

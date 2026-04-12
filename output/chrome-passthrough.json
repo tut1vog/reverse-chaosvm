@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-04-11T10:24:33.680Z",
+  "timestamp": "2026-04-11T11:00:55.655Z",
   "method": "chrome-passthrough",
   "results": [
     {
@@ -9,19 +9,19 @@
       "collectLength": 3980,
       "eksLength": 312,
       "vDataLength": 152,
-      "sliderRawOffset": 494,
-      "sliderAnswer": 225,
+      "sliderRawOffset": 467,
+      "sliderAnswer": 454,
       "httpStatus": 200
     },
     {
       "attempt": 2,
       "errorCode": 9,
       "ticket": null,
-      "collectLength": 3980,
+      "collectLength": 3948,
       "eksLength": 312,
       "vDataLength": 152,
-      "sliderRawOffset": 488,
-      "sliderAnswer": 214,
+      "sliderRawOffset": 509,
+      "sliderAnswer": 496,
       "httpStatus": 200
     },
     {
@@ -31,8 +31,8 @@
       "collectLength": 3980,
       "eksLength": 312,
       "vDataLength": 152,
-      "sliderRawOffset": 462,
-      "sliderAnswer": 203,
+      "sliderRawOffset": 257,
+      "sliderAnswer": 244,
       "httpStatus": 200
     }
   ],

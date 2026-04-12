@@ -1,0 +1,24 @@
+{
+  "key": [
+    1379284274,
+    1768704847,
+    1649634631,
+    1729961238
+  ],
+  "delta": 2654435769,
+  "rounds": 32,
+  "keyModConstants": [
+    1973780,
+    0,
+    0,
+    2434356
+  ],
+  "verified": false,
+  "notes": "Found 9302 sum+=delta at PC 3395; 9302 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x52363532, 0x696C4B4F, 0x62536D47, 0x671D1D16]; Key mod constants: [1973780, 0, 0, 2434356] (key[0]+1973780, key[3]+2434356)",
+  "keyMods": [
+    1973780,
+    0,
+    0,
+    2434356
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "match": true,
+  "liveTokenLength": 4606,
+  "standaloneTokenLength": 4606,
+  "segments": [
+    {
+      "name": "hash",
+      "liveLength": 64,
+      "standaloneLength": 64,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "header",
+      "liveLength": 4096,
+      "standaloneLength": 4096,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "cdBody",
+      "liveLength": 64,
+      "standaloneLength": 64,
+      "match": true,
+      "firstDivergenceOffset": null
+    },
+    {
+      "name": "sig",
+      "liveLength": 120,
+      "standaloneLength": 120,
+      "match": true,
+      "firstDivergenceOffset": null
+    }
+  ],
+  "capturedData": {
+    "cdString": "{\"cd\":[null,\"+08\",[{\"name\":\"PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chrome PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Chromium PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"Microsoft Edge PDF Viewer\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"},{\"name\":\"WebKit built-in PDF\",\"description\":\"Portable Document Format\",\"filename\":\"internal-pdf-viewer\"}],0,\"\",{\"nt_vc_output\":{\"ac-baseLatency\":0.011609977324263039,\"ac-outputLatency\":0,\"ac-sampleRate\":44100,\"ac-maxChannelCount\":2,\"ac-numberOfInputs\":1,\"ac-numberOfOutputs\":0,\"ac-channelCount\":2,\"ac-channelCountMode\":\"explicit\",\"ac-channelInterpretation\":\"speakers\",\"an-fftSize\":2048,\"an-frequencyBinCount\":1024,\"an-minDecibels\":-100,\"an-maxDecibels\":-30,\"an-smoothingTimeConstant\":0.8,\"an-numberOfInputs\":1,\"an-numberOfOutputs\":1,\"an-channelCount\":2,\"an-channelCountMode\":\"max\",\"an-channelInterpretation\":\"speakers\"},\"pxi_output\":11888.616780045351},[{\"codec\":\"AAC\",\"support\":\"probably\"},{\"codec\":\"MP3\",\"support\":\"probably\"},{\"codec\":\"Ogg Vorbis\",\"support\":\"probably\"},{\"codec\":\"Ogg Opus\",\"support\":\"probably\"},{\"codec\":\"WAV\",\"support\":\"probably\"},{\"codec\":\"FLAC\",\"support\":\"probably\"},{\"codec\":\"WebM Vorbis\",\"support\":\"probably\"},{\"codec\":\"WebM Opus\",\"support\":\"probably\"},{\"codec\":\"M4A\",\"support\":\"maybe\"}],2,\"ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)\",600,\"top\",0,\"Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei\",\"srgb\",1700000000,{\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"mobile\":false,\"platform\":\"Linux\"},\"data:image/png;base64,FROZEN_CANVAS_FINGERPRINT\",8,[{\"codec\":\"H.264\",\"support\":\"probably\"},{\"codec\":\"H.264 High\",\"support\":\"probably\"},{\"codec\":\"H.265/HEVC\",\"support\":\"\"},{\"codec\":\"VP8\",\"support\":\"probably\"},{\"codec\":\"VP9\",\"support\":\"probably\"},{\"codec\":\"AV1\",\"support\":\"probably\"},{\"codec\":\"Theora\",\"support\":\"\"},{\"codec\":\"MPEG-4\",\"support\":\"\"}],\"\",\"800-600-600-24-*-*-|-*\",20,\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36\",{\"_state\":0,\"architecture\":\"x86\",\"bitness\":\"64\",\"brands\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24\"},{\"brand\":\"Chromium\",\"version\":\"146\"}],\"fullVersionList\":[{\"brand\":\"Not-A.Brand\",\"version\":\"24.0.0.0\"},{\"brand\":\"Chromium\",\"version\":\"146.0.7680.153\"}],\"mobile\":false,\"model\":\"\",\"platform\":\"Linux\",\"platformVersion\":\"\",\"uaFullVersion\":\"146.0.7680.153\",\"wow64\":false},0,{\"_state\":0,\"quota\":10737418240,\"usage\":null,\"usageDetails\":{}},800,\"\",1023,\"Google Inc. (Google)\",840000000,1700000000,681731712,[1920,1080],\"0;0\",20,0,1,0,0,\"\",\"http://127.0.0.1:46185/?rand=1519713624347\",\"98k\",1,[\"en-US\"],\"UTF-8\",0,\"\",0,{\"timeZone\":\"Asia/Shanghai\",\"calendar\":\"gregory\",\"numberingSystem\":\"latn\",\"locale\":\"en-US\"},[{\"type\":\"application/pdf\",\"suffixes\":\"pdf\"},{\"type\":\"text/pdf\",\"suffixes\":\"pdf\"}],\"unknown\",1700000000,1,\"linux\",    ,{\"_state\":-2},\"Linux x86_64\",\"\",24]}",
+    "sdString": "\"sd\":{\"od\":\"C\",\"appid\":\"2090803262\",\"nonce\":\"0.12345678\",\"token\":\"test_token_123\"}}",
+    "timestamp": 1700000000000
+  },
+  "eksToken": "Q73jG2DNLIgoTIr4swlu9uPKK7XQqyollGMhleP1KofXNQRjfL//OBuA7b0RIxPhKyx53Jl0ED8sG9XZ7f44kld5KkGmemJ6ueSx0hflS2xUAFw4aRyL/I/buaHJ3b+Wp8E6787vYCJuD37s7tDBa7Spilmki5gKqXtWxtBrdzSkq1S3aoMLCXDfHHI5rxHzUbDew9sAofCMMlPgKiCiDq5lYVidEMB4vpSpNLNNBcjoKRBO7FTpTg9bKzm3wmzNj5jZQNnEE1FzklXxuixCHVVlbnw4Nm0d0aTW0zBivptwmSRioXB1eQ==",
+  "notes": "Tokens are byte-identical; Frozen timestamp confirmed (2 Date.now calls)"
+}

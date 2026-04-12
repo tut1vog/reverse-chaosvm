@@ -1,0 +1,494 @@
+{
+  "tdcName": "hDWlWNMRnBmeDRVkbhNbSOFBjAXJPHig",
+  "template": "live-extracted",
+  "caseCount": 95,
+  "chromeFieldCount": 59,
+  "cdFieldOrder": [
+    0,
+    4,
+    23,
+    44,
+    21,
+    11,
+    1,
+    26,
+    -1,
+    28,
+    5,
+    47,
+    24,
+    27,
+    8,
+    46,
+    12,
+    30,
+    -1,
+    31,
+    6,
+    15,
+    16,
+    3,
+    18,
+    7,
+    19,
+    38,
+    17,
+    48,
+    -1,
+    -1,
+    45,
+    2,
+    35,
+    53,
+    42,
+    54,
+    52,
+    9,
+    29,
+    20,
+    51,
+    43,
+    41,
+    34,
+    -1,
+    33,
+    57,
+    56,
+    10,
+    14,
+    32,
+    13,
+    37,
+    -1,
+    -1,
+    22,
+    50
+  ],
+  "confidence": {
+    "high": 27,
+    "medium": 6,
+    "low": 19
+  },
+  "conflicts": [
+    {
+      "chromeIdx": 8,
+      "schemaIdx": 1,
+      "field": "osPlatform",
+      "reason": "CONFLICT: schema index 1 already assigned"
+    }
+  ],
+  "unmatched": [
+    {
+      "chromeIdx": 8,
+      "value": "windows",
+      "type": "string"
+    },
+    {
+      "chromeIdx": 18,
+      "value": "7448545647781613568",
+      "type": "string"
+    },
+    {
+      "chromeIdx": 30,
+      "value": 4,
+      "type": "number"
+    },
+    {
+      "chromeIdx": 31,
+      "value": "Intel Iris OpenGL Engine",
+      "type": "string"
+    },
+    {
+      "chromeIdx": 46,
+      "value": "Intel Inc.",
+      "type": "string"
+    },
+    {
+      "chromeIdx": 55,
+      "value": [
+        [
+          4,
+          -1,
+          -1,
+          1775871669800,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "type": "array"
+    },
+    {
+      "chromeIdx": 56,
+      "value": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
+      "type": "string"
+    }
+  ],
+  "fieldMapping": [
+    {
+      "chromeIdx": 0,
+      "schemaIdx": 0,
+      "field": "callCounter",
+      "confidence": "medium",
+      "reason": "integer 1 (call counter first call) (3 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 1,
+      "schemaIdx": 4,
+      "field": "detectedFonts",
+      "confidence": "high",
+      "reason": "comma-separated font list"
+    },
+    {
+      "chromeIdx": 2,
+      "schemaIdx": 23,
+      "field": "plugins",
+      "confidence": "high",
+      "reason": "array of objects with name+filename"
+    },
+    {
+      "chromeIdx": 3,
+      "schemaIdx": 44,
+      "field": "availHeight",
+      "confidence": "low",
+      "reason": "integer 800 (screen dimension) (2 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 4,
+      "schemaIdx": 21,
+      "field": "storageEstimate",
+      "confidence": "high",
+      "reason": "object with quota key"
+    },
+    {
+      "chromeIdx": 5,
+      "schemaIdx": 11,
+      "field": "sessionStorageAvail",
+      "confidence": "low",
+      "reason": "integer 0 (9 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 6,
+      "schemaIdx": 1,
+      "field": "osPlatform",
+      "confidence": "high",
+      "reason": "matches OS platform \"unknown\""
+    },
+    {
+      "chromeIdx": 7,
+      "schemaIdx": 26,
+      "field": "timezoneOffset",
+      "confidence": "high",
+      "reason": "matches timezone offset pattern"
+    },
+    {
+      "chromeIdx": 9,
+      "schemaIdx": 28,
+      "field": "colorGamut",
+      "confidence": "high",
+      "reason": "matches color gamut value"
+    },
+    {
+      "chromeIdx": 10,
+      "schemaIdx": 5,
+      "field": "flashFonts",
+      "confidence": "low",
+      "reason": "empty string (8 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 11,
+      "schemaIdx": 47,
+      "field": "screenComposite",
+      "confidence": "high",
+      "reason": "matches screenComposite pattern"
+    },
+    {
+      "chromeIdx": 12,
+      "schemaIdx": 24,
+      "field": "indexedDbAvail",
+      "confidence": "low",
+      "reason": "integer 0 (8 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 13,
+      "schemaIdx": 27,
+      "field": "adBlockDetected",
+      "confidence": "low",
+      "reason": "integer 0 (7 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 14,
+      "schemaIdx": 8,
+      "field": "hardwareConcurrency",
+      "confidence": "medium",
+      "reason": "integer 8 (CPU cores)"
+    },
+    {
+      "chromeIdx": 15,
+      "schemaIdx": 46,
+      "field": "userAgentData",
+      "confidence": "high",
+      "reason": "object with brands+mobile (no architecture)"
+    },
+    {
+      "chromeIdx": 16,
+      "schemaIdx": 12,
+      "field": "videoCodecs",
+      "confidence": "high",
+      "reason": "array of objects with codec+support (video codecs)"
+    },
+    {
+      "chromeIdx": 17,
+      "schemaIdx": 30,
+      "field": "webdriverFlag",
+      "confidence": "low",
+      "reason": "integer 0 (6 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 19,
+      "schemaIdx": 31,
+      "field": "userAgent",
+      "confidence": "high",
+      "reason": "contains Mozilla/5.0"
+    },
+    {
+      "chromeIdx": 20,
+      "schemaIdx": 6,
+      "field": "languages",
+      "confidence": "high",
+      "reason": "array of locale strings"
+    },
+    {
+      "chromeIdx": 21,
+      "schemaIdx": 15,
+      "field": "canvasHash",
+      "confidence": "low",
+      "reason": "large integer 849554640 (hash candidate) (2 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 22,
+      "schemaIdx": 16,
+      "field": "timestampInit",
+      "confidence": "medium",
+      "reason": "unix timestamp 1775871669 (3 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 23,
+      "schemaIdx": 3,
+      "field": "viewportWidth",
+      "confidence": "low",
+      "reason": "integer 600 (viewport dimension)"
+    },
+    {
+      "chromeIdx": 24,
+      "schemaIdx": 18,
+      "field": "audioFingerprint",
+      "confidence": "high",
+      "reason": "object with nt_vc_output key"
+    },
+    {
+      "chromeIdx": 25,
+      "schemaIdx": 7,
+      "field": "colorGamutLegacy",
+      "confidence": "low",
+      "reason": "empty string (7 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 26,
+      "schemaIdx": 19,
+      "field": "mimeTypes",
+      "confidence": "high",
+      "reason": "array of objects with type+suffixes"
+    },
+    {
+      "chromeIdx": 27,
+      "schemaIdx": 38,
+      "field": "internalToken",
+      "confidence": "high",
+      "reason": "value is \"98k\""
+    },
+    {
+      "chromeIdx": 28,
+      "schemaIdx": 17,
+      "field": "mathFingerprint",
+      "confidence": "high",
+      "reason": "float in (0,1) range: 0.9920001029968262"
+    },
+    {
+      "chromeIdx": 29,
+      "schemaIdx": 48,
+      "field": "platform",
+      "confidence": "high",
+      "reason": "matches platform string pattern"
+    },
+    {
+      "chromeIdx": 32,
+      "schemaIdx": 45,
+      "field": "headlessFlag",
+      "confidence": "low",
+      "reason": "integer 0 (5 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 33,
+      "schemaIdx": 2,
+      "field": "touchSupport",
+      "confidence": "medium",
+      "reason": "integer 2 (desktop touch flag)"
+    },
+    {
+      "chromeIdx": 34,
+      "schemaIdx": 35,
+      "field": "connectionInfo",
+      "confidence": "high",
+      "reason": "null value (connectionInfo)"
+    },
+    {
+      "chromeIdx": 35,
+      "schemaIdx": 53,
+      "field": "timestampCollectionStart",
+      "confidence": "medium",
+      "reason": "unix timestamp 1775871670 (2 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 36,
+      "schemaIdx": 42,
+      "field": "permissionStatus",
+      "confidence": "high",
+      "reason": "object with _state (no quota)"
+    },
+    {
+      "chromeIdx": 37,
+      "schemaIdx": 54,
+      "field": "performanceHash",
+      "confidence": "low",
+      "reason": "large integer 673205290 (hash candidate)"
+    },
+    {
+      "chromeIdx": 38,
+      "schemaIdx": 52,
+      "field": "timestampCollectionEnd",
+      "confidence": "medium",
+      "reason": "unix timestamp 1775871669"
+    },
+    {
+      "chromeIdx": 39,
+      "schemaIdx": 9,
+      "field": "screenResolution",
+      "confidence": "high",
+      "reason": "array of 2 numbers [width, height]"
+    },
+    {
+      "chromeIdx": 40,
+      "schemaIdx": 29,
+      "field": "audioCodecs",
+      "confidence": "high",
+      "reason": "array of objects with codec+support (audio codecs)"
+    },
+    {
+      "chromeIdx": 41,
+      "schemaIdx": 20,
+      "field": "webglImage",
+      "confidence": "low",
+      "reason": "empty string (6 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 42,
+      "schemaIdx": 51,
+      "field": "cookiesEnabled",
+      "confidence": "low",
+      "reason": "integer 0 (4 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 43,
+      "schemaIdx": 43,
+      "field": "webrtcIp",
+      "confidence": "low",
+      "reason": "empty string (5 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 44,
+      "schemaIdx": 41,
+      "field": "frameStatus",
+      "confidence": "high",
+      "reason": "value is \"top\" (frame status)"
+    },
+    {
+      "chromeIdx": 45,
+      "schemaIdx": 34,
+      "field": "intlOptions",
+      "confidence": "high",
+      "reason": "object with timeZone+calendar"
+    },
+    {
+      "chromeIdx": 47,
+      "schemaIdx": 33,
+      "field": "screenPosition",
+      "confidence": "high",
+      "reason": "matches X;Y screen position pattern"
+    },
+    {
+      "chromeIdx": 48,
+      "schemaIdx": 57,
+      "field": "featureBitmask",
+      "confidence": "high",
+      "reason": "integer 1023 (0x3FF bitmask)"
+    },
+    {
+      "chromeIdx": 49,
+      "schemaIdx": 56,
+      "field": "canvasBlocked",
+      "confidence": "low",
+      "reason": "integer 0 (3 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 50,
+      "schemaIdx": 10,
+      "field": "devicePixelRatio",
+      "confidence": "low",
+      "reason": "integer 1 (could be pixelRatio) (2 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 51,
+      "schemaIdx": 14,
+      "field": "maxTouchPoints",
+      "confidence": "low",
+      "reason": "integer 0 (no touch) (2 candidates, picked best)"
+    },
+    {
+      "chromeIdx": 52,
+      "schemaIdx": 32,
+      "field": "characterSet",
+      "confidence": "high",
+      "reason": "value is UTF-8"
+    },
+    {
+      "chromeIdx": 53,
+      "schemaIdx": 13,
+      "field": "localStorageAvail",
+      "confidence": "low",
+      "reason": "integer 1 (localStorage available)"
+    },
+    {
+      "chromeIdx": 54,
+      "schemaIdx": 37,
+      "field": "highEntropyValues",
+      "confidence": "high",
+      "reason": "object with architecture+bitness"
+    },
+    {
+      "chromeIdx": 57,
+      "schemaIdx": 22,
+      "field": "pageUrl",
+      "confidence": "high",
+      "reason": "matches URL pattern"
+    },
+    {
+      "chromeIdx": 58,
+      "schemaIdx": 50,
+      "field": "doNotTrack",
+      "confidence": "low",
+      "reason": "empty string (4 candidates, picked best)"
+    }
+  ]
+}

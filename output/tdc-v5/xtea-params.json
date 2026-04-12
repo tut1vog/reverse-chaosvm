@@ -8,9 +8,17 @@
   "delta": 2654435769,
   "rounds": 32,
   "keyModConstants": [
+    986893,
+    0,
     0,
     263180
   ],
   "verified": false,
-  "notes": "Found 9756 sum+=delta at PC 36640; 9756 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x5949415A, 0x454D6265, 0x6D686358, 0x6C66525F]; Key mod constants: [0, 263180]"
+  "notes": "Found 10138 sum+=delta at PC 36640; 10138 delta additions (trace may be truncated); assuming 32 rounds; Key: [0x5949415A, 0x454D6265, 0x6D686358, 0x6C66525F]; Key mod constants: [986893, 0, 0, 263180] (key[0]+986893, key[3]+263180)",
+  "keyMods": [
+    986893,
+    0,
+    0,
+    263180
+  ]
 }

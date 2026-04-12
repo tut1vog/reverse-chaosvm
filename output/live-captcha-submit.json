@@ -1,36 +1,8 @@
 {
-  "timestamp": "2026-04-11T05:25:57.281Z",
+  "timestamp": "2026-04-11T10:17:29.879Z",
   "attempt": 3,
-  "tdcName": "XDNjaBAfTnmcmcHkOlDVmNBfePGUbRXR",
-  "template": "B",
-  "caseCount": 94,
-  "key": [
-    "0x59596d4d",
-    "0x41586d6d",
-    "0x503c645a",
-    "0x575a5b5d"
-  ],
-  "keyMods": [
-    0,
-    0,
-    657930,
-    526341
-  ],
-  "chromeCdFieldCount": 60,
-  "fieldOrderMatchCount": 55,
-  "hashPosition": 47,
-  "headerSplit": {
-    "strategy": "byte-boundary",
-    "contentLength": 144,
-    "paddingLength": 0
-  },
-  "serializationDiffCount": 1,
-  "sliderOffset": 477,
-  "collectLength": 11276,
-  "vDataLength": 152,
-  "httpStatus": 200,
-  "errorCode": 9,
+  "errorCode": -1,
   "ticket": null,
-  "randstr": null,
+  "error": "VM parser failed: Could not identify thisCtx variable",
   "verifyMethod": "standalone collect + Chrome TLS"
 }
