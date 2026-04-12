@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Tests for helper functions in scripts/token-isolation-test.js:
+ * Tests for helper functions in research/errorcode-12/token-isolation-test.js:
  *   - replacePostField(body, fieldName, newValue)
  *   - buildShowUrl(session, aid, userAgent)
  */
@@ -13,7 +13,7 @@ const {
   replacePostField,
   buildShowUrl,
   parseArgs,
-} = require('../scripts/token-isolation-test');
+} = require('../research/errorcode-12/token-isolation-test');
 
 // ============================================================================
 // replacePostField

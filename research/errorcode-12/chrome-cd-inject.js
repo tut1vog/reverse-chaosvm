@@ -28,9 +28,9 @@
  *  11. Log result + comparison
  *
  * Usage:
- *   node scripts/chrome-cd-inject.js
- *   node scripts/chrome-cd-inject.js --headful
- *   node scripts/chrome-cd-inject.js --retries 3
+ *   node research/errorcode-12/chrome-cd-inject.js
+ *   node research/errorcode-12/chrome-cd-inject.js --headful
+ *   node research/errorcode-12/chrome-cd-inject.js --retries 3
  */
 
 const fs = require('fs');
@@ -40,14 +40,14 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../tools/captcha-solver/captcha-client');
-const { solveSlider } = require('../tools/captcha-solver/slide-solver');
-const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray } = require('../tools/scraper/collect-generator');
-const { buildCdString, buildSdString } = require('../tools/token-generator/outer-pipeline');
-const { extractTdcName, extractEks } = require('../tools/scraper/tdc-utils');
-const TemplateCache = require('../tools/scraper/template-cache');
+const { CaptchaClient } = require('../../tools/captcha-solver/captcha-client');
+const { solveSlider } = require('../../tools/captcha-solver/slide-solver');
+const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray } = require('../../tools/scraper/collect-generator');
+const { buildCdString, buildSdString } = require('../../tools/token-generator/outer-pipeline');
+const { extractTdcName, extractEks } = require('../../tools/scraper/tdc-utils');
+const TemplateCache = require('../../tools/scraper/template-cache');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Constants
@@ -428,9 +428,9 @@ async function solve(opts) {
       let cached = cache.lookup(tdcName);
       if (!cached) {
         log('  TDC_NAME not in cache, running pipeline key extraction...');
-        const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
-        const { mapOpcodes } = require('../tools/porting-pipeline/opcode-mapper');
-        const { extractKey } = require('../tools/porting-pipeline/key-extractor');
+        const { parseVmFunction } = require('../../tools/porting-pipeline/vm-parser');
+        const { mapOpcodes } = require('../../tools/porting-pipeline/opcode-mapper');
+        const { extractKey } = require('../../tools/porting-pipeline/key-extractor');
         const os = require('os');
 
         let vmInfo = null;

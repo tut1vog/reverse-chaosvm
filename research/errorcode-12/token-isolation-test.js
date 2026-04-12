@@ -18,9 +18,9 @@
  *   --headless   Run headless instead of headful
  *
  * Usage:
- *   node scripts/token-isolation-test.js              # swap mode (headful)
- *   node scripts/token-isolation-test.js --no-swap     # control (no swap)
- *   node scripts/token-isolation-test.js --headless    # swap mode headless
+ *   node research/errorcode-12/token-isolation-test.js              # swap mode (headful)
+ *   node research/errorcode-12/token-isolation-test.js --no-swap     # control (no swap)
+ *   node research/errorcode-12/token-isolation-test.js --headless    # swap mode headless
  */
 
 const fs = require('fs');
@@ -30,23 +30,23 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../tools/captcha-solver/captcha-client');
-const { solveSlider } = require('../tools/captcha-solver/slide-solver');
+const { CaptchaClient } = require('../../tools/captcha-solver/captcha-client');
+const { solveSlider } = require('../../tools/captcha-solver/slide-solver');
 const {
   generateDragPath,
   DEFAULT_AID,
   DEFAULT_SLIDE_Y,
   CALIBRATION_OFFSET,
-} = require('../tools/captcha-solver/captcha-solver');
-const { extractTdcName, extractEks } = require('../tools/scraper/tdc-utils');
-const TemplateCache = require('../tools/scraper/template-cache');
+} = require('../../tools/captcha-solver/captcha-solver');
+const { extractTdcName, extractEks } = require('../../tools/scraper/tdc-utils');
+const TemplateCache = require('../../tools/scraper/template-cache');
 const {
   generateCollect,
   generateBehavioralEvents,
   buildSlideSd,
-} = require('../tools/scraper/collect-generator');
+} = require('../../tools/scraper/collect-generator');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Constants
@@ -265,7 +265,7 @@ async function main() {
         if (!cached) {
           log(`  TDC_NAME not in cache, trying structural lookup...`);
           try {
-            const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
+            const { parseVmFunction } = require('../../tools/porting-pipeline/vm-parser');
             const vmInfo = parseVmFunction(capturedTdcSource);
             log(`  Parsed VM: ${vmInfo.caseCount} opcodes`);
             cached = templateCache.lookupByStructure(vmInfo.caseCount);

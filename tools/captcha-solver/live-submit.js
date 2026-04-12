@@ -13,9 +13,9 @@
  *   - Submits via Chrome fetch() for proper TLS fingerprint
  *
  * Usage:
- *   node scripts/live-captcha-submit.js
- *   node scripts/live-captcha-submit.js --headful
- *   node scripts/live-captcha-submit.js --retries 5
+ *   node tools/captcha-solver/live-submit.js
+ *   node tools/captcha-solver/live-submit.js --headful
+ *   node tools/captcha-solver/live-submit.js --retries 5
  */
 
 const fs = require('fs');
@@ -26,14 +26,14 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../tools/captcha-solver/captcha-client');
-const { solveSlider } = require('../tools/captcha-solver/slide-solver');
-const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray, buildSerializationOverrides } = require('../tools/scraper/collect-generator');
-const { buildSdString, buildCdString } = require('../tools/token-generator/outer-pipeline');
-const { extractTdcName, extractEks } = require('../tools/scraper/tdc-utils');
-const { parseVmFunction } = require('../tools/porting-pipeline/vm-parser');
-const { mapOpcodes } = require('../tools/porting-pipeline/opcode-mapper');
-const { extractKey } = require('../tools/porting-pipeline/key-extractor');
+const { CaptchaClient } = require('./captcha-client');
+const { solveSlider } = require('./slide-solver');
+const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray, buildSerializationOverrides } = require('../scraper/collect-generator');
+const { buildSdString, buildCdString } = require('../token-generator/outer-pipeline');
+const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
+const { parseVmFunction } = require('../porting-pipeline/vm-parser');
+const { mapOpcodes } = require('../porting-pipeline/opcode-mapper');
+const { extractKey } = require('../porting-pipeline/key-extractor');
 const {
   matchFieldOrder,
   detectHashPosition,
@@ -41,9 +41,9 @@ const {
   detectSerializationDiffs,
   decryptHeaderSegment,
   analyzeHeaderSplit,
-} = require('../tools/porting-pipeline/structure-extractor');
+} = require('../porting-pipeline/structure-extractor');
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Constants

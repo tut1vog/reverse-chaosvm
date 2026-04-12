@@ -10,7 +10,7 @@
  * The browser token is a single base64-encoded XTEA-encrypted blob that
  * decrypts to JSON: {"cd":[...],"sd":{...}}
  *
- * Usage: node scripts/decrypt-collect.js
+ * Usage: node tools/token-generator/decrypt.js
  */
 
 const fs = require('fs');
@@ -123,7 +123,7 @@ function decryptCollect(collectStr, params) {
 // ═══════════════════════════════════════════════════════════════════════
 
 function main() {
-  const projectRoot = path.resolve(__dirname, '..');
+  const projectRoot = path.resolve(__dirname, '..', '..');
   const captureDir = path.join(projectRoot, 'output', 'puppeteer-capture');
   const postPath = path.join(captureDir, 'verify-post.json');
 
@@ -154,7 +154,7 @@ function main() {
 
   // 3. Generate scraper token
   console.log('\n--- Generating scraper collect token ---');
-  const { generateCollect } = require('../tools/scraper/collect-generator.js');
+  const { generateCollect } = require('../scraper/collect-generator.js');
   const profile = JSON.parse(
     fs.readFileSync(path.join(projectRoot, 'profiles', 'default.json'), 'utf8')
   );
