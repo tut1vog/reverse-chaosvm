@@ -355,7 +355,7 @@ describe('Scraper._autoPort()', () => {
   // -----------------------------------------------------------------------
   // 10. Passes correct arguments to execFile
   // -----------------------------------------------------------------------
-  it('invokes node with pipeline/run.js, temp file, and --skip-verify', async () => {
+  it('invokes node with tools/porting-pipeline/run.js, temp file, and --skip-verify', async () => {
     const tdcName = uniqueTdcName();
     currentName = tdcName;
     const config = fullConfig();
