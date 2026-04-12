@@ -1,178 +1,158 @@
 # Plan
 
 ## Status
-Current phase: Phase 36
-Current task: none — Phase 36 complete
+Current phase: Phase 37
+Current task: pending — awaiting user review
 
 ---
 
 ## Phases
 
-### Phases 1-24: Foundation through End-to-End Live Verification (all done)
+### Phases 1-36: All prior work (done)
+> See `history/` for detailed records. Key milestones: decompiler pipeline,
+> byte-identical token generator, automated porting pipeline (all 10 templates),
+> headless scraper, errorCode 12 diagnosed as fingerprint/rate-limit issue.
 
-### Phase 25: Chrome cd Injection — Validate Token Structure (done)
-
-### Phase 26: Realistic Fingerprint Profile (deprioritized)
-
-### Phase 27: VM Parser Extension for New Templates (pending)
-
-### Phase 28: End-to-End CAPTCHA Solve — Token Isolation (done)
-> Standalone token accepted by server (errorCode 0) via Puppeteer request interception.
-
-### Phase 29: Cache Refresh & TLS Verification (done)
-> All 10 templates refreshed. cap_union_new_show 403 was missing sess, not TLS.
-> Full headless flow confirmed possible.
-
-### Phase 30: Puppeteer-Free Domain Query (done)
-> `node scraper/cli.js --verbose https://example.com` works end-to-end.
-> CAPTCHA solve + urlsec query with zero Puppeteer dependency. Confirmed 2026-04-11.
-
-### Phase 31: Auto-Port Unknown Templates in Scraper (done)
-> When the scraper encounters an unknown template, automatically run the porting
-> pipeline as a subprocess, cache the result, and retry — instead of failing.
-> Confirmed working 2026-04-11.
-
-### Phase 32: Switch Template Cache Key to Source Hash (done)
-> TDC_NAME is not a reliable cache key — same TDC_NAME can map to different XTEA
-> params across builds (confirmed in 28.13/28.14). Replaced with SHA-256 hash of
-> tdc.js source after stripping the eks token. Cache cleared and re-seeded. 2026-04-12.
-
-### Phase 33: TDC Survey — Collect Live Template Data
-> Clear the cache, run the scraper repeatedly, save each unique tdc.js build,
-> record which builds port successfully vs fail, and which still get errorCode 12.
-> Output a structured report for analysis.
+### Phase 37: Project Cleanup
+> Audit and clean up scripts, documentation, and tests. Remove obsolete files,
+> fix inaccurate docs, update stale references, fix the 3 permanently-failing tests.
 
 | ID | Task | Status |
 |----|------|--------|
-| 33.1 | Create tdc.js survey script | done |
-| 33.2 | Tests for survey script | done |
-| 33.3 | Run survey and analyze results | done |
+| 37.1 | Remove obsolete scripts | pending |
+| 37.2 | Remove obsolete dynamic tracers and targets | pending |
+| 37.3 | Fix test-scraper-foundation.js template-cache lookup | pending |
+| 37.4 | Tests for template-cache fix | pending |
+| 37.5 | Fix test-cfg.js func 272 edge case | pending |
+| 37.6 | Fix test-emit.js quality thresholds | pending |
+| 37.7 | Archive project-brief.md and docs/PROGRESS.md | pending |
+| 37.8 | Update docs/WORKFLOW.md with Phase 11-36 epilogue | pending |
+| 37.9 | Update README.md (template count, test count, phase references) | pending |
+| 37.10 | Update CLAUDE.md — correct Phase 36 conclusion and add cleanup notes | pending |
+| 37.11 | Update docs/VERSION_DIFFERENCES.md — close open questions | pending |
+| 37.12 | Add Phase 36 diagnostic findings to docs | pending |
 
 ---
 
-## Survey Results (Phase 33)
+## Phase 37 Detail
 
-30 attempts → **10 unique builds** observed.
+### 37.1 — Remove obsolete scripts
 
-| Hash | Opcodes | Template | Size | Port | Solves | errorCodes |
-|------|---------|----------|------|------|--------|------------|
-| e6a45ba64d246f82 | 98 | unknown | 129K | OK | 4 | -1,-1,err:verify,12 |
-| 79dd6b418d0a7406 | 94 | B | 131K | OK | 3 | 12,12,9 |
-| 3e77d1890dff73ab | 98 | unknown | 147K | OK | 2 | -1,12 |
-| 83d7be69627c3d9e | 95 | A | 133K | OK | 4 | 12,-1,-1,12 |
-| 27dda893f81dbc4f | ? | ? | 202K | FAIL:vm-parse | 4 | - |
-| 3429444f324c6110 | ? | ? | 199K | FAIL:vm-parse | 3 | - |
-| 5cc91a7dbcc64cdb | 94 | B | 132K | OK | 4 | 12,12,12,12 |
-| e5341ccb12b78e65 | 96 | unknown | 144K | OK | 2 | 12,12 |
-| 0e2b306a1f0e24b6 | 94 | B | 131K | OK | 2 | 12,12 |
-| e2170903e201e018 | ? | ? | 162K | FAIL:vm-parse | 2 | - |
+**Scripts to remove** (one-off investigation tools whose findings are now recorded in history/docs — no ongoing value):
 
-**Key findings**:
-- **7/10 builds port successfully** (vm-parser + pipeline OK)
-- **3/10 builds fail vm-parse** ("Could not identify thisCtx variable") — all are large (162K-202K), likely a new VM architecture
-- **errorCode -1 (success) achieved** on 3 distinct builds (e6a45ba6, 3e77d189, 83d7be69)
-- **errorCode 12 dominates** — even ported builds frequently get 12 (token rejected)
-- **errorCode 9** seen once (wrong slider answer)
-- Template classification: 1× A (95 ops), 3× B (94 ops), 3× "unknown" (96/98 ops), 3× unparseable
+| Script | Reason for removal |
+|--------|-------------------|
+| `scripts/tls-403-investigation.js` | Superseded by `tls-403-deep-dive.js`; finding recorded: 403 was missing `sess`, not TLS |
+| `scripts/tls-403-deep-dive.js` | Investigation complete (Phase 29). Finding in CLAUDE.md |
+| `scripts/chrome-passthrough.js` | One-off proof that errorCode 9 = slider miss. Finding recorded |
+| `scripts/ref-inject-forensics.js` | One-off forensic analysis during Phase 25. Findings absorbed |
+| `scripts/ref-inject-solver.js` | Experimental approach, superseded by scraper pipeline |
+| `scripts/post-body-compare.js` | Debugging tool, finding absorbed into vdata-generator |
+| `scripts/vdata-compare.js` | Debugging tool, finding absorbed into vdata-generator |
+| `scripts/collect-diff.js` | One-off debugging, findings absorbed into collect-generator |
+| `scripts/diag-keymods.js` | Key mod serialization bug found and fixed. Finding recorded |
+| `scripts/token-diff.js` | One-off token comparison. Superseded by pipeline token-verifier |
+| `scripts/token-forensics.js` | One-off deep trace. Findings in docs/TOKEN_FORMAT.md |
+| `scripts/hybrid-solver.js` | Experimental approach, superseded by scraper pipeline |
 
-### Phase 34: Fix VM Parser for Obfuscated Builds
-> The 3 unparseable builds (162K-202K) use obfuscated property access:
-> `['call']` instead of `.call`, and `array[decoderFn(0xNN)]()` instead of
-> `array.pop()`. Two fixes needed in vm-parser.js: extractThisCtx and
-> extractCatchVars.
+**Scripts to KEEP**:
 
-| ID | Task | Status |
-|----|------|--------|
-| 34.1 | Fix extractThisCtx and extractCatchVars for obfuscated builds | done |
-| 34.2 | Tests for vm-parser obfuscation fixes | done |
-| 34.3 | Re-run survey to verify all builds port | done |
+| Script | Reason |
+|--------|--------|
+| `scripts/tdc-survey.js` | Active survey tool, has tests |
+| `scripts/tdc-diagnose.js` | Active diagnostic tool, has tests |
+| `scripts/live-captcha-submit.js` | Active end-to-end verification tool |
+| `scripts/live-comparison.js` | Active live comparison tool |
+| `scripts/chrome-cd-inject.js` | Active Chrome injection tool (4 references) |
+| `scripts/token-isolation-test.js` | Active test tool (3 references, has test file) |
+| `scripts/decrypt-collect.js` | Reusable utility for token analysis (3 references) |
+| `scripts/discover-field-order.js` | Reusable discovery tool for new templates |
 
----
+### 37.2 — Remove obsolete dynamic tracers and targets
 
-## Survey Results (Phase 34 — post-fix)
+**Dynamic tracers to remove**:
 
-20 attempts → **10/10 builds port OK** (was 7/10 before fix).
+| File | Reason |
+|------|--------|
+| `dynamic/v2-token-capture.js` | 0 references, superseded by pipeline |
+| `dynamic/chunk-tracer.js` | 0 references, one-off tracer |
+| `dynamic/crypto-tracer.js` | Superseded by crypto-tracer-v3.js |
+| `dynamic/crypto-tracer-v2.js` | Superseded by crypto-tracer-v3.js |
 
-| Hash | Opcodes | Mapped | XTEA Key | Solves | errorCodes |
-|------|---------|--------|----------|--------|------------|
-| 0e2b306a | 94 | 91/94 | OK | 2 | -1,12 |
-| 27dda893 | 103 | 43/103 | OK | 1 | 12 |
-| 3e77d189 | 98 | 92/98 | OK | 1 | -1 |
-| 83d7be69 | 95 | 91/95 | OK | 4 | -1,-1,12,12 |
-| e6a45ba6 | 98 | 92/98 | OK | 4 | -1,12,12,12 |
-| 79dd6b41 | 94 | 92/94 | OK | 1 | 12 |
-| 5cc91a7d | 94 | 90/94 | OK | 1 | -1 |
-| e2170903 | 93 | 48/93 | **null** | 1 | 12 |
-| 3429444f | 91 | 41/91 | **null** | 2 | 12,12 |
-| e5341ccb | 96 | 94/96 | OK | 3 | 12,12,12 |
+**Dynamic tracers to KEEP**: `harness.js`, `instrument.js`, `comparison-harness.js`, `crypto-tracer-v3.js`, `encoding-tracer.js`, `payload-tracer.js`
 
-**New finding**: 2 obfuscated builds (e2170903, 3429444f) pass vm-parse but fail opcode mapping
-(~50% mapped) and produce null XTEA keys. The opcode-mapper's pattern matching doesn't
-handle obfuscated case handler code. These builds need opcode-mapper improvements.
+**Target files to remove**:
 
-### Phase 35: Source Deobfuscator for Opcode Mapper
-> Obfuscated builds use two layers: (1) a string decoder function that replaces
-> method names like `.call`, `.push`, `.fromCharCode` with `obj[decoder(0xNN)]`,
-> and (2) a helper wrapper object that replaces binary operators like `a + b`
-> with `helper.prop(a, b)`. The deobfuscator rewrites the source before parsing
-> so the existing mapper patterns match unchanged.
+| File | Reason |
+|------|--------|
+| `targets/tdc-capture.js` | Ad-hoc capture, only referenced from output/. Not a canonical version |
+| `targets/tdc-captured.js` | Duplicate of tdc-capture.js concept |
+| `targets/tdc-diag.js` | Untracked diagnostic copy |
+| `targets/tdc-live-test.js` | Untracked test copy |
 
-| ID | Task | Status |
-|----|------|--------|
-| 35.1 | Create source deobfuscator module | done |
-| 35.2 | Tests for deobfuscator | done |
-| 35.3 | Integrate deobfuscator into pipeline | done |
-| 35.4 | Tests for pipeline integration | done (covered by existing suite) |
-| 35.5 | Re-run survey to verify obfuscated builds port | done |
+**Target files to KEEP**: `tdc.js` (reference), `tdc-v2.js` through `tdc-v5.js` (canonical versions), `tdc-live.js` (live capture used by scripts)
 
----
+### 37.3 — Fix test-scraper-foundation.js template-cache lookup
 
-## Survey Results (Phase 35 — post-deobfuscator)
+**Problem**: Template cache `seed()` populates with `key: [1, 2, 3, 4]` instead of correct XTEA key values. Test ordering issue — some earlier test corrupts `output/tdc/pipeline-config.json` or the cache file.
 
-20 attempts → **8/8 unique builds port OK, 0 failures** (all extract XTEA keys).
+**Fix approach**: Make the test self-contained — use a temp directory and inject known config data instead of depending on `output/tdc/pipeline-config.json` state.
 
-Previously-null-key obfuscated builds now all produce valid keys:
-- 3429444f (91 ops): key `[0x63303C45, 0x6D436969, 0x53163E47, 0x52506845]` ✅
-- e2170903 (93 ops): key extracted ✅
-- 27dda893 (103 ops): key `[0x42322B41, 0x63514754, 0x63435742, 0x655A4F3D]` ✅
+### 37.4 — Tests for template-cache fix
 
-Build 0e2b306a got errorCode=-1 (success) — proving the full pipeline works end-to-end.
+Verify the fix doesn't regress other scraper tests.
 
-**Remaining issue**: errorCode 12 still dominates. Same build sometimes returns -1 (success), sometimes 12. This is likely timing/freshness, not a token generation issue.
+### 37.5 — Fix test-cfg.js func 272 edge case
 
-### Phase 36: Investigate errorCode 12 Pattern
-> errorCode 12 means the server rejected the collect token. Success rate is inconsistent
-> (5-28% across survey runs). Need to identify what differentiates successful (-1)
-> from failed (12) attempts — timing, token structure, session state, or fingerprint data.
+**Problem**: Function 272 block b3 has a JMP with 0 successors (expected 1). Target address 41580 isn't resolved as a valid block boundary.
 
-| ID | Task | Status |
-|----|------|--------|
-| 36.1 | Create errorCode 12 diagnostic survey script | done |
-| 36.2 | Tests for diagnostic script | done |
-| 36.3 | Run diagnostic experiments and analyze | done |
+**Fix approach**: Investigate CFG builder's handling of JMP targets at function boundaries. Either fix the CFG builder to handle this edge case, or if it's genuinely unreachable code, adjust the test assertion to document the known limitation.
 
----
+### 37.6 — Fix test-emit.js quality thresholds
 
-## Diagnostic Results (Phase 36)
+**Problem**: Two failures:
+1. Return count: 434 `return` keywords emitted vs 665 actual return stmts (need ≥90% = 599)
+2. Brace imbalance: func 276 has 32 `{` but 31 `}`
 
-30 attempts → **7 successes (23.3%)**, 22 errorCode 12, 1 errorCode 9.
+**Fix approach**: These are code quality thresholds. Options:
+- (a) Fix the emitter to handle more return cases and fix the brace imbalance — real improvement
+- (b) Lower the threshold to match current reality — pragmatic but loses the quality signal
 
-**Root cause: IP-based rate limiting.**
+Prefer (a) for the brace bug (real bug), and assess (a) vs (b) for the return count based on investigation.
 
-| Window | Attempts | Successes | Rate |
-|--------|----------|-----------|------|
-| Attempt 1 | 1 | 0 | 0% (cold start penalty) |
-| Attempts 2-9 | 8 | 7 | 87.5% |
-| Attempts 10-30 | 21 | 0 | 0% |
+### 37.7 — Archive project-brief.md and docs/PROGRESS.md
 
-**Ruled out**:
-- Timing: avg 1275ms (success) vs 1291ms (fail) — no correlation
-- Token size: same hash, similar collect sizes → different outcomes
-- Nonce: always `eda1152f11f1daf0` (static per appid, not per session)
-- vData: constant 152 bytes across all attempts
-- Build/template: multiple hashes succeed early, same hashes fail later
+- `project-brief.md`: Add "ARCHIVED" header — superseded by CLAUDE.md
+- `docs/PROGRESS.md`: Add "ARCHIVED — Phases 1-10" header. It's 1,262 lines of detailed task history that's valuable as reference but misleading as "current state"
 
-**Conclusion**: Token generation is correct. The server imposes per-IP rate limiting
-after ~8-10 CAPTCHA solves, rejecting all subsequent tokens with errorCode 12 regardless
-of correctness. First request also penalized (cold start). For production use, IP
-rotation would be needed.
+### 37.8 — Update docs/WORKFLOW.md
+
+Add epilogue section noting Phases 11-36 exist, with one-line summary per phase and pointer to `history/` for details.
+
+### 37.9 — Update README.md
+
+- Fix template count: "3 distinct templates" → "10+ observed builds across multiple templates"
+- Fix test count to match current suite (296 tests, 293 pass)
+- Remove "Phase 10" reference from intro
+- Update version status table
+
+### 37.10 — Update CLAUDE.md
+
+- Correct Phase 36 conclusion: "IP-based rate limiting" → "likely fingerprint detection / anti-bot scoring (not pure IP rate limiting — browser solves still work from same IP)"
+- Update test count in Known Issues
+- Add note about Phase 37 cleanup
+
+### 37.11 — Update docs/VERSION_DIFFERENCES.md
+
+Close the open questions at the end:
+- "Does the key change between builds?" → YES, confirmed. Each template has unique STATE_A key
+- "How many templates exist?" → At least 10 observed in live rotation (3+ distinct template architectures)
+
+### 37.12 — Add Phase 36 diagnostic findings to docs
+
+Create a short section in docs/ (or extend an existing doc) documenting:
+- errorCode 12 is not pure IP rate limiting (browser solves work from same IP)
+- Temporal pattern: ~87% success rate for first 8-10 attempts, 0% after
+- Server likely does fingerprint/behavioral scoring that flags our profile
+- Nonce is static per appid (`eda1152f11f1daf0`)
+- No correlation with timing, token size, or build/template
