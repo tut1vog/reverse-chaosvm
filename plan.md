@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 41 — minor cleanup + Captcha orchestrator (Stream B Track 2)
-Current task: MID-PHASE CHECK-IN — 41.4 survey complete, awaiting user confirmation before dispatching 41.5 deep analysis
+Current task: 41.5 — Captcha orchestrator deep flow analysis (user confirmed option (a) — proceed as scoped)
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -53,7 +53,7 @@ Current task: MID-PHASE CHECK-IN — 41.4 survey complete, awaiting user confirm
 | 41.2 | Tests for the type guard | done |
 | 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` (says "pipeline/run.js" but the assertion underneath uses the post-restructure path) | done |
 | 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | done |
-| 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | awaiting mid-phase check-in |
+| 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | done |
 | 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | pending |
 | 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | pending |
 
@@ -70,14 +70,65 @@ Current task: MID-PHASE CHECK-IN — 41.4 survey complete, awaiting user confirm
 
 ## Current Task
 
-**MID-PHASE CHECK-IN — no task in progress.** 41.4 closed with a green tractability verdict; 41.5 will not dispatch until the user confirms the deep-analysis scope.
-
-**ID**: 41.5 (pending user confirmation)
-**Title**: Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow
+**ID**: 41.6
+**Title**: Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings
 **Phase**: Phase 41 — Minor cleanup + Captcha orchestrator (Stream B Track 2)
-**Status**: awaiting mid-phase check-in
+**Status**: pending (ready to dispatch)
 
-### Survey outcome (41.4) — headline for the check-in
+### Goal
+Transcribe `research/captcha-orchestrator/FLOW.md` + `output/captcha-orchestrator/verify-body-origination.json` into the public-facing `docs/CAPTCHA_ORCHESTRATOR.md` per the Track 2 DoD. The heavy analytical work is done; this is a documentation task, not a research task. Required sections (per `project-brief.md`): show-page load → vm-slide fetch → vData compute → verify POST assembly → ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. Must also reconcile against `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md` using the §8 reconciliation already recorded in FLOW.md.
+
+### Context — what 41.5 already produced
+- **`research/captcha-orchestrator/FLOW.md`** (612 lines) — the research-side narrative. Every section 41.6 needs already exists there. Use it as the primary input.
+- **`output/captcha-orchestrator/verify-body-origination.json`** — 39-field origination table in machine-readable form. Can be pretty-printed or embedded as a table in the doc.
+- **`output/captcha-orchestrator/slide-jy-diff.md`** — slide-jy.js vs module 76 classification.
+- **`research/captcha-orchestrator/MODULE-41-NOTES.md`** — i18n caption table finding (park note; probably a single-sentence footnote in the public doc).
+- **`research/captcha-orchestrator/SURVEY.md`** — the structural baseline.
+
+### Key findings to surface in the public doc
+1. **Bundle shape**: standard webpack 4, 50 live modules, entry 64, no dynamic requires. Static require graph is complete.
+2. **Module 8 is NOT the vm-slide loader** — it's a generic script-injector, and its only call site fetches `/slide-jy.js`. `vm-slide.e201876f.enc.js` is loaded by a hardcoded `<script>` tag in the show-page HTML, not by the orchestrator bundle. (41.4 survey hypothesis correctly overturned by 41.5.)
+3. **Module 56** (8 KB, fanout 21) is the orchestrator core. Every DoD keyword appears exactly once in its source, and the doc should show the one-liner write for each (`e[_.collectdata]=decodeURIComponent(C())`, `d.eks=R()`, etc.).
+4. **`collect` and `eks` are transport-only** — module 56 reads them from `window.TDC.getData(true)` and `window.TDC.getInfo().info` respectively, via the tdc adapter module 38. This confirms `docs/TOKEN_FORMAT.md` and `docs/EKS_FORMAT.md` are still authoritative.
+5. **`nonce` and `sess` are server-baked** into the show-page inline `window.captchaConfig`. `sess` is rotated mid-session by module 30 `updateSession` on both verify and getsig success responses.
+6. **`vsig` and `websig`** are separate fields (no free-floating `sig=` field). Both read from `captchaConfig`.
+7. **`vData` is the single unresolved static question** — only lexical write is inside `if (a.isLowIE()) { window.getVData(...) }` but HAR was captured on Chrome 146 (not lowIE) and `vData` is still present in the POST. Hypothesis: `vm-slide.e201876f.enc.js` installs a runtime binding (jQuery `ajaxPrefilter`/`ajaxTransport` or a `window.getVData` write). The doc must state this honestly as an open question, not paper over it.
+8. **`cdata`/`ans`** are a client-side md5 PoW driven by module 72 (`$.challenge`). `pow_answer`/`pow_calc_time` are a SEPARATE md5 PoW driven by `captchaConfig.powCfg` via a WebWorker (module 48). Both empty in this HAR because `powCfg` is unset.
+9. **Ticket return via `window.postMessage`**, not as an HTTP response. On `errorCode === 0`, module 56 calls module 45's `parent.send(JSON.stringify({type:3, ticket, randstr, errorCode, errorMessage, ret}))`.
+10. **Module 76 is Zepto, `sample/slide-jy.js` is jQuery 1.11.3** — they are different libraries, not the same code minified differently. Module 64 picks between them at load time: Zepto for mobile, jQuery for desktop.
+11. **Module 41** is the i18n caption table (`c1..c23`, `puzzle1..puzzle10`, language map). Parked as a footnote.
+
+### Deliverable
+- `docs/CAPTCHA_ORCHESTRATOR.md` — new file. Required sections:
+  1. Overview (bundle shape, entry, module count, how webpack wraps modules)
+  2. End-to-end flow (show-page load → vm-slide fetch → vData compute → verify POST → ticket return) — transcribed from FLOW.md §6
+  3. Verify POST origination table — embedded from `verify-body-origination.json` or equivalent
+  4. Critical fields in detail: `collect`, `eks`, `vData` (with the honest "open question" framing), `nonce`, `sess`, `vsig`/`websig`
+  5. Ticket return via postMessage
+  6. Library note (Zepto vs jQuery, module 76 vs slide-jy.js)
+  7. Known limitations / open questions (vData runtime binding, module 41 parked, any other unresolved items from FLOW.md §9)
+  8. Reconciliation footnotes against `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md` — the research found no contradictions, so these should be short "consistent with" footnotes unless FLOW.md §8 records specific discrepancies.
+- **Also update `docs/HAR_ANALYSIS.md`** if and only if FLOW.md §8 records a concrete contradiction with it. Otherwise leave it alone. Same for TOKEN_FORMAT.md and EKS_FORMAT.md.
+
+### Explicit non-goals
+- **No new research.** If FLOW.md doesn't cover it, 41.6 doesn't cover it. Escalate open questions as follow-up tasks rather than inventing new findings.
+- **No code changes.** No tests, no scripts, no helper files. Pure documentation.
+- **Do not update `plan.md` / `history/` / `SURVEY.md` / `FLOW.md`.** The director owns those.
+
+### Verification
+1. `docs/CAPTCHA_ORCHESTRATOR.md` exists and covers all eight required sections.
+2. Every major claim cites its source (module id + line range, or FLOW.md §N).
+3. The verify-POST origination table matches `verify-body-origination.json` for at least the six DoD fields.
+4. `vData` is framed as an open question, not as a resolved flow.
+5. `npm test` — still 353/353 (no code changes expected).
+6. `git diff --stat docs/` — shows only `CAPTCHA_ORCHESTRATOR.md` as added (plus reconciliation edits to the three existing docs if and only if FLOW.md §8 required them).
+
+### Suggested Agent
+`general-purpose` — documentation task. Needs care with provenance (cite FLOW.md / module IDs / line ranges) but the analytical work is done. Different agent than the one that did 41.5, to keep the "author vs transcriber" separation honest.
+
+---
+
+### Prior: 41.5 survey outcome (headline, archived from mid-phase check-in)
 
 `sample/t_captcha_slide.js` is a standard webpack 4 IIFE bundle. Single-root require graph (entry = module 64), 110 slots / **50 live modules** / 60 sparse holes, 91 static edges, max fanout 21, avg 1.82, 24 leaves. **No dynamic `n(var)` require patterns observed in the static pass.** All five Track 2 DoD origination concepts are anchored to a small, structurally obvious set of candidates:
 
@@ -98,115 +149,7 @@ XTEA delta `0x9E3779B9` is **not present** anywhere in `t_captcha_slide.js` (sca
 
 41.5's proposed scope: trace show-page → vm-slide fetch → vData compute → verify POST across modules 8, 56, 76, and their required subgraphs; cross-reference `sample/captcha-har.har` for network endpoints; confirm `sample/slide-jy.js` is vanilla jQuery/Zepto via diff against module 76; document verify-body origination per field. Module 41 deferred — sanity-check upfront whether static analysis can make progress; if not, park it for a dedicated follow-up task rather than blocking 41.5.
 
-**Please confirm one of**:
-- (a) Proceed with 41.5 as scoped above (auto-continues into 41.6 docs + 41.7 README bump).
-- (b) Tighten scope — e.g. only map module 56 + verify-body origination and defer the vm-slide fetch + jQuery diff.
-- (c) Expand scope — e.g. include a dynamic harness for module 41 up front.
-- (d) Re-plan — the subagent missed something structural that changes the approach.
-
-Below is the verbatim original 41.4 brief kept for audit trail.
-
----
-
-### Goal (41.4, completed)
-Produce a static, source-only **structural map** of `sample/t_captcha_slide.js` (213 KB Tencent CAPTCHA orchestrator webpack bundle). No deep flow analysis yet — this is the survey step that informs whether 41.5's deep analysis is tractable. After this task completes, the director **pauses for a mid-phase check-in** with the user to decide on 41.5 scope, mirroring the Phase 39 survey→pause pattern. Do not spill into flow tracing or doc writing — that's 41.5 and 41.6.
-
-### Context
-- **Input file** (read-only): `sample/t_captcha_slide.js`, ~213 KB. Per `project-brief.md`, it is a standard webpack bundle with a module array, which makes static analysis via `acorn` tractable. `tools/porting-pipeline/vm-parser.js` is the established acorn-parsing pattern in this repo — follow the same style (`acorn.parse(source, { ecmaVersion: 'latest', ranges: true, locations: true })`, walk the AST, etc.).
-- **Related read-only inputs** you may reference but not modify:
-  - `sample/captcha-har.har` — network trace of a real CAPTCHA flow, useful later (41.5) for cross-referencing network endpoints against module findings.
-  - `sample/slide-jy.js` — already suspected to be vanilla jQuery (41.5 will confirm); do not analyze as part of 41.4.
-  - `sample/vm_slide.js` + `research/vm-slide-stack-vm/` — the vm-slide stack VM that t_captcha_slide loads and drives. Track 1 closed in Phase 40; its decoder output under `output/vm-slide/` is available if you need to cross-reference bytecode.
-- **Track directory**: `research/captcha-orchestrator/`. Per `.claude/rules/research-artifacts.md`, the track must have a `README.md` (create/update), artifacts go under `output/captcha-orchestrator/` (NOT inside the research dir), scripts live in `research/captcha-orchestrator/`, and every claim must be backed by a committed script whose output reproduces it.
-- **Project rules in force**:
-  - `.claude/rules/targets-readonly.md` — `targets/` and `sample/` are read-only. Never write to them.
-  - `.claude/rules/output-versioning.md` — artifacts go to `output/captcha-orchestrator/`, stable filenames across runs, no timestamped dirs.
-  - `.claude/rules/coding-style.md` — CommonJS, 2-space indent, single quotes, semicolons, `const`/`let`.
-  - `.claude/rules/verify-dont-assume.md` — every claim needs a reproducible trace.
-
-### What "survey" means for this task
-
-Produce **four concrete artifacts** — all small enough to diff in git:
-
-1. **A webpack-parser script** — `research/captcha-orchestrator/parse-bundle.js`. Acorn-parses `sample/t_captcha_slide.js` and identifies the webpack module container (the array/object literal passed to the webpack runtime). Writes its findings to `output/captcha-orchestrator/`. Must be idempotent (same input → same output; stable filenames). Runs as `node research/captcha-orchestrator/parse-bundle.js`. Prefer reading the input path from the script rather than an argument; keep it boring.
-
-2. **A module inventory JSON** — `output/captcha-orchestrator/modules.json`. For each webpack module in the bundle:
-   - `id` (webpack module id — number or string)
-   - `sourceRange` (`[startOffset, endOffset]` in the bundle file, based on acorn's `range`)
-   - `sourceLines` (`{start, end}` 1-indexed for human inspection)
-   - `byteLength`
-   - `requires` — an array of the `require(<id>)` calls made by this module, pulled by walking the AST of the module body and collecting arguments to the webpack `require`/`__webpack_require__` function. If the bundle uses a different convention (e.g. module function signature is `(module, exports, require) => { ... }` or `function(e, t, n) { ... }`), infer which parameter is `require` by its usage pattern and extract the numeric-literal arguments passed to it. Skip non-literal arguments but **log a count** of dynamic requires.
-   - `exports` — a best-effort list of module.exports-assigned or `exports.X = ...` identifiers. String-only.
-   - `hint` — optional short tag describing what the module looks like at a glance (e.g. `"xhr"`, `"string-table"`, `"hasher"`, `"unknown"`). Keep this CONSERVATIVE — if in doubt, `"unknown"`. No guessing.
-   
-   Schema-first: decide the JSON shape, write it in the script, run it, commit the output. Do not hand-edit the JSON.
-
-3. **A module graph** — `output/captcha-orchestrator/module-graph.json`. Derived from the inventory above:
-   - `nodes`: `[{id, byteLength, hint}]`
-   - `edges`: `[{from, to}]` for every static `require` relationship.
-   - `roots`: modules that are executed on bundle entry (the webpack entry point — typically module id 0 or the one passed to the runtime bootstrap).
-   - `leaves`: modules that nobody requires (candidates for orphans or dynamic-load targets).
-   
-   Produced by the same `parse-bundle.js` (do not split into a second script). This is pure static structure; no runtime simulation.
-
-4. **A written survey note** — `research/captcha-orchestrator/SURVEY.md` (a plain Markdown file, NOT a doc under `docs/`; `docs/CAPTCHA_ORCHESTRATOR.md` is 41.6's territory and MUST NOT be touched). Max ~150 lines. Required sections:
-   - **Bundle shape**: how webpack wraps modules, what the entry point looks like, how `require` is dispatched. Include the actual code shape (short snippet, 5-10 lines) from `sample/t_captcha_slide.js` — do not paraphrase.
-   - **Module count + size distribution**: a small histogram or summary (total modules, total bytes, largest 5 modules by byte length).
-   - **Graph shape**: how many roots, how many leaves, max/average fan-out, any isolated subgraphs.
-   - **Candidate modules for Track 2 DoD concepts** — for each of these 6 concepts, list the module IDs that look like they _might_ touch it, with a one-line justification grounded in what the script found (NOT a guess):
-     - `vm-slide` loading / invocation
-     - `vData` construction
-     - verify POST body assembly
-     - `collect` / `eks` handling
-     - `nonce` / `sess` / `sig` origination
-     - show-page entry flow
-     
-     If a concept has zero candidates, say so — that's a finding. Do not fabricate.
-   - **Open questions for 41.5**: what a deep-analysis pass would still need to resolve (dynamic requires, indirect dispatch, obfuscation patterns worth knowing about).
-   - **Tractability verdict** (one paragraph): is deep analysis in 41.5 likely to succeed on this bundle with the same acorn-based approach, or did you find something (heavy obfuscation, dynamic loading, eval, indirect dispatch, string-table opcode dispatch like ChaosVM) that warrants re-planning? This is the key input for the mid-phase check-in.
-
-5. **Track README** — update `research/captcha-orchestrator/README.md`. If it doesn't exist, create it. Required sections per `.claude/rules/research-artifacts.md`: the open question this track exists to answer, current status (should be `partial` after this task), inputs (`sample/t_captcha_slide.js`), how to reproduce (`node research/captcha-orchestrator/parse-bundle.js`), and a link to `SURVEY.md`.
-
-### Explicit non-goals
-- **Do NOT write `docs/CAPTCHA_ORCHESTRATOR.md`.** That is 41.6 and depends on 41.5's findings.
-- **Do NOT trace runtime flows across modules.** That is 41.5. If you find yourself writing prose about "and then module X calls Y which computes Z" — stop, that's out of scope. Stick to structural observation.
-- **Do NOT rename webpack module IDs, pretty-print the bundle, or produce a decompiled output.** The deliverable is a MAP of the bundle, not a re-emission of it.
-- **Do NOT analyze `sample/slide-jy.js`, `sample/vm_slide.js`, or `sample/captcha-har.har`.** 41.5 will cross-reference them.
-- **Do NOT write tests.** Tests for parser scripts are a separate task if we decide to add them.
-- **Do NOT commit large binary artifacts or multi-megabyte JSON.** The inventory JSON should be a few hundred KB at most. If it's larger, reduce per-module detail or store positional info more compactly.
-
-### Implementation Steps
-1. Read `project-brief.md` for the Track 2 DoD and `.claude/rules/research-artifacts.md` + `.claude/rules/output-versioning.md` for the artifact discipline. Also skim `research/vm-slide-stack-vm/README.md` as a template for what a good track README looks like post-Phase 40.
-2. Read `tools/porting-pipeline/vm-parser.js` to see the established acorn pattern in this repo. Use the same import + options style.
-3. Open `sample/t_captcha_slide.js` — first scan the head (~200 lines) and the tail (~100 lines) to identify the webpack runtime signature. Then determine exactly how modules are laid out: array of `function(module, exports, require) {...}`, object literal keyed by ID, or something else.
-4. Build `parse-bundle.js` incrementally: bundle-open → module-container locator → per-module AST → per-module `require`-extraction → JSON writer. Test each stage by running the script and inspecting its JSON output.
-5. Produce `modules.json`, `module-graph.json`, `SURVEY.md`, and the track `README.md`.
-6. Run `npm test` — must stay at 353/353. (No new tests added by this task.)
-7. Run `node research/captcha-orchestrator/parse-bundle.js` one last time after all files are written — confirm it's fully idempotent (same input produces identical output; `git diff output/captcha-orchestrator/` is empty the second time).
-
-### Verification — report all of these
-1. `ls -la research/captcha-orchestrator/ output/captcha-orchestrator/` — shows the new files (parse-bundle.js, SURVEY.md, README.md in the former; modules.json, module-graph.json in the latter).
-2. `node research/captcha-orchestrator/parse-bundle.js` — runs cleanly; report total module count and total bytes.
-3. `node research/captcha-orchestrator/parse-bundle.js && git status --short output/captcha-orchestrator/` — after a second run, no diff in `output/captcha-orchestrator/` (proves idempotence).
-4. `wc -l research/captcha-orchestrator/SURVEY.md` — report the line count (target ~100-150, hard cap 200).
-5. `jq '.[] | .id' output/captcha-orchestrator/modules.json | wc -l` — total module count. Report it.
-6. `jq '.edges | length' output/captcha-orchestrator/module-graph.json` — total edge count.
-7. `jq '.roots' output/captcha-orchestrator/module-graph.json` — root module(s).
-8. `head -40 research/captcha-orchestrator/SURVEY.md` — first portion so the director can sanity-check tone and scope.
-9. `npm test` — 353/353.
-10. **Tractability verdict** — paste the one-paragraph verdict from the SURVEY.md here in the final report so the director can forward it to the user for the mid-phase check-in.
-
-### Constraints
-- **Do not make any git commits.** The director handles all commits after verification.
-- **Do not modify `sample/`, `targets/`, `docs/`, `tools/`, `tests/`, or `output/` for anything other than the specific paths listed above.** The only touched files are: `research/captcha-orchestrator/parse-bundle.js`, `research/captcha-orchestrator/SURVEY.md`, `research/captcha-orchestrator/README.md`, `output/captcha-orchestrator/modules.json`, `output/captcha-orchestrator/module-graph.json`.
-- **No new npm dependencies.** `acorn` is already in `package.json`. If you need a walker, use `acorn-walk` only if it's also already declared in `package.json`; otherwise hand-walk the AST — don't add packages.
-- **Use CommonJS** (`'use strict';`, `require()`, `module.exports`). Match the project style strictly.
-- **Do NOT write to `research/captcha-orchestrator/`** with JSON/large artifacts — those go under `output/`. Scripts and docs live in `research/`.
-- **Honor all project rules**: `targets-readonly.md`, `verify-dont-assume.md`, `research-artifacts.md`, `output-versioning.md`, `coding-style.md`.
-- **If the task is too difficult or impossible to complete** — e.g. the bundle doesn't look like webpack, the AST walk explodes, modules are obfuscated beyond static analysis — stop immediately and report back. Explain what you attempted, what went wrong, whether it's a tooling problem or a bundle-shape problem, and what a different approach might look like. Do not leave partial parse-bundle.js scripts or half-written SURVEY.md in the tree — clean up and report.
-
-### Suggested Agent
-`general-purpose` — this is an acorn-based structural survey. Needs a sharp subagent comfortable with AST walking and webpack bundle conventions. After it completes, the director reviews, then pauses for user check-in before 41.5.
+User confirmed option (a) — proceed as scoped. 41.5 ran; findings recorded in `research/captcha-orchestrator/FLOW.md`. 41.6 auto-continues.
 
 ---
 
