@@ -100,7 +100,7 @@ async function autoPort(sourceHash, tdcSource) {
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       execFile(
         process.execPath,
-        [path.join(PROJECT_ROOT, 'pipeline', 'run.js'), tempFile, '--skip-verify'],
+        [path.join(PROJECT_ROOT, 'tools', 'porting-pipeline', 'run.js'), tempFile, '--skip-verify'],
         { cwd: PROJECT_ROOT, timeout: 120000 },
         (err, stdout, stderr) => {
           if (err) reject(err);
