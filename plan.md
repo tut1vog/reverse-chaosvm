@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 41 — minor cleanup + Captcha orchestrator (Stream B Track 2)
-Current task: 41.4 — Captcha orchestrator survey (sample/t_captcha_slide.js webpack module enumeration)
+Current task: MID-PHASE CHECK-IN — 41.4 survey complete, awaiting user confirmation before dispatching 41.5 deep analysis
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -52,8 +52,8 @@ Current task: 41.4 — Captcha orchestrator survey (sample/t_captcha_slide.js we
 | 41.1 | Add `config.target` type guard to `TemplateCache.seed()` (impl only — 1-line defensive check noted as a secondary finding in 40.4) | done |
 | 41.2 | Tests for the type guard | done |
 | 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` (says "pipeline/run.js" but the assertion underneath uses the post-restructure path) | done |
-| 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | in-progress |
-| 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | pending |
+| 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | done |
+| 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | awaiting mid-phase check-in |
 | 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | pending |
 | 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | pending |
 
@@ -70,12 +70,45 @@ Current task: 41.4 — Captcha orchestrator survey (sample/t_captcha_slide.js we
 
 ## Current Task
 
-**ID**: 41.4
-**Title**: Captcha orchestrator survey — webpack module enumeration of `sample/t_captcha_slide.js`
-**Phase**: Phase 41 — Minor cleanup + Captcha orchestrator (Stream B Track 2)
-**Status**: in-progress
+**MID-PHASE CHECK-IN — no task in progress.** 41.4 closed with a green tractability verdict; 41.5 will not dispatch until the user confirms the deep-analysis scope.
 
-### Goal
+**ID**: 41.5 (pending user confirmation)
+**Title**: Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow
+**Phase**: Phase 41 — Minor cleanup + Captcha orchestrator (Stream B Track 2)
+**Status**: awaiting mid-phase check-in
+
+### Survey outcome (41.4) — headline for the check-in
+
+`sample/t_captcha_slide.js` is a standard webpack 4 IIFE bundle. Single-root require graph (entry = module 64), 110 slots / **50 live modules** / 60 sparse holes, 91 static edges, max fanout 21, avg 1.82, 24 leaves. **No dynamic `n(var)` require patterns observed in the static pass.** All five Track 2 DoD origination concepts are anchored to a small, structurally obvious set of candidates:
+
+| Concept | Candidate | Evidence |
+|---|---|---|
+| vm-slide loading | **module 8** | exports `getScript`/`getScriptUrl`/`isIframeSupportCdnDomain`, one `document.createElement('script')` call |
+| vData / collect / eks / nonce / sess / sig / cap_union | **module 56** (8 KB, fanout 21) | all 7 DoD keyword strings literally present in its source range — confirmed by independent grep |
+| jQuery/Zepto ajax layer | **module 76** (27 KB) | Zepto-shaped, 43 exports including `ajax`, `ajaxJSONP`, `Event` — diff vs `sample/slide-jy.js` in 41.5 |
+| (risk) 62 KB opaque blob | **module 41** | 29% of the bundle, 1 outgoing edge, zero `exports.<name>` — main obfuscation risk |
+
+XTEA delta `0x9E3779B9` is **not present** anywhere in `t_captcha_slide.js` (scanned) — vm-slide's XTEA lives in `sample/vm_slide.js`, not here. Confirms orchestrator layer is transport-only with respect to XTEA.
+
+**Tractability verdict** (from `research/captcha-orchestrator/SURVEY.md`):
+
+> The bundle is a clean, flat webpack 4 module array with 50 live modules, a single-root require graph rooted at module 64, and no dynamic-require patterns observed in the static pass. Every Track 2 DoD concept (vData, collect, eks, nonce, sess, sig, cap_union, prehandle) is anchored to a small and structurally obvious set of candidates — module 56 alone contains every keyword, and module 8 is unambiguously the script loader. An acorn-based deep-analysis pass in 41.5 is very likely to succeed for mapping the show-page-load → vm-slide-fetch → vData-compute → verify-POST flow and for identifying the origination points of the verify-body fields. The two real risks are (i) module 41's 62 KB opaque blob, which may be obfuscated enough to resist static analysis and need a small dynamic harness, and (ii) potential dynamic `n(var)` requires that the current pass cannot see — neither of which is disqualifying, but both should be sanity-checked early in 41.5 before committing to a pure-static approach.
+
+### Decision for the user
+
+41.5's proposed scope: trace show-page → vm-slide fetch → vData compute → verify POST across modules 8, 56, 76, and their required subgraphs; cross-reference `sample/captcha-har.har` for network endpoints; confirm `sample/slide-jy.js` is vanilla jQuery/Zepto via diff against module 76; document verify-body origination per field. Module 41 deferred — sanity-check upfront whether static analysis can make progress; if not, park it for a dedicated follow-up task rather than blocking 41.5.
+
+**Please confirm one of**:
+- (a) Proceed with 41.5 as scoped above (auto-continues into 41.6 docs + 41.7 README bump).
+- (b) Tighten scope — e.g. only map module 56 + verify-body origination and defer the vm-slide fetch + jQuery diff.
+- (c) Expand scope — e.g. include a dynamic harness for module 41 up front.
+- (d) Re-plan — the subagent missed something structural that changes the approach.
+
+Below is the verbatim original 41.4 brief kept for audit trail.
+
+---
+
+### Goal (41.4, completed)
 Produce a static, source-only **structural map** of `sample/t_captcha_slide.js` (213 KB Tencent CAPTCHA orchestrator webpack bundle). No deep flow analysis yet — this is the survey step that informs whether 41.5's deep analysis is tractable. After this task completes, the director **pauses for a mid-phase check-in** with the user to decide on 41.5 scope, mirroring the Phase 39 survey→pause pattern. Do not spill into flow tracing or doc writing — that's 41.5 and 41.6.
 
 ### Context
