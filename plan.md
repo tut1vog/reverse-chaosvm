@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 40 — Phase-39 follow-ups
-Current task: 40.1 — Upgrade vm-slide disassembler with control-flow-aware walker
+Current task: 40.2 — Tests for control-flow walker
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -37,8 +37,8 @@ Current task: 40.1 — Upgrade vm-slide disassembler with control-flow-aware wal
 
 | ID | Task | Status |
 |----|------|--------|
-| 40.1 | Upgrade vm-slide disassembler with control-flow-aware walker (static CFG, adapt approach from `research/tdc-register-vm/cfg-builder.js`). **Must special-case opcode 58 FUNC_CREATE**: its runtime byte width is `3 + 2·A + C`, not the static count of 6. The current linear walker mis-parses after the first FUNC_CREATE, which is likely why it halts at pc=512. Fix FUNC_CREATE handling FIRST, then address control-flow. | in-progress |
-| 40.2 | Tests for control-flow walker | pending |
+| 40.1 | Upgrade vm-slide disassembler with control-flow-aware walker (static CFG, adapt approach from `research/tdc-register-vm/cfg-builder.js`). **Must special-case opcode 58 FUNC_CREATE**: its runtime byte width is `3 + 2·A + C`, not the static count of 6. The current linear walker mis-parses after the first FUNC_CREATE, which is likely why it halts at pc=512. Fix FUNC_CREATE handling FIRST, then address control-flow. | done |
+| 40.2 | Tests for control-flow walker | in-progress |
 | 40.3 | Refresh `docs/VM_SLIDE_ARCHITECTURE.md` + `docs/VM_SLIDE_OPCODES.md` using full-coverage disassembly from 40.1; promote track status from `partial` to `closed` | pending |
 | 40.4 | Diagnose intermittent `tests/test-scraper-foundation.js → template-cache: lookup` flake (7+ sightings in Phases 38-39) | pending |
 | 40.5 | Resolve orphaned `tests/test-auto-port.js` — either add it back to `package.json` `scripts.test` (and fix any breakage) or delete it intentionally | pending |
@@ -48,167 +48,135 @@ Current task: 40.1 — Upgrade vm-slide disassembler with control-flow-aware wal
 
 
 
+
 ## Current Task
 
-**ID**: 40.1
-**Title**: Upgrade vm-slide disassembler with control-flow-aware walker (fix FUNC_CREATE first)
+**ID**: 40.2
+**Title**: Tests for vm-slide control-flow walker
 **Phase**: Phase 40 — Phase-39 follow-ups
 **Status**: in-progress
 
 ### Goal
-Replace the 39.1 linear disassembler (which only covers ~2% of the bytecode because it mis-parses `FUNC_CREATE` and halts at pc=512) with a **control-flow-aware walker** that produces a full-coverage disassembly of `sample/vm_slide.js`'s 24,273-element bytecode.
+Write `node --test`-compatible regression coverage for the control-flow walker built in 40.1. Tests pin the 14,134-instruction full-coverage disassembly as the new regression anchor alongside the existing 39.2 tests that pin the linear walker's 312-instruction output.
 
-The walker must:
-1. **Special-case opcode 58 `FUNC_CREATE`** so its variable-width operand region (`3 + 2·A + C` bytes) is correctly consumed. This is the prerequisite for every other fix — without it the walker desynchronizes at the first FUNC_CREATE site.
-2. **Trace control flow** from the entry PC (0) through jumps, branches, exception-handler installs, function entries (via FUNC_CREATE's `K` operand), and terminator opcodes. Use a worklist-based reachability walk, not a linear scan.
-3. **Produce a new output file** `output/vm-slide/disassembly-full.txt` listing every reachable instruction with placeholder-or-classified names. The existing `output/vm-slide/disassembly.txt` (pinned by 39.2 tests) **must NOT be overwritten** — it stays as the regression anchor for the linear walker.
-
-Tests for the walker are **explicitly out of scope** — task 40.2 will be dispatched to a different agent per impl/tests separation.
+This task is assigned to a **different agent** than 40.1 per the project's impl/tests separation rule — the tests author approaches the walker as a consumer, not the author.
 
 ### Context
 
-**Existing artifacts** (all committed):
-- `research/vm-slide-stack-vm/decoder.js` — 39.1 implementation. Parses `sample/vm_slide.js`, writes `output/vm-slide/dispatch-table.json` and `output/vm-slide/bytecode.json`. **Do not rewrite** — it's correct for simple-width opcodes; its only limitation is that `operandCount` on opcode 58 is a lexical count (6) rather than a runtime width. You may optionally extend `dispatch-table.json` with a `variableWidth: true` flag on opcode 58 if you need it, but if you do, update `tests/test-vm-slide-decoder.js` minimally to accept the extended shape.
-- `research/vm-slide-stack-vm/disassembler.js` — 39.1's linear walker. **Do not modify or delete** — its output is pinned by 39.2 tests as the regression baseline. Add the new walker as a separate file.
-- `output/vm-slide/{dispatch-table.json, bytecode.json, disassembly.txt}` — 39.1's committed fixtures. `disassembly.txt` stays pinned; `dispatch-table.json` and `bytecode.json` will be regenerated by the walker as a sanity check but content must not change unless you extend the dispatch-table schema (see above).
-- `research/tdc-register-vm/cfg-builder.js` — **reference implementation** of a worklist-based CFG walker for the register VM. Read it before starting — it has a clean pattern for terminator classification, jump-target formulas, worklist management, and basic-block boundaries. Do NOT copy its opcode numbers (those are register-VM specific and will be different for vm-slide).
+40.1 produced:
+- `research/vm-slide-stack-vm/walker.js` — a CommonJS CLI. Worklist-based walker that reads `output/vm-slide/dispatch-table.json` and `output/vm-slide/bytecode.json`, traces reachable PCs from entry 0 plus every FUNC_CREATE's `K` operand, writes `output/vm-slide/disassembly-full.txt`. Prints exactly `walked 14134 instructions across 101 function entries, visited range [0, 24273)` to stdout.
+- `output/vm-slide/disassembly-full.txt` — 14,486 lines (14,134 instructions + blank separators between discontinuous regions).
 
-**Handler sources that matter for control flow** — read these from `output/vm-slide/dispatch-table.json` before coding:
+**Director-verified facts to pin** (independently re-verified after 40.1's return):
+- Walker stdout: exactly `walked 14134 instructions across 101 function entries, visited range [0, 24273)`
+- `disassembly-full.txt` line count: **14486**.
+- Walker instruction count: **14134**.
+- Function-entry count: **101** (entry 0 + 100 unique K values across 128 FUNC_CREATE sites).
+- Visited range: `[0, 24273)` — full bytecode.
+- First 10 lines of `disassembly-full.txt`:
+  ```
+  00000  OP_40 3
+  00002  OP_42 2
+  00004  OP_06 1568
 
-| Opcode | Name (from 39.3 classification) | Behavior | Walker treatment |
-|---|---|---|---|
-| 6 | `JUMP` | `function(){g=m[g++]}` — unconditional jump, PC := operand | Terminator. Target = operand. Add target to worklist. No fall-through. |
-| 60 | `JUMP_IF_TRUE` | `function(){var A=m[g++];n[n.length-1]&&(g=A)}` — conditional jump, does not pop | Branch. Add both target (operand) and fall-through (pc+2) to worklist. |
-| 7 | `RETURN`-ish (from 39.3: pops, throws, terminates)? | read the source to confirm | Terminator. Confirm behavior; if it ends the block, add no successor. |
-| 38 | `THROW`? | read source | Terminator if it ends execution. |
-| 58 | `FUNC_CREATE` | `function(){for(var K=m[g++],p=[],A=m[g++],C=m[g++],Q=[],B=0;B<A;B++)p[m[g++]]=n[m[g++]];for(B=0;B<C;B++)Q[B]=m[g++];n.push(function w(){...return __TENCENT_CHAOS_VM(K,m,U,A,E,F,Y,c)})}` | **Not** a branch — it instantiates a closure that runs a nested VM at entry PC `K` when called. The current basic block continues normally after the FUNC_CREATE instruction. BUT the nested function at PC `K` is a **new function entry** the walker must trace separately. | Fall-through to pc + 3 + 2·A + C. Also add `K` to a separate "function entries" worklist so `K` becomes the start of another reachable function body. |
-| Other opcodes that read `m[g++]` and write to `g` | any other JMP-like handlers | Grep the dispatch table sources for `g=` assignments. Every handler that writes to `g` (not just `g++`) is a potential jump. | Treat as terminators; extract target statically from the source if possible. |
-| Exception opcodes (any handler touching `C.push`, `C.pop`, or `K`) | catch installs / throws | Installing a catch adds a handler PC to the walker's exception-handler worklist. | Treat catch-install as a fall-through + a new function-entry-like target for the handler PC. |
+  00007  OP_40 6
+  00009  OP_42 2
+  00011  OP_42 3
+  00013  OP_42 4
+  00015  OP_42 5
+  00017  OP_06 289
+  ```
+  Note the blank line after pc=4 (OP_06 is an unconditional JUMP terminator, so pc=7 is a separate worklist target). This formatting convention is a walker invariant — pin it.
+- Control-flow classification (walker's internal constants) — these are locked in the walker source and the tests should verify the walker's **behavior**, not reach into private state. The public contract is: given the committed dispatch table and bytecode, the walker produces exactly this output file.
 
-**You must not assume** the above table is complete. Before writing the walker, **grep every non-null handler's source** in `dispatch-table.json` for `g=` (PC mutation) and `g+=` / `g-=` (PC offset) and build your own table of every opcode that can affect control flow. Report your findings.
+**FUNC_CREATE hand-verification anchors** (each cites a concrete PC the walker visits):
+- pc=291: `58 20 2 1 5 4 6 3 3` → K=20, A=2, C=1, width 8, nextPc=300. The instruction at 300 is `OP_36`.
+- pc=1568: `58 7 0 1 3` → K=7, A=0, C=1, width 4, nextPc=1573. The instruction at 1573 is `OP_04`.
 
-**Directory layout**:
-- New walker file: `research/vm-slide-stack-vm/walker.js` (CommonJS, Node ≥18, 2-space indent, single quotes, `'use strict';`, matches `.claude/rules/coding-style.md`).
-- New output file: `output/vm-slide/disassembly-full.txt`. Stable filename, no timestamps, overwrite on re-run.
-- Optional additional output for debugging: `output/vm-slide/cfg.json` containing basic-block info (entry PC, exit PC, successors, terminator opcode) — useful for 40.2 tests and 40.3 docs, but only if it falls out naturally from the walker's internal state.
+**Dispatch hole audit**: zero holes were hit during the walk. The walker should never emit a `HALT` line against the committed fixtures.
 
-**Existing test file** `tests/test-vm-slide-decoder.js` (16 tests pinning 39.1 behavior):
-- Must continue to pass unchanged. The new walker writes to a different output file, so there's no conflict.
-- If you extend `dispatch-table.json` with a `variableWidth` flag, **one** test currently asserts the shape of non-null entries ("Every non-null entry has keys `opcode`, `operandCount`, `source`"). You may extend that assertion to permit an optional fourth key `variableWidth`, but nothing else in the test file should be touched.
+**Coverage delta**: 14,134 instructions vs the 39.1 linear walker's 312 = **45.3× coverage increase**.
+
+**Existing tests**:
+- `tests/test-vm-slide-decoder.js` — 16 tests for 39.1. Pins `dispatch-table.json`, `bytecode.json`, `disassembly.txt`, decoder CLI stdout, disassembler CLI stdout+stderr. These must continue to pass unchanged. Your new tests go in a **separate new file** `tests/test-vm-slide-walker.js`.
+- House style: see `tests/test-vm-slide-decoder.js`. Uses `node:test` + `node:assert`, `child_process.execFileSync` / `spawnSync` for CLI tests, committed fixtures as source of truth.
+
+**Module exports**: the 40.1 walker may or may not export anything importable. You need to read the file and find out. Per 39.2 precedent, the tests-author is permitted to add `module.exports = { ... };` at the end of `walker.js` if needed for testability — **exports only, no logic changes**. But if the walker's `main()` runs at top level (like 39.1's files did), prefer `execFileSync` over `require()` to avoid invasive edits.
+
+**Fixture files**: tests should read `output/vm-slide/disassembly-full.txt` from disk as the ground truth. The committed file was verified by the director after 40.1 returned. Do not regenerate inside the test and compare against runtime output — that couples tests to walker invocation and is slow. Instead:
+- Static assertions against the committed file (line count, first-N lines, contains-string tests for specific PCs).
+- One end-to-end test that spawns the walker via `execFileSync`, captures its stdout, and compares its output file byte-for-byte to the committed version.
 
 ### Implementation Steps
 
-1. **Read reference implementations**:
-   - `research/tdc-register-vm/cfg-builder.js` — understand the worklist / basic-block / terminator structure.
-   - `research/vm-slide-stack-vm/decoder.js` — understand what's in `dispatch-table.json`.
-   - `research/vm-slide-stack-vm/disassembler.js` — understand what the existing linear walker does and why it halts.
-   - `output/vm-slide/dispatch-table.json` — read all 53 handler sources.
+1. Read `.claude/rules/coding-style.md`.
+2. Read `tests/test-vm-slide-decoder.js` end-to-end — match its house style (describe/it structure, execFileSync patterns, byte-for-byte file comparison patterns).
+3. Read `research/vm-slide-stack-vm/walker.js` — determine whether it exports anything and whether it has top-level side-effect code.
+4. Read `output/vm-slide/disassembly-full.txt` (at least first/last 50 lines + middle sample) — confirm every pinned value from the "Director-verified facts" section matches.
+5. Verify the two FUNC_CREATE hand-trace anchors by reading `output/vm-slide/bytecode.json` slices around pc=291 and pc=1568. Confirm the K/A/C values and that the walker's output at pc=300 and pc=1573 matches.
+6. Create `tests/test-vm-slide-walker.js` with the test groups listed below.
+7. Add `tests/test-vm-slide-walker.js` to `package.json` `scripts.test` (append at the end of the list alongside `test-vm-slide-decoder.js`).
+8. Run `node --test tests/test-vm-slide-walker.js` in isolation — all new cases pass.
+9. Run `npm test`. Total = **312 + (new cases you added)**. `template-cache: lookup` flake may hit (13+ sightings); re-run up to 3 times. If it fails deterministically on every run, stop and report — your new tests may be interacting with shared state.
 
-2. **Audit control-flow handlers**. Grep every non-null handler source in `dispatch-table.json` for PC-mutating patterns (`g=`, `g+=`, `g-=`). Build a table of every opcode that can change control flow, its operand reading pattern, and its treatment (terminator / conditional / fall-through). Report the table. If you find opcodes beyond {6, 60, 58} that affect control flow, use them; if you find fewer, report that.
+### Required test groups (each a `describe` block with multiple `it` cases)
 
-3. **Static opcode classification for the walker**. Define a small table in `walker.js`:
-   ```js
-   const TERMINATORS = new Set([6, ...]);      // opcodes that end a basic block
-   const BRANCHES = new Set([60, ...]);         // conditional: both target + fall-through
-   const FUNCTION_ENTRIES = new Set([58]);      // opcodes that spawn new reachable entries
-   const VARIABLE_WIDTH = new Set([58]);        // opcodes where operand count is runtime
-   ```
-   Grounds for each entry must come from handler source inspection — cite the handler body in a code comment next to each set.
+1. **`walker output shape`** — static assertions against the committed `output/vm-slide/disassembly-full.txt`:
+   - Line count is **14486**.
+   - First 10 lines match the golden block above (including the blank line).
+   - Contains the exact string `OP_06 1568` (the first JUMP at pc=4).
+   - At least one line exists for each of the hand-trace anchors — find a line starting with `00300  ` and one starting with `01573  `.
+   - Contains no `HALT` or `OP_??` marker anywhere (walker never hit a hole).
+   - Every non-blank line matches the format `/^\d{5}  OP_\d{2}(?:\s+-?\d+(?:\.\d+)?)*$/` (5-digit PC, two-space gap, OP_NN, optional space-separated numeric operands).
 
-4. **Implement `readInstruction(bytecode, pc, dispatchTable)`** helper that returns `{opcode, operands, nextPc, extras}`. For opcode 58 (or any VARIABLE_WIDTH), read K, A, C first then compute the real byte count and read the remaining operands. For everything else, use `dispatchTable[opcode].operandCount` directly. Return `null` on dispatch-table holes or out-of-range opcodes so the caller can handle the halt gracefully.
+2. **`walker coverage facts`** — assertions about aggregate walker behavior from the committed file:
+   - Number of distinct PC values (lines starting with a digit) is **14134**.
+   - Lowest PC is 0, highest PC is below 24273.
+   - At least 45x more instructions than the linear walker's committed `disassembly.txt` (which has 313 lines total, 312 instructions + 1 halt marker).
 
-5. **Implement the worklist walker**. Pseudocode:
-   ```
-   function walk(bytecode, dispatchTable):
-     visited = new Map()   // pc -> instruction info
-     worklist = [0]         // start at entry PC
-     functionEntries = new Set([0])
-     
-     while worklist not empty:
-       pc = worklist.pop()
-       if visited.has(pc): continue
-       
-       instr = readInstruction(bytecode, pc, dispatchTable)
-       if instr is null:
-         // hole or out-of-range — record as diagnostic, don't crash
-         visited.set(pc, { halt: true, op: bytecode[pc] })
-         continue
-       
-       visited.set(pc, instr)
-       
-       if instr.opcode is TERMINATOR:
-         // determine successor(s) based on opcode
-         if instr.opcode === 6 (JUMP):
-           worklist.push(instr.operands[0])  // static jump target
-         else if instr.opcode is an unconditional-terminator (RET/THROW/etc):
-           // no successor
-         // ... etc
-       else if instr.opcode is BRANCH (60):
-         worklist.push(instr.operands[0])      // target
-         worklist.push(instr.nextPc)            // fall-through
-       else if instr.opcode is FUNCTION_ENTRY (58):
-         functionEntries.add(K operand)
-         worklist.push(K operand)              // new function entry
-         worklist.push(instr.nextPc)           // fall-through after FUNC_CREATE
-       else:
-         worklist.push(instr.nextPc)           // normal fall-through
-   
-     return { visited, functionEntries }
-   ```
+3. **`walker CLI contract`** — spawn via `execFileSync`:
+   - stdout equals exactly `walked 14134 instructions across 101 function entries, visited range [0, 24273)\n`.
+   - Exit code 0.
+   - stderr is empty (no HALT diagnostics).
+   - After running, `output/vm-slide/disassembly-full.txt` is byte-for-byte identical to the committed version (idempotent re-run).
 
-6. **Emit `output/vm-slide/disassembly-full.txt`**. Walk the sorted set of visited PCs and emit a line per instruction. Format should match `disassembly.txt`'s column style so a reader can diff them. Lines that fell on a dispatch hole become `<pc>  HALT  <op>` with a comment. Group output by function entry if easy; at minimum, emit contiguous blocks with blank-line separators when the PC jumps backward or forward by more than a few bytes.
+4. **`linear walker pinned file is untouched`** — sanity check that 40.1 didn't accidentally break 39.2's baseline:
+   - `output/vm-slide/disassembly.txt` still has 313 lines.
+   - First line is `00000  OP_40 3` (same as the walker's first line — both start at pc=0).
+   - The committed file matches the 39.2-pinned golden first 10 lines.
+   (These assertions duplicate a subset of 39.2's test coverage but are cheap and pin the invariant that 40.1 preserved.)
 
-7. **CLI shape**: `node research/vm-slide-stack-vm/walker.js` with optional `--dispatch <path>` and `--bytecode <path>` flags. One-line stdout summary: `walked N instructions across M function entries, visited range [0, L)`. Diagnostics to stderr.
+5. **`dispatch-table is unchanged from 39.1`**:
+   - `dispatch-table.json` length is still 69.
+   - Non-null count is 53, null count is 16.
+   - No `variableWidth` key present on any entry (walker keeps its own constant; schema untouched).
 
-8. **Sanity checks before finishing**:
-   - Run the walker on the committed `output/vm-slide/{dispatch-table.json, bytecode.json}`.
-   - Confirm the walker visits **significantly more than 312 instructions** (the 39.1 linear walker's coverage). Hopefully thousands. Report the number.
-   - Confirm opcode 58 is handled correctly by pointing at one concrete FUNC_CREATE instance in the bytecode and tracing its operand region by hand. Report the PC, the K/A/C values, and the computed next-PC.
-   - Hand-verify the first 20 lines of `disassembly-full.txt` against the bytecode. (Should match `disassembly.txt` for the linear prefix before any FUNC_CREATE.)
-   - Spot-check a PC that the linear walker didn't reach. Confirm it's a sensible instruction.
-   - Report how many dispatch-table holes (if any) the walker actually hit during the walk. If it hit **zero**, the pc=512 halt was almost certainly the FUNC_CREATE mis-parse from 39.1 — confirm and report.
+6. **Optional but recommended — `FUNC_CREATE hand-traces`**: assert the walker output contains a line at pc=300 starting with `00300  OP_36` and a line at pc=1573 starting with `01573  OP_04`. These are concrete regression anchors for the FUNC_CREATE width fix — if the walker regresses its operand consumption, these specific downstream PCs would land on different bytes.
 
-9. **Optional but recommended**: also write `output/vm-slide/cfg.json` with basic-block / function-entry structure, so 40.2 tests can pin it and 40.3 docs can cite it. If the walker's internal state doesn't map cleanly to this, skip it and note why.
-
-10. **Do NOT**:
-    - Modify `research/vm-slide-stack-vm/disassembler.js` (pinned by 39.2 tests).
-    - Overwrite `output/vm-slide/disassembly.txt` (pinned by 39.2 tests).
-    - Modify `tests/test-vm-slide-decoder.js` **except** for the one narrow allowance on the `variableWidth` key if you extend the dispatch-table schema.
-    - Add any tests — 40.2 owns that.
-    - Add any docs — 40.3 owns that.
-    - Install any new npm package.
-
-11. **Run `npm test`**. Must stay at 312/312. If the `template-cache: lookup` flake hits (12+ sightings), re-run up to 3 times. If it consistently fails, note it but proceed — 40.4 owns diagnosis.
+Aim for at least **10 test cases** across the groups. More is fine.
 
 ### Verification — report all of these
 
-1. `ls research/vm-slide-stack-vm/walker.js` — exists.
-2. `ls output/vm-slide/disassembly-full.txt` — exists.
-3. `ls output/vm-slide/disassembly.txt` — **still** exists (pinned 39.2 file, must be untouched).
-4. `diff output/vm-slide/disassembly.txt <(git show HEAD:output/vm-slide/disassembly.txt)` — empty (confirms the linear-walker output is byte-identical to what's committed).
-5. `node research/vm-slide-stack-vm/walker.js` — runs without throwing. Paste stdout.
-6. `wc -l output/vm-slide/disassembly-full.txt` — report the line count. Expect **significantly more than 313** (the linear walker's committed output).
-7. **Control-flow handler audit**: paste your table of every opcode that can affect control flow, with handler source citations. Must at minimum cover opcodes 6 (JUMP) and 60 (JUMP_IF_TRUE); should include any others you found by grepping for `g=` in handler sources.
-8. **FUNC_CREATE hand-trace**: find one concrete FUNC_CREATE instance in the walker's output, report its PC, its K/A/C operand values, and the computed nextPc = `pc + 3 + 2·A + C`. Confirm the walker's nextPc matches.
-9. **Dispatch-hole audit**: how many times (and at which PCs) did the walker hit a dispatch-table hole during the full walk? If zero, report that explicitly — it confirms the 39.1 pc=512 halt was caused by FUNC_CREATE mis-parse, not by legitimate data.
-10. **Instruction count delta**: walker visited N instructions; linear walker's pinned output has 312; report the ratio (new/old).
-11. **Function entries discovered**: how many distinct function entry PCs did the walker find (entry 0 + each FUNC_CREATE `K` + any other entries)?
-12. First 10 lines of `output/vm-slide/disassembly-full.txt` — paste verbatim.
-13. If you extended `dispatch-table.json` with a `variableWidth` flag, show the narrow `tests/test-vm-slide-decoder.js` edit (must be additive-only to one assertion).
-14. `npm test` — final summary line. Note flake hits.
-15. `node --check research/vm-slide-stack-vm/walker.js` — parses cleanly.
-16. **Surprises**: control-flow patterns you didn't expect, opcodes that look like jumps but aren't (or vice versa), handlers with unusual PC semantics, any reason the walker had to halt before reaching the end of the bytecode.
+1. `ls tests/test-vm-slide-walker.js` — exists.
+2. `node --test tests/test-vm-slide-walker.js` summary — paste pass/fail counts.
+3. `npm test` summary — total should be **312 + (delta)**, 0 failures. Paste the summary line.
+4. `grep -n 'test-vm-slide-walker' package.json` — shows new file listed in `scripts.test`.
+5. Count of `it(` calls in the new test file — at least 10.
+6. Presence of all 6 required test groups (5 mandatory + 1 optional — you can include or skip the FUNC_CREATE group, but document the decision).
+7. If you added `module.exports` to `walker.js`, show the diff (must be additive, exports-only). If not, note that tests use `execFileSync`.
+8. Any pinned-value discrepancies between the Director-verified facts and what you found in the committed files — do not silently rewrite assertions to match drift.
+9. Any flake sightings during verification and how many re-runs it took.
 
 ### Constraints
 
 - **Do not make any git commits.** The director handles all commits.
-- **Do not modify `disassembler.js` or `disassembly.txt`** — these are pinned by 39.2 tests as the regression baseline for the linear walker.
-- **Do not write any tests.** Task 40.2 owns tests and is dispatched to a different agent.
-- **Do not write or modify any doc.** Task 40.3 owns doc refresh.
-- **Do not modify `sample/vm_slide.js`** or anything under `sample/`, `targets/`, `.claude/rules/`, `history/`, `docs/WORKFLOW.md`, `project-brief.md`, `CLAUDE.md`.
-- **Do not install any new npm package.** `acorn` (already a dep) may or may not be needed — you may not even need to re-parse `sample/vm_slide.js` since `dispatch-table.json` + `bytecode.json` already have everything the walker needs.
-- **If the task is too difficult or impossible to complete**, stop and report — the walker upgrade is a judgment-heavy task and there may be control-flow patterns that defeat static tracing. If you find something genuinely intractable (e.g. an opcode computes PC from stack data at runtime rather than from an immediate operand), stop, document the pattern, and return partial progress rather than hack around it.
-- **Do not speculate on opcode semantics for control-flow classification.** Every entry in the terminators/branches/function-entries table must be backed by handler source inspection and cited in a comment.
+- **Do not refactor `walker.js`** — only additive `module.exports = { ... };` if needed for imports.
+- **Do not modify `research/vm-slide-stack-vm/disassembler.js`, `decoder.js`, or `output/vm-slide/*.json` / `disassembly.txt`.** These are pinned by 39.2 or produced by 39.1/40.1 and must stay byte-identical.
+- **Do not modify `tests/test-vm-slide-decoder.js`** — it pins 39.1/39.2 state.
+- **Do not install any new npm package** — `node:test` + `node:assert` are built-ins.
+- **Do not weaken any assertion to make a flake pass.** If a test hits a genuine race, stop and report.
+- **Verify every pinned value against the committed files first.** If the director-supplied facts above differ from reality, stop and report the discrepancy — don't silently rewrite.
+- If the task is too difficult or impossible, stop and report back.
 
 ### Suggested Agent
-`general-purpose` — AST-free static analysis + file I/O + judgment-driven control-flow classification. The `opcode-mapper` agent is register-VM-specific and will not help here. No specialized agent exists for stack-VM work.
+`general-purpose` — same capability as 40.1 but a fresh instance per impl/tests separation rule.
