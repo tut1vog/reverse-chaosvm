@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 42 — vData runtime binding reversal (follow-up from Phase 41 open question)
-Current task: 42.3 — Director-owned docs bookkeeping (vData mechanism resolved on Chrome via XHR proxy)
+Current phase: Phase 42 COMPLETE — vData runtime binding resolved in mechanism (captcha-orchestrator track substantively closed)
+Current task: none — Phase 42 done, awaiting next user direction
 
 **Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
 
@@ -51,7 +51,7 @@ Current task: 42.3 — Director-owned docs bookkeeping (vData mechanism resolved
 |----|------|--------|
 | 42.1 | vm-slide vData static trace — locate every `OP_04 OP_10* OP_13` anchor for `"getVData"` / `"vData="` / `"&vData="`, walk surrounding basic blocks, identify property-write vs property-read, extract the installed function body, produce a reproducible script + analysis note | done |
 | 42.2 | Cross-reference against FLOW.md §6 + HAR + crypto provenance scan — confirm the function signature matches `window.getVData(n.join("&"))` and characterise where the 152-char HAR value's crypto comes from | done — mechanism resolved: vm-slide installs an XHR proxy on Chrome (not `window.getVData`), crypto is modified-XTEA + custom 64-char base64, window-installs=1 (only getVData on IE9 fallback) |
-| 42.3 | Docs bookkeeping — update `docs/CAPTCHA_ORCHESTRATOR.md` §6/§8, `research/captcha-orchestrator/README.md` status, `FLOW.md` §9 Q1 post-script with the resolved mechanism. Also correct 42.1's VDATA-TRACE.md framing that the install is "unconditional" (it isn't — it's IE9-gated). Promote the three Phase 39/40 vm-slide docs from CLAUDE.md "new docs planned" list into the main doc table. | in-progress |
+| 42.3 | Docs bookkeeping — update `docs/CAPTCHA_ORCHESTRATOR.md` §6/§8, `research/captcha-orchestrator/README.md` status, `FLOW.md` §9 Q1 post-script with the resolved mechanism. Also correct 42.1's VDATA-TRACE.md framing that the install is "unconditional" (it isn't — it's IE9-gated). Promote the three Phase 39/40 vm-slide docs from CLAUDE.md "new docs planned" list into the main doc table. | done |
 
 ### Phase 41: Minor cleanup + Captcha orchestrator (Stream B Track 2)
 > Two tiny cleanups from 40.4's deferred findings, then Stream B Track 2 — analyze `sample/t_captcha_slide.js` (213 KB webpack bundle) to document the end-to-end CAPTCHA flow. Track 2's DoD from `project-brief.md`: `docs/CAPTCHA_ORCHESTRATOR.md` with show-page load → vm-slide fetch → vData compute → verify POST → ticket, identifying every origination point for `collect`, `eks`, `vData`, `nonce`, `sess`, `sig`. The file is a standard webpack bundle with a module array, which makes static analysis via acorn tractable (same approach as `tools/porting-pipeline/vm-parser.js`).
@@ -79,55 +79,28 @@ Current task: 42.3 — Director-owned docs bookkeeping (vData mechanism resolved
 
 ## Current Task
 
-**ID**: 42.3
-**Title**: Director-owned docs bookkeeping — propagate vData mechanism resolution to public docs + CLAUDE.md
-**Phase**: Phase 42 — vData runtime binding reversal
-**Status**: in-progress
+**none — Phase 42 complete.**
 
+Phase 42 closed in three tasks:
+- **42.1** — vm-slide vData static trace. Wrote `research/vm-slide-stack-vm/vdata-trace.js` + `VDATA-TRACE.md` + `output/vm-slide/vdata-anchors.json`. Identified the `[window, "getVData"] + OP_58 + OP_24` property-write sequence at bytecode pcs 19681/20059/20066 with function body `[19702, 20058]`.
+- **42.2** — cross-reference + crypto provenance scan. Wrote `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` + `vdata-provenance.js` + `output/vm-slide/window-installs.json`. Discovered the outer IE-gate at bytecode pc 19636 (`OP_60 19666` on `<state>.isIE9Below()`) that 42.1 had missed one block up. Enumerated all `[window, <key>] + FUNC_CREATE + OP_24` installs and found exactly **1** (`getVData`, only on IE9). Verified the crypto pipeline ingredients (XTEA delta `0x9E3779B9` at bytecode[15352]/[15530], custom 64-char base64 alphabet at pc 16932, char-set validation regex at pc 17677) and confirmed the full 152-char HAR `vData` value's character set is a strict subset of the alphabet.
+- **42.3** — director-owned docs bookkeeping. Rewrote `docs/CAPTCHA_ORCHESTRATOR.md` §2 step 7 + §4 header table row + §5.2 origination row + §6 `vData` subsection + §8 open questions with the resolved mechanism. Added a 42.2 correction post-script to `research/vm-slide-stack-vm/VDATA-TRACE.md`. Appended a resolution post-script to `research/captcha-orchestrator/FLOW.md` §9 Q1. Bumped `research/captcha-orchestrator/README.md` status to "closed (mechanism)" with a narrower `vData` byte-identical follow-up flagged. Updated `research/vm-slide-stack-vm/README.md` with Phase 42 findings + new reproduction commands. Promoted the three Phase 39/40 vm-slide docs (`CHAOSVM_VARIANTS.md`, `VM_SLIDE_ARCHITECTURE.md`, `VM_SLIDE_OPCODES.md`) from the CLAUDE.md "new docs planned" list into the main doc table, and added a Phase 42 paragraph to CLAUDE.md's "Project Memory — Established Facts" section.
 
-### Summary of what 42.1 + 42.2 established
+Tests stayed at 353/353 throughout. No code changes; Phase 42 was purely research + docs.
 
-The vData runtime binding is **mechanism-resolved** on Chrome (non-IE):
+**The vData mechanism in one paragraph**: on Chrome, vm-slide takes a fall-through branch at bytecode pc 19636 that calls `<state>.proxyXHR(p[3])` at pc 19662. `proxyXHR` installs an `XMLHttpRequest.prototype.send`/`open` monkey-patch that intercepts the orchestrator's verify POST and injects `vData=<ciphertext>` into the outgoing body before `send()` completes. The ciphertext is built from modified XTEA (delta `0x9E3779B9`) followed by a custom 64-char base64 alphabet containing `-_*` as its non-alphanumeric members. On IE9 and below, the same gate instead installs `window.getVData` at pc 20066 and the orchestrator's `if (a.isLowIE())` branch calls it explicitly. The two paths are mutually exclusive and `window.getVData` is never installed on Chrome. The captcha-orchestrator research track is substantively closed; a narrower byte-identical-reproducibility follow-up is available but was not required by Track 2's DoD.
 
-- **On Chrome 146**: vm-slide calls `proxyXHR(ctx)` which monkey-patches `XMLHttpRequest.prototype.send/open` globally. The patched send intercepts the verify POST and injects `vData=<ciphertext>` into the body. The orchestrator's `if (isLowIE())` branch **never executes** and `window.getVData` is **never installed** on Chrome at all.
-- **On IE9 and below**: vm-slide installs `window.getVData` at pc=20066 via the classical `[window, "getVData"] + FUNC_CREATE + OP_24` sequence. The orchestrator's `if (isLowIE())` branch calls it explicitly.
-- **Branch gate**: `OP_60 19666` at pc 19636 — `if (obj.isIE9Below()) { install getVData }` else `{ obj.proxyXHR(p[3]) }` then `OP_06 20070` to skip install.
-- **Crypto**: modified-XTEA (delta `0x9E3779B9` as `OP_08` immediate at bytecode indices 15352 and 15530, matching encrypt+decrypt) + custom 64-char base64 alphabet at pc 16932 (`GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`, contains `-_*`) + char-set-validation regex `[^A-Za-z0-9\-\_\*]` at pc 17677.
-- **HAR value verification**: the full 152-char HAR `vData` value `7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY` — every character is a member of the custom alphabet, zero outliers. Conclusive.
-- **Window-installs enumeration**: vm-slide installs exactly **1** `window.*` property — `window.getVData`. No second crypto helper. `output/vm-slide/window-installs.json` has one entry.
+**Captcha-orchestrator track status**: closed (mechanism). Follow-up available for byte-identical `vData` generator (extract XTEA key + characterize plaintext + build standalone tool).
 
-42.1 retroactive correction: 42.1's VDATA-TRACE.md §3-§4 characterised the install as "unconditional". That prose was wrong — 42.2 traced one level up and found the IE-gate. 42.1's physical opcode identification (OP_24 at 20066) was correct; only the "unconditional" word in the narrative needs fixing.
+**Open research tracks the user may want to tackle next** (per `project-brief.md` priority backlog):
+- **Byte-identical vData generator** — narrow follow-up to Phase 42. Decompile the vm-slide XHR proxy body (bytecode pcs ~15000..20700), extract the XTEA key schedule, build a standalone generator under `tools/`. Bounded and well-scoped.
+- **eks payload structural reversal** — `research/eks-payload/` still `open`. `eks` confirmed transport-only in Phases 41 + 42 (orchestrator reads `TDC.getInfo().info`, never derives its own), but its internal structure is still unknown.
+- **Template pool survey** — `research/template-pool/` still `open`. Classify many live `tdc.js` builds and measure Tencent's template rotation.
+- **Key-modification constants** — `research/key-mod/` still `open`. Cross-template diff of XTEA key-mod constants between Templates A, B, C (register-VM only; Phase 40 confirmed this does NOT apply to vm-slide).
+- **Collector field count** — is 59 template-specific or constant?
+- **errorCode 12** — confirm whether verify-endpoint 12 is fingerprint/behavioral scoring. Phase 41 found module 56 treats it as soft-retryable via a cover error, consistent with existing `docs/ERRORCODE_12_INVESTIGATION.md` but still not fully characterized.
 
-The "extract the exact XTEA key and build a byte-identical vData generator" work is a legitimate follow-up but **out of Phase 42 scope**. FLOW.md §9 Q1 and CAPTCHA_ORCHESTRATOR.md §8 asked "where does vData come from"; we now know.
-
-### Checklist — files to edit (director-owned)
-
-1. **`docs/CAPTCHA_ORCHESTRATOR.md`**:
-   - §2 End-to-end flow — add a step describing the vm-slide-side `proxyXHR` install on Chrome (between the vm-slide load step and the verify POST step).
-   - §5.2 origination table `vData` row — replace "ORIGIN UNRESOLVED STATICALLY" with the resolved mechanism (XHR proxy injection), short provenance sentence, `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` citation.
-   - §6 critical fields — replace the `vData` subsection with the resolved mechanism narrative: Chrome path (XHR proxy) + IE9 path (direct install), gate at pc 19636, crypto ingredients at bytecode[15352/15530] + pc 16932 + pc 17677.
-   - §8 known limitations — remove `vData` from the open-questions list; replace with a narrower follow-up bullet ("full decompile of the XHR proxy body + XTEA key extraction for byte-identical vData generation").
-2. **`research/captcha-orchestrator/FLOW.md`**:
-   - §9 Q1 — append a resolution post-script citing VDATA-TRACE.md and VDATA-RESOLUTION.md, correcting the jQuery-ajax-hook hypothesis (wrong mechanism; right location: vm-slide) and stating the actual mechanism (XHR proxy on Chrome, direct install on IE9).
-3. **`research/captcha-orchestrator/README.md`**:
-   - Status bump from `partial — flow traced end-to-end, public doc shipped, one open question remaining (vData runtime binding)` to `closed — full flow documented; vData mechanism resolved in Phase 42; follow-up for byte-identical vData generator available but out of scope`.
-   - Remove the `vData` entry from the "Open questions" section (or re-scope it to the narrow follow-up).
-4. **`research/vm-slide-stack-vm/VDATA-TRACE.md`**:
-   - Add a short "**Correction from 42.2**" post-script at the end noting that the install is IE9-gated (not unconditional), with a pointer to VDATA-RESOLUTION.md §3 candidate (b) / §4 verdict.
-5. **`research/vm-slide-stack-vm/README.md`**:
-   - Update to reference the new VDATA-TRACE.md, VDATA-RESOLUTION.md, vdata-trace.js, vdata-provenance.js, window-installs.json artifacts.
-6. **`CLAUDE.md`**:
-   - Promote `docs/CHAOSVM_VARIANTS.md`, `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md` from the "new docs planned for the research phase" list into the main doc table (latent Phase 39/40 bookkeeping gap, was noted in the Phase 42 plan).
-
-### Verification
-- `npm test` — must stay 353/353.
-- `git diff --stat` — should show the six paths above plus plan.md + history.
-- No new research scripts or output artifacts.
-
-### Constraints
-- **Director-owned**, no subagent dispatch (per the "director writes docs updates itself" rule).
-- **Do not edit** the 42.1/42.2 research artifacts (`vdata-trace.js`, `vdata-anchors.json`, `vdata-provenance.js`, `window-installs.json`, `VDATA-RESOLUTION.md`) — only add the correction post-script to `VDATA-TRACE.md`.
-- **Do not promote the captcha-orchestrator track to `closed` if there's any structural doubt.** vData is resolved in mechanism but not in byte-level reproducibility; "closed with a follow-up flagged" is the correct framing.
+No task in progress. Awaiting next user direction.
 
 ### Prior: 41.6 (completed)
 Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md`. Director added the new doc to CLAUDE.md's main doc table.
