@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 37
-Current task: 37.8 — Update docs/WORKFLOW.md and README.md
+Current task: 37.10 — Documentation corrections (CLAUDE.md, VERSION_DIFFERENCES.md, Phase 36 findings)
 
 ---
 
@@ -23,100 +23,156 @@ Current task: 37.8 — Update docs/WORKFLOW.md and README.md
 | 37.5 | Fix test-cfg.js func 272 edge case | done |
 | 37.6 | Fix test-emit.js quality thresholds | done |
 | 37.7 | Archive project-brief.md and docs/PROGRESS.md | done |
-| 37.8 | Update docs/WORKFLOW.md + README.md | in-progress |
+| 37.8 | Update docs/WORKFLOW.md + README.md | done |
 | 37.9 | (merged into 37.8) | done |
-| 37.10 | Update CLAUDE.md — correct Phase 36 conclusion | pending |
-| 37.11 | Update docs/VERSION_DIFFERENCES.md — close open questions | pending |
-| 37.12 | Add Phase 36 diagnostic findings to docs | pending |
+| 37.10 | Documentation corrections (CLAUDE.md + VERSION_DIFFERENCES.md + Phase 36 findings) | in-progress |
+| 37.11 | (merged into 37.10) | done |
+| 37.12 | (merged into 37.10) | done |
 
 ---
 
 ## Current Task
 
-**ID**: 37.8
-**Title**: Update docs/WORKFLOW.md and README.md
+**ID**: 37.10
+**Title**: Documentation corrections
 **Phase**: Project Cleanup
 **Status**: in-progress
 
 ### Goal
-Update two stale reference docs: add a Phase 11-36 epilogue to WORKFLOW.md, and fix stale counts/references in README.md.
+Three related documentation updates, all touching current-state descriptions:
+1. Fix stale "Known Issues" in CLAUDE.md (test failures are now resolved)
+2. Close "Open Questions" in docs/VERSION_DIFFERENCES.md (Phase 33 answered them)
+3. Add a short Phase 36 findings section somewhere in docs/ describing errorCode 12 diagnostic
 
 ### Context
 
-**docs/WORKFLOW.md** (333 lines) ends with:
-> Phases 1–8: ✅ Complete | 28 tasks total | 28 test rounds | All passing
-> Phase 9: ✅ Complete (9.1–9.6 all passing)
-> Phase 10: ✅ Complete (conditional) — Puppeteer solver works, jsdom solver gets errorCode 9
-> **Summary**: 51 test rounds across 10 phases.
+**CLAUDE.md Known Issues (lines 181-188)** currently says:
+- `test-cfg.js`: 583/584 assertions pass (1 edge case in func 272)
+- `test-emit.js`: Code quality threshold assertions fail (cosmetic, not functional)
 
-Needs an epilogue listing Phases 11-36 with one-line summaries, pointing to `history/` for details.
+Both are now resolved (37.5 and 37.6). Entire test suite is 296/296.
 
-**README.md** stale references (from grep):
-- Line 27: "Tested on 5 builds across 3 distinct templates" — should reflect 10+ observed builds
-- Line 116: "Test suite (90 passing, 2 known issues)" — now 296 passing, 0 issues
-- Line 185: "3 distinct templates observed" — 10+ now
-- Line 220: "10-phase development workflow (51 test rounds)" — more phases now
-- Line 271-273: "90 of 92 tests pass" + known failures — all 296 pass now
+CLAUDE.md also has no mention of errorCode 12 findings from Phase 36, and doesn't mention the Phase 37 cleanup.
+
+**docs/VERSION_DIFFERENCES.md Open Questions (lines 356-381)** has 7 questions. Several are now answered:
+1. "Does the key change between builds?" — **ANSWERED: YES**, each build has unique STATE_A key. Pipeline auto-extracts.
+2. "Are compound opcodes stable?" — unknown, leave as-is
+3. "Does the collector count change?" — still unknown, leave as-is
+4. "Is the assembly order fixed?" — now verified across 10+ live builds, leave as-is
+5. "Could the VM architecture change fundamentally?" — no change observed, leave as-is
+6. "How many templates exist in the pool?" — **ANSWERED**: at least 10 unique builds observed in live rotation across multiple template architectures (95, 94, 96, 98, 100+ opcode variants)
+7. "How long are templates valid?" — still unknown, leave as-is
+
+Also the opening "3-Build Live Comparison" section is fine as historical context — don't modify.
+
+**Phase 36 findings** — errorCode 12 is NOT pure IP rate limiting (browser solves still work from same IP). Likely fingerprint/behavioral detection. Temporal pattern: ~87% success in first 8-10 attempts, 0% after. Nonce is static per appid. Best location: new short section at end of docs/VERSION_DIFFERENCES.md or as a separate small file `docs/ERRORCODE_12_INVESTIGATION.md`. Use separate file — it's a distinct topic.
 
 ### Implementation Steps
 
-#### Part A: docs/WORKFLOW.md
-Append a new section after the "Current Status" section:
+#### Part A: CLAUDE.md Known Issues section (lines 181-188)
 
-```markdown
----
-
-## Epilogue: Phases 11–36
-
-After the initial 10 phases, work continued through 26 more phases focused on multi-version support, automated porting, and live validation. Each phase is recorded in day-files under `history/` (e.g. `history/20260409.md`). Summary by phase:
-
-- **Phase 11–20**: Automated porting pipeline (vm-parser, opcode-mapper, key-extractor, token-verifier); support for Templates A, B, C; multi-build verification
-- **Phase 21–27**: Headless scraper (`scraper/`); jsdom vData generation; slide CAPTCHA HTTP flow; template cache with source-hash keys
-- **Phase 28–32**: Live testing; corrected documentation (TLS 403 was sess-missing, not TLS fingerprinting); source-hash cache key (replacing TDC_NAME)
-- **Phase 33**: TDC survey — collected 10 unique builds from live rotation, documented errorCode distribution
-- **Phase 34**: vm-parser obfuscation support (bracket-notation thisCtx extraction, catch-var fallback heuristic)
-- **Phase 35**: Source deobfuscator for string-decoder + helper-wrapper obfuscation; all 10 builds now port successfully
-- **Phase 36**: errorCode 12 diagnostic survey — determined token rejection correlates with fingerprint/rate-limit, not token generation
-- **Phase 37**: Project cleanup — removed 20 obsolete files, fixed all test failures (296/296), archived legacy docs
-
-For task-level detail see `history/YYYYMMDD.md` day-files.
+Replace:
+```
+- `test-cfg.js`: 583/584 assertions pass (1 edge case in func 272).
+- `test-emit.js`: Code quality threshold assertions fail (cosmetic, not functional).
 ```
 
-#### Part B: README.md
+With:
+```
+- errorCode 12 on token verify: NOT pure IP rate limiting — browser solves work from the same IP. Likely fingerprint/behavioral scoring at the verify endpoint. See `docs/ERRORCODE_12_INVESTIGATION.md`.
+```
 
-Apply the following edits:
+Also, in the "Project Memory → Current State" block near the bottom, update the date to 2026-04-12 and add a bullet noting Phase 37 completion: "Project cleanup (Phase 37): removed 20 obsolete files, all 296 tests passing, legacy docs archived."
 
-1. Line 27 — change:
-   - FROM: `Tested on 5 builds across 3 distinct templates — all produce byte-identical tokens.`
-   - TO: `Tested on 10+ live builds across multiple template architectures — all produce byte-identical tokens.`
+#### Part B: docs/VERSION_DIFFERENCES.md — close answered open questions
 
-2. Line 116 — change:
-   - FROM: `# Test suite (90 passing, 2 known issues)`
-   - TO: `# Test suite (296 passing, all green)`
+Find the "Open Questions" section (starts with `## Open Questions`). Replace its contents. Keep the questions that are still open (2, 3, 4, 5, 7) and mark the answered ones (1, 6) with resolution:
 
-3. Line 185 — change:
-   - FROM: `3 distinct templates observed. Each has a unique XTEA key.`
-   - TO: `10+ distinct builds observed in live rotation across multiple template architectures. Each build has a unique XTEA key.`
+Replace the section content to clearly show which are answered vs still open. Example format:
 
-4. Line 220 — change:
-   - FROM: `10-phase development workflow (51 test rounds)`
-   - TO: `Multi-phase development workflow — see history/ for per-phase day-files`
+```markdown
+## Open Questions
 
-5. Lines 271-274 — change the test results section. Find:
-   ```
-   90 of 92 tests pass. The 2 failures are known pre-existing issues:
-   - `test-cfg.js`: 583/584 assertions pass (1 edge case in func 272)
-   - `test-emit.js`: Code quality threshold assertions (cosmetic, not functional)
-   ```
-   REPLACE with:
-   ```
-   All 296 tests pass.
-   ```
+### Answered
+
+**1. Does the XTEA key change between builds?** — **YES, confirmed.** Each build has a unique `STATE_A` key. The automated pipeline (`pipeline/key-extractor.js`) dynamically extracts the key from the VM source for every new build. Delta (0x9E3779B9) and round count (32) are constant across all observed builds.
+
+**6. How many templates exist in the pool?** — **At least 10 distinct builds** observed in live rotation (2026-04). Template architectures range from 94 to 100+ opcodes. Some builds are obfuscated (string-decoder + helper-wrapper layers). See `scripts/tdc-survey.js` for the survey methodology.
+
+### Still Open
+
+**2. Are compound opcodes stable?** [keep original text...]
+
+**3. Does the collector count change?** [keep original text...]
+
+**4. Is the assembly order fixed?** — Confirmed across 10+ builds for current architecture.
+
+**5. Could the VM architecture change fundamentally?** [keep original text...]
+
+**7. How long are templates valid?** [keep original text...]
+```
+
+Use the existing text for the still-open questions verbatim where possible.
+
+#### Part C: Create `docs/ERRORCODE_12_INVESTIGATION.md`
+
+New file documenting Phase 36 findings:
+
+```markdown
+# errorCode 12 Investigation
+
+**Phase 36 diagnostic survey — 2026-04-12**
+
+## Symptom
+
+The `cap_union_new_verify` endpoint returns `errorCode: 12` (token rejected) for most scraper-generated tokens, even when the token is byte-identical to what the live VM would produce.
+
+## What errorCode 12 is NOT
+
+- **Not a token generation bug.** All 10 observed builds produce byte-identical tokens compared to the live VM (verified by `pipeline/token-verifier.js`).
+- **Not pure IP-based rate limiting.** A normal browser session on the same IP continues to solve CAPTCHAs successfully after the scraper starts getting rejected. If this were pure IP throttling, the browser would also be blocked.
+- **Not timing-dependent in the simple sense.** Attempts with varied delay (100ms–60s) show no correlation with outcome.
+- **Not correlated with token size, nonce, or build/template.** All tokens are roughly equal size, nonce is static per appid (`eda1152f11f1daf0`), and the same build sees both success and failure responses.
+
+## Observed Pattern (30-attempt survey)
+
+| Attempts | Success rate |
+|----------|--------------|
+| 1        | 0% (cold-start penalty) |
+| 2–9      | ~87.5% (7/8) |
+| 10–30    | 0% (0/21)    |
+
+Attempts are independent CAPTCHA sessions with fresh sig/session IDs each time. The server begins rejecting all tokens from the scraper after roughly 8–10 solves, while a real browser from the same IP continues to work.
+
+## Hypothesis
+
+The `cap_union_new_verify` endpoint performs some form of **fingerprint or behavioral scoring** beyond just validating the token. Candidates:
+
+- **TLS/JA3 fingerprint detection** — probably not, since `cap_union_new_show` (which precedes verify) works fine from Node.js as long as `sess` is passed (verified 2026-04-11).
+- **Behavioral event entropy analysis** — the scraper emits synthesized slideSd events; these may lack the entropy of real mouse movement and get flagged after a threshold of attempts.
+- **Account/session reputation** — once the server has seen enough suspicious sessions from an IP, it downgrades the trust score and starts rejecting regardless of token correctness.
+- **Cookie/referer chain** — the scraper submits without the upstream referer/cookie chain a browser would carry.
+
+## Next Investigation Steps
+
+If errorCode 12 is worth fixing:
+1. Capture a real browser's behavioral event stream (slideSd payload) and replay it through the scraper.
+2. Compare the scraper's and the browser's request headers byte-by-byte at the verify stage.
+3. Test from a fresh IP — does the 8–10 attempt window reset?
+4. Test with a warm-up phase (a few "real" solves via Puppeteer before the scraper attempts start).
+
+## Status
+
+Open. Token generation is verified correct; the remaining issue is on the request-presentation / behavioral side.
+```
 
 ### Verification
-- [ ] `grep -n "51 test rounds\|90 of 92\|3 distinct templates\|583/584" README.md docs/WORKFLOW.md` returns no hits
-- [ ] `tail -20 docs/WORKFLOW.md` shows the Phase 11-36 epilogue
+- [ ] CLAUDE.md no longer references test-cfg.js and test-emit.js as failing
+- [ ] CLAUDE.md mentions errorCode 12 in Known Issues
+- [ ] CLAUDE.md Project Memory section has updated date and Phase 37 note
+- [ ] docs/VERSION_DIFFERENCES.md Open Questions splits into Answered / Still Open
+- [ ] docs/ERRORCODE_12_INVESTIGATION.md exists with the content above
 - [ ] `npm test` still 296/296
 
 ### Suggested Agent
-general-purpose — documentation edits across 2 files
+general-purpose — multi-file documentation edits
