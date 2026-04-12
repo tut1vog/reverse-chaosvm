@@ -4,7 +4,7 @@
 
 `sample/vm_slide.js` is a stack-based ChaosVM variant (the `__TENCENT_CHAOS_STACK` global) used by Tencent's slide CAPTCHA. It is a **different VM** from the register-based `tdc.js` ChaosVM documented in `docs/VM_ARCHITECTURE.md`: instead of a switch-dispatched register machine, it is a table-dispatched stack machine with an explicit operand stack, a small dispatch table (69 slots), and an exception-history stack.
 
-This is a **first-pass reference based on Phase 39 source inspection**. The linear disassembler in `research/vm-slide-stack-vm/disassembler.js` currently decodes 312 instructions from pc=0 to pc=512 before halting on a legitimate dispatch-table hole (opcode 65 at pc=512), which is approximately **2% of the 24,273-element bytecode**. Full-coverage analysis requires a control-flow-aware walker and is deferred to **Phase 40 task 40.1**. The opcode semantics below are derived by reading all 53 non-null handler source strings committed in `output/vm-slide/dispatch-table.json`, so the semantic coverage of this doc is complete even where behavioral coverage (observed instruction decodings) is not.
+This document reflects Phase 39+40 analysis of `sample/vm_slide.js`. First-pass source classification (Phase 39.3) of all 53 non-null handler source strings in `output/vm-slide/dispatch-table.json` has been validated by a control-flow-aware walker (Phase 40.1, `research/vm-slide-stack-vm/walker.js`) that decodes **14,134 instructions across 101 distinct function entries** with zero unreached bytecode bytes — the visited range `[0, 24273)` is fully covered, with 58.2% of bytes being instruction starts and the remainder being operand bytes of visited instructions. A cross-track investigation (Phase 40.6, `research/vm-slide-stack-vm/xtea-hunt.js`) confirmed the presence of **classical XTEA encrypt and decrypt closures** inside the bytecode at entry PCs `15241` and `15416`, both instantiated by an outer factory at entry PC `15220`. The Phase 39.1 linear disassembler's pc=512 halt is now understood to have been caused entirely by `FUNC_CREATE` mis-parse, not by reaching a legitimate dispatch-table hole.
 
 ## File layout
 
@@ -101,13 +101,27 @@ Execution sequence:
 
 1. **Inner loop**: read an opcode byte with `m[g++]`, invoke the handler `Q[opcode]()`, and continue as long as the handler returns a falsy value.
 2. **Halt condition**: a handler returning truthy breaks the inner loop. Two handlers can do this:
-   - Opcode 16 — unconditionally `return true` (RETURN).
-   - Opcode 61 — `return !!K` (RETURN_IF_EXC) — breaks only when an exception is live.
+   - Opcode 16 — unconditionally `return true` (VM_EXIT, walker-verified terminator: returns truthy from every reachable call site and exits the outer `for(;!B;)` loop).
+   - Opcode 61 — `return !!K` (RETURN_IF_EXC) — context-dependent terminator that breaks only when the exception latch `K` is non-null. The walker deliberately treats it as fall-through during static analysis because static reasoning cannot decide whether `K` is set.
 3. **Post-loop rethrow**: `if (0, K) throw K;` — if an exception was latched into `K` (e.g. by a handler that copied the current exception value there), re-raise it into the outer try/catch.
 4. **Return**: at the top-level invocation (`A === true` because no caller supplied `n`), the VM pops one value off the stack and returns a slice starting at `3 + __TENCENT_CHAOS_VM.v` — this is how the `__TENCENT_CHAOS_STACK.g` helper receives its result. Nested invocations return `n.pop()` directly.
 5. **Exception path**: the `catch` clause pops one entry `o` off the catch stack `C`. Entries are 3-tuples `[catchPc, savedStackLen, exceptionSlot]` pushed by opcode 35. On a throw:
    - If `C` is empty, the exception propagates out of the VM.
    - Otherwise, `K` receives the caught value, `g` jumps to the saved pc, `n.length` is truncated to the saved stack depth, and if `exceptionSlot` is non-zero the caught value is stored into `n[exceptionSlot][0]` (so bytecode can `LOAD_LOCAL` it).
+
+### Control-flow opcodes
+
+The Phase 40.1 walker audited every handler body and identified the following five opcodes as control-flow-relevant. Every other handler is a straight-line fall-through. This enumeration is the basis for the walker's reachability analysis:
+
+| Opcode | Role | Handler body | Walker treatment |
+|---|---|---|---|
+| 6 `JUMP` | Unconditional branch, terminator | `function(){g=m[g++]}` | Terminator; enqueue operand 0 as a branch target. |
+| 16 `VM_EXIT` | Unconditional dispatch-loop exit | `function(){return!0}` | Terminator; exits the `for(;!B;) B=Q[m[g++]]()` inner loop by returning truthy. |
+| 35 `TRY_PUSH` | Implicit branch (catch edge) | `function(){C.push([m[g++],n.length,m[g++]])}` | Not a direct branch in source, but the outer VM's `catch(I){...g=o[0]}` reaches the catch PC (operand 0) only via the exception path. Walker enqueues operand 0 as an implicit branch target. |
+| 58 `FUNC_CREATE` | Nested VM invocation (closure) | variable-width, `3 + 2·A + C` operand bytes | Instantiates a nested `__TENCENT_CHAOS_VM` invocation at entry PC `K`. Walker enqueues `K` as a new function entry and advances past the variable-width operand tail. |
+| 60 `JUMP_IF_TRUE` | Conditional branch (no pop) | `function(){var A=m[g++];n[n.length-1]&&(g=A)}` | Two-way; enqueue both operand 0 (taken) and fall-through. TOS is left in place. |
+
+Across the entire 14,134-instruction walk, the walker hit **zero dispatch-table holes**. The 16 holes at slots `[9, 14, 18, 19, 22, 26, 27, 29, 30, 34, 43, 44, 48, 53, 57, 65]` are unreached by any code path in this vm-slide build.
 
 ## Exception handling
 
@@ -123,6 +137,10 @@ Exception handling is split across four handlers and the outer try/catch:
 The outer catch block quoted in the dispatch-loop section reads catch frames in push order and restores pc, stack depth, and optionally the exception slot.
 
 No handler pushes onto `C` more than once per invocation, and no handler writes to `K` directly except opcode 33 (clear). The exception value arrives via the outer `catch` clause, not via a bytecode operation.
+
+**Implicit branches through `TRY_PUSH`**: although opcode 35 has no direct `g = ...` assignment in its handler body, its first operand (`catchPc`) is an edge from the VM's control-flow perspective — it is the only way the outer VM reaches the catch-block PC. The Phase 40.1 walker models this by enqueueing operand 0 of every `TRY_PUSH` as a branch target alongside the fall-through. Without this modeling, catch blocks would appear unreachable in the reachability graph.
+
+**Opcode 61's context-dependent terminator**: `return !!K` only breaks the dispatch loop when the exception latch is non-null. Whether this fires at a given call site is a runtime property that static analysis cannot resolve, so the walker conservatively treats opcode 61 as fall-through. This keeps the walker sound — it may over-visit bytecode after a `RETURN_IF_EXC` that never actually falls through, but it will never miss reachable code.
 
 ## Constant pool
 
@@ -144,7 +162,7 @@ Top-level invocation returns a value via the operand stack:
 return A ? (n.pop(), n.slice(3 + __TENCENT_CHAOS_VM.v)) : n.pop();
 ```
 
-When `A === true` (top-level), the VM pops one value and returns `n.slice(3 + __TENCENT_CHAOS_VM.v)` — a contiguous tail of the operand stack. The constant `__TENCENT_CHAOS_VM.v` is not assigned anywhere in the visible source; it is either left `undefined` (so `3 + undefined === NaN` and `slice(NaN)` yields the full array) or is patched in by an external loader. **This is an open question — it should be resolved during Phase 40 task 40.1 once full-coverage disassembly reveals how the VM consumes its own return value.**
+When `A === true` (top-level), the VM pops one value and returns `n.slice(3 + __TENCENT_CHAOS_VM.v)` — a contiguous tail of the operand stack. The constant `__TENCENT_CHAOS_VM.v` is not assigned anywhere in the visible source; it is either left `undefined` (so `3 + undefined === NaN` and `slice(NaN)` yields the full array) or is patched in by an external loader. This remains an open question — see "Unresolved findings" below.
 
 The consumer reads results with:
 
@@ -169,23 +187,47 @@ Format properties:
 
 ## Observed coverage and limitations
 
-**The current linear disassembler decodes 312 instructions from pc=0 to pc=512 before halting on a dispatch-table hole (opcode 65 is null).** This is approximately 2% of the 24,273-element bytecode. The remaining 98% is either reachable only via control-flow paths the linear walker does not follow (jumps like `OP_06 1568` at pc=4 target absolute addresses far from the linear frontier, exception unwinding through the catch stack, embedded data regions dereferenced as operands but never executed), or legitimately unreachable. **Full-coverage analysis is deferred to Phase 40 task 40.1 (control-flow-aware disassembler upgrade).**
+**Behavioral coverage is now effectively complete for this vm-slide build.** The Phase 40.1 control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) decodes **14,134 instructions across 101 distinct function entries** — a 45.3× increase over the Phase 39.1 linear disassembler's 312 instructions. Walker outputs are committed to `output/vm-slide/disassembly-full.txt` (14,486 lines).
 
-Specific consequences of the 2% coverage limit for this document:
+Key coverage facts:
 
-- Opcode semantics are classified from **handler source strings** (complete, all 53 non-null slots covered). This is static and does not depend on disassembler reach.
-- Stack-effect descriptions are derived from the handler body alone, not from observed run-time stack shapes. Where a handler's stack effect depends on a captured operand value (opcodes 2, 25, 40, 55, 58, 66), the description cites the operand without speculating on typical values.
-- **No control-flow claims are made about the bytecode as a whole** — we do not yet know how many basic blocks, functions, or exception regions the full bytecode contains, only that the first 513 elements hold 312 decodable instructions plus one null-handler hole.
-- The 16 dispatch holes are documented below, but whether they are ever referenced by any opcode anywhere in the bytecode cannot be determined until Phase 40 task 40.1 completes.
+- **Visited range `[0, 24273)`** — every byte of the 24,273-element bytecode is either an instruction start or an operand byte of a visited instruction. No dead regions remain.
+- **58.2% of bytes are instruction starts**; the remaining 42% are operand bytes of visited instructions.
+- **101 distinct function entries** — entry PC 0 plus 100 unique `K` values across 128 `FUNC_CREATE` sites (some factories share start PCs).
+- **Zero dispatch-hole hits** across the whole walk. The 16 dispatch holes at slots `[9, 14, 18, 19, 22, 26, 27, 29, 30, 34, 43, 44, 48, 53, 57, 65]` are confirmed unreached in this vm-slide build. The Phase 39.1 pc=512 halt was caused entirely by `FUNC_CREATE` variable-width mis-parse, not by the linear walker legitimately reaching hole 65.
+- **Opcode classifications validated**: every non-null handler has been observed firing at least once across the 14,134-instruction walk, so Phase 39.3's source-only classifications are now behaviorally grounded.
+
+The honest remaining limitation is **module-export indirection**: static analysis cannot identify which real-world values are supplied as arguments to the XTEA factory (see "XTEA factory and closures" below), because the closures are stored into module exports and invoked indirectly through Tencent's CommonJS-style module system. Pinning the real-world callers requires runtime instrumentation or coordinated analysis with the `captcha-orchestrator` / `eks-payload` research tracks.
+
+## XTEA factory and closures
+
+The Phase 40.6 cross-track investigation (`research/vm-slide-stack-vm/xtea-hunt.js`) identified a pair of classical-XTEA cipher closures embedded in the bytecode. They are created together by a single outer factory function:
+
+- **Outer factory — entry PC `15220`.** Instantiated by a `FUNC_CREATE 15220 0 3 3 4 5` near PC `16835` from within a CommonJS-style `__esModule` module bootstrap routine. Takes **3 arguments** bound into local slots 3, 4, and 5. Local slot 4 holds the XTEA key material per the 40.6 disassembly windows; the other two slots have not been resolved statically.
+- **Encrypt closure — entry PC `15241`.** Created by `FUNC_CREATE` at PC `15404` inside the factory body. Loop head at PC `15284`; 32-round loop bound is the `PUSH_K 84941944608` at PC `15284` (decimal `84941944608 = 32·0x9E3779B9`). Uses `ADD` for `sum += delta` and `v += ...`. Backward `JUMP 15284` at PC `15377` closes the loop. The delta `0x9E3779B9` (decimal `2654435769`) appears as the `PUSH_K` operand at bytecode index `15353`.
+- **Decrypt closure — entry PC `15416`.** Created by `FUNC_CREATE` at PC `15579` inside the factory body. Loop head at PC `15459`; same `PUSH_K 84941944608` loop bound. Uses `SUB` for `sum -= delta` — the classical XTEA decrypt inverse. Backward `JUMP 15459` at PC `15552` closes the loop. The delta appears as the `PUSH_K` operand at bytecode index `15531`.
+
+Both closures implement the **vanilla XTEA round** from Needham & Wheeler — shifts by 4 and 5, bitwise XOR, `sum & 3` and `(sum >>> 11) & 3` key indices, 32 iterations. The cipher is **classical XTEA, not the register-VM's modified variant**: see the "Differences from the register-based `tdc.js` VM" section below and `docs/CRYPTO_ANALYSIS.md`. The key is an argument to the factory rather than derived from a per-template STATE_A, so the `key-mod/` research track's cross-template findings do not apply to vm-slide.
+
+The presence of both encrypt and decrypt strongly suggests vm-slide handles a round-trip cipher — the most likely use is `eks`-payload decryption on incoming data and verify-body encryption on outbound, but the module-export indirection described above prevents static pinning of the real-world callers. This is a natural handoff to the `captcha-orchestrator` and `eks-payload` research tracks.
+
+See `research/vm-slide-stack-vm/xtea-hunt.js` for the reproducible analysis and the semantic disassembly windows around both closures.
 
 ## Unresolved findings
 
-- **Opcode 58 (FUNC_CREATE) is variable-length.** Its source reads three header operands (`K` = start-pc, `A` = capture-count, `C` = argmap-count), then `2*A` operands for the captured-slot pairs, then `C` operands for the argmap. The decoder reports a static operand count of 6 because there are six literal `m[g++]` expressions in the handler body, but the true instruction width at runtime is `3 + 2A + C` bytes. The linear disassembler must be taught this shape in Phase 40 task 40.1.
-- **The XTEA round constant `0x9E3779B9` (decimal `2654435769`) appears exactly twice in the bytecode — confirmed classical XTEA (Phase 40 task 40.6).** Verified by counting occurrences in `output/vm-slide/bytecode.json`. Both occurrences live inside `PUSH_K` (opcode 8) immediate operands at bytecode indices `15353` and `15531`, each inside a distinct function: **encrypt** (entry PC `15241`) and **decrypt** (entry PC `15416`). Both functions implement the full classical-XTEA round structure — 32 iterations bounded by `sum == 32*delta` (`PUSH_K 84941944608` at PC `15284` and `15454`), shifts by 4 and 5 (`PUSH_K 4; SHL` / `PUSH_K 5; USHR`), bitwise XOR, key indexing via `sum & 3` and `(sum >>> 11) & 3`, a `[v0, v1]` block read from local slot 3 as the first argument, and a key array read from local slot 4 as the second argument. Encrypt uses `ADD` for `sum += delta` and `v += ...`; decrypt mirrors it with `SUB` and `sum -= delta`, matching the classical XTEA decrypt inverse. The backward JUMPs closing the loops are `15377 → 15284` (encrypt) and `15552 → 15459` (decrypt). Both closures are created by an outer factory function at entry PC `15220`, which stores them as locals and is itself instantiated by a CommonJS-style module bootstrap routine near PC `16835` (`FUNC_CREATE 15220 0 3 3 4 5`, three arguments). **The cipher is classical XTEA, not the register-VM's modified XTEA** — the round math is the vanilla form from Needham & Wheeler, and the key is passed in as an argument rather than derived from a per-template STATE_A. The actual payload per call is whatever the module caller supplies as argument 1 (a 2-element `[v0, v1]` 64-bit block); pinning the real-world callers (is it `eks`? is it the verify-POST body?) requires tracing the module-export keys or runtime instrumentation, and is left as follow-up work. See `research/vm-slide-stack-vm/xtea-hunt.js` for the reproducible analysis and the semantic disassembly windows around both deltas.
-- **One bytecode element is `0.5`.** Located near the tail of the literal. No handler integer-coerces operands, so this is legal, but why the VM would push a half is unclear — candidates include a Math.pow/Math.sqrt argument, a progress-bar coordinate, or a slide-puzzle interpolation constant. Full-coverage disassembly in Phase 40 task 40.1 will show which opcode reads it.
-- **The 16 dispatch-table holes** — indices `[9, 14, 18, 19, 22, 26, 27, 29, 30, 34, 43, 44, 48, 53, 57, 65]` — are sparse-array gaps in the `Q = [...]` literal, not `null` values. It is unknown whether any of them are referenced by the bytecode; if they are, the VM will throw `TypeError: Q[op] is not a function` and the catch stack will handle it. Opcode 65 at pc=512 is where the linear disassembler halts, which proves at least one hole is reachable. The others remain untested.
-- **The `__TENCENT_CHAOS_VM.v` return-slice constant** is never assigned in visible source (see "Return protocol" above). Whether this is deliberate (so `slice(NaN)` yields the whole array) or patched at load time is unresolved.
-- **Pass-through parameters `F`, `Y`, `c`** are forwarded by opcode 58 to nested invocations but never read by any of the 53 handlers in this build. They may be slots reserved for future opcodes, or they may be consumed by opcodes in dispatch holes that aren't populated in this particular VM instance.
+### Resolved in Phase 40
+
+- **Opcode 58 (FUNC_CREATE) variable-length width** — resolved in Phase 40.1. The walker correctly decodes `FUNC_CREATE` as `3 + 2·A + C` runtime bytes and enqueues the entry PC `K` as a new function. The static `operandCount: 6` reported by the decoder was a lexical count of `m[g++]` expressions; the walker special-cases the two inline `for` loops. Phase 40.6 then confirmed `FUNC_CREATE` is the mechanism that instantiates the XTEA closures at runtime.
+- **XTEA cipher presence and form** — resolved in Phase 40.6. The XTEA delta `0x9E3779B9` appears exactly twice in the bytecode, at indices `15353` and `15531`, both as `PUSH_K` operands. They anchor classical XTEA encrypt and decrypt closures (entry PCs `15241` and `15416`) created by a shared outer factory at entry PC `15220`. See "XTEA factory and closures" above.
+
+### Still open
+
+- **Real-world XTEA caller arguments.** The outer factory takes 3 arguments, and the closures it creates are stored into module exports. The actual inputs supplied by the real-world caller — key material, plaintext/ciphertext blocks, invocation order — cannot be resolved statically because of CommonJS-style module-export indirection through Tencent's loader. Pinning callers requires runtime instrumentation, or coordinated analysis with the `captcha-orchestrator` and `eks-payload` research tracks.
+- **Shared compiler backend across register VM and stack VM.** Whether `tdc.js` (register) and `vm-slide` (stack) share a common upstream bytecode compiler or are independent codegens remains an open question with no active task.
+- **One bytecode element is `0.5`.** Located near the tail of the literal. No handler integer-coerces operands, so this is legal, but why the VM would push a half remains unexplained. Candidates include a Math argument, a coordinate, or a slide-puzzle interpolation constant. No active task.
+- **Whether the 16 dispatch holes become reachable in any other vm-slide build.** Confirmed unreached in this build by the Phase 40.1 walker, but Tencent can ship a different vm-slide build that populates (or references) those slots.
+- **The `__TENCENT_CHAOS_VM.v` return-slice constant** is never assigned in visible source (see "Return protocol" above). Whether this is deliberate (so `slice(NaN)` yields the whole array) or patched at load time remains unresolved.
+- **Pass-through parameters `F`, `Y`, `c`** are forwarded by opcode 58 to nested invocations but never read by any of the 53 handlers in this build. They may be slots reserved for other vm-slide builds or consumed by opcodes in dispatch holes that aren't populated here.
 
 ## Differences from the register-based `tdc.js` VM
 
@@ -201,5 +243,9 @@ A side-by-side comparison will live in the future `docs/CHAOSVM_VARIANTS.md` (Ph
 | Bytecode size | ~7K elements (`tdc.js` Template A: 7,200 ish) | 24,273 elements |
 | Operand types | Integers only (decoded through varint + zigzag) | Integers, and at least one non-integer (`0.5`) |
 | Opcode shuffling across builds | Confirmed, template-specific | Unknown; dispatch table is a source-level literal, not an encoded map |
+| XTEA variant | Modified XTEA with per-template STATE_A key derivation via `keyModConstants` | **Classical XTEA** (Needham & Wheeler), key passed in as a factory argument |
+| Cipher direction(s) present | Encrypt only (token generation) | **Both encrypt and decrypt** — `eks` round-trip hypothesis, see "XTEA factory and closures" |
+
+The classical-vs-modified XTEA distinction is important for future porting work: the register VM's `keyModConstants` story and the `key-mod/` research track findings do **not** apply to vm-slide. vm-slide's key is whatever the factory caller supplies.
 
 See `docs/VM_ARCHITECTURE.md` for the register VM and `docs/VM_SLIDE_OPCODES.md` for the vm-slide opcode table.

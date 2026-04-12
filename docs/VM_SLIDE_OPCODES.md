@@ -2,18 +2,18 @@
 
 ## Overview
 
-This is the opcode table for the `__TENCENT_CHAOS_STACK` stack-based ChaosVM variant implemented in `sample/vm_slide.js`. Every row below is classified by reading the handler source string committed in `output/vm-slide/dispatch-table.json` — Phase 39.1's decoder extracted all 53 non-null handlers and their literal `operandCount` from the dispatch-table array literal. Classification is at **Phase 39 first-pass level**: each handler body has been read and described, but behavioral validation against real disassembled instructions is limited by the current ~2% linear-disassembly coverage (see "Coverage caveat" below).
+This is the opcode table for the `__TENCENT_CHAOS_STACK` stack-based ChaosVM variant implemented in `sample/vm_slide.js`. Every row below is classified by reading the handler source string committed in `output/vm-slide/dispatch-table.json` — Phase 39.1's decoder extracted all 53 non-null handlers and their literal `operandCount` from the dispatch-table array literal. Source classifications have now been validated against the Phase 40.1 walker's full-coverage disassembly (`output/vm-slide/disassembly-full.txt`, 14,134 instructions across 101 function entries): every non-null handler has been observed firing at least once in real bytecode, so the table below is both semantically and behaviorally grounded.
 
 For VM internals (register file, dispatch loop, exception handling, return protocol), see `docs/VM_SLIDE_ARCHITECTURE.md`.
 
-## Coverage caveat
+## Coverage
 
 Two different notions of "coverage" apply to this document:
 
 - **Semantic coverage — complete.** All 53 non-null handlers in the 69-slot dispatch table have been read and classified from source. The table below is exhaustive for this build.
-- **Behavioral coverage — partial (~2%).** The linear disassembler in `research/vm-slide-stack-vm/disassembler.js` decodes 312 instructions from pc=0 to pc=512 before halting on a dispatch-table hole (opcode 65 at pc=512). This covers approximately 2% of the 24,273-element bytecode. Therefore, while every opcode is documented here, only a subset have been **observed** firing in the disassembly output. **Phase 40 task 40.1 will close the behavioral-coverage gap with a control-flow-aware disassembler upgrade.**
+- **Behavioral coverage — effectively complete.** The Phase 40.1 control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) decoded 14,134 instructions across 101 distinct function entries, covering the entire `[0, 24273)` byte range of the bytecode (58.2% instruction starts, 42% operand bytes). Every non-null handler classified below has been observed firing at least once. The Phase 39.1 linear disassembler's ~2% coverage limitation is resolved: the pc=512 halt was caused by `FUNC_CREATE` variable-width mis-parse, not by legitimate data at opcode 65.
 
-Where a classification below depends on subtle handler-body behavior (in-place mutation vs pop-and-push, variable operand widths, iterator-like pair shapes), the description reflects the source literally. If full-coverage disassembly in Phase 40 contradicts any row here, that row should be corrected then.
+The 40.1 walker did not contradict any Phase 39.3 source-only classification. Where a row notes "walker-validated" below, the walker explicitly audited that opcode as part of its control-flow analysis.
 
 ## Notation
 
@@ -35,7 +35,7 @@ All handlers are zero-argument JavaScript functions; "returns true" / "returns f
 | 3 | MK_PAIR | 0 | `[..., a, b]` → `[..., [a, b]]` | Pop two values, push a 2-element array built from them in original order (`[a,b].reverse()` is applied to `[b,a]` after the pops). |
 | 4 | PUSH_EMPTY_STR | 0 | `[...]` → `[..., ""]` | Push an empty string. |
 | 5 | POP | 0 | `[..., x]` → `[...]` | Pop and discard TOS. |
-| 6 | JUMP | 1 | `[...]` → `[...]` | Absolute jump: `g = m[g++]`. Reads a target pc and writes it into the program counter. |
+| 6 | JUMP | 1 | `[...]` → `[...]` | Absolute jump: `g = m[g++]`. Reads a target pc and writes it into the program counter. Walker-validated unconditional terminator; target = operand 0. |
 | 7 | XOR | 0 | `[..., a, b]` → `[..., a ^ b]` | Bitwise XOR via in-place mutate of TOS-1 with popped TOS. |
 | 8 | PUSH_K | 1 | `[...]` → `[..., K]` | Push the immediate operand K as-is. |
 | 10 | STR_APPEND_CHAR | 1 | `[..., s]` → `[..., s + char(K)]` | In-place append `String.fromCharCode(K)` to TOS. |
@@ -43,7 +43,7 @@ All handlers are zero-argument JavaScript functions; "returns true" / "returns f
 | 12 | EQ | 0 | `[..., a, b]` → `[..., a == b]` | Loose equality (`==`). |
 | 13 | LOAD_GLOBAL | 0 | `[..., key]` → `[..., U[key]]` | Replace TOS (string key) with `U[key]` — global/constant-pool lookup. |
 | 15 | ITER_NEXT | 0 | `[..., arr]` → `[..., arr, value, true]` or `[..., arr, undefined, false]` | Iterator step: if `arr.length`, shift one value and push it with `true`; else push `undefined, false`. TOS `arr` is mutated in place. |
-| 16 | RETURN | 0 | `[..., x]` → `[..., x]` | `return true` — breaks the inner dispatch loop unconditionally so the outer loop can return the top-of-stack as the VM result. |
+| 16 | VM_EXIT (a.k.a. RETURN) | 0 | `[..., x]` → `[..., x]` | `return true` — breaks the inner dispatch loop unconditionally so the outer loop can return the top-of-stack as the VM result. Walker-validated as the VM_EXIT terminator for every reachable call site; Phase 39.3's `RETURN` name is semantically correct. |
 | 17 | PUSH_UNDEFINED | 0 | `[...]` → `[..., undefined]` | Push `undefined`. |
 | 20 | ADD | 0 | `[..., a, b]` → `[..., a + b]` | Numeric/string `+`. |
 | 21 | SUB | 0 | `[..., a, b]` → `[..., a - b]` | Numeric `-`. |
@@ -54,7 +54,7 @@ All handlers are zero-argument JavaScript functions; "returns true" / "returns f
 | 31 | GT | 0 | `[..., a, b]` → `[..., a > b]` | Greater-than. |
 | 32 | MAKE_GLOBAL_REF | 0 | `[..., key]` → `[..., [U, key]]` | Pop a key, push a `[constPool, key]` reference pair — i.e. a writable reference into the global object. |
 | 33 | CLEAR_EXCEPTION | 0 | `[...]` → `[...]` | Set `K = null`. Clears the exception latch after handling a caught throw. |
-| 35 | TRY_PUSH | 2 | `[...]` → `[...]` | Push catch frame `[catchPc=K1, savedStackLen=n.length, exceptionSlot=K2]` onto the catch stack `C`. |
+| 35 | TRY_PUSH | 2 | `[...]` → `[...]` | Push catch frame `[catchPc=K1, savedStackLen=n.length, exceptionSlot=K2]` onto the catch stack `C`. The first operand (catch PC) is an **implicit branch target** reached only via the outer VM's `catch(I){...g=o[0]}` block; the 40.1 walker enqueues operand 0 as a branch target to keep catch blocks reachable in the control-flow graph. |
 | 36 | STORE_LOCAL_REF | 0 | `[..., [slot], v]` | In-place write: `n[n[n.length-2][0]][0] = n[n.length-1]`. Reads the single-element ref pair at TOS-1, looks up its slot, and stores the TOS into that slot's 0-cell. Stack unchanged. |
 | 37 | MOD | 0 | `[..., a, b]` → `[..., a % b]` | Modulo. |
 | 38 | DIV | 0 | `[..., a, b]` → `[..., a / b]` | Division. |
@@ -72,13 +72,13 @@ All handlers are zero-argument JavaScript functions; "returns true" / "returns f
 | 54 | DEREF | 0 | `[..., pair]` → `[..., pair[0][pair[1]]]` | Pop a `[obj, key]` pair, push `obj[key]` — read through an object reference. |
 | 55 | NEW_FUNC | 1 | `[..., fn, arg1...argK]` → `[..., new fn(...args)]` | Pop K args, unshift `null`, pop a constructor, invoke via the `p()` helper: `new fn(...args)`. |
 | 56 | OR | 0 | `[..., a, b]` → `[..., a \| b]` | Bitwise OR. |
-| 58 | FUNC_CREATE | var (3 + 2·A + C) | `[...]` → `[..., fn]` | Closure factory. Reads header `K` (start-pc), `A` (capture count), `C` (argmap count); then `A` pairs of `[destSlot, srcSlot]` copied from the current operand stack into a capture frame `p[]`; then `C` argmap entries into `Q[]`. Pushes a new function `w` that, when called, copies `p[]`, installs `[this]`, `[arguments]`, and `[w]` into slots 0/1/2, maps up to `Q.length` caller arguments into their mapped slots, and invokes `__TENCENT_CHAOS_VM(K, m, U, A, E, F, Y, c)` as a nested VM. See "Unresolved entries" below — the **static** `operandCount` reported by the decoder is 6, but the **runtime** width depends on `A` and `C`. |
+| 58 | FUNC_CREATE | var (3 + 2·A + C) | `[...]` → `[..., fn]` | Closure factory. Reads header `K` (start-pc), `A` (capture count), `C` (argmap count); then `A` pairs of `[destSlot, srcSlot]` copied from the current operand stack into a capture frame `p[]`; then `C` argmap entries into `Q[]`. Pushes a new function `w` that, when called, copies `p[]`, installs `[this]`, `[arguments]`, and `[w]` into slots 0/1/2, maps up to `Q.length` caller arguments into their mapped slots, and invokes `__TENCENT_CHAOS_VM(K, m, U, A, E, F, Y, c)` as a nested VM. **Walker-resolved:** the Phase 40.1 walker correctly decodes the runtime width `3 + 2·A + C` bytes (the Phase 39.3 decoder's static `operandCount: 6` was a lexical count of `m[g++]` expressions). Phase 40.6 confirmed this opcode instantiates the XTEA encrypt/decrypt closures — see `docs/VM_SLIDE_ARCHITECTURE.md` "XTEA factory and closures". |
 | 59 | MAKE_LOCAL_PAIR | 0 | `[..., slot, key]` → `[..., [n[slot][0], key]]` | Pop a key, pop a slot index, push a `[localValue, key]` pair — a reference-shaped 2-tuple backed by a local's current value. |
-| 60 | JUMP_IF_TRUE | 1 | `[..., x]` | If TOS is truthy, `g = K`. **Does not pop** — TOS is left in place so later code can branch on it again or consume it. |
-| 61 | RETURN_IF_EXC | 0 | `[...]` | `return !!K` — breaks the inner dispatch loop only if the exception latch `K` is set, letting the outer loop rethrow. |
+| 60 | JUMP_IF_TRUE | 1 | `[..., x]` | If TOS is truthy, `g = K`. **Does not pop** — TOS is left in place so later code can branch on it again or consume it. Walker-validated conditional branch with both operand 0 (taken) and fall-through edges enqueued. |
+| 61 | RETURN_IF_EXC | 0 | `[...]` | `return !!K` — breaks the inner dispatch loop only if the exception latch `K` is set, letting the outer loop rethrow. Context-dependent terminator: truthy only when `K` is non-null, so static analysis cannot decide. The 40.1 walker deliberately treats it as fall-through to keep reachability sound. |
 | 62 | GE | 0 | `[..., a, b]` → `[..., a >= b]` | Greater-or-equal. |
 | 63 | LOAD_LOCAL_REF | 0 | `[..., [slot]]` → `[..., n[slot][0]]` | Pop a single-element ref array, push the referenced local's current value. Companion to `MAKE_LOCAL_REF` / `STORE_LOCAL_REF`. |
-| 64 | SWAP_AT | 1 | `[..., x, ..., y]` → `[..., y, ..., x]` | Swap TOS with `n[n.length - 2 - K]`; push the old element from that depth. Effectively an indexed exchange useful for reordering without full shuffling. |
+| 64 | SWAP_AT | 1 | `[..., x, ..., y]` → `[..., y, ..., x]` | Swap TOS with `n[n.length - 2 - K]`; push the old element from that depth. Effectively an indexed exchange useful for reordering without full shuffling. Phase 40.6 observed SWAP_AT repeatedly in the XTEA round body (e.g. at PCs 15334 and 15356) rearranging the top-of-stack to hoist locals into position for upcoming binary operations — the mechanics-only name `SWAP_AT` is supported by this usage context. |
 | 66 | CALL_GLOBAL | 1 | `[..., fn, arg1...argK]` → `[..., result]` | Pop K args, pop a function, push `fn.apply(U, args)` — call with `this` bound to the constant pool (i.e. `window` at top level). |
 | 67 | MUL | 0 | `[..., a, b]` → `[..., a * b]` | Multiplication. |
 | 68 | USHR | 0 | `[..., a, b]` → `[..., a >>> b]` | Unsigned right-shift. |
@@ -87,7 +87,7 @@ All handlers are zero-argument JavaScript functions; "returns true" / "returns f
 
 ## Dispatch holes
 
-The dispatch table `Q` is a 69-element sparse-array literal with 16 holes. These are not explicit `null` values in the source — they are gaps in the `[..., , func, , , func, ...]` literal that `JSON.stringify` and the Phase 39.1 decoder normalize to `null`. Whether any of them are reachable from the committed bytecode is unknown (Phase 40 task 40.1 will decide this once a control-flow-aware walker is in place).
+The dispatch table `Q` is a 69-element sparse-array literal with 16 holes. These are not explicit `null` values in the source — they are gaps in the `[..., , func, , , func, ...]` literal that `JSON.stringify` and the Phase 39.1 decoder normalize to `null`. The Phase 40.1 walker's full-coverage walk confirmed that **none of the 16 holes are hit by any reachable code path in this vm-slide build** — they are confirmed unreached, not merely unobserved.
 
 The 16 hole indices (verified against `output/vm-slide/dispatch-table.json`):
 
@@ -106,22 +106,36 @@ The 16 hole indices (verified against `output/vm-slide/dispatch-table.json`):
 - Slot 48: null — no handler in the source array literal
 - Slot 53: null — no handler in the source array literal
 - Slot 57: null — no handler in the source array literal
-- Slot 65: null — no handler in the source array literal (**halts the linear disassembler at pc=512**)
+- Slot 65: null — no handler in the source array literal (Phase 39.1's linear disassembler halted at pc=512 on a decoded "opcode 65"; Phase 40.1 showed this was a `FUNC_CREATE` mis-parse, not a legitimate hole hit)
 
 ## Unresolved entries
 
-No opcode in the table above required a `?NAME` fallback — all 53 handlers classify cleanly from their source bodies. However, two handlers have quirks that Phase 40 task 40.1 / task 40.3 will revisit using full-coverage disassembly as ground truth:
+No opcode in the table above required a `?NAME` fallback — all 53 handlers classify cleanly from their source bodies. The two quirks flagged in Phase 39.3 have since been resolved:
 
-- **Opcode 58 (FUNC_CREATE) operand width.** The decoder reports `operandCount: 6` because it counts lexical `m[g++]` expressions in the handler body: 3 in the header (`K`, `A`, `C`) + 2 inside the first `for` loop body (`p[m[g++]] = n[m[g++]]`) + 1 inside the second `for` loop body. At runtime the first loop runs `A` times and the second runs `C` times, so the true instruction width is `3 + 2·A + C` bytes. Any linear disassembler that trusts the static count of 6 will mis-align at every `FUNC_CREATE` site. Phase 40 task 40.1 must upgrade the disassembler to special-case this handler.
-- **Opcode 64 (SWAP_AT) naming.** The handler source is `var A = m[g++], C = n[n.length - 2 - A]; n[n.length - 2 - A] = n.pop(); n.push(C)`. The operation is unambiguous — it swaps TOS with an element at depth `2 + K` and places the displaced element on top — but the intent is less clear without seeing it in real bytecode contexts. Candidate interpretations include stack-slot rotate for multi-return handling, re-ordering of function-call argument stacks before an `apply`, or internal assembler hygiene for loops. The name `SWAP_AT` describes the mechanics; Phase 40 task 40.3 should observe real call sites and either confirm or rename it.
+- **Opcode 58 (FUNC_CREATE) operand width — resolved in Phase 40.1.** The decoder's static `operandCount: 6` was a lexical count of `m[g++]` expressions; the true runtime width is `3 + 2·A + C` bytes because the two inline `for` loops execute `A` and `C` times respectively. The Phase 40.1 walker special-cases this handler and correctly advances through all 128 `FUNC_CREATE` sites in the bytecode. Phase 40.6 then confirmed `FUNC_CREATE` is the mechanism that instantiates the classical-XTEA encrypt and decrypt closures at runtime.
+- **Opcode 64 (SWAP_AT) naming — resolved in Phase 40.6.** Phase 40.6 observed SWAP_AT in the XTEA round body (e.g. at PCs 15334 and 15356) used to rearrange the top-of-stack so that locals land in the correct positions for upcoming binary operations (shift/XOR/add). The mechanics-only name `SWAP_AT` is a good fit for this usage — no rename is needed.
+
+## Opcodes in the XTEA factory
+
+Phase 40.6 enumerated the opcodes that appear inside the classical-XTEA encrypt and decrypt closures (entries PC 15241 and PC 15416). This is the **minimum viable opcode set** for porting vm-slide's XTEA step to a standalone implementation — any future reimplementation that restricts itself to these 22 opcodes will handle both cipher directions:
+
+- **Locals / references:** `LOAD_LOCAL`, `MAKE_LOCAL_REF`, `LOAD_LOCAL_REF`, `STORE_LOCAL_REF`, `MAKE_LOCAL_PAIR`, `DEREF`
+- **Constants / stack manipulation:** `PUSH_K`, `DUP`, `POP`, `SWAP_AT`, `REPLACE_TOP_K`
+- **Arithmetic / bitwise:** `ADD`, `SUB`, `AND`, `XOR`, `SHL`, `USHR`
+- **Comparison / logic:** `EQ`, `LOGICAL_NOT`
+- **Control flow:** `JUMP`, `JUMP_IF_TRUE`
+- **Closure creation:** `FUNC_CREATE` (only used by the outer factory that spawns the encrypt/decrypt pair)
+
+Notably absent from the round body: `SHR`, `MUL`, `DIV`, `MOD`, `OR` — classical XTEA uses neither signed right-shift nor arithmetic besides add/sub. See `docs/VM_SLIDE_ARCHITECTURE.md` "XTEA factory and closures" for the full structural description and `research/vm-slide-stack-vm/xtea-hunt.js` for the annotated disassembly windows that produced this list.
 
 ## Cross-references
 
 - `docs/VM_SLIDE_ARCHITECTURE.md` — register file, dispatch loop, exception model, bytecode format, return protocol, and open cross-track findings.
 - `docs/OPCODE_REFERENCE.md` — opcode table for the register-based `tdc.js` ChaosVM (the different-variant counterpart to this doc).
 - `docs/VM_ARCHITECTURE.md` — architecture reference for the register-based `tdc.js` ChaosVM.
-- `docs/CRYPTO_ANALYSIS.md` — XTEA round constants and key-derivation details; relevant to the vm-slide `0x9E3779B9` finding (Phase 40 task 40.6).
+- `docs/CRYPTO_ANALYSIS.md` — XTEA round constants and key-derivation details for the register-based `tdc.js` (modified XTEA). Note that vm-slide uses classical XTEA with a key passed in as a factory argument, not the register VM's STATE_A-derived key, so the `keyModConstants` story does not apply here.
 - `research/vm-slide-stack-vm/` — source artifacts for Phase 39 (decoder, disassembler, tests).
 - `output/vm-slide/dispatch-table.json` — raw handler source for all 69 dispatch slots (the primary input for this document).
 - `output/vm-slide/bytecode.json` — 24,273-element bytecode array extracted from `sample/vm_slide.js`.
-- `output/vm-slide/disassembly.txt` — current 312-instruction linear disassembly output (halts at pc=512).
+- `output/vm-slide/disassembly.txt` — Phase 39.1 linear disassembly (312 instructions, pinned by tests as a regression baseline).
+- `output/vm-slide/disassembly-full.txt` — Phase 40.1 control-flow-aware disassembly (14,134 instructions across 101 function entries, full-coverage).
