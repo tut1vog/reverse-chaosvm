@@ -2,9 +2,9 @@
 
 ## Status
 Current phase: Phase 43 — Standalone vData cipher encoder (narrowed per user Option C, 2026-04-13)
-Current task: 43.3 — Standalone cipher encoder under `tools/vdata-generator/`
+Current task: 43.4 — Tests for the standalone vData cipher encoder
 
-**Dispatch order** (user-confirmed 2026-04-13): 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 → 43.4 → 43.5. Phase 43 narrowed on 2026-04-13 to the cipher half of the vData pipeline only — the plaintext-fingerprint half moved to the new Phase 44 track per user Option C. The generator ships as a pure re-encoder that consumes a plaintext byte buffer and emits the 152-char vData string byte-for-byte; Phase 44 will reverse the fingerprint build separately if/when the user wants it.
+**Dispatch order** (user-confirmed 2026-04-13): 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 → 43.5. Phase 43 narrowed on 2026-04-13 to the cipher half of the vData pipeline only — the plaintext-fingerprint half moved to the new Phase 44 track per user Option C. The generator ships as a pure re-encoder that consumes a plaintext byte buffer and emits the 152-char vData string byte-for-byte; Phase 44 will reverse the fingerprint build separately if/when the user wants it.
 
 **Phase 43 recommendation (user-confirmed 2026-04-13)**: use the existing `tools/scraper/vdata-harness.js` jsdom harness as the dynamic oracle for test-time validation. Puppeteer live capture via `tools/captcha-solver/live-submit.js` kept as an optional tail-validation vector in 43.4.
 
@@ -74,8 +74,8 @@ Current task: 43.3 — Standalone cipher encoder under `tools/vdata-generator/`
 | 43.0 | Rename `tools/scraper/vdata-generator.js` → `tools/scraper/vdata-harness.js` + update all imports (director-owned) | done |
 | 43.1 | Hybrid static+dynamic XTEA/plaintext extraction via jsdom harness instrumentation + Phase 40 walker cross-check | done |
 | 43.2 | Freeze deterministic jsdom + HAR fixtures under `tests/fixtures/`; re-verify custom base64 alphabet length directly from `output/vm-slide/bytecode.json` at pc 16932 | done |
-| 43.3 | Standalone cipher encoder `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js}` — pure JS, no jsdom/vm-slide dep, byte-identical against both fixtures | in-progress |
-| 43.4 | Tests for the encoder (different agent per impl/tests separation) — byte-identical assertions against both fixtures + unit tests for XTEA and custom base64 | pending |
+| 43.3 | Standalone cipher encoder `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js}` — pure JS, no jsdom/vm-slide dep, byte-identical against both fixtures | done |
+| 43.4 | Tests for the encoder (different agent per impl/tests separation) — byte-identical assertions against both fixtures + unit tests for XTEA and custom base64 | in-progress |
 | 43.5 | Docs — new `docs/VDATA_FORMAT.md` (authoritative byte-level spec), update `docs/CAPTCHA_ORCHESTRATOR.md` §6, track README + CLAUDE.md Project Memory bumps (director-owned) | pending |
 
 ### Phase 44: vm-slide plaintext fingerprint reversal (open track, no active tasks)
@@ -93,46 +93,54 @@ Current task: 43.3 — Standalone cipher encoder under `tools/vdata-generator/`
 
 ## Current Task
 
-**ID**: 43.3
-**Title**: Standalone cipher encoder under `tools/vdata-generator/`
+**ID**: 43.4
+**Title**: Tests for `tools/vdata-generator/` — different agent per impl/tests separation
 **Phase**: Phase 43 — Standalone vData cipher encoder
 **Status**: pending — director will dispatch next
 
 ### Goal
-Ship `tools/vdata-generator/` as a pure-JS, dep-free, white-box reimplementation of the cipher half of vm-slide's vData pipeline. Consumes a 112-byte plaintext buffer (or hex string) and emits the 152-char vData string byte-for-byte. Must round-trip both `tests/fixtures/vdata-jsdom-capture.json` and `tests/fixtures/vdata-har-capture.json` byte-for-byte.
+Add a `node --test` test file (or files) under `tests/` that exercises `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js}` and asserts byte-identical output against both committed fixtures. Wire `tests/fixtures/verify-vdata-fixtures.js` into the suite as a sanity check. Per impl/tests separation rule, this MUST be a different agent than the one that wrote 43.3.
 
 ### Context
-43.2 froze two committed fixtures and built a working reference verifier at `tests/fixtures/verify-vdata-fixtures.js`. That verifier already contains a working `customBase64Encode`/`customBase64Decode` (standard b64 with `isNaN`-guarded padding, alphabet index 64 = padding) and a working classical XTEA engine (32 rounds, delta `0x9E3779B9`, LE uint32 packing). 43.3's job is to factor that reference into a clean module layout under `tools/vdata-generator/`, expose a public encode API, and ship a CLI — NOT to re-derive the algorithm.
+43.3 shipped `tools/vdata-generator/` with `xtea.js` (classical XTEA), `custom-base64.js` (standard b64 with custom 65-char alphabet, index-64 padding), `encode.js` (`encodeVData`, `encryptOnly`, hardcoded XTEA key), and `cli.js`. Director-verified round-trips:
+- `encodeVData(Buffer.from(jsdom.plaintext_hex, 'hex')) === jsdom.vdata_string` ✅
+- `encodeVData(Buffer.from(har.har_decrypted_plaintext_hex, 'hex')) === har.har_vdata_string` ✅
+- CLI stdin + arg form both produce the matching string ✅
+- CLI rejects bad input with exit 2 + clear error message ✅
 
-**Critical correction from 43.1**: there is NO `10 40` trailer. Real encoder is standard base64 with padding char `Y` at index 64. 112-byte input → 152 chars output ending in `YY`. The encoder bytecode lives at pcs 17084..17418 in `output/vm-slide/disassembly-full.txt` if you need to cross-check.
+The existing test layout uses `node --test` with files named `tests/test-*.js`. See `tests/test-token-generator.js` for the closest analog (standalone cipher tool with fixture-based byte-identical assertions).
 
 ### Inputs
-- `tests/fixtures/verify-vdata-fixtures.js` — working reference impl, copy/factor from this.
-- `tests/fixtures/vdata-jsdom-capture.json` — fixture 1 (synthetic via jsdom).
-- `tests/fixtures/vdata-har-capture.json` — fixture 2 (real Chrome 146 HAR).
-- `research/vm-slide-stack-vm/VDATA-PIPELINE.md` — authoritative spec (corrected by 43.2).
-- `tools/token-generator/` — example of an existing standalone cipher tool with similar layout. Mirror its module conventions.
+- `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js}` — subject under test.
+- `tests/fixtures/{vdata-jsdom-capture.json, vdata-har-capture.json}` — committed fixtures.
+- `tests/fixtures/verify-vdata-fixtures.js` — independent reference verifier from 43.2.
+- `tests/test-token-generator.js` — example test file to mirror in style.
 
 ### Implementation Steps
-1. Create `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js, README.md}`.
-2. `xtea.js`: classical XTEA encrypt/decrypt block + LE buffer wrappers. No external deps. Export both directions even though only encrypt is needed by encode (decrypt is used by tests).
-3. `custom-base64.js`: standard base64 with hardcoded 65-char alphabet from VDATA-PIPELINE.md and `padding_char_index = 64`. Use `isNaN`-guarded encoder matching the bytecode at pcs 17084..17418. Export both encode and decode.
-4. `encode.js`: top-level `encodeVData(plaintextBuffer) → vdataString`. Validates plaintext length is a multiple of 8, encrypts with the hardcoded XTEA key from VDATA-PIPELINE.md, base64-encodes the result, returns the string. Also export `XTEA_KEY_HEX` and `OUTPUT_ALPHABET` as named constants.
-5. `cli.js`: read plaintext hex from stdin or `--plaintext-hex` arg, write vData string to stdout. `--verbose` prints intermediate ciphertext hex. Mirror the CLI shape of `tools/token-generator/cli.js`.
-6. `README.md`: scope, usage, the corrected pipeline spec (link to VDATA-PIPELINE.md), explicit "this is the cipher half only — Phase 44 owns the plaintext build" disclaimer.
-7. Round-trip both fixtures via a quick local check (not committed test code — that's 43.4) before reporting done.
+1. Create `tests/test-vdata-generator-encoder.js` (or similar — match existing naming) using `node:test` + `node:assert/strict`.
+2. Top-level fixture round-trip suite: load both JSON fixtures and assert `encodeVData(Buffer.from(plaintext_hex, 'hex')) === expected_vdata_string` for each. Also assert `encryptOnly(...).toString('hex') === ciphertext_hex` for each.
+3. XTEA unit tests: round-trip random and edge-case 8-byte blocks (`xteaEncryptBlock`/`xteaDecryptBlock`); buffer-level `xteaEncryptLE`/`xteaDecryptLE` round trip on multi-block inputs; reject non-multiple-of-8 with clear error; `keyFromHex` rejects wrong-length hex.
+4. Custom base64 unit tests: encode/decode round trip on 1..8 byte inputs (covering all 3 padding cases: 0/1/2 chars trailing); confirm hardcoded alphabet length is 65 and `PADDING_CHAR_INDEX === 64`; decode rejects non-alphabet chars; encode of exactly 112 bytes always ends in `YY`.
+5. `encode.js` API tests: 112-byte plaintext requirement enforced (wrong length throws with a message mentioning Phase 44); accepts both Buffer and hex string input forms; produces 152-char output; rejects bad type input (TypeError).
+6. Wire `tests/fixtures/verify-vdata-fixtures.js` into the suite as a sanity check — either by `require()`ing its exported functions and asserting both round-trips, or by spawning it as a subprocess and asserting exit 0. Either is fine; pick whichever matches the existing test patterns.
+7. Run `npm test` and confirm new tests pass and the total goes from 353 → 353+N green.
 
 ### Verification
-- [ ] `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js, README.md}` all exist.
-- [ ] `node -e "const {encodeVData} = require('./tools/vdata-generator/encode.js'); const f = require('./tests/fixtures/vdata-jsdom-capture.json'); console.log(encodeVData(Buffer.from(f.plaintext_hex, 'hex')) === f.vdata_string);"` prints `true`.
-- [ ] Same one-liner against `vdata-har-capture.json` (use `har_decrypted_plaintext_hex` and `har_vdata_string`) prints `true`.
-- [ ] CLI: `echo <plaintext_hex> | node tools/vdata-generator/cli.js` outputs the matching vData string.
-- [ ] No external deps added to `package.json`. No jsdom. No requires from `research/`, `tools/scraper/`, or `sample/`.
-- [ ] `npm test` 353/353 unchanged (43.4 will add new tests).
-- [ ] `tests/fixtures/verify-vdata-fixtures.js` still exits 0.
+- [ ] New test file(s) under `tests/` follow `tests/test-*.js` naming and use `node:test` + `node:assert/strict`.
+- [ ] `npm test` passes; total test count strictly greater than 353; no failures.
+- [ ] Both fixture round-trips (jsdom + HAR) are asserted in the new tests, not just smoke-checked.
+- [ ] At least one unit test each for `xtea.js`, `custom-base64.js`, and `encode.js` public surfaces.
+- [ ] Edge cases covered: wrong plaintext length, non-multiple-of-8 XTEA input, non-alphabet base64 chars, wrong-type input to `encodeVData`.
+- [ ] `tests/fixtures/verify-vdata-fixtures.js` still exits 0 standalone AND its checks are re-asserted from inside the suite.
+- [ ] No edits to `tools/vdata-generator/` (the encoder is the subject under test, not under modification).
+- [ ] No new dependencies in `package.json`.
+- [ ] No writes to `targets/`, `sample/`, `tools/scraper/`, `research/`, or `tests/fixtures/`.
+
+### Warnings
+- **Different agent than 43.3.** This is a hard rule from the director's impl/tests separation policy. The agent writing tests must approach the encoder as a consumer, not as the author. Do not modify the encoder to make tests easier — file a remediation back to the director if you find a real bug.
 
 ### Suggested Agent
-`general-purpose` — pure-JS module factoring with an existing reference implementation. No specialist agent fits better.
+`general-purpose` — straightforward Node test authoring against an existing module + fixtures. Different agent instance than the one that did 43.3.
 
 ### Goal
 Produce two committed test fixtures under `tests/fixtures/` that 43.3's encoder can target for byte-identical verification, and resolve the 43.1 open caveat about whether vm-slide's custom base64 alphabet at bytecode pc 16932 is 64 or 65 chars. No encoder code yet — 43.2 is fixture capture + spec confirmation.
