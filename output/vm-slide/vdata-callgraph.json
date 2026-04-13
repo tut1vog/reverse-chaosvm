@@ -1,0 +1,768 @@
+{
+  "schema_version": 1,
+  "task": "44.1",
+  "encrypt_entry_pc": 15241,
+  "decrypt_entry_pc": 15416,
+  "cipher_region_end": 15600,
+  "vdata_captured_prefix": "5eaMxXt8XGQj-PJHpiw1cx9B3omR4BII",
+  "vdata_length": 152,
+  "timeline_stats": {
+    "total_events": 50413,
+    "dispatch_hits_in_range": 50239,
+    "enter_events": 174,
+    "enter_to_ENC_ENTRY": 14
+  },
+  "runtime_caller_pcs_raw": [
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    },
+    {
+      "pc": 16182,
+      "op": 66
+    }
+  ],
+  "runtime_caller_details": [
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    },
+    {
+      "caller_pc": 16182,
+      "caller_op": 66,
+      "containing_entry": 15918,
+      "containing_range": [
+        15918,
+        16230
+      ]
+    }
+  ],
+  "covering_function_entries": [
+    {
+      "entry": 15918,
+      "body_range": [
+        15918,
+        16230
+      ]
+    }
+  ],
+  "static_enc_func_create_sites": [
+    {
+      "pc": 15404,
+      "containingEntry": 15220
+    }
+  ],
+  "static_cross_check": [
+    {
+      "entry": 15918,
+      "static_call_site_count": 11,
+      "static_call_site_sample": [
+        {
+          "pc": 15950,
+          "op": 25
+        },
+        {
+          "pc": 15971,
+          "op": 25
+        },
+        {
+          "pc": 16037,
+          "op": 2
+        },
+        {
+          "pc": 16039,
+          "op": 66
+        },
+        {
+          "pc": 16131,
+          "op": 2
+        },
+        {
+          "pc": 16133,
+          "op": 66
+        },
+        {
+          "pc": 16169,
+          "op": 2
+        },
+        {
+          "pc": 16171,
+          "op": 66
+        },
+        {
+          "pc": 16182,
+          "op": 66
+        },
+        {
+          "pc": 16197,
+          "op": 66
+        }
+      ]
+    }
+  ],
+  "key_closure_spawn_sites": {
+    "15241": {
+      "spawn_pc": 15404,
+      "spawned_in_fn": 15220
+    },
+    "15416": {
+      "spawn_pc": 15579,
+      "spawned_in_fn": 15220
+    },
+    "15591": {
+      "spawn_pc": 15724,
+      "spawned_in_fn": 15220
+    },
+    "15735": {
+      "spawn_pc": 15815,
+      "spawned_in_fn": 15220
+    },
+    "15918": {
+      "spawn_pc": 16231,
+      "spawned_in_fn": 15220
+    },
+    "19604": {
+      "spawn_pc": 20073,
+      "spawned_in_fn": 19507
+    },
+    "20353": {
+      "spawn_pc": 20463,
+      "spawned_in_fn": 20140
+    },
+    "20539": {
+      "spawn_pc": 20797,
+      "spawned_in_fn": 20140
+    },
+    "20843": {
+      "spawn_pc": 20950,
+      "spawned_in_fn": 0
+    }
+  },
+  "ancestor_chains": [
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ],
+    [
+      {
+        "enter_k": 15241,
+        "caller_pc": 16182,
+        "caller_op": 66,
+        "caller_fn": 15918
+      },
+      {
+        "enter_k": 15918,
+        "caller_pc": 20749,
+        "caller_op": 66,
+        "caller_fn": 20539
+      },
+      {
+        "enter_k": 20539,
+        "caller_pc": 20462,
+        "caller_op": 16,
+        "caller_fn": 20353
+      },
+      {
+        "enter_k": 20353,
+        "caller_pc": 20949,
+        "caller_op": 16,
+        "caller_fn": 20843
+      },
+      {
+        "enter_k": 20843,
+        "caller_pc": 20967,
+        "caller_op": 6,
+        "caller_fn": 0
+      }
+    ]
+  ],
+  "ancestor_function_union": [
+    {
+      "body_range": null,
+      "size": null
+    }
+  ],
+  "notes": [
+    "Phase 44 task 44.1: back-walk from encrypt closure entry (pc 15241) to",
+    "the function(s) in vm-slide that build the plaintext blocks.",
+    "runtime_caller_pcs_raw should contain exactly 14 entries (14 encrypt",
+    "calls = 112 plaintext bytes).",
+    "Each caller pc is the outer-frame dispatch tick immediately preceding",
+    "a __VMTAP_ENTER(K=15241) event, skipping any dispatch tick inside the",
+    "cipher body [ENC_ENTRY, CIPHER_REGION_END] (those are inner-frame",
+    "ticks of the closure itself)."
+  ]
+}
