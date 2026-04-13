@@ -3,7 +3,7 @@
 /**
  * scraper.js — Main Scraper Orchestrator
  *
- * Wires together CaptchaClient, slide-solver, collect-generator, vdata-generator,
+ * Wires together CaptchaClient, slide-solver, collect-generator, vdata-harness,
  * template-cache, and tdc-utils into a complete headless CAPTCHA-solving and
  * URL security checking flow.
  *
@@ -20,7 +20,7 @@ const path = require('path');
 const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/captcha-client');
 const { solveSlider } = require('../captcha-solver/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./collect-generator');
-const { generateVData, parseVmSlideUrl } = require('./vdata-generator');
+const { generateVData, parseVmSlideUrl } = require('./vdata-harness');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
 const { execFile } = require('child_process');

@@ -5,6 +5,12 @@ const { JSDOM } = require('jsdom');
 const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36';
 
 /**
+ * vData black-box harness — generates vData by executing vm-slide.enc.js
+ * inside a jsdom environment. This is NOT a standalone reimplementation; it
+ * runs vm-slide's own bytecode through its real proxyXHR path and captures
+ * the resulting value off a pre-installed XHR send hook. For the white-box
+ * byte-identical reimplementation, see tools/vdata-generator/ (Phase 43).
+ *
  * Generate vData by executing vm-slide.enc.js in a jsdom environment.
  *
  * The vm-slide VM (__TENCENT_CHAOS_STACK) hooks XMLHttpRequest.prototype.send.
