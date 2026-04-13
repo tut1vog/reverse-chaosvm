@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide plaintext fingerprint reversal (**pivot confirmed — orchestrator target; Phase 44 redraft pending user review**)
-Current task: — (none; 44.2.5 done, Phase 44 tasks 44.3/44.4/44.5b awaiting user-reviewed redraft)
+Current phase: Phase 44 — vm-slide 9504→112 reduction reversal (**re-pivoted 2026-04-13 after 44.3 found the orchestrator does NOT build a 112-byte body; vm-slide reduces the 9504-byte verify body into the 112-byte XTEA input**)
+Current task: — (none; 44.3 done, Phase 44 tasks 44.4/44.5b awaiting second plan revision)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -107,13 +107,13 @@ Current task: — (none; 44.2.5 done, Phase 44 tasks 44.3/44.4/44.5b awaiting us
 | 44.1 | Encrypt-callsite back-walk + plaintext-build call graph (static + runtime caller-PC capture) | done |
 | 44.2 | Plaintext-build static decompile to pseudocode — `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` | done |
 | 44.2.5 | fn 20539 full static decompile — settle pivot premise → verdict **(A) pure encrypt stage**, orchestrator builds plaintext | done |
-| 44.3 | Dynamic property-read instrumentation — tap OP_47/OP_60/string-build inside the plaintext-build pc range, dump every `(object, key, value)` tuple, cross-check against the captured 112-byte plaintext to identify the 8 fields | pending |
-| 44.3.5 | Real-Chrome differential capture via Puppeteer — capture a third fixture from production Chrome using the `tools/captcha-solver/` infrastructure; cross-validate the schema from 44.3 against a non-jsdom environment | pending |
-| 44.4 | Per-run order resolution — run the instrumented harness ≥20 times across both jsdom and real Chrome, determine whether order varies (memory iteration) or content varies (internal salt); blocking for 44.5b | pending |
-| 44.5a | Standalone plaintext builder — replay-with-substitution. `tools/vdata-generator/build-plaintext.js` (initial form) reads a captured plaintext + a field-value override map and emits a substituted 112-byte plaintext. Early Stream-B checkpoint that validates the schema from 44.2/44.3 without depending on 44.4. | pending |
-| 44.5b | Standalone plaintext builder — full synthesis. Extends 44.5a with a from-scratch builder that reads a JS environment description and emits a fresh 112-byte plaintext matching the order distribution from 44.4. Adds `--from-env` CLI flag. Depends on 44.4. | pending |
+| 44.3 | **Orchestrator plaintext-build JS-level trace** — hook `XHR.prototype.send` before vm-slide's proxyXHR install, capture the 112-byte body + JS stacktrace, back-walk in `t_captcha_slide.js` to name the orchestrator function that assembled it + pin the ciphertext's path to the verify POST | done (static-fallback; **inverted Phase 44 model** — orchestrator builds 39-field 9504-byte body, vm-slide reduces it to 112 bytes) |
+| 44.3.5 | Real-Chrome differential capture via Puppeteer — third fixture from production Chrome; capture target is the orchestrator pre-encrypt body + surrounding verify POST body | pending |
+| 44.4 | **Orchestrator 8-field schema pin** — run the 44.3 harness ≥20x across jsdom + real Chrome; for each captured plaintext parse the 8 `key=value` pairs; determine field names, value-source rules, order-mechanism, per-run variability source | pending |
+| 44.5a | Plaintext builder: replay-with-substitution. `tools/vdata-generator/build-plaintext.js` reads a captured plaintext + field-value override map, emits a substituted 112-byte plaintext. Early Stream-B checkpoint. | pending |
+| 44.5b | **Plaintext builder: from-scratch JS synthesis**. Extends 44.5a with `--from-env` — consumes a JS environment description, emits a fresh 112-byte plaintext matching 44.4's schema + order distribution. Pure JS, not a bytecode walker. Depends on 44.4. | pending |
 | 44.6 | Tests for the plaintext builder (different agent per impl/tests separation) — unit tests per field source rule + integration tests asserting byte-identical reproduction of all three fixtures' plaintexts → vData strings end-to-end (jsdom + HAR + real-Chrome from 44.3.5) | pending |
-| 44.7 | Docs closeout (director-owned) — expand `docs/VDATA_FORMAT.md` §1 with the now-complete plaintext spec; mark Phase 44 closed in `plan.md` + `research/vm-slide-stack-vm/README.md`; bump `CLAUDE.md` Project Memory to record full end-to-end byte-identical vData reproducibility | pending |
+| 44.7 | Docs closeout (director-owned) — expand `docs/VDATA_FORMAT.md` §1 with the complete plaintext spec; **fix `docs/CAPTCHA_ORCHESTRATOR.md` §517 + §6.2** (whole-body-replacement correction from 44.2.5); mark Phase 44 closed; bump CLAUDE.md Project Memory | pending |
 
 > **Scope decisions (user-confirmed 2026-04-13)**: 9-task variant. (1) Real-Chrome differential capture **YES** → 44.3.5 added. (2) Per-run order resolution **REQUIRED**, not nice-to-have → 44.4 is blocking for 44.5b. (3) 44.5 builder design **BOTH** → split into 44.5a (replay-with-substitution, ships first) + 44.5b (full synthesis, depends on 44.4). User explicitly asked the director to record this decision but **NOT auto-dispatch** 44.1 — dispatch is on user trigger only.
 
@@ -121,15 +121,51 @@ Current task: — (none; 44.2.5 done, Phase 44 tasks 44.3/44.4/44.5b awaiting us
 
 ## Current Task
 
-— None. Phase 44 downstream redraft pending user review.
+— None. Phase 44 awaiting second plan revision (third-level re-pivot).
 
-**Pivot status (2026-04-13)**: 44.2.5 confirmed vm-slide is classification **(A) pure encrypt stage**, rigorously grounded:
-- fn 20539 emits **zero** `OP_10 61` (`=`) and **zero** `OP_10 38` (`&`) bytes across its full 257-instruction body (director-verified independently from `output/vm-slide/bytecode.json`). It cannot assemble a `key=value&...` fingerprint string.
-- fn 20539 has exactly **one** `OP_52 TYPEOF` in the whole function, applied to `arguments[0]` at pc 20604 as a string-type guard on the incoming body — no fingerprint-shaped environment probes.
-- Argmap `Q[0]=3` from parent `OP_58 20539 3 1 7 6 8 3 9 4 3` (pc 20797) proves **slot 3 = arguments[0]** at frame entry and is never overwritten until pc 20751 (where it is replaced with the fn 15918 return value).
-- Tail [20751, 20796]: `savedSend.call(this, slot3_ciphertext)` at pc 20770 — vm-slide actually **replaces** the caller's body with the ciphertext before forwarding to the original `XMLHttpRequest.prototype.send`. (This also partially corrects `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 which called it "injection as `vData=<cipher>`" — it's actually whole-body replacement, per 44.2.5. The orchestrator must still parse/use the ciphertext downstream; that's a 44.3 discovery item.)
+**Status after 44.3 (2026-04-13)**: 44.3's investigation met its verification checklist (build-site located, docs corrected, tests green) but the **finding itself inverts the pivot model I took the user through on 2026-04-13**. Director-verified against the HAR fixture `sample/captcha-har.har`:
+- The verify POST body is **9504 bytes** with **39 fields** joined by `&`. `vData` appears as the 40th (last-ish) field at **152 chars**.
+- There is **no** `xhr.send(<112-byte body>)` call anywhere. The orchestrator builds a standard multi-field form body via Zepto's `$.ajax({data: d})` where `d` is a 39-field JS object assembled inside module 56 function `Y` (`sample/t_captcha_slide.js` byte range [159126, 167171], `$.ajax` callsite at byte 163131).
+- vm-slide appends `&vData=<ciphertext>` onto the outgoing 9504-byte body. The `&vData=` literal is built inside vm-slide bytecode at pcs **24211..24223** via `OP_10 38 118 68 97 116 97 61` — director byte-verified directly from `output/vm-slide/bytecode.json`.
+- The `&vData=` literal lives inside a **different function than fn 20539** — specifically fn 22317 (body range approximately [22317, 24234], based on FUNC_CREATE at pc 24234 targeting entry 22317). fn 20539's body [20539, 20796] contains zero `OP_10 61` or `OP_10 38` instructions, consistent with 44.2.5's static claim. Both facts are simultaneously true — vm-slide has more than one relevant function.
+- **Phase 43's "112-byte plaintext" was never a wire-observable buffer.** Phase 43 computed it by running XTEA decrypt on the observed 152-char vData ciphertext. The 112-byte result has 8 `=` / 7 `&` shape, but it is a **VM-internal XTEA input**, not something any XHR body ever contained. The label "plaintext" in `tests/fixtures/vdata-*-capture.json` has been misleading since Phase 43.1.
 
-**44.2's original pivot proposal is confirmed**. The downstream Phase 44 tasks (44.3, 44.4, 44.5b) need to be redrafted against the orchestrator target before any further dispatch. Director will present the redraft on the next message.
+**Corrected model (post-44.3)**:
+```
+orchestrator (module 56 fn Y)
+    builds 39-field JS object d
+    calls Zepto $.ajax({data: d})         <- d has 39 fields
+    which calls xhr.send(urlencoded d)    <- 9504-byte body
+      |
+      v
+vm-slide's installed XMLHttpRequest.prototype.send replacement
+    (some function that uses fn 22317's `&vData=` literal at pc 24211;
+     relationship to fn 20539 NOT YET RECONCILED)
+    reduces the 9504-byte body to a 112-byte XTEA input
+    (44.3 hypothesizes a 6-bit / base64-style accumulator reduction
+     based on OP_08 63 / OP_08 6 / OP_08 31 mask-shift patterns at
+     pcs 19221..19443 and 24023..24084; NOT YET VERIFIED)
+    XTEA-encrypts via fn 15918 / fn 15241 chain
+    base64s via Phase 43 custom alphabet
+    appends "&vData=" + <152-char ciphertext> to the 9504-byte body
+    forwards to savedSend.call(this, body + "&vData=" + ciphertext)
+    which actually sends over the wire
+```
 
-**Also noted for later**: the "slot 4 contradiction" 44.2 flagged inside fn 15918 (first loop reads slot 4 as 16-byte sliceable buffer, call site passes `{py}`) is still open — 44.2.5 confirmed slot 4 is a py-flag bool, so fn 15918's first loop needs a re-read. Not blocking for 44.3; parked as a micro-task for whoever re-reads fn 15918.
+**What still holds from prior tasks**:
+- 44.1 (encrypt-callsite back-walk): solid. fn 15918 @ pc 16182 is the 14x XTEA call site.
+- 44.2 (fn 15918 decompile): solid for the XTEA loop. The arg-to-local mapping for slot 4 is still ambiguous (first-loop reads slot 4 as 16-byte sliceable buffer) but this does not affect the reduction-formula question.
+- 44.2.5 (fn 20539 decompile): solid for fn 20539 internally. But 44.2.5's **conclusion** that fn 20539 is "the" installed send replacement with "whole-body replacement" is **incomplete** — fn 20539 may be a secondary helper (e.g. a `.call`/`.apply` handler replacement, or a different code path) while fn 22317 is the actual `.send` replacement that does the append-mode rewrite. 44.2.5's bytecode-level claims about fn 20539's body stand; the functional-role claim does not.
+
+**What needs to change**:
+1. New task **44.2.6 — fn 22317 full static decompile + reconciliation with fn 20539** (~1–2 hours, ~1917 instructions in [22317, 24234]). Analogous to 44.2.5 but for the fn 22317 body. Must answer: (i) is fn 22317 the actual installed `XMLHttpRequest.prototype.send` replacement? (ii) is fn 20539 a sibling, a helper, or dead code? (iii) what does the prologue of fn 22317 do with its argument 0 — does it reduce it to 112 bytes, or does it dispatch to fn 20539 or to fn 15918 directly?
+2. **Retarget 44.4** from "orchestrator 8-field schema pin" to **"9504→112 reduction formula reversal"**. Decompile the reduction region (will be named by 44.2.6). Determine which of the 39 fields feed into the reduction, how the 8 accumulators are shaped, and what the per-accumulator rule is. Ground truth: the committed fixtures give us both the 9504-byte body (HAR) and the 112-byte XTEA input (decrypted from vData) — so we can check any candidate reduction formula byte-for-byte against the fixtures.
+3. **Retarget 44.5b** from "from-scratch JS environment fingerprint builder" to **"from-scratch JS 9504→112→encrypt pipeline"**. Input: a 39-field verify POST body shape (or just the fields the reduction consumes). Output: the 152-char vData string. This is substantially easier than the original 44.5b draft because the reduction is deterministic given the input body — no per-run variability to model except whatever the reduction itself introduces.
+4. **44.5a (replay-with-substitution)** — still structurally valid but the substitution target is now "the 9504-byte body", not "the 112-byte intermediate". Likely ships as a slim wrapper that just calls 44.5b with a modified body.
+5. **44.6, 44.7** — structurally unchanged.
+6. **44.3.5 (real-Chrome capture)** — capture target shifts from "orchestrator pre-encrypt body" to "the full verify POST body + vData ciphertext pair". Still produces a third fixture. Unchanged shape.
+
+**Also noted**: 44.3 wrote surgical edits to `docs/CAPTCHA_ORCHESTRATOR.md` §517 and §6.2 — these corrections are **mostly** right (the §6.2 append-mode correction matches HAR evidence; the §517 "not-a-JS-environment-fingerprint" correction is right) but they rest on 44.3's un-verified claim about fn 22317 being the installed send replacement. Director will commit them as-is because (a) they are strictly better than the current text and (b) 44.2.6 will refine them further if fn 22317's actual role differs.
+
+**Director will present the revised plan on the next user message.** No dispatch until user confirms the second revision.
 
