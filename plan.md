@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide plaintext fingerprint reversal (**planned 2026-04-13, awaiting user dispatch trigger**)
-Current task: 44.1 — Encrypt-callsite back-walk + plaintext-build call graph (pending; user will trigger dispatch later — director must NOT auto-dispatch)
+Current phase: Phase 44 — vm-slide plaintext fingerprint reversal
+Current task: 44.2 — Plaintext-build static decompile to pseudocode (pending dispatch)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -104,7 +104,7 @@ Current task: 44.1 — Encrypt-callsite back-walk + plaintext-build call graph (
 
 | ID | Task | Status |
 |----|------|--------|
-| 44.1 | Encrypt-callsite back-walk + plaintext-build call graph (static + runtime caller-PC capture) | pending |
+| 44.1 | Encrypt-callsite back-walk + plaintext-build call graph (static + runtime caller-PC capture) | done |
 | 44.2 | Plaintext-build static decompile to pseudocode — `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` | pending |
 | 44.3 | Dynamic property-read instrumentation — tap OP_47/OP_60/string-build inside the plaintext-build pc range, dump every `(object, key, value)` tuple, cross-check against the captured 112-byte plaintext to identify the 8 fields | pending |
 | 44.3.5 | Real-Chrome differential capture via Puppeteer — capture a third fixture from production Chrome using the `tools/captcha-solver/` infrastructure; cross-validate the schema from 44.3 against a non-jsdom environment | pending |
@@ -120,189 +120,51 @@ Current task: 44.1 — Encrypt-callsite back-walk + plaintext-build call graph (
 
 ## Current Task
 
-**ID**: 44.1
-**Title**: Encrypt-callsite back-walk + plaintext-build call graph
+**ID**: 44.2
+**Title**: Plaintext-build static decompile to pseudocode
 **Phase**: Phase 44 — vm-slide plaintext fingerprint reversal
-**Status**: pending — Phase 44 plan accepted (9-task variant, user-confirmed 2026-04-13). User explicitly deferred dispatch — director must wait for an explicit "go" / "dispatch 44.1" / equivalent before invoking the subagent. **Do not auto-dispatch even if the user sends an unrelated message next.**
+**Status**: pending — awaiting dispatch.
 
 ### Goal
-Identify the function (or chain of functions) inside vm-slide's `proxyXHR` body that constructs the 112-byte plaintext buffer fed into the encrypt closure at pc 15241. Produce a directed call graph from XHR-`send` entry to the encrypt callsite, plus the bytecode pc ranges that 44.2 will decompile.
+Produce a readable pseudocode decompilation of the plaintext-build + encrypt-driver function **fn 15918** (body `[15918, 16230]`), with enough detail to identify how the 112-byte plaintext buffer is assembled, how it is sliced into 14 × 8-byte blocks, and where each block's two uint32 words come from. Secondarily, follow the call edge from **fn 20539** (proxyXHR send-handler, body `[20539, 20796]`) at its `OP_66` pc **20749** into fn 15918 to determine where fn 15918's input buffer argument originates. Output lives in `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md`.
 
-### Context
-The encrypt closure entry is bytecode pc **15241**, instantiated at pc 15404 by `OP_58 15241 0 2 3 4` (FUNC_CREATE with 3 args, key in local 4). The closure is stored into Tencent's module-export table and invoked indirectly — there is no inline call to it at pc 15404. Phase 40.6 noted this opacity and Phase 43.1 worked around it by tapping the closure entry directly via `vdata-dynamic-trace.js`'s instrumented dispatch loop.
-
-For 44.1 we need the **caller side**: which function in the proxyXHR pc range (~19500..20800, with possible upstream call sites) builds the args before each encrypt call? Two complementary approaches:
-
-1. **Static back-walk**. Search the disassembly for every `OP_58` / `OP_60` site that could plausibly invoke the encrypt closure via the module-export indirection. Cross-reference with the FUNC_CREATE-based function-entry table to find the smallest function that contains those calls.
-2. **Runtime caller-PC capture**. Extend `vdata-dynamic-trace.js` with a tap that, on every entry to the encrypt closure (pc 15241), records the **return PC** from the call frame (or equivalently, the most recent dispatch loop PC immediately before the call). Run once and dump the 14 caller PCs. The smallest contiguous range covering all 14 is the plaintext-build region.
-
-### Inputs
-- `output/vm-slide/disassembly-full.txt` (Phase 40.1 walker output, all 14,134 reachable instructions).
-- `output/vm-slide/bytecode.json`.
-- `research/vm-slide-stack-vm/walker.js` (control-flow walker — has the function-entry table).
-- `research/vm-slide-stack-vm/vdata-dynamic-trace.js` (existing instrumentation — extend).
-- `tests/fixtures/vdata-jsdom-capture.json` (oracle).
-- `docs/VM_SLIDE_OPCODES.md` (call/return opcode semantics).
-
-### Implementation Steps
-1. From `walker.js`'s function-entry table, list every reachable function entry whose body contains an `OP_58` referencing pc 15241 (instantiation) or any `OP_60` / `OP_58` whose target lives downstream of the module-export table.
-2. Add a runtime caller-PC tap to a copy of `vdata-dynamic-trace.js` (do NOT modify the original — make `vdata-callgraph-trace.js` next to it). Capture the dispatch loop PC immediately preceding each entry into pc 15241. Run once, dump the 14 caller PCs.
-3. Identify the smallest set of function entries containing all 14 caller PCs. That set is the plaintext-build region.
-4. Write `research/vm-slide-stack-vm/plaintext-callgraph.md` documenting: the encrypt callsite chain, the function-entry list to be decompiled in 44.2, the dispatch tree (with a small ASCII diagram), and the runtime PC capture results.
-5. Cross-check: the captured caller PCs should be inside the regions 44.1's static back-walk identified.
-
-### Verification
-- [ ] `research/vm-slide-stack-vm/vdata-callgraph-trace.js` exists and produces a 14-element caller-PC list when run against `sample/vm_slide.js` via the same jsdom harness pattern as `vdata-dynamic-trace.js`.
-- [ ] Caller PCs match (or are sub-ranges of) the static back-walk results.
-- [ ] `research/vm-slide-stack-vm/plaintext-callgraph.md` exists with the call graph, function-entry list, and PC-range output for 44.2.
-- [ ] No modifications to `research/vm-slide-stack-vm/vdata-dynamic-trace.js`, `tools/vdata-generator/`, `tests/fixtures/`, `targets/`, or `sample/`.
-- [ ] `npm test` 411/411 unchanged.
-
-### Suggested Agent
-`general-purpose` — bytecode disassembly walking + jsdom instrumentation extension. Same shape of work as 43.1.
-
-### Goal
-Add a `node --test` test file (or files) under `tests/` that exercises `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js}` and asserts byte-identical output against both committed fixtures. Wire `tests/fixtures/verify-vdata-fixtures.js` into the suite as a sanity check. Per impl/tests separation rule, this MUST be a different agent than the one that wrote 43.3.
-
-### Context
-43.3 shipped `tools/vdata-generator/` with `xtea.js` (classical XTEA), `custom-base64.js` (standard b64 with custom 65-char alphabet, index-64 padding), `encode.js` (`encodeVData`, `encryptOnly`, hardcoded XTEA key), and `cli.js`. Director-verified round-trips:
-- `encodeVData(Buffer.from(jsdom.plaintext_hex, 'hex')) === jsdom.vdata_string` ✅
-- `encodeVData(Buffer.from(har.har_decrypted_plaintext_hex, 'hex')) === har.har_vdata_string` ✅
-- CLI stdin + arg form both produce the matching string ✅
-- CLI rejects bad input with exit 2 + clear error message ✅
-
-The existing test layout uses `node --test` with files named `tests/test-*.js`. See `tests/test-token-generator.js` for the closest analog (standalone cipher tool with fixture-based byte-identical assertions).
+### Context (from 44.1 — verified)
+- All 14 encrypt calls in a single vData run come from **one single call site**: `OP_66 CALL_GLOBAL` at pc **16182** inside fn 15918's body.
+- fn 15918 has a 14-iteration loop: backedge `OP_06 15989` at pc 16064; loop body span `[15989, 16191]`.
+- fn 15918 is a **sibling closure** of the XTEA encrypt closure (fn 15241). Both are spawned by factory fn 15220. Factory pc 16231 is `OP_58 15918 3 2 9 8 10 6 11 9 3 4` — fn 15918 captures 3 upvalues via pairs (2→9), (8→10), (6→11). **Local 10 ← factory slot 8** at spawn time; that upvalue is almost certainly the encrypt closure reference fn 15918 invokes at pc 16182.
+- Static call-site scan of fn 15918 found 11 call/invoke ops including the target pc 16182 (`OP_66`), plus pcs 15950/15971 (OP_25), 16037/16039, 16131/16133, 16169/16171, 16197 — these are the helper calls fn 15918 makes for each iteration (slice/append/convert). 44.2 should map each of these to a semantic role.
+- fn 15918 is called from fn 20539 (proxyXHR send-handler) at pc **20749** via `OP_66`. fn 20539's entry is called from native JS (harness-installed `XMLHttpRequest.prototype.send` replacement) — its "caller pc" in the runtime capture is stale (VM_EXIT, op 16), which is expected.
+- Encrypt closure takes 3 args (FUNC_CREATE with 3 params); 44.1 noted locals 6 and 7 hold `v0, v1` at the call site; local 5 is the third arg (likely the destination buffer / index).
+- vm-slide dispatch is stack-based; see `docs/VM_SLIDE_ARCHITECTURE.md` for the dispatch loop and `docs/VM_SLIDE_OPCODES.md` for the opcode table (53 non-null handlers).
+- The 112-byte plaintext has 8 `key=value` pairs joined by `&` (exactly 8 `=`, 7 `&`). Per-run byte order varies; multiset is invariant within an environment.
 
 ### Inputs
-- `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js}` — subject under test.
-- `tests/fixtures/{vdata-jsdom-capture.json, vdata-har-capture.json}` — committed fixtures.
-- `tests/fixtures/verify-vdata-fixtures.js` — independent reference verifier from 43.2.
-- `tests/test-token-generator.js` — example test file to mirror in style.
+- `output/vm-slide/bytecode.json` (24,273 elements; slice [15918, 16230] for fn 15918, [20539, 20796] for fn 20539).
+- `output/vm-slide/disassembly-full.txt` (Phase 40.1 walker output — includes both functions, already decoded).
+- `output/vm-slide/vdata-callgraph.json` (44.1 artifact — has the 11 static call sites inside fn 15918, the spawn-site capture pairs, and both function body ranges).
+- `research/vm-slide-stack-vm/plaintext-callgraph.md` (44.1 narrative).
+- `research/vm-slide-stack-vm/{walker,decoder,disassembler}.js` (Phase 39/40 tooling — reuse for any re-walks you need).
+- `docs/VM_SLIDE_OPCODES.md`, `docs/VM_SLIDE_ARCHITECTURE.md` (authoritative opcode + dispatch semantics).
+- `tests/fixtures/vdata-jsdom-capture.json`, `tests/fixtures/vdata-har-capture.json` (committed plaintexts to cross-check hypotheses against).
 
 ### Implementation Steps
-1. Create `tests/test-vdata-generator-encoder.js` (or similar — match existing naming) using `node:test` + `node:assert/strict`.
-2. Top-level fixture round-trip suite: load both JSON fixtures and assert `encodeVData(Buffer.from(plaintext_hex, 'hex')) === expected_vdata_string` for each. Also assert `encryptOnly(...).toString('hex') === ciphertext_hex` for each.
-3. XTEA unit tests: round-trip random and edge-case 8-byte blocks (`xteaEncryptBlock`/`xteaDecryptBlock`); buffer-level `xteaEncryptLE`/`xteaDecryptLE` round trip on multi-block inputs; reject non-multiple-of-8 with clear error; `keyFromHex` rejects wrong-length hex.
-4. Custom base64 unit tests: encode/decode round trip on 1..8 byte inputs (covering all 3 padding cases: 0/1/2 chars trailing); confirm hardcoded alphabet length is 65 and `PADDING_CHAR_INDEX === 64`; decode rejects non-alphabet chars; encode of exactly 112 bytes always ends in `YY`.
-5. `encode.js` API tests: 112-byte plaintext requirement enforced (wrong length throws with a message mentioning Phase 44); accepts both Buffer and hex string input forms; produces 152-char output; rejects bad type input (TypeError).
-6. Wire `tests/fixtures/verify-vdata-fixtures.js` into the suite as a sanity check — either by `require()`ing its exported functions and asserting both round-trips, or by spawning it as a subprocess and asserting exit 0. Either is fine; pick whichever matches the existing test patterns.
-7. Run `npm test` and confirm new tests pass and the total goes from 353 → 353+N green.
+1. **Slice and label fn 15918's body.** Extract the `[15918, 16230]` disassembly region. Annotate each instruction with its role: prologue (arg unpack, local init), loop header, loop body (iteration = one 8-byte block), loop tail, return. Use the existing disassembler text from `disassembly-full.txt`; do not re-run the walker unless you need to.
+2. **Classify each of fn 15918's 11 call sites** by stack-effect reasoning: which are `slice`-style string/buffer carves, which are `charCodeAt`-style byte reads, which are uint32 packers, and which is the encrypt call at pc 16182. Pull operand/stack effects from `docs/VM_SLIDE_OPCODES.md`.
+3. **Trace the v0/v1 uint32 words.** For the encrypt call at pc 16182, walk backward inside the loop body `[15989, 16191]` to find where locals 6 and 7 (the encrypt args) are written. Identify the byte-to-uint32 packing convention (LE per Phase 43). Cross-check against `tests/fixtures/vdata-jsdom-capture.json`'s `plaintext_blocks` — pick block N, reproduce its two words by hand from the first N×8 bytes of `plaintext_hex`, and confirm the packing matches.
+4. **Trace fn 15918's input buffer argument.** fn 15918 takes N args; the primary is the 112-byte plaintext buffer (or the source it is assembled from). Identify which local receives it in fn 15918's prologue. Then cross fn boundary: inspect fn 20539's body around pc 20749 (the `OP_66` that calls fn 15918) and record what is pushed on the stack as fn 15918's arguments at that call site. Record the upstream data-flow one level back — enough to say "fn 20539 assembles X from Y and passes it to fn 15918".
+5. **Produce pseudocode.** Write readable JS-like pseudocode for fn 15918, with comments naming each bytecode pc range. Keep opcode names where semantics are ambiguous; lift to JS where semantics are clear. The pseudocode must show: (a) arg unpack, (b) any pre-loop setup, (c) the 14-iteration loop structure, (d) per-iteration block extraction, (e) v0/v1 packing, (f) the encrypt call, (g) any post-loop assembly / return. Include a second, shorter pseudocode block for fn 20539's call site at pc 20749 (just enough context to see what flows into fn 15918).
+6. **Open-questions list.** Any opcode semantics you could not pin down, any helpers whose role you could not classify, any data-flow edges you could not resolve — list them explicitly at the bottom of `PLAINTEXT-BUILD.md` so 44.3's dynamic instrumentation can resolve them.
+7. **Write `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md`** with sections: Summary, Inputs, fn 15918 pseudocode, fn 20539 → fn 15918 call-site snippet, Block-extraction verification (the fixture cross-check from step 3), Helper call-site classification table, Open questions for 44.3.
 
 ### Verification
-- [ ] New test file(s) under `tests/` follow `tests/test-*.js` naming and use `node:test` + `node:assert/strict`.
-- [ ] `npm test` passes; total test count strictly greater than 353; no failures.
-- [ ] Both fixture round-trips (jsdom + HAR) are asserted in the new tests, not just smoke-checked.
-- [ ] At least one unit test each for `xtea.js`, `custom-base64.js`, and `encode.js` public surfaces.
-- [ ] Edge cases covered: wrong plaintext length, non-multiple-of-8 XTEA input, non-alphabet base64 chars, wrong-type input to `encodeVData`.
-- [ ] `tests/fixtures/verify-vdata-fixtures.js` still exits 0 standalone AND its checks are re-asserted from inside the suite.
-- [ ] No edits to `tools/vdata-generator/` (the encoder is the subject under test, not under modification).
-- [ ] No new dependencies in `package.json`.
-- [ ] No writes to `targets/`, `sample/`, `tools/scraper/`, `research/`, or `tests/fixtures/`.
-
-### Warnings
-- **Different agent than 43.3.** This is a hard rule from the director's impl/tests separation policy. The agent writing tests must approach the encoder as a consumer, not as the author. Do not modify the encoder to make tests easier — file a remediation back to the director if you find a real bug.
+- [ ] `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` exists and contains all seven sections above.
+- [ ] Step 3's fixture cross-check is reproducible: the doc must state explicitly which fixture and which block it verified, and the v0/v1 values must match the fixture bytes when packed LE.
+- [ ] Every claim about fn 15918's structure cites a specific bytecode pc range (verify-don't-assume rule).
+- [ ] The 11 helper call sites inside fn 15918 are classified (even if some entries are "unknown — 44.3 owns"); no silent omissions.
+- [ ] fn 20539 → fn 15918 call-site semantics documented at least at the level "X local holds the buffer that becomes fn 15918's arg N".
+- [ ] No modifications to `targets/`, `sample/`, `tools/vdata-generator/`, `tools/scraper/`, `tests/fixtures/`, `docs/`, or the `research/vm-slide-stack-vm/vdata-*-trace.js` tracer files.
+- [ ] `npm test` passes at **411/411**.
 
 ### Suggested Agent
-`general-purpose` — straightforward Node test authoring against an existing module + fixtures. Different agent instance than the one that did 43.3.
+`general-purpose` — static bytecode reading + pseudocode lifting. Different agent instance than 44.1 is acceptable but not required (44.2 is a continuation of the same static-analysis track, not an impl/tests pair).
 
-### Goal
-Produce two committed test fixtures under `tests/fixtures/` that 43.3's encoder can target for byte-identical verification, and resolve the 43.1 open caveat about whether vm-slide's custom base64 alphabet at bytecode pc 16932 is 64 or 65 chars. No encoder code yet — 43.2 is fixture capture + spec confirmation.
-
-### Context
-43.1 left two deferred items blocking 43.3 impl:
-
-1. **Non-idempotent live_run in `output/vm-slide/vdata-pipeline.json`** — `live_run.vdata` and `live_run.ciphertext_hex` vary per run because jsdom's object-enumeration order is non-deterministic and (likely) vm-slide uses an internal salt. The stable fields (`xtea_key_hex`, `encrypt_entry_pc`, `har_reference`, `plaintext_blocks` structure) are stable across re-runs. For 43.3's tests to pass deterministically, one run must be **frozen** as a committed fixture. Test time MUST NOT re-run the jsdom harness.
-
-2. **Alphabet-length = 65 mystery**. `research/vm-slide-stack-vm/vdata-dynamic-trace.js` line 59..60 hardcodes the alphabet as the 65-char string `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`. The decoder iterates `i < alphabet.length` so maps `Y` → index 64. By arithmetic coincidence `(64<<6)|64 = 0x1040`, which produces the constant `10 40` trailer bytes when `YY` appears as the last two chars of a base64 group. This works but is suspicious — real 6-bit base64 has 64 values, not 65. Two hypotheses:
-   - (a) Tencent's alphabet is genuinely 65 chars and `Y` at index 64 is a deliberate "overflow" trick used to emit the `10 40` trailer without a separate write — i.e. the trailer is literally "encode two Y's at the end" rather than "append two bytes `10 40`". This would mean the trailer is part of the base64 encode, not a separate step.
-   - (b) The alphabet is actually 64 chars and the hardcoded string in `vdata-dynamic-trace.js` has an extra character somewhere (maybe `Y` is a typo for something else, or the real alphabet ends at `m`). The trailer `10 40` would then be a separate 2-byte append before the base64 encode, which happens to always encode to `YY` if `Y` maps to 64 in the corrected alphabet.
-
-   43.2 must read the bytecode at pc 16932 directly via `output/vm-slide/bytecode.json` + `output/vm-slide/disassembly-full.txt` to settle this. The alphabet is built by a sequence of `OP_04 (OP_10 ch)*` string-build opcodes starting at pc 16932 — count the `OP_10` steps to get the authoritative length, then compare char-for-char to the hardcoded string.
-
-### Inputs
-- `output/vm-slide/vdata-pipeline.json` — machine-readable 43.1 spec. Read `xtea_key_hex`, `plaintext_blocks`, `har_reference.*`, `output_alphabet`.
-- `output/vm-slide/bytecode.json` — decoded 24,273-element bytecode. Slice around index 16932 to read the alphabet-build sequence.
-- `output/vm-slide/disassembly-full.txt` — Phase 40.1 full-coverage walker disassembly. Look for the `OP_04` starting pc 16932 and read the `OP_10` run that follows.
-- `research/vm-slide-stack-vm/VDATA-PIPELINE.md` §6 — already cites pc 16932 for the alphabet load; confirm against your direct read.
-- `research/vm-slide-stack-vm/vdata-dynamic-trace.js` lines 59-60 — the hardcoded alphabet string to verify or correct.
-- `sample/captcha-har.har` — the full verify POST + response. Extract the reference vData and the surrounding field set if needed.
-- `research/vm-slide-stack-vm/decoder.js`, `research/vm-slide-stack-vm/disassembler.js` — Phase 40 tooling. `OP_04` = PUSH_STR_EMPTY, `OP_10` = STR_APPEND_CHAR (or similar — confirm from `docs/VM_SLIDE_OPCODES.md`).
-- `docs/VM_SLIDE_OPCODES.md` — authoritative opcode table.
-
-### Implementation Steps
-
-1. **Read the alphabet from bytecode directly**. Write (or reuse existing walker/disassembler output) to dump the instruction sequence starting at pc 16932. Count the `OP_10` steps. The sequence is `OP_04` (push empty string) then N × `OP_10 <char_code>` (append one character), followed by some consumer. The total N gives the true alphabet length. Also record the exact character sequence for char-for-char comparison against `vdata-dynamic-trace.js`'s hardcoded string.
-
-2. **Update `research/vm-slide-stack-vm/VDATA-PIPELINE.md`** §5 and §8 (whichever sections describe the alphabet) with the definitive finding:
-   - If 65 chars: note explicitly that `Y` at index 64 is the trailer-encoding trick, explain the bit arithmetic, correct §5/§8 to remove the "alphabet length = 65 is suspicious" open question.
-   - If 64 chars: correct `vdata-dynamic-trace.js` hardcoded alphabet to the true 64-char form; note the trailer `10 40` is then a separate 2-byte append (verify by recomputing the jsdom and HAR decode against the corrected alphabet).
-   In either case, §4/§5 of VDATA-PIPELINE.md should end up fully consistent with the bytecode reality, not with the 43.1 hardcoded guess.
-
-3. **Freeze one deterministic jsdom capture as a committed fixture**. Run the existing `research/vm-slide-stack-vm/vdata-dynamic-trace.js` once. From the resulting `output/vm-slide/vdata-pipeline.json`, copy the *stable* fields and the *one captured run* into a new file `tests/fixtures/vdata-jsdom-capture.json` with this schema:
-
-   ```json
-   {
-     "source": "research/vm-slide-stack-vm/vdata-dynamic-trace.js",
-     "captured_at": "2026-04-13",
-     "notes": "Frozen single-run capture of the jsdom harness for 43.3 byte-identical tests. Re-running the harness produces a DIFFERENT capture due to non-deterministic fingerprint byte order; this fixture is the canonical test input.",
-     "xtea_key_hex": "32653433306638633135623764613936",
-     "output_alphabet": "<verified from step 1 — 64 or 65 chars>",
-     "plaintext_hex": "<112 bytes hex>",
-     "plaintext_blocks": [[v0, v1], ...14 entries],
-     "ciphertext_hex": "<114 bytes hex, including 10 40 trailer>",
-     "vdata_string": "<152 chars>",
-     "trailer_hex": "1040"
-   }
-   ```
-
-   The fixture must be self-sufficient: 43.3 and 43.4 will read this file directly, feed `plaintext_hex` (or `plaintext_blocks`) into the standalone encoder, and assert the output equals `vdata_string` byte-for-byte.
-
-4. **Freeze the HAR reference as a committed fixture**. Write `tests/fixtures/vdata-har-capture.json`:
-
-   ```json
-   {
-     "source": "sample/captcha-har.har",
-     "notes": "HAR reference vector from a real Chrome 146 capture of Tencent's captcha. Decrypted plaintext used as 43.3 test input to prove the encoder is byte-identical against live traffic — NOT just against jsdom.",
-     "xtea_key_hex": "32653433306638633135623764613936",
-     "output_alphabet": "<same as jsdom fixture>",
-     "har_vdata_string": "7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY",
-     "har_ciphertext_hex": "41f4f30830245004c817d13ca796e26dac36059827adca2f08edff6b2863d24071b5fdb709f50a2be7deada1e197dc283ec8d8c90ab21d361f5a8b15bc8a20a6430685be3e7897d074c2eea28a635eb58d8025250a154df0d363e6135b03afca8e7cd795eb846950e24e67e7091f6d461040",
-     "har_decrypted_plaintext_hex": "<112 bytes hex — decrypt the HAR ciphertext with the XTEA key using classical XTEA + LE packing>",
-     "har_decrypted_plaintext_ascii": "iimnfevn&=fr0=ae&700436t99p44=6865c=6Ll2oo40a2&dd&s=vi2To&DekCrne1s1Ls%y=2=2C2&1t2i2CdCdevcsm%l%&0kkkkkpkkykk=kk",
-     "trailer_hex": "1040"
-   }
-   ```
-
-   `har_decrypted_plaintext_hex` must be computed — do not hand-guess. Use the standalone classical XTEA decrypt already written inside `vdata-dynamic-trace.js` (or copy the inline decrypt the director used during 43.1 verification) against `har_ciphertext_hex[:224 hex chars]` (= 112 bytes = 14 blocks) to produce the plaintext bytes. Store hex + ASCII for human-readability. Store the trailer separately.
-
-5. **Self-check the fixtures** by re-decoding each fixture's `vdata_string` / `har_vdata_string` against the verified alphabet and confirming the result matches `ciphertext_hex` / `har_ciphertext_hex` byte-for-byte. Also decrypt each fixture's ciphertext (first 112 bytes, LE packing, 32 rounds XTEA with `xtea_key_hex`) and confirm it matches the stored `plaintext_hex` / `har_decrypted_plaintext_hex`. Both round-trips must hold before you commit the fixtures.
-
-6. **Write a short self-check script** `tests/fixtures/verify-vdata-fixtures.js` (or equivalent under `research/vm-slide-stack-vm/`) that a future test task (43.4) can invoke to re-run the round-trip verification at test time. This script is pure-JS (no jsdom), reads the two fixtures, and exits 0 if both round-trips hold. Node built-ins only. Use whichever location (`tests/fixtures/` or `research/vm-slide-stack-vm/`) is consistent with the project's testing conventions — check how existing tests load fixtures first.
-
-7. **Update `research/vm-slide-stack-vm/README.md`** — add a 43.2 bullet under "Phase 42/43 findings" pointing to the fixture files + self-check script; list the alphabet-length resolution.
-
-8. **Do NOT** create `tools/vdata-generator/`. That is 43.3's directory.
-
-### Warnings
-
-- **No jsdom in test-time fixtures**. The committed fixture must contain fully-resolved hex strings + the vdata output. 43.4's tests will NOT re-run jsdom; they will read the static JSON and assert encoder output matches.
-- **Do not modify `tools/scraper/vdata-harness.js`**. Production harness; has its own tests.
-- **Do not touch `targets/` or `sample/`**. Read-only per `.claude/rules/targets-readonly.md`.
-- **Do not make any git commits**. Director owns all commits after verification.
-- **If Step 1 reveals the alphabet is 64 chars** (i.e. the `Y` at index 64 in `vdata-dynamic-trace.js`'s hardcoded string is an extra character that does not exist in the bytecode), you MUST correct `vdata-dynamic-trace.js` to match the true 64-char alphabet AND re-run it to re-derive `output/vm-slide/vdata-pipeline.json`, then rebuild both fixtures from the corrected output. This is important because 43.3's encoder will use whatever fixture you commit — if the fixture is based on a wrong alphabet, the encoder will be wrong.
-- **If the task is too difficult or impossible to complete**, stop immediately and report back. In particular: if the alphabet is 65 chars AND decoding the HAR reference produces byte-identical bytes AND decoding the jsdom live run produces byte-identical bytes, but you cannot explain *why* 65 chars works, report the evidence and let the director decide whether to proceed or dispatch a deeper investigation.
-
-### Verification
-- [ ] Step 1 produces a definitive answer: the custom base64 alphabet is N chars (where N is 64 or 65), with the character sequence exactly matching the bytecode at pc 16932, verified by counting `OP_10` opcodes after `OP_04` at that pc.
-- [ ] `tests/fixtures/vdata-jsdom-capture.json` exists, follows the schema above, and is valid JSON.
-- [ ] `tests/fixtures/vdata-har-capture.json` exists, follows the schema above, and is valid JSON.
-- [ ] Both fixtures round-trip: decoding `vdata_string` with the verified alphabet produces `ciphertext_hex`; decrypting `ciphertext_hex[:112]` with classical XTEA + LE packing + `xtea_key_hex` produces `plaintext_hex`.
-- [ ] `verify-vdata-fixtures.js` (or equivalent) runs and exits 0. Does not require jsdom.
-- [ ] `research/vm-slide-stack-vm/VDATA-PIPELINE.md` is corrected/updated to reflect the true alphabet length.
-- [ ] `research/vm-slide-stack-vm/README.md` has a 43.2 bullet pointing at the new artifacts.
-- [ ] `npm test` passes at 353/353 (or 354+ if you wire the self-check into package.json — but prefer to leave that for 43.4).
-- [ ] No writes under `tools/vdata-generator/`.
-- [ ] No modifications to `tools/scraper/vdata-harness.js`, `targets/`, or `sample/`.
-
-### Suggested Agent
-`general-purpose` — bytecode reading, fixture authoring, JSON round-trip verification. No specialist agent fits better.
