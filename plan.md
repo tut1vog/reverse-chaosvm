@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide plaintext fingerprint reversal
-Current task: 44.2 — Plaintext-build static decompile to pseudocode (pending dispatch)
+Current phase: Phase 44 — vm-slide plaintext fingerprint reversal (**PLAN REVISION NEEDED** — 44.2 found the plaintext is built outside vm-slide)
+Current task: — (none; awaiting user confirmation of Phase 44 scope pivot)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -105,7 +105,7 @@ Current task: 44.2 — Plaintext-build static decompile to pseudocode (pending d
 | ID | Task | Status |
 |----|------|--------|
 | 44.1 | Encrypt-callsite back-walk + plaintext-build call graph (static + runtime caller-PC capture) | done |
-| 44.2 | Plaintext-build static decompile to pseudocode — `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` | pending |
+| 44.2 | Plaintext-build static decompile to pseudocode — `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` | done |
 | 44.3 | Dynamic property-read instrumentation — tap OP_47/OP_60/string-build inside the plaintext-build pc range, dump every `(object, key, value)` tuple, cross-check against the captured 112-byte plaintext to identify the 8 fields | pending |
 | 44.3.5 | Real-Chrome differential capture via Puppeteer — capture a third fixture from production Chrome using the `tools/captcha-solver/` infrastructure; cross-validate the schema from 44.3 against a non-jsdom environment | pending |
 | 44.4 | Per-run order resolution — run the instrumented harness ≥20 times across both jsdom and real Chrome, determine whether order varies (memory iteration) or content varies (internal salt); blocking for 44.5b | pending |
@@ -120,51 +120,20 @@ Current task: 44.2 — Plaintext-build static decompile to pseudocode (pending d
 
 ## Current Task
 
-**ID**: 44.2
-**Title**: Plaintext-build static decompile to pseudocode
-**Phase**: Phase 44 — vm-slide plaintext fingerprint reversal
-**Status**: pending — awaiting dispatch.
+— None. Phase 44 pivot pending user review (see history/20260413.md entry "44.2: plan pivot — plaintext lives in orchestrator, not vm-slide").
 
-### Goal
-Produce a readable pseudocode decompilation of the plaintext-build + encrypt-driver function **fn 15918** (body `[15918, 16230]`), with enough detail to identify how the 112-byte plaintext buffer is assembled, how it is sliced into 14 × 8-byte blocks, and where each block's two uint32 words come from. Secondarily, follow the call edge from **fn 20539** (proxyXHR send-handler, body `[20539, 20796]`) at its `OP_66` pc **20749** into fn 15918 to determine where fn 15918's input buffer argument originates. Output lives in `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md`.
+**Situation**: 44.2's decompile of fn 15918 proved vm-slide is a **pure encrypt stage** — fn 20539 (the proxyXHR send-handler) intercepts `xhr.send(body)`, passes `body` (already the 112-byte plaintext) to fn 15918 as arg 0, and fn 15918's 14-iteration loop just XTEA-encrypts that buffer 8 bytes at a time. The fingerprint plaintext is therefore assembled by the **captcha orchestrator** (Phase 41 `t_captcha_slide.js`, likely module 56), NOT by vm-slide. Tasks 44.3/44.4 as originally written targeted bytecode instrumentation inside vm-slide's plaintext-build region — that region does not exist.
 
-### Context (from 44.1 — verified)
-- All 14 encrypt calls in a single vData run come from **one single call site**: `OP_66 CALL_GLOBAL` at pc **16182** inside fn 15918's body.
-- fn 15918 has a 14-iteration loop: backedge `OP_06 15989` at pc 16064; loop body span `[15989, 16191]`.
-- fn 15918 is a **sibling closure** of the XTEA encrypt closure (fn 15241). Both are spawned by factory fn 15220. Factory pc 16231 is `OP_58 15918 3 2 9 8 10 6 11 9 3 4` — fn 15918 captures 3 upvalues via pairs (2→9), (8→10), (6→11). **Local 10 ← factory slot 8** at spawn time; that upvalue is almost certainly the encrypt closure reference fn 15918 invokes at pc 16182.
-- Static call-site scan of fn 15918 found 11 call/invoke ops including the target pc 16182 (`OP_66`), plus pcs 15950/15971 (OP_25), 16037/16039, 16131/16133, 16169/16171, 16197 — these are the helper calls fn 15918 makes for each iteration (slice/append/convert). 44.2 should map each of these to a semantic role.
-- fn 15918 is called from fn 20539 (proxyXHR send-handler) at pc **20749** via `OP_66`. fn 20539's entry is called from native JS (harness-installed `XMLHttpRequest.prototype.send` replacement) — its "caller pc" in the runtime capture is stale (VM_EXIT, op 16), which is expected.
-- Encrypt closure takes 3 args (FUNC_CREATE with 3 params); 44.1 noted locals 6 and 7 hold `v0, v1` at the call site; local 5 is the third arg (likely the destination buffer / index).
-- vm-slide dispatch is stack-based; see `docs/VM_SLIDE_ARCHITECTURE.md` for the dispatch loop and `docs/VM_SLIDE_OPCODES.md` for the opcode table (53 non-null handlers).
-- The 112-byte plaintext has 8 `key=value` pairs joined by `&` (exactly 8 `=`, 7 `&`). Per-run byte order varies; multiset is invariant within an environment.
+**What still holds**:
+- 44.3.5 (real-Chrome differential capture via Puppeteer) — still valid and still useful as a third fixture; the capture target shifts from "vm-slide fingerprint" to "orchestrator pre-encrypt body".
+- 44.5a (replay-with-substitution plaintext builder) — still valid; it consumes a captured 112-byte plaintext and emits a substituted one. Agnostic to where the plaintext was built.
+- 44.6 / 44.7 (tests + docs closeout) — structurally still valid.
 
-### Inputs
-- `output/vm-slide/bytecode.json` (24,273 elements; slice [15918, 16230] for fn 15918, [20539, 20796] for fn 20539).
-- `output/vm-slide/disassembly-full.txt` (Phase 40.1 walker output — includes both functions, already decoded).
-- `output/vm-slide/vdata-callgraph.json` (44.1 artifact — has the 11 static call sites inside fn 15918, the spawn-site capture pairs, and both function body ranges).
-- `research/vm-slide-stack-vm/plaintext-callgraph.md` (44.1 narrative).
-- `research/vm-slide-stack-vm/{walker,decoder,disassembler}.js` (Phase 39/40 tooling — reuse for any re-walks you need).
-- `docs/VM_SLIDE_OPCODES.md`, `docs/VM_SLIDE_ARCHITECTURE.md` (authoritative opcode + dispatch semantics).
-- `tests/fixtures/vdata-jsdom-capture.json`, `tests/fixtures/vdata-har-capture.json` (committed plaintexts to cross-check hypotheses against).
+**What needs to change**:
+- 44.3: retarget from vm-slide bytecode instrumentation to **orchestrator JS-level tracing**. Use Phase 41's `docs/CAPTCHA_ORCHESTRATOR.md` module map + the existing Puppeteer harness to hook `XMLHttpRequest.prototype.send` *before* vm-slide's proxyXHR wraps it, capture the plaintext `body` string at the hook site, and back-walk in JS to find which orchestrator function assembled it.
+- 44.4: per-run order resolution still matters but now targets **JS iteration semantics** (likely `for (k in obj)` or `Object.keys()` order over a fingerprint object) rather than VM-internal order.
+- 44.5b: full synthesis becomes a JS-environment fingerprint builder mirroring the orchestrator's logic — completely different codebase than a bytecode walker.
 
-### Implementation Steps
-1. **Slice and label fn 15918's body.** Extract the `[15918, 16230]` disassembly region. Annotate each instruction with its role: prologue (arg unpack, local init), loop header, loop body (iteration = one 8-byte block), loop tail, return. Use the existing disassembler text from `disassembly-full.txt`; do not re-run the walker unless you need to.
-2. **Classify each of fn 15918's 11 call sites** by stack-effect reasoning: which are `slice`-style string/buffer carves, which are `charCodeAt`-style byte reads, which are uint32 packers, and which is the encrypt call at pc 16182. Pull operand/stack effects from `docs/VM_SLIDE_OPCODES.md`.
-3. **Trace the v0/v1 uint32 words.** For the encrypt call at pc 16182, walk backward inside the loop body `[15989, 16191]` to find where locals 6 and 7 (the encrypt args) are written. Identify the byte-to-uint32 packing convention (LE per Phase 43). Cross-check against `tests/fixtures/vdata-jsdom-capture.json`'s `plaintext_blocks` — pick block N, reproduce its two words by hand from the first N×8 bytes of `plaintext_hex`, and confirm the packing matches.
-4. **Trace fn 15918's input buffer argument.** fn 15918 takes N args; the primary is the 112-byte plaintext buffer (or the source it is assembled from). Identify which local receives it in fn 15918's prologue. Then cross fn boundary: inspect fn 20539's body around pc 20749 (the `OP_66` that calls fn 15918) and record what is pushed on the stack as fn 15918's arguments at that call site. Record the upstream data-flow one level back — enough to say "fn 20539 assembles X from Y and passes it to fn 15918".
-5. **Produce pseudocode.** Write readable JS-like pseudocode for fn 15918, with comments naming each bytecode pc range. Keep opcode names where semantics are ambiguous; lift to JS where semantics are clear. The pseudocode must show: (a) arg unpack, (b) any pre-loop setup, (c) the 14-iteration loop structure, (d) per-iteration block extraction, (e) v0/v1 packing, (f) the encrypt call, (g) any post-loop assembly / return. Include a second, shorter pseudocode block for fn 20539's call site at pc 20749 (just enough context to see what flows into fn 15918).
-6. **Open-questions list.** Any opcode semantics you could not pin down, any helpers whose role you could not classify, any data-flow edges you could not resolve — list them explicitly at the bottom of `PLAINTEXT-BUILD.md` so 44.3's dynamic instrumentation can resolve them.
-7. **Write `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md`** with sections: Summary, Inputs, fn 15918 pseudocode, fn 20539 → fn 15918 call-site snippet, Block-extraction verification (the fixture cross-check from step 3), Helper call-site classification table, Open questions for 44.3.
+**Also flagged for follow-up**: 44.2's static decompile surfaced a "slot 4 contradiction" inside fn 15918 (first-loop treats slot 4 as a 16-byte sliceable buffer, but fn 20539 demonstrably passes `{py:"0"|"1"}` at the call site). One plausible reading: the first loop is XTEA key expansion over a 16-byte key constant that is supplied via an upvalue under some other path, and the `{py}` arg takes a different local slot at runtime. Not blocking — 44.3's JS-level trace will incidentally resolve it or push it to a separate micro-task.
 
-### Verification
-- [ ] `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` exists and contains all seven sections above.
-- [ ] Step 3's fixture cross-check is reproducible: the doc must state explicitly which fixture and which block it verified, and the v0/v1 values must match the fixture bytes when packed LE.
-- [ ] Every claim about fn 15918's structure cites a specific bytecode pc range (verify-don't-assume rule).
-- [ ] The 11 helper call sites inside fn 15918 are classified (even if some entries are "unknown — 44.3 owns"); no silent omissions.
-- [ ] fn 20539 → fn 15918 call-site semantics documented at least at the level "X local holds the buffer that becomes fn 15918's arg N".
-- [ ] No modifications to `targets/`, `sample/`, `tools/vdata-generator/`, `tools/scraper/`, `tests/fixtures/`, `docs/`, or the `research/vm-slide-stack-vm/vdata-*-trace.js` tracer files.
-- [ ] `npm test` passes at **411/411**.
-
-### Suggested Agent
-`general-purpose` — static bytecode reading + pseudocode lifting. Different agent instance than 44.1 is acceptable but not required (44.2 is a continuation of the same static-analysis track, not an impl/tests pair).
-
+**Director recommends** user confirm the pivot and let the director redraft Phase 44 tasks 44.3..44.5b against the orchestrator target before dispatching anything further.
