@@ -1,10 +1,12 @@
 # Plan
 
 ## Status
-Current phase: Phase 42 COMPLETE — vData runtime binding resolved in mechanism (captcha-orchestrator track substantively closed)
-Current task: none — Phase 42 done, awaiting next user direction
+Current phase: Phase 43 — Byte-identical vData generator
+Current task: 43.1 — Hybrid static+dynamic XTEA/plaintext extraction
 
-**Dispatch order** (user-confirmed 2026-04-12): 40.1 → 40.2 → 40.5 → 40.4 → 40.6 → 40.3. Rationale: walker upgrade first (blocks 40.3 and 40.6); walker tests by a different agent per impl/tests separation; then small-and-independent cleanups (40.5 / 40.4) while investigative work is still unblocked; then the XTEA investigation which benefits from the walker; then the vm-slide docs refresh which needs both the walker and the investigation's outcome.
+**Dispatch order** (user-confirmed 2026-04-13): 43.0 → 43.1 → 43.2 → 43.3 → 43.4 → 43.5. Rationale: rename frees the namespace for the new standalone; hybrid static+dynamic extraction narrows the pipeline; validation fixture locks the ground truth; impl then tests (different agents per impl/tests separation); docs last, director-owned.
+
+**Phase 43 recommendation (user-confirmed 2026-04-13)**: use the existing `tools/scraper/vdata-generator.js` jsdom harness as the dynamic oracle instead of Puppeteer — it already runs vm-slide's real bytecode through its XHR proxy path, so its output is ground truth. Puppeteer live capture via `tools/captcha-solver/live-submit.js` kept as an optional tail validation vector in 43.4.
 
 ---
 
@@ -21,97 +23,174 @@ Current task: none — Phase 42 done, awaiting next user direction
 | 38.4 | Fix latent string-literal path misses from 38.1 (survey.js, diagnose.js) | done |
 | 38.5 | Move the 5 previously-ambiguous scripts to their decided homes (user-confirmed 2026-04-12) | done |
 
-### Phase 39: vm-slide stack VM (Stream B — Track 1, top priority)
-> Decompile `sample/vm_slide.js` — stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`). First-pass documentation only per user option (3) — the full control-flow-aware disassembler upgrade is deferred to Phase 40. Docs must explicitly state the ~2% coverage limitation.
+### Phase 39: vm-slide stack VM (Stream B — Track 1) — DONE
+> Decompile `sample/vm_slide.js` — stack-based ChaosVM variant (`__TENCENT_CHAOS_STACK`). First-pass documentation with ~2% coverage limitation.
 
 | ID | Task | Status |
 |----|------|--------|
 | 39.1 | Implement vm-slide decoder + disassembler under `research/vm-slide-stack-vm/` | done |
 | 39.2 | Write tests for vm-slide decoder + disassembler | done |
-| 39.3 | Write `docs/VM_SLIDE_ARCHITECTURE.md` + `docs/VM_SLIDE_OPCODES.md` from source inspection (first-pass, admits ~2% coverage) | done |
+| 39.3 | Write `docs/VM_SLIDE_ARCHITECTURE.md` + `docs/VM_SLIDE_OPCODES.md` from source inspection | done |
 | 39.4 | Write `docs/CHAOSVM_VARIANTS.md` — top-level register-vs-stack comparison | done |
-| 39.5 | Update `project-brief.md` with corrected vm-slide facts (53 opcodes, 24K bytecode, XTEA finding) + refresh `research/vm-slide-stack-vm/README.md` status to `partial` | done |
+| 39.5 | Update `project-brief.md` + refresh track README to `partial` | done |
 
-### Phase 40: Phase-39 follow-ups + session cleanup (planned, not yet started)
-> Addresses the deferred issues surfaced during Phase 38-39 and upgrades the vm-slide disassembler to full coverage. Each task is independent; they can be dispatched in any order the user prefers.
+### Phase 40: Phase-39 follow-ups + session cleanup — DONE
 
 | ID | Task | Status |
 |----|------|--------|
-| 40.1 | Upgrade vm-slide disassembler with control-flow-aware walker (static CFG, adapt approach from `research/tdc-register-vm/cfg-builder.js`). **Must special-case opcode 58 FUNC_CREATE**: its runtime byte width is `3 + 2·A + C`, not the static count of 6. The current linear walker mis-parses after the first FUNC_CREATE, which is likely why it halts at pc=512. Fix FUNC_CREATE handling FIRST, then address control-flow. | done |
+| 40.1 | Upgrade vm-slide disassembler with control-flow-aware walker | done |
 | 40.2 | Tests for control-flow walker | done |
-| 40.3 | Refresh `docs/VM_SLIDE_ARCHITECTURE.md` + `docs/VM_SLIDE_OPCODES.md` using full-coverage disassembly from 40.1 + XTEA finding from 40.6; promote track status from `partial` to `closed` | done |
-| 40.4 | Diagnose intermittent `tests/test-scraper-foundation.js → template-cache: lookup` flake (17+ sightings in Phases 38-40) | done |
-| 40.5 | Resolve orphaned `tests/test-auto-port.js` — either add it back to `package.json` `scripts.test` (and fix any breakage) or delete it intentionally | done |
-| 40.6 | Cross-track investigation: does vm-slide run an XTEA round function on eks data? (XTEA delta `0x9E3779B9` appears twice in the vm-slide bytecode — flagged by 39.1. Connects to `eks-payload` and `key-mod` tracks.) | done — CONFIRMED classical XTEA, both encrypt (entry 15241) and decrypt (entry 15416) |
+| 40.3 | Refresh `docs/VM_SLIDE_ARCHITECTURE.md` + `docs/VM_SLIDE_OPCODES.md` using full-coverage disassembly | done |
+| 40.4 | Diagnose intermittent `tests/test-scraper-foundation.js → template-cache: lookup` flake | done |
+| 40.5 | Resolve orphaned `tests/test-auto-port.js` | done |
+| 40.6 | Cross-track XTEA investigation — CONFIRMED classical XTEA, both encrypt (entry 15241) and decrypt (entry 15416) | done |
 
-### Phase 42: vData runtime binding reversal
-> Resolve Phase 41's single unresolved question: where does the `vData` verify-body field come from? Orient spike already confirmed (a) the string `getVData` is present exactly once as an `OP_04 OP_10* OP_13` run in `output/vm-slide/bytecode.json`, (b) `vData=` and `&vData=` are also present as pre-baked URL-fragment constants, (c) zero `ajaxPrefilter`/`ajaxTransport`/`ajaxSettings`/`beforeSend` strings appear anywhere in vm-slide — so the FLOW.md §9 Q1 hypothesis is wrong in mechanism (no jQuery ajax hook) but right in location (vm-slide installs `window.getVData` directly). Phase 40 already shipped the full-coverage disassembler + dispatch table, so this is a focused static-analysis task.
-
-| ID | Task | Status |
-|----|------|--------|
-| 42.1 | vm-slide vData static trace — locate every `OP_04 OP_10* OP_13` anchor for `"getVData"` / `"vData="` / `"&vData="`, walk surrounding basic blocks, identify property-write vs property-read, extract the installed function body, produce a reproducible script + analysis note | done |
-| 42.2 | Cross-reference against FLOW.md §6 + HAR + crypto provenance scan — confirm the function signature matches `window.getVData(n.join("&"))` and characterise where the 152-char HAR value's crypto comes from | done — mechanism resolved: vm-slide installs an XHR proxy on Chrome (not `window.getVData`), crypto is modified-XTEA + custom 64-char base64, window-installs=1 (only getVData on IE9 fallback) |
-| 42.3 | Docs bookkeeping — update `docs/CAPTCHA_ORCHESTRATOR.md` §6/§8, `research/captcha-orchestrator/README.md` status, `FLOW.md` §9 Q1 post-script with the resolved mechanism. Also correct 42.1's VDATA-TRACE.md framing that the install is "unconditional" (it isn't — it's IE9-gated). Promote the three Phase 39/40 vm-slide docs from CLAUDE.md "new docs planned" list into the main doc table. | done |
-
-### Phase 41: Minor cleanup + Captcha orchestrator (Stream B Track 2)
-> Two tiny cleanups from 40.4's deferred findings, then Stream B Track 2 — analyze `sample/t_captcha_slide.js` (213 KB webpack bundle) to document the end-to-end CAPTCHA flow. Track 2's DoD from `project-brief.md`: `docs/CAPTCHA_ORCHESTRATOR.md` with show-page load → vm-slide fetch → vData compute → verify POST → ticket, identifying every origination point for `collect`, `eks`, `vData`, `nonce`, `sess`, `sig`. The file is a standard webpack bundle with a module array, which makes static analysis via acorn tractable (same approach as `tools/porting-pipeline/vm-parser.js`).
+### Phase 41: Captcha orchestrator (Stream B Track 2) — DONE
 
 | ID | Task | Status |
 |----|------|--------|
-| 41.1 | Add `config.target` type guard to `TemplateCache.seed()` (impl only — 1-line defensive check noted as a secondary finding in 40.4) | done |
+| 41.1 | Add `config.target` type guard to `TemplateCache.seed()` | done |
 | 41.2 | Tests for the type guard | done |
-| 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` (says "pipeline/run.js" but the assertion underneath uses the post-restructure path) | done |
-| 41.4 | Captcha orchestrator survey — acorn-parse `sample/t_captcha_slide.js`, enumerate webpack modules, map the module graph, identify which modules touch vm-slide loading / verify POST / vData construction. Source-only, no deep analysis yet. | done |
-| 41.5 | Captcha orchestrator deep analysis — trace the show-page → vm-slide fetch → vData compute → verify POST flow across the relevant modules identified by 41.4. Cross-reference `sample/captcha-har.har` network trace. Confirm `sample/slide-jy.js` is vanilla jQuery. | done |
-| 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` from 41.4/41.5 findings. Required sections per DoD: show-page load, vm-slide fetch, vData compute, verify POST assembly, ticket return, plus an origination table for `collect`/`eks`/`vData`/`nonce`/`sess`/`sig`. | done |
-| 41.7 | Update `research/captcha-orchestrator/README.md` — promote status `open → partial` (or `closed` if 41.5 reached full understanding) and populate How-to-reproduce + Notes from the committed artifacts. | done |
+| 41.3 | Clean up stale describe-block text at `tests/test-auto-port.js:358` | done |
+| 41.4 | Captcha orchestrator survey — webpack module graph + candidate mapping | done |
+| 41.5 | Captcha orchestrator deep analysis — end-to-end flow trace + 39-field origination | done |
+| 41.6 | Write `docs/CAPTCHA_ORCHESTRATOR.md` | done |
+| 41.7 | Bump `research/captcha-orchestrator/README.md` status + populate reproducibility | done |
+
+### Phase 42: vData runtime binding reversal — DONE
+
+| ID | Task | Status |
+|----|------|--------|
+| 42.1 | vm-slide vData static trace — locate `OP_04 OP_10* OP_13` anchors for `getVData`/`vData=`/`&vData=` | done |
+| 42.2 | Cross-reference FLOW.md §6 + HAR + crypto provenance scan — mechanism resolved (Chrome: XHR proxy; IE9: `window.getVData`) | done |
+| 42.3 | Docs bookkeeping — `docs/CAPTCHA_ORCHESTRATOR.md` + `FLOW.md` §9 Q1 + README bumps + CLAUDE.md Project Memory | done |
+
+### Phase 43: Byte-identical vData generator (Stream B Track 2 follow-up, in progress)
+> Ship `tools/vdata-generator/` — a standalone white-box reimplementation of vm-slide's vData pipeline that produces byte-identical output matching a captured HAR vector. Builds on Phase 42's resolved mechanism: classical XTEA (delta `0x9E3779B9`, 32 rounds, encrypt entry pc 15241, decrypt entry pc 15416) + custom 64-char base64 alphabet `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` at pc 16932. What's still unknown: (a) exact 16-byte XTEA key, (b) exact plaintext layout fed into encrypt, (c) output assembly (is base64 the entire vData or is there a wrapper?). Reference vector: 152-char vData from `sample/captcha-har.har`.
+
+| ID | Task | Status |
+|----|------|--------|
+| 43.0 | Rename `tools/scraper/vdata-generator.js` → `tools/scraper/vdata-harness.js` + update all imports (director-owned) | done |
+| 43.1 | Hybrid static+dynamic XTEA/plaintext extraction via jsdom harness instrumentation + Phase 40 walker cross-check | in-progress |
+| 43.2 | Validation trace against HAR fixture — produce committed `tests/fixtures/vdata-har-capture.json` | pending |
+| 43.3 | Standalone generator `tools/vdata-generator/{xtea.js, custom-base64.js, plaintext.js, cli.js}` | pending |
+| 43.4 | Tests for the standalone generator (different agent) + optional live fresh-capture validation via `tools/captcha-solver/live-submit.js` | pending |
+| 43.5 | Docs — new `docs/VDATA_FORMAT.md`, update `docs/CAPTCHA_ORCHESTRATOR.md` §6 with byte-level spec, track README + CLAUDE.md Project Memory bumps (director-owned) | pending |
 
 ---
-
-
-
-
-
-
-
-
-
 
 ## Current Task
 
-**none — Phase 42 complete.**
+**ID**: 43.1
+**Title**: Hybrid static+dynamic XTEA/plaintext extraction
+**Phase**: Phase 43 — Byte-identical vData generator
+**Status**: in-progress
 
-Phase 42 closed in three tasks:
-- **42.1** — vm-slide vData static trace. Wrote `research/vm-slide-stack-vm/vdata-trace.js` + `VDATA-TRACE.md` + `output/vm-slide/vdata-anchors.json`. Identified the `[window, "getVData"] + OP_58 + OP_24` property-write sequence at bytecode pcs 19681/20059/20066 with function body `[19702, 20058]`.
-- **42.2** — cross-reference + crypto provenance scan. Wrote `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` + `vdata-provenance.js` + `output/vm-slide/window-installs.json`. Discovered the outer IE-gate at bytecode pc 19636 (`OP_60 19666` on `<state>.isIE9Below()`) that 42.1 had missed one block up. Enumerated all `[window, <key>] + FUNC_CREATE + OP_24` installs and found exactly **1** (`getVData`, only on IE9). Verified the crypto pipeline ingredients (XTEA delta `0x9E3779B9` at bytecode[15352]/[15530], custom 64-char base64 alphabet at pc 16932, char-set validation regex at pc 17677) and confirmed the full 152-char HAR `vData` value's character set is a strict subset of the alphabet.
-- **42.3** — director-owned docs bookkeeping. Rewrote `docs/CAPTCHA_ORCHESTRATOR.md` §2 step 7 + §4 header table row + §5.2 origination row + §6 `vData` subsection + §8 open questions with the resolved mechanism. Added a 42.2 correction post-script to `research/vm-slide-stack-vm/VDATA-TRACE.md`. Appended a resolution post-script to `research/captcha-orchestrator/FLOW.md` §9 Q1. Bumped `research/captcha-orchestrator/README.md` status to "closed (mechanism)" with a narrower `vData` byte-identical follow-up flagged. Updated `research/vm-slide-stack-vm/README.md` with Phase 42 findings + new reproduction commands. Promoted the three Phase 39/40 vm-slide docs (`CHAOSVM_VARIANTS.md`, `VM_SLIDE_ARCHITECTURE.md`, `VM_SLIDE_OPCODES.md`) from the CLAUDE.md "new docs planned" list into the main doc table, and added a Phase 42 paragraph to CLAUDE.md's "Project Memory — Established Facts" section.
+### Goal
+Pin down the exact byte-level pipeline that converts a verify POST body into the `vData` string. Produce a written, reproducible specification of: (a) the XTEA key (16 bytes, classical variant), (b) the plaintext structure being encrypted (what fields are concatenated, in what order, with what separators and padding), (c) the ciphertext → custom-base64 transform, and (d) where each stage lives in `sample/vm_slide.js` bytecode. This is the foundational task that everything else in Phase 43 depends on. No standalone code under `tools/` yet — 43.1 is research.
 
-Tests stayed at 353/353 throughout. No code changes; Phase 42 was purely research + docs.
+### Context
+Phase 42 already resolved the *mechanism*: on Chrome vm-slide calls `<state>.proxyXHR(p[3])` at bytecode pc 19662, which installs an `XMLHttpRequest.prototype.send`/`open` monkey-patch. The monkey-patch intercepts the orchestrator's verify POST and rewrites the body to append `vData=<ciphertext>`. What's still unknown is the byte-level detail of that rewrite.
 
-**The vData mechanism in one paragraph**: on Chrome, vm-slide takes a fall-through branch at bytecode pc 19636 that calls `<state>.proxyXHR(p[3])` at pc 19662. `proxyXHR` installs an `XMLHttpRequest.prototype.send`/`open` monkey-patch that intercepts the orchestrator's verify POST and injects `vData=<ciphertext>` into the outgoing body before `send()` completes. The ciphertext is built from modified XTEA (delta `0x9E3779B9`) followed by a custom 64-char base64 alphabet containing `-_*` as its non-alphanumeric members. On IE9 and below, the same gate instead installs `window.getVData` at pc 20066 and the orchestrator's `if (a.isLowIE())` branch calls it explicitly. The two paths are mutually exclusive and `window.getVData` is never installed on Chrome. The captcha-orchestrator research track is substantively closed; a narrower byte-identical-reproducibility follow-up is available but was not required by Track 2's DoD.
+Known crypto ingredients (from `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` §3 + Phase 40.6):
+- **Classical XTEA** (not the modified variant used by the register-VM `tdc.js` family). Encrypt closure entry pc 15241, decrypt closure entry pc 15416. Delta `0x9E3779B9` at bytecode indices 15352 and 15530. 32 rounds (sum-bounded at `32·delta = 84941944608`). Both encrypt and decrypt are instantiated by a single outer factory at entry pc 15220, spawned via `FUNC_CREATE 15220 0 3 3 4 5` near pc 16835; the factory takes 3 arguments including key material in local slot 4 (Phase 40.6 finding).
+- **Custom 64-char base64 alphabet** at pc 16932: `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`. Every character in the 152-char HAR `vData` value is a member of this alphabet (zero outliers — verified by 42.2).
+- **Char-set validator regex** at pc 17677: `[^A-Za-z0-9\-\_\*]`. Matches the alphabet's non-alphanumerics.
+- **Reference HAR `vData` value** (from `sample/captcha-har.har`): `7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY` (152 chars, `len % 4 == 0`, decodes to 114 raw bytes ≈ 14 × 8-byte XTEA blocks).
 
-**Captcha-orchestrator track status**: closed (mechanism). Follow-up available for byte-identical `vData` generator (extract XTEA key + characterize plaintext + build standalone tool).
+What's *still unknown* from Phase 42 and needs 43.1 to resolve:
+1. **Exact 16-byte XTEA key** — constant baked into bytecode, or derived at runtime from session state?
+2. **Exact plaintext layout** — is it the query-string `n.join("&")` shape the orchestrator's `window.getVData` fallback uses (`aid=...&protocol=...&accver=...&...`)? Or the raw POST body? Or a session-state snapshot? What padding scheme reaches the 114-byte boundary?
+3. **XHR proxy body pc range** — Phase 42 localized it to approximately pcs 15000..20700 but did not decompile it. 43.1 must identify the specific entry pc of the proxy function, the path from there to the XTEA encrypt call, and the path from XTEA encrypt output to the custom-base64 transform.
+4. **Output assembly** — is the final `vData=<base64>` built inside vm-slide and the entire `key=value` pair injected, or does vm-slide return just the value and the XHR proxy prepends the `vData=`?
 
-**Open research tracks the user may want to tackle next** (per `project-brief.md` priority backlog):
-- **Byte-identical vData generator** — narrow follow-up to Phase 42. Decompile the vm-slide XHR proxy body (bytecode pcs ~15000..20700), extract the XTEA key schedule, build a standalone generator under `tools/`. Bounded and well-scoped.
-- **eks payload structural reversal** — `research/eks-payload/` still `open`. `eks` confirmed transport-only in Phases 41 + 42 (orchestrator reads `TDC.getInfo().info`, never derives its own), but its internal structure is still unknown.
-- **Template pool survey** — `research/template-pool/` still `open`. Classify many live `tdc.js` builds and measure Tencent's template rotation.
-- **Key-modification constants** — `research/key-mod/` still `open`. Cross-template diff of XTEA key-mod constants between Templates A, B, C (register-VM only; Phase 40 confirmed this does NOT apply to vm-slide).
-- **Collector field count** — is 59 template-specific or constant?
-- **errorCode 12** — confirm whether verify-endpoint 12 is fingerprint/behavioral scoring. Phase 41 found module 56 treats it as soft-retryable via a cover error, consistent with existing `docs/ERRORCODE_12_INVESTIGATION.md` but still not fully characterized.
+### Two-pronged approach
 
-No task in progress. Awaiting next user direction.
+**Prong A — Dynamic trace via jsdom harness instrumentation.**
 
-### Prior: 41.6 (completed)
-Wrote `docs/CAPTCHA_ORCHESTRATOR.md` — 607 lines, 9 sections, full 39-row origination table split into upstream passthroughs (24) vs orchestrator-computed (15). `vData` honestly framed as unresolved in §5.2, §6, and §8. Module 8 not-the-vm-slide-loader finding prominent in §2. §9 reconciliation records "no contradictions" with `docs/HAR_ANALYSIS.md`, `docs/TOKEN_FORMAT.md`, `docs/EKS_FORMAT.md`, `docs/ERRORCODE_12_INVESTIGATION.md`. Director added the new doc to CLAUDE.md's main doc table.
+The existing `tools/scraper/vdata-harness.js` (just renamed by 43.0) already executes `sample/vm_slide.js` inside jsdom with a pre-installed `XMLHttpRequest.prototype.send` hook. For 43.1 we extend the harness temporarily — NOT in production code, but in a new research script under `research/vm-slide-stack-vm/vdata-dynamic-trace.js` — to capture the crypto internals:
 
-### Prior: 41.5 (completed — user confirmed option (a))
-Full static end-to-end flow trace via `research/captcha-orchestrator/FLOW.md` (612 lines) + `trace-flow.js` → 39-field `verify-body-origination.json` + `slide-jy-diff.js` → library classification. Both 41.4 candidate hypotheses overturned (module 8 only fetches `/slide-jy.js`; module 76 is Zepto, `slide-jy.js` is jQuery 1.11.3 — different libraries). Module 41 parked as i18n caption table. 38/39 verify-body fields traced cleanly; `vData` is the single unresolved static question.
+1. **Before loading vm-slide into jsdom**, install hooks on all the primitives XTEA might use: `Uint8Array`, `Uint32Array`, `DataView`, `Array.prototype.push`, `String.prototype.charCodeAt`, `String.fromCharCode`. Record every call.
+2. **After vm-slide loads but before firing the XHR**, capture a snapshot of the jsdom global object. Diff against the pre-load snapshot to see every property vm-slide installed. This is how we find the `proxyXHR` reference and any key material that made it to globals.
+3. **During the verify-POST fire**, observe the order of primitive calls between the harness's body serialization and the final `send` invocation. The XTEA 32-round structure is unmistakable: 32 consecutive iterations where a running `sum` folds `delta=0x9E3779B9` with bit-mixed `v0`/`v1` words. Record the key bytes as they're XORed.
+4. **Capture** `{pre_body, post_body, plaintext_bytes, key_bytes, ciphertext_bytes, vData_string}` as JSON.
 
----
+The big advantage of Prong A: we don't need to read vm-slide disassembly to get the answer. The dynamic trace hands us the key and plaintext directly.
 
-## Phase 41 execution strategy
+**Prong B — Static cross-check via Phase 40 walker.**
 
-After 41.1 and 41.2 (cleanup + tests) and 41.3 (describe text cleanup), 41.4 is a **survey** task that characterizes the orchestrator file before any deep analysis. After 41.4 returns, the director will **pause for a mid-phase check-in** so the user can confirm the deep-analysis scope based on what the survey finds. If the module structure is clean and tractable, 41.5-41.7 auto-continue. If the survey reveals something unexpected (heavy obfuscation, dynamic loading, indirect dispatch that static analysis can't follow), the director re-plans before dispatching deep analysis.
+Prong A gives us the ground truth. Prong B confirms it lives where we think it lives and that the static bytecode structure matches what we observed dynamically. Use `research/vm-slide-stack-vm/walker.js` to enumerate function bodies in pcs 15000..20700. Cross-reference against `output/vm-slide/window-installs.json` (42.2) and Phase 40.6's findings about the XTEA factory at pc 15220. Produce a short annotated disassembly window covering:
+- The outer factory at pc 15220 and its arguments
+- The two closures it spawns (encrypt entry 15241, decrypt entry 15416)
+- The `proxyXHR` function body (wherever it turns out to live — Phase 42 localized to ~15000..20700)
+- The call path from `proxyXHR` to the encrypt closure
 
-This mirrors the 39.2→39.3 mid-track strategy call pattern from Phase 39: survey → pause → deep analysis.
+This locks the dynamic trace onto bytecode coordinates so future builds can be diffed against it.
+
+### Inputs (read these)
+- `sample/vm_slide.js` — vm-slide source (read-only target).
+- `sample/captcha-har.har` — the HAR capture. Extract the full verify-POST field set (`sample/payload.txt` is a related sample) and the reference `vData` string above.
+- `sample/slide-jy.js` — jQuery 1.11.3, used by the harness to serialize the POST body in exactly the shape vm-slide expects.
+- `tools/scraper/vdata-harness.js` — the existing jsdom harness. Read its full 98 lines before writing the instrumented variant — you'll reuse its jsdom bootstrap, pre-send hook pattern, and user-agent stubbing.
+- `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — Phase 42's write-up. Section §3 lists every known crypto-adjacent pc. Section §4 is the resolution verdict. Section §5 is a suggested 42.3 hand-off that Phase 43 is executing.
+- `research/vm-slide-stack-vm/VDATA-TRACE.md` — Phase 42.1 static trace with the 42.2 correction post-script. Use for pc coordinates of the `getVData` IE9 branch; *not* the proxyXHR branch you care about.
+- `docs/CAPTCHA_ORCHESTRATOR.md` §6 — the `vData` sub-section. Reconcile any byte-level finding here.
+- `output/vm-slide/bytecode.json` — the decoded 24,273-element bytecode array. Read-via-index in your research script.
+- `output/vm-slide/disassembly-full.txt` — full-coverage CFG walker output from Phase 40.1. Use for static cross-reference.
+- `output/vm-slide/window-installs.json` — reproducible `[window, <key>]` install enumeration from 42.2.
+- `research/vm-slide-stack-vm/walker.js`, `decoder.js`, `disassembler.js` — Phase 40 tooling. The walker exposes a function-body enumerator; the disassembler produces the text format used in `disassembly-full.txt`.
+- `research/vm-slide-stack-vm/xtea-hunt.js` — Phase 40.6's annotated XTEA disassembly script. Use for the encrypt/decrypt closure shape reference.
+- **Do NOT** touch `targets/` or `sample/` files — read-only per `.claude/rules/targets-readonly.md`.
+
+### Implementation Steps
+
+1. **Set up the research directory**. Create `research/vm-slide-stack-vm/vdata-dynamic-trace.js` as a new file (not in `tools/`, this is research). Add a short comment block pointing back to Phase 43 and this plan task.
+
+2. **Build the instrumented jsdom harness**. Start from the structure of `tools/scraper/vdata-harness.js` — same jsdom bootstrap, same pre-send hook, same jQuery + vm-slide load order. Extend with the instrumentation hooks listed under Prong A step 1. The hooks should be installed on `dom.window.*` BEFORE vm-slide is injected. All hook output should go to an in-memory trace array, not stdout, so you can post-process it.
+
+3. **Fire a verify POST using the HAR field set**. Parse `sample/captcha-har.har` (or read `sample/payload.txt` if it contains the same body) to reconstruct the exact field set that produced the reference `vData`. Feed it to the instrumented harness. Confirm the final captured body contains a `vData=` tail (proof the harness works).
+
+4. **Identify the XTEA call window**. Post-process the hook trace to find the 32-iteration pattern that folds `0x9E3779B9`. The `sum` variable starts at 0 (encrypt) or `32·delta` (decrypt) and steps by ±delta per round. Once you find the window, read the key bytes: classical XTEA references `key[sum & 3]` and `key[(sum >>> 11) & 3]` inside each round, so every round touches exactly 2 of the 4 key words. After 32 rounds all 4 words have been referenced. Extract them.
+
+5. **Identify the plaintext**. Before the first XTEA round, the harness should have observed the caller of the encrypt entry. Capture its input — the plaintext bytes — as an array. Decode it as UTF-8 and as hex. Record both.
+
+6. **Identify the output path**. After the 32nd round, observe where the ciphertext goes. Trace it through the custom-base64 transform (the alphabet at pc 16932; a lookup-table encode). Confirm the resulting string matches the reference `vData`.
+
+7. **Emit the dynamic artifacts**:
+   - `output/vm-slide/vdata-pipeline.json` — `{xtea_key_hex, plaintext_hex, plaintext_utf8_or_null, ciphertext_hex, vdata_string, plaintext_source_description, output_alphabet, reference_har_match: bool}`.
+   - `output/vm-slide/vdata-dynamic-trace.json` — full hook trace, truncated to the XTEA window ±50 calls. For debugging future builds.
+
+8. **Static cross-check (Prong B)**. Use `research/vm-slide-stack-vm/walker.js` and `decoder.js` to enumerate function bodies in the range pcs 15000..20700. Identify which function body is the `proxyXHR` implementation (look for string table references to `XMLHttpRequest`, `send`, `open` — Phase 42.2 found those at pcs 20154/20220/20290/20476/20621 for `XMLHttpRequest`, 20204/20526/20671 for `send`, 20270/20340 for `open`). Locate the call from the proxy body into the encrypt closure at pc 15241.
+
+9. **Write `research/vm-slide-stack-vm/VDATA-PIPELINE.md`**. Required sections:
+   - §1 Scope: what 43.1 resolves vs what it does not
+   - §2 Dynamic trace methodology: how the instrumented harness works, reproduction command
+   - §3 XTEA key: 16 bytes hex, plus the classical-variant confirmation (round count, delta, bit-mix pattern)
+   - §4 Plaintext: byte-level layout, field order, separators, padding scheme, UTF-8 decoding
+   - §5 Output: custom-base64 encode confirmation, alphabet cross-reference, final string assembly
+   - §6 Static bytecode coordinates: pcs for the proxyXHR body, the encrypt call site, the plaintext constructor (if distinct), the base64 transform
+   - §7 Reference HAR match: show the full transform `(fields) → (plaintext) → (ciphertext) → (vData)` against the `sample/captcha-har.har` field set, and whether it reproduces the reference 152-char value
+   - §8 Open questions (if any) for 43.2+
+
+10. **Update `research/vm-slide-stack-vm/README.md`** — add `vdata-dynamic-trace.js` to the "How to reproduce" section and add a short bullet under Phase 42 findings pointing to VDATA-PIPELINE.md.
+
+### Warnings
+
+- **Do not modify `tools/scraper/vdata-harness.js`**. The instrumentation lives in a separate research script. The harness is production code used by the scraper and its test; adding crypto-tracing hooks there would pollute its API and slow its tests.
+- **Do not write anything under `tools/vdata-generator/`**. That directory is reserved for 43.3 (implementation). 43.1 is research only.
+- **Classical XTEA — not modified XTEA**. The register-VM `tdc.js` family uses a *modified* XTEA (key modification constants per template, see `docs/CRYPTO_ANALYSIS.md`). vm-slide uses *classical* XTEA per Phase 40.6. Do not import or reuse the register-VM's XTEA implementation — write a fresh classical one if your trace needs a reference decoder.
+- **Byte-identical is the bar, not "approximately matches"**. If your Prong A dynamic trace reproduces a 152-char output that matches the reference HAR `vData` byte-for-byte, 43.1 is a pass. If it matches in structure but not in bytes, dig deeper before declaring success — the key or plaintext is likely off by a field order or a padding byte.
+- **The reference HAR may have been captured with a specific session/timestamp state**. If the plaintext includes a session-derived field (which is likely), the instrumented harness will produce a *different* vData than the HAR reference even when everything works correctly — because the session state differs. This is fine for 43.1 as long as you can explain *why* they differ (i.e. "this field of the plaintext is the session token, which is different between the HAR capture and this run"). 43.2 will build a deterministic fixture against the exact HAR field set.
+- **Do NOT make any git commits**. The director handles all commits after verification.
+- **If the task is too difficult or impossible to complete**, stop immediately and report back. Explain what you attempted, what went wrong, and why you believe the task cannot be completed as specified. Do not leave behind partial or broken changes. In particular: if the instrumentation hooks interfere with vm-slide's execution (e.g. the hook machinery causes vm-slide to detect instrumentation and take a different branch), report it — don't fight it. The fallback is a pure-static approach using the Phase 40 walker, which the director can re-plan around.
+
+### Verification
+- [ ] `node research/vm-slide-stack-vm/vdata-dynamic-trace.js` runs idempotently and writes `output/vm-slide/vdata-pipeline.json` + `output/vm-slide/vdata-dynamic-trace.json`
+- [ ] `output/vm-slide/vdata-pipeline.json` contains a 16-byte `xtea_key_hex` (32 hex chars), a non-empty `plaintext_hex`, a non-empty `ciphertext_hex`, and a 152-char `vdata_string` whose character set is a subset of the custom alphabet
+- [ ] `VDATA-PIPELINE.md` §7 shows the full transform reproducing the reference HAR `vData` byte-for-byte — or, if session-state differs, clearly explains which plaintext field diverges and why
+- [ ] `VDATA-PIPELINE.md` §6 cites static bytecode pcs for (a) the proxyXHR body entry, (b) the encrypt call site, (c) the plaintext construction site, (d) the base64 transform site, each confirmed by a disassembly snippet from `output/vm-slide/disassembly-full.txt`
+- [ ] `npm test` still passes at 353/353 (no regressions; 43.1 should not touch production code)
+- [ ] `grep -R "vdata-generator" tools/` returns only the forward-looking JSDoc reference in `vdata-harness.js` (no accidental early writes to `tools/vdata-generator/`)
+
+### Suggested Agent
+`general-purpose` — Prong A (jsdom instrumentation + dynamic tracing) is script-authoring and data-wrangling, Prong B (static cross-check) is reading existing Phase 40 tooling and `output/vm-slide/disassembly-full.txt`. No specialist agent fits this shape better.
