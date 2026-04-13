@@ -1,10 +1,10 @@
 # Plan
 
 ## Status
-Current phase: Phase 43 — Standalone vData cipher encoder (narrowed per user Option C, 2026-04-13)
-Current task: 43.5 — Docs for the vData cipher encoder (director-owned)
+Current phase: Phase 43 — Standalone vData cipher encoder — **CLOSED 2026-04-13**
+Current task: none — awaiting user direction on next phase (Phase 44 open with no active tasks; user may dispatch other tracks).
 
-**Dispatch order** (user-confirmed 2026-04-13): 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5. Phase 43 narrowed on 2026-04-13 to the cipher half of the vData pipeline only — the plaintext-fingerprint half moved to the new Phase 44 track per user Option C. The generator ships as a pure re-encoder that consumes a plaintext byte buffer and emits the 152-char vData string byte-for-byte; Phase 44 will reverse the fingerprint build separately if/when the user wants it.
+**Dispatch order** (user-confirmed 2026-04-13): 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Phase 43 narrowed on 2026-04-13 to the cipher half of the vData pipeline only — the plaintext-fingerprint half moved to the new Phase 44 track per user Option C. The generator ships as a pure re-encoder that consumes a plaintext byte buffer and emits the 152-char vData string byte-for-byte; Phase 44 will reverse the fingerprint build separately if/when the user wants it.
 
 **Phase 43 recommendation (user-confirmed 2026-04-13)**: use the existing `tools/scraper/vdata-harness.js` jsdom harness as the dynamic oracle for test-time validation. Puppeteer live capture via `tools/captcha-solver/live-submit.js` kept as an optional tail-validation vector in 43.4.
 
@@ -76,7 +76,7 @@ Current task: 43.5 — Docs for the vData cipher encoder (director-owned)
 | 43.2 | Freeze deterministic jsdom + HAR fixtures under `tests/fixtures/`; re-verify custom base64 alphabet length directly from `output/vm-slide/bytecode.json` at pc 16932 | done |
 | 43.3 | Standalone cipher encoder `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js}` — pure JS, no jsdom/vm-slide dep, byte-identical against both fixtures | done |
 | 43.4 | Tests for the encoder (different agent per impl/tests separation) — byte-identical assertions against both fixtures + unit tests for XTEA and custom base64 | done |
-| 43.5 | Docs — new `docs/VDATA_FORMAT.md` (authoritative byte-level spec), update `docs/CAPTCHA_ORCHESTRATOR.md` §6, track README + CLAUDE.md Project Memory bumps (director-owned) | in-progress |
+| 43.5 | Docs — new `docs/VDATA_FORMAT.md` (authoritative byte-level spec), update `docs/CAPTCHA_ORCHESTRATOR.md` §6, track README + CLAUDE.md Documentation table bumps (director-owned) | done |
 
 ### Phase 44: vm-slide plaintext fingerprint reversal (open track, no active tasks)
 > Separate track opened 2026-04-13 (user Option C). Phase 44's goal is to decompile the `proxyXHR` body inside `sample/vm_slide.js` (bytecode pcs roughly 15000..20800, densely clustered around 19500..20800) and reverse the **plaintext-build half** of the vData pipeline — the JS-environment fingerprint computation that produces the 112-byte `k=v&k=v&...` structure vm-slide feeds into the XTEA encrypt.
@@ -93,39 +93,7 @@ Current task: 43.5 — Docs for the vData cipher encoder (director-owned)
 
 ## Current Task
 
-**ID**: 43.5
-**Title**: Docs for the vData cipher encoder — `docs/VDATA_FORMAT.md` + cross-references
-**Phase**: Phase 43 — Standalone vData cipher encoder
-**Status**: in-progress — director-owned (no subagent)
-
-### Goal
-Land the authoritative byte-level cipher spec for vm-slide's vData pipeline at `docs/VDATA_FORMAT.md`, update `docs/CAPTCHA_ORCHESTRATOR.md` §6 to point at it, refresh `research/vm-slide-stack-vm/README.md` with the Phase 43 closeout, and bump the CLAUDE.md Documentation table to list the new doc. CLAUDE.md Project Memory was already corrected during 43.2 — only the Documentation table needs the new row. Director-owned; no subagent dispatched.
-
-### Inputs (read-only references)
-- `research/vm-slide-stack-vm/VDATA-PIPELINE.md` — research-track spec; `docs/VDATA_FORMAT.md` is the user-facing distillation (link from doc → research, not the other way).
-- `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, README.md}` — public API to document.
-- `tests/fixtures/{vdata-jsdom-capture.json, vdata-har-capture.json}` — example vectors to embed in the doc.
-- `docs/TOKEN_FORMAT.md` — closest-analog existing user-facing crypto spec; mirror its section structure and depth.
-- `docs/CAPTCHA_ORCHESTRATOR.md` — §6 needs a "see VDATA_FORMAT.md for the cipher spec" pointer + a one-paragraph correction note on the "10 40 trailer" phantom.
-
-### Implementation Steps
-1. Read `docs/TOKEN_FORMAT.md` to mirror its structure (scope / pipeline / parameters / worked example / provenance).
-2. Write `docs/VDATA_FORMAT.md`: scope (cipher half only, Phase 44 owns plaintext-build), pipeline (3 steps), parameters table (XTEA key, alphabet, padding, lengths), worked example using one of the committed fixtures (show plaintext_hex → ciphertext_hex → vdata_string), provenance (cite bytecode pcs + research/ artifacts), explicit "10 40 trailer was a phantom" correction note for future readers, public API surface table for `tools/vdata-generator/`.
-3. Edit `docs/CAPTCHA_ORCHESTRATOR.md` §6 (vData mechanism section): add a forward link to `docs/VDATA_FORMAT.md`, add the trailer-phantom correction.
-4. Edit `research/vm-slide-stack-vm/README.md`: bump status to reflect Phase 43 closeout (cipher half done, fixtures + encoder + tests + doc all landed); add a 43.5 bullet pointing at the new `docs/VDATA_FORMAT.md`.
-5. Edit `CLAUDE.md` Documentation table: add a row for `docs/VDATA_FORMAT.md` between the existing vm-slide entries.
-6. Run `npm test` — must remain 411/411.
-
-### Verification
-- [ ] `docs/VDATA_FORMAT.md` exists with the 6 sections from step 2.
-- [ ] Worked example in the doc round-trips against a real fixture (verify by hand or with the encoder one-liner).
-- [ ] `docs/CAPTCHA_ORCHESTRATOR.md` §6 links forward to `docs/VDATA_FORMAT.md` and contains the trailer-phantom correction.
-- [ ] `research/vm-slide-stack-vm/README.md` lists the 43.5 doc and reflects Phase 43 closeout.
-- [ ] `CLAUDE.md` Documentation table contains the new `docs/VDATA_FORMAT.md` row.
-- [ ] `npm test` 411/411 unchanged.
-
-### Suggested Agent
-Director-owned (no dispatch). Documentation work the director writes itself per the Verify-mode rule.
+_None._ Phase 43 closed 2026-04-13. Phase 44 (vm-slide plaintext fingerprint reversal) is open with no active tasks — awaiting user direction. The director will Orient and present options on the next user prompt.
 
 ### Goal
 Add a `node --test` test file (or files) under `tests/` that exercises `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js}` and asserts byte-identical output against both committed fixtures. Wire `tests/fixtures/verify-vdata-fixtures.js` into the suite as a sanity check. Per impl/tests separation rule, this MUST be a different agent than the one that wrote 43.3.
