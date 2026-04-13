@@ -36,6 +36,10 @@ node research/vm-slide-stack-vm/vdata-trace.js
 #   -> output/vm-slide/window-installs.json
 node research/vm-slide-stack-vm/vdata-provenance.js
 
+# Phase 43.1 vData byte-level pipeline trace (instrumented jsdom harness)
+#   -> output/vm-slide/vdata-pipeline.json + output/vm-slide/vdata-dynamic-trace.json
+node research/vm-slide-stack-vm/vdata-dynamic-trace.js
+
 # Run regression tests (39.2 + 40.2, 37 total)
 node --test tests/test-vm-slide-decoder.js tests/test-vm-slide-walker.js
 ```
@@ -48,6 +52,8 @@ Phase 42 research artifacts under this track:
 - `VDATA-RESOLUTION.md` — task 42.2 cross-reference against FLOW.md §6 + HAR + crypto provenance scan. Identifies the Chrome-vs-IE9 branch at bytecode pc 19636 and the `proxyXHR` XHR-interceptor path.
 - `vdata-trace.js` + `output/vm-slide/vdata-anchors.json` — reproducible anchor extractor.
 - `vdata-provenance.js` + `output/vm-slide/window-installs.json` — reproducible `[window, <key>]` property-write enumerator. Finds exactly 1 install (`getVData`, on the IE9 branch).
+- `VDATA-PIPELINE.md` — task 43.1 byte-level vData generator spec. Recovers the XTEA key (constant `2e430f8c15b7da96`, 16 ASCII bytes), confirms classical XTEA + LE uint32 packing + custom base64 alphabet + constant `10 40` trailer, byte-identical match against jsdom harness ciphertext and successful HAR decrypt cross-check. Plaintext field schema deferred — see §8 open questions.
+- `vdata-dynamic-trace.js` + `output/vm-slide/vdata-pipeline.json` + `output/vm-slide/vdata-dynamic-trace.json` — reproducible instrumented jsdom harness. Patches `sample/vm_slide.js` in memory (file unchanged on disk) to tap the dispatch loop and FUNC_CREATE entry, captures encrypt-closure args and locals, recovers the XTEA key + plaintext blocks + ciphertext byte-for-byte.
 
 ## Notes
 

@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "task": "43.1",
+  "har_reference": {
+    "vdata": "7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY",
+    "vdata_length": 152,
+    "ciphertext_hex": "41f4f30830245004c817d13ca796e26dac36059827adca2f08edff6b2863d24071b5fdb709f50a2be7deada1e197dc283ec8d8c90ab21d361f5a8b15bc8a20a6430685be3e7897d074c2eea28a635eb58d8025250a154df0d363e6135b03afca8e7cd795eb846950e24e67e7091f6d461040",
+    "ciphertext_bytes": 114,
+    "field_count": 38
+  },
+  "live_run": {
+    "vdata": "crojBb7JsxZuqB8N9vXCicCvvy9OvMR5Qu6*jsSi1MvyJVF2J3bo7dO6OaSjOvFnNetQqVDq3z7eVUy0DiOylPgqSlmIjnMMDEJQelKZ3w88v516OboSLxfrNu1A9rE2EguCZ7eZtjLuqum1_Er5QXYY",
+    "vdata_length": 152,
+    "ciphertext_hex": "13e9139a842df5eca35e6ef7554c1880461450354e51f442a63e6f4fd2a015f503b41899b52a2443c3b93892933948badea1e95c1d974b142a06e0dcda038394db172a5feb4fa7dfd8fb69aa5cf2488efb5021793a890a69e5bede316757e3d93ec8d8c90ab21d36a35e3fc518ff82a71040",
+    "ciphertext_bytes": 114
+  },
+  "output_alphabet": "GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY",
+  "encrypt_entry_pc": 15241,
+  "decrypt_entry_pc": 15416,
+  "factory_entry_pc": 15220,
+  "xtea_key_hex": "32653433306638633135623764613936",
+  "xtea_key_words": [
+    845493299,
+    812005475,
+    825582135,
+    1684093238
+  ],
+  "plaintext_blocks": [
+    [
+      828732521,
+      1848012399
+    ],
+    [
+      1885762678,
+      1025916272
+    ],
+    [
+      544370237,
+      1131439471
+    ],
+    [
+      1952543329,
+      1679847023
+    ],
+    [
+      1970235760,
+      1701602917
+    ],
+    [
+      1936878624,
+      1847620640
+    ],
+    [
+      1663067176,
+      1915168617
+    ],
+    [
+      1852123507,
+      1919377702
+    ],
+    [
+      807825771,
+      1697017932
+    ],
+    [
+      1132032889,
+      1029324147
+    ],
+    [
+      1852785469,
+      812409894
+    ],
+    [
+      1663397693,
+      1967927905
+    ],
+    [
+      1030956644,
+      1412589942
+    ],
+    [
+      1698980463,
+      1852982114
+    ]
+  ],
+  "plaintext_hex": "316574696e266e6f706674763d263d7020726e3d4370656f7461726164206e6f756f6970656c666573726c206e20742063206428722727696e652973726761263026716b6526704c437973793d5a3d736e6f433d306c642663256f3d754c32613d732664543269766544626f6e724362",
+  "plaintext_utf8_or_null": "1etin&nopftv=&=p rn=Cpeotarad nouoipelfesrl n t c d(r''ine)srga&0&qke&pLCysy=Z=snoC=0ld&c%o=uL2a=s&dT2iveDbonrCb",
+  "sample_encrypt_entry": {
+    "locals_summary": [
+      [
+        "<obj>",
+        [
+          "_globalObject",
+          "_globalProxy",
+          "XPathException",
+          "XPathExpression",
+          "XPathResult",
+          "XPathEvaluator",
+          "onafterprint",
+          "onbeforeprint",
+          "onbeforeunload",
+          "onhashchange",
+          "onlanguagechange",
+          "onmessage",
+          "onmessageerror",
+          "onoffline",
+          "ononline",
+          "onpagehide"
+        ]
+      ],
+      [
+        "<obj>",
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "<fn>",
+      [
+        "<arr>",
+        2,
+        [
+          828732521,
+          1848012399
+        ]
+      ],
+      [
+        "<arr>",
+        4,
+        [
+          845493299,
+          812005475,
+          825582135,
+          1684093238
+        ]
+      ]
+    ],
+    "args_summary": [
+      [
+        "<arr>",
+        2,
+        [
+          828732521,
+          1848012399
+        ]
+      ],
+      [
+        "<arr>",
+        4,
+        [
+          845493299,
+          812005475,
+          825582135,
+          1684093238
+        ]
+      ]
+    ]
+  },
+  "sample_factory_entry": {
+    "locals_summary": [
+      [
+        "<obj>",
+        [
+          "__esModule"
+        ]
+      ],
+      [
+        "<obj>",
+        [
+          "0",
+          "1",
+          "2"
+        ]
+      ],
+      "<fn>",
+      [
+        "<obj>",
+        [
+          "i",
+          "l",
+          "exports"
+        ]
+      ],
+      [
+        "<obj>",
+        [
+          "__esModule"
+        ]
+      ],
+      "<fn>"
+    ],
+    "args_summary": [
+      [
+        "<obj>",
+        [
+          "i",
+          "l",
+          "exports"
+        ]
+      ],
+      [
+        "<obj>",
+        [
+          "__esModule"
+        ]
+      ],
+      "function"
+    ]
+  },
+  "notes": [
+    "task 43.1: dynamic trace via instrumented jsdom harness.",
+    "patched dispatch loop in sample/vm_slide.js by string substitution at runtime — sample/vm_slide.js itself is unmodified on disk.",
+    "live_run.vdata is regenerated per session and will differ from har_reference.vdata; xtea_key_hex and plaintext_blocks are the load-bearing facts."
+  ]
+}
