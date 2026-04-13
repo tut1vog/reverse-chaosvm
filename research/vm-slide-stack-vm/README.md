@@ -52,8 +52,15 @@ Phase 42 research artifacts under this track:
 - `VDATA-RESOLUTION.md` — task 42.2 cross-reference against FLOW.md §6 + HAR + crypto provenance scan. Identifies the Chrome-vs-IE9 branch at bytecode pc 19636 and the `proxyXHR` XHR-interceptor path.
 - `vdata-trace.js` + `output/vm-slide/vdata-anchors.json` — reproducible anchor extractor.
 - `vdata-provenance.js` + `output/vm-slide/window-installs.json` — reproducible `[window, <key>]` property-write enumerator. Finds exactly 1 install (`getVData`, on the IE9 branch).
-- `VDATA-PIPELINE.md` — task 43.1 byte-level vData generator spec. Recovers the XTEA key (constant `2e430f8c15b7da96`, 16 ASCII bytes), confirms classical XTEA + LE uint32 packing + custom base64 alphabet + constant `10 40` trailer, byte-identical match against jsdom harness ciphertext and successful HAR decrypt cross-check. Plaintext field schema deferred — see §8 open questions.
+- `VDATA-PIPELINE.md` — task 43.1 byte-level vData generator spec, with 43.2 corrections inline. Recovers the XTEA key (constant `2e430f8c15b7da96`, 16 ASCII bytes), confirms classical XTEA + LE uint32 packing + custom 65-char base64 alphabet (index 64 = padding char `Y`), byte-identical match against jsdom harness ciphertext and successful HAR decrypt cross-check. Plaintext field schema deferred — see §8 open questions.
 - `vdata-dynamic-trace.js` + `output/vm-slide/vdata-pipeline.json` + `output/vm-slide/vdata-dynamic-trace.json` — reproducible instrumented jsdom harness. Patches `sample/vm_slide.js` in memory (file unchanged on disk) to tap the dispatch loop and FUNC_CREATE entry, captures encrypt-closure args and locals, recovers the XTEA key + plaintext blocks + ciphertext byte-for-byte.
+
+Phase 43.2 research artifacts under this track:
+
+- `extract-alphabet.js` — reads `output/vm-slide/bytecode.json` and walks the `OP_04` + `OP_10*` run starting at pc 16932 to recover the custom base64 alphabet character-by-character. Output: 65 chars total (`GV5yc1_t...Y`), terminated by `OP_24` at pc 17063, byte-for-byte equal to the hardcoded string in `vdata-dynamic-trace.js`. Resolves a 43.1 caveat: the alphabet is genuinely 65 chars, not 64. The 65th char `Y` (index 64) is the **base64 padding character** (analogous to `=` in RFC 4648), used by vm-slide's encoder when the input length is not a multiple of 3. The phantom `10 40` "trailer" 43.1 reported is just `YY` mis-decoded as raw 6-bit values; the real ciphertext is 112 bytes (14 XTEA blocks), and re-encoding under standard b64 with index-64 padding reproduces both the HAR and jsdom `vData` strings byte-for-byte.
+- `tests/fixtures/vdata-jsdom-capture.json` — frozen single-run jsdom capture (alphabet, 16-byte XTEA key, 112-byte plaintext + ciphertext, 152-char vData). Pinned for 43.3 byte-identical encoder tests; re-running the harness produces a different capture, so this fixture is the canonical input.
+- `tests/fixtures/vdata-har-capture.json` — frozen HAR reference vector (real Chrome 146 vData from `sample/captcha-har.har`, with the cleartext recovered by XTEA decryption of the decoded 112-byte ciphertext).
+- `tests/fixtures/verify-vdata-fixtures.js` — pure-JS standalone verifier (no jsdom). Decodes both fixtures, round-trips base64 + XTEA in both directions, and exits 0 only when all four checks pass for both fixtures.
 
 ## Notes
 

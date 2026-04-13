@@ -1,0 +1,27 @@
+{
+  "source": "sample/captcha-har.har",
+  "notes": [
+    "HAR reference vector from a real Chrome 146 capture of Tencent's captcha.",
+    "Used as the 43.3 ground-truth test input to prove the encoder is byte-identical",
+    "against live traffic, not just against jsdom.",
+    "The vdata, ciphertext, and decrypted plaintext are pinned together: standard",
+    "base64 with alphabet index 64 as padding, then classical XTEA (32 rounds,",
+    "delta 0x9E3779B9, LE uint32 packing)."
+  ],
+  "xtea_key_hex": "32653433306638633135623764613936",
+  "xtea_key_words_be": [
+    845493299,
+    812005475,
+    825582135,
+    1684093238
+  ],
+  "output_alphabet": "GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY",
+  "output_alphabet_length": 65,
+  "padding_char_index": 64,
+  "padding_char": "Y",
+  "har_vdata_string": "7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY",
+  "har_vdata_length": 152,
+  "har_ciphertext_hex": "41f4f30830245004c817d13ca796e26dac36059827adca2f08edff6b2863d24071b5fdb709f50a2be7deada1e197dc283ec8d8c90ab21d361f5a8b15bc8a20a6430685be3e7897d074c2eea28a635eb58d8025250a154df0d363e6135b03afca8e7cd795eb846950e24e67e7091f6d46",
+  "har_decrypted_plaintext_hex": "69696d6e6665766e263d6672303d6165263730303433367439397034343d36383635633d364c6c326f6f3430613226646426733d766932546f2644656b43726e653173314c7325793d323d32433226317432693243644364657663736d256c2526306b6b6b6b6b706b6b796b6b3d6b6b",
+  "har_decrypted_plaintext_ascii": "iimnfevn&=fr0=ae&700436t99p44=6865c=6Ll2oo40a2&dd&s=vi2To&DekCrne1s1Ls%y=2=2C2&1t2i2CdCdevcsm%l%&0kkkkkpkkykk=kk"
+}

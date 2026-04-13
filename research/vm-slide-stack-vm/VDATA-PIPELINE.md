@@ -16,9 +16,17 @@ the static disassembly in `output/vm-slide/disassembly-full.txt`.
 2. Cipher confirmation — classical XTEA, 32 rounds, delta `0x9E3779B9`,
    little-endian uint32 packing at the cipher boundary. Standalone XTEA
    reproduces the live ciphertext byte-for-byte for all 14 blocks.
-3. Output assembly — 14 × 8-byte XTEA blocks (= 112 bytes) plus a
-   constant 2-byte trailer `10 40`, encoded as 152 chars of custom
-   base64 over the alphabet `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`.
+3. Output assembly — 14 × 8-byte XTEA blocks (= 112 bytes), encoded as
+   152 chars of **standard base64 with a custom alphabet**. The alphabet
+   has 65 characters: indices 0..63 carry data, index **64 (`Y`) is the
+   padding character** (the role `=` plays in RFC 4648). 112 bytes
+   require 2 padding chars (`YY`) to round up to a 4-char group.
+   Alphabet: `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`.
+   **Correction (43.2)**: 43.1 originally read the encoded buffer as 114
+   bytes including a constant `10 40` "trailer". That trailer is a
+   phantom — it's the result of mis-decoding the `YY` padding as raw
+   6-bit values (`(64<<6)|64 = 0x1040`). The true encoder input is 112
+   bytes, no trailer.
 4. Entry/exit points in the bytecode — encrypt closure at pc 15241,
    decrypt closure at pc 15416, factory at pc 15220, factory FUNC_CREATE
    instantiation at pc 16835, proxyXHR install branch at pc 19638..19663,
@@ -198,54 +206,78 @@ The captured plaintext is **112 bytes of structured form data**:
 
 ## §5 Output assembly
 
-After the 14 encrypt calls, the proxyXHR body produces a 114-byte
-ciphertext stream:
+**Corrected by 43.2.** The proxyXHR body produces exactly **112** bytes
+of ciphertext (14 XTEA blocks, no trailer) and feeds them into a
+**standard base64 encoder** that uses a custom 65-character alphabet
+where index 64 (`Y`) is the padding character — analogous to `=` in
+RFC 4648.
 
 ```
-ct = LE_PACK(c0_0, c1_0) || LE_PACK(c0_1, c1_1) || ... || LE_PACK(c0_13, c1_13) || 0x10 0x40
+ct  = LE_PACK(c0_0, c1_0) || LE_PACK(c0_1, c1_1) || ... || LE_PACK(c0_13, c1_13)   (112 bytes)
+out = b64_encode(ct, alphabet, padding_index = 64)                                  (152 chars)
 ```
 
-The trailing 2 bytes `10 40` are **constant** across every run and every
-session (verified across our 3 instrumented runs and the HAR reference;
-both the jsdom captures and the HAR ciphertext end in `1040`). Their
-semantic meaning is not yet known but they are part of the ciphertext
-stream that gets base64-encoded — they are not appended after encoding.
+112 bytes is one byte short of `38 × 3`, so the last 4-char group encodes
+1 data byte + 2 padding chars. The padding chars in this alphabet are
+`Y`, so every vData ends in `YY`. This is why the HAR vData and every
+jsdom capture both end in `YY` and have length 152.
 
-114 bytes is `38 × 3 = 114`, so it encodes to exactly `38 × 4 = 152`
-custom-base64 chars with no padding needed. This is why the HAR vData
-has length 152 and `vData.length % 4 === 0`.
+**Why 43.1 saw a phantom `10 40` trailer.** 43.1's decoder didn't treat
+index 64 as padding — it just decoded every char as a raw 6-bit value
+and emitted 3 bytes per 4-char group. Decoding the trailing `YY` that
+way produces `(0<<16) | (0<<8) | (64<<6) | 64 = 0x1040`, so the last
+two output bytes were always `10 40`. There is no trailer in the
+ciphertext stream; the bytes simply come from mis-decoding the padding.
+The corrected decoder (see fixture verifier under
+`tests/fixtures/verify-vdata-fixtures.js`) produces 112 bytes and
+round-trips byte-for-byte.
 
-**Custom base64 alphabet** (64 chars, found at bytecode pc 16932 — see
-§6):
+**Custom base64 alphabet** (65 chars, indices 0..63 = data, 64 = `Y` =
+padding, found at bytecode pc 16932 — see §6):
 ```
 GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY
 ```
 - Position 0 = `G`, position 22 = `7` (matches the HAR vData starting
-  with `7Mj...`), position 63 = `Y`.
+  with `7Mj...`), position 64 = `Y` (padding).
 - Includes the URL-safe substitutions `_`, `-`, and `*` instead of
   standard `/`, `+`, `=`.
-- Does NOT include `A`, `D`, `F`, `I`, `J`, `K`, etc. as 0-position
-  chars — it is a non-RFC-4648 alphabet, so naive base64 libraries will
-  not work.
+- It is a non-RFC-4648 alphabet, so naive base64 libraries will not
+  work; you must build the lookup table from the alphabet string and
+  treat index 64 as padding.
 
-**Standalone encode** (CommonJS):
+**Standalone encode** (CommonJS) — standard base64 with a custom
+alphabet and a non-`=` padding char:
 ```js
-function customBase64Encode(buf, alphabet) {
-  // buf.length must be a multiple of 3 (vm-slide always produces 114).
+function customBase64Encode(buf, alphabet, padIdx /* = 64 */) {
   let out = '';
   for (let i = 0; i < buf.length; i += 3) {
-    const n = (buf[i] << 16) | (buf[i + 1] << 8) | buf[i + 2];
-    out += alphabet[(n >>> 18) & 0x3f];
-    out += alphabet[(n >>> 12) & 0x3f];
-    out += alphabet[(n >>> 6) & 0x3f];
-    out += alphabet[n & 0x3f];
+    const b0 = buf[i];
+    const b1 = i + 1 < buf.length ? buf[i + 1] : NaN;
+    const b2 = i + 2 < buf.length ? buf[i + 2] : NaN;
+    const c0 = b0 >>> 2;
+    const c1 = ((b0 & 3) << 4) | (Number.isNaN(b1) ? 0 : (b1 >>> 4));
+    const c2 = Number.isNaN(b1) ? padIdx
+                                : (((b1 & 0xf) << 2) | (Number.isNaN(b2) ? 0 : (b2 >>> 6)));
+    const c3 = Number.isNaN(b2) ? padIdx : (b2 & 0x3f);
+    out += alphabet[c0] + alphabet[c1] + alphabet[c2] + alphabet[c3];
   }
   return out;
 }
 ```
-Decoding the captured live `vData` with the inverse table reproduces
-the 114-byte ciphertext stream byte-for-byte, and re-encoding that
-stream produces back the exact `vData` string.
+112 bytes → 37 full 3-byte groups (148 chars) + 1 byte (1 data char +
+1 char with the low nibble in the high bits + 2 padding chars `YY`) =
+152 chars. Re-encoding the decoded ciphertext reproduces the live and
+HAR `vData` strings byte-for-byte (verified by
+`tests/fixtures/verify-vdata-fixtures.js`).
+
+**How 43.2 confirmed this.** vm-slide's encoder bytecode at pcs
+17084..17418 implements exactly this `isNaN`-gated padding pattern:
+`OP_08 64` immediates appear at pcs 17395 and 17409 inside the
+`isNaN(b1)` and `isNaN(b2)` branches, supplying index 64 as the
+padding character. The math `c1 = ((b0 & 3) << 4)` (when `b1` is NaN)
+and the `Y`-substitutions are the decisive markers. See the
+disassembly window in `output/vm-slide/disassembly-full.txt` lines
+10140..10350.
 
 vm-slide does **not** prepend `vData=` itself; the proxyXHR body
 constructs the URL-encoded form-data string `body + '&vData=' + base64`
@@ -320,9 +352,13 @@ false, vm-slide takes this branch and the `proxyXHR` method patches
 into the encrypt factory + closure chain at pcs 15220 / 15241.
 
 **Custom base64 alphabet load** — pc **16932** (start of an
-`OP_04 (OP_10 ch)*` run reconstructing the 64-char alphabet string).
-Phase 42.2 confirmed every character of the HAR `vData` is a member
-of this alphabet (zero outliers).
+`OP_04 (OP_10 ch)*` run reconstructing the alphabet string). The run
+contains exactly **65** `OP_10` instructions, terminated by `OP_24` at
+pc 17063 (verified by `research/vm-slide-stack-vm/extract-alphabet.js`,
+which reads the bytes directly from `output/vm-slide/bytecode.json`).
+Phase 42.2 confirmed every character of the HAR `vData` is a member of
+this alphabet (zero outliers). 43.2 corrected 43.1's "64 chars" reading
+to 65 chars, with index 64 (`Y`) being the padding character (see §5).
 
 **Char-set validation regex** — pc **17677** (`[^A-Za-z0-9\-\_\*]`,
 matches the alphabet's special chars). Used inside the proxyXHR body
@@ -336,12 +372,13 @@ verify POST):
 7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4lsXbEguCZ7eZtjCMfbg9*wbiQoH_4-hrxaM7THpUbbQuqIfPi5vl549PdPPu64P-GnmSuAKqlxUcL9yFjBMA5RsJRiYY
 ```
 
-Decoded under the custom alphabet → **114 bytes** (`28 × 4 = 152` chars,
-38 byte groups → `38 × 3 = 114` bytes), of which the last two bytes are
-`10 40` (the same constant trailer observed in our jsdom runs).
+Decoded under the custom alphabet (with index 64 = padding) → **112
+bytes** = 14 LE-packed XTEA blocks. (43.1 reported 114 bytes including
+a `10 40` "trailer"; 43.2 corrected this — those two bytes are the
+result of mis-decoding the trailing `YY` base64 padding as raw 6-bit
+values. See §5.)
 
-Decrypted with the recovered XTEA key (treating the first 112 bytes as
-14 LE-packed XTEA blocks):
+Decrypted with the recovered XTEA key (LE uint32 packing, 32 rounds):
 ```
 "iimnfevn&=fr0=ae&700436t99p44=6865c=6Ll2oo40a2&dd&s=vi2To&DekCrne1s1Ls%y=2=2C2&1t2i2CdCdevcsm%l%&0kkkkkpkkykk=kk"
 ```
@@ -353,8 +390,9 @@ the same `8 =` / `7 &` shape as our jsdom plaintexts, confirming:
    Tencent's real Chrome 146 environment (the key is a constant in the
    bytecode, not session-derived).
 2. The cipher endianness is **byte-identical** (LE uint32 packing).
-3. The trailer `10 40` is **byte-identical** (a fixed appendix to the
-   ciphertext stream, not session-dependent).
+3. The base64 framing is **byte-identical** (both vData strings end
+   in `YY` padding because the 112-byte ciphertext is 1 byte short of
+   a clean 3-byte group).
 4. The **character set** of the plaintext content differs (HAR has
    many `k`s and digits, jsdom has parens and apostrophes), reflecting
    the different JS environment fingerprints — jsdom's `typeof` and
@@ -385,10 +423,12 @@ freeze the harness output as ground truth for now).
    `Object.keys`, `typeof`, and `toString()` calls feed the encryption
    buffer. The relevant pcs are inside the
    region 15000..20800, mostly clustered around pcs 19500..20800.
-2. **Trailer bytes `10 40`**. Constant across every run, but origin
-   unknown. Candidates: a fixed format version tag, a checksum byte
-   pair, or a length/scheme indicator. Static origin is somewhere in
-   the proxyXHR body that builds the final 114-byte buffer.
+2. ~~**Trailer bytes `10 40`**.~~ **Resolved by 43.2** — there is no
+   trailer. The bytes were a phantom from mis-decoding the `YY` base64
+   padding as raw 6-bit values (`(64<<6)|64 = 0x1040`). The encoder
+   input is 112 bytes, the alphabet is 65 chars with index 64 = padding,
+   and re-encoding under that scheme reproduces the HAR and jsdom
+   `vData` strings byte-for-byte. See §5.
 3. **Why the per-run byte order varies even with identical input**.
    Two runs of `runWith({a:'1'})` produce two different byte orderings
    of the same 112-byte plaintext multiset. Either vm-slide is reading

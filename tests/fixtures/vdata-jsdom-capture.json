@@ -1,0 +1,85 @@
+{
+  "source": "research/vm-slide-stack-vm/vdata-dynamic-trace.js",
+  "captured_at": "2026-04-13",
+  "notes": [
+    "Frozen single-run capture of the jsdom harness for 43.3 byte-identical tests.",
+    "Re-running the harness produces a DIFFERENT capture due to non-deterministic",
+    "fingerprint byte order in jsdom; this fixture is the canonical test input.",
+    "The vdata_string and cipher/plaintext fields are pinned together — they round",
+    "trip via standard base64 (alphabet index 64 = padding) and classical XTEA",
+    "(32 rounds, delta 0x9E3779B9, LE uint32 packing at the cipher boundary)."
+  ],
+  "xtea_key_hex": "32653433306638633135623764613936",
+  "xtea_key_words_be": [
+    845493299,
+    812005475,
+    825582135,
+    1684093238
+  ],
+  "output_alphabet": "GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY",
+  "output_alphabet_length": 65,
+  "padding_char_index": 64,
+  "padding_char": "Y",
+  "plaintext_hex": "697465316f6e266e76746670703d263d3d6e72206f657043617261746f6e206470696f7565666c65206c72732074206e28642063692727727329656e266167726b7126304c70266579737943733d5a3d3d436f6e26646c303d6f256361324c756426733d766932546f6244656243726e",
+  "plaintext_blocks_le": [
+    [
+      828732521,
+      1848012399
+    ],
+    [
+      1885762678,
+      1025916272
+    ],
+    [
+      544370237,
+      1131439471
+    ],
+    [
+      1952543329,
+      1679847023
+    ],
+    [
+      1970235760,
+      1701602917
+    ],
+    [
+      1936878624,
+      1847620640
+    ],
+    [
+      1663067176,
+      1915168617
+    ],
+    [
+      1852123507,
+      1919377702
+    ],
+    [
+      807825771,
+      1697017932
+    ],
+    [
+      1132032889,
+      1029324147
+    ],
+    [
+      1852785469,
+      812409894
+    ],
+    [
+      1663397693,
+      1967927905
+    ],
+    [
+      1030956644,
+      1412589942
+    ],
+    [
+      1698980463,
+      1852982114
+    ]
+  ],
+  "ciphertext_hex": "13e9139a842df5eca35e6ef7554c1880461450354e51f442a63e6f4fd2a015f503b41899b52a2443c3b93892933948badea1e95c1d974b142a06e0dcda038394db172a5feb4fa7dfd8fb69aa5cf2488efb5021793a890a69e5bede316757e3d93ec8d8c90ab21d36a35e3fc518ff82a7",
+  "vdata_string": "crojBb7JsxZuqB8N9vXCicCvvy9OvMR5Qu6*jsSi1MvyJVF2J3bo7dO6OaSjOvFnNetQqVDq3z7eVUy0DiOylPgqSlmIjnMMDEJQelKZ3w88v516OboSLxfrNu1A9rE2EguCZ7eZtjLuqum1_Er5QXYY",
+  "vdata_length": 152
+}
