@@ -464,11 +464,19 @@ is reachable on the fall-through path.
   appears 5× at bytecode pcs 20154 / 20220 / 20290 / 20476 / 20621, with
   `"send"` at 20204/20526/20671 and `"open"` at 20270/20340). The patched
   `send` intercepts the orchestrator's later `/cap_union_new_verify` POST
-  and injects `vData=<ciphertext>` into the outgoing body. `OP_06 20070`
-  at pc 19663 then skips the entire `getVData` install block. On this path
-  `window.getVData` is **never installed**, so the orchestrator's
-  `if (a.isLowIE())` guard evaluates false and module 56 never writes
-  `d.vData` itself — the field materializes inside the proxy.
+  and appends `&vData=<ciphertext>` onto the outgoing body before forwarding
+  to the real `XMLHttpRequest.prototype.send`. The `&vData=` literal is
+  built inside vm-slide bytecode at pcs **24211..24223** (`OP_10 38 118 68
+  97 116 97 61`), inside the enclosing function that contains pc 24210 —
+  see `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` §"Build-
+  site identification" for the full decompile of the open-hook (fn 20353
+  at pcs 20353..20462, which guards on URL `== "/cap_union_new_verify"`
+  at pc 20424 and captures `this` as the verify XHR instance) and the
+  send-hook body-rewrite chain. `OP_06 20070` at pc 19663 then skips the
+  entire `getVData` install block. On this path `window.getVData` is
+  **never installed**, so the orchestrator's `if (a.isLowIE())` guard
+  evaluates false and module 56 never writes `d.vData` itself — the field
+  materializes inside the proxy.
 - **IE9 fallback** — jump-target branch at pc 19666. vm-slide builds the
   descriptor `[window, "getVData"]` (build `"window"` at pc 19667, `OP_32`
   at 19680 to form `[U, "window"]`, build `"getVData"` at pc 19681, `OP_41`
@@ -514,7 +522,7 @@ keeps everything inside a closure.
 
 **What's now resolved** (Phase 43, 2026-04-13). The XTEA key is `2e430f8c15b7da96`; the cipher is classical (not modified) XTEA with LE uint32 packing; the alphabet is 65 chars with `Y` as the padding char; byte-identical reproducibility for the cipher half is achieved by `tools/vdata-generator/` against both a synthetic jsdom fixture and a real Chrome 146 HAR capture — see `docs/VDATA_FORMAT.md` for the full spec and `tests/test-vdata-generator-encoder.js` for the test coverage.
 
-**What remains open**. The 112-byte plaintext is not the verify POST body — it is a JS-environment fingerprint that vm-slide's `proxyXHR` builds at runtime from `typeof`, property enumeration, and object stringification. Reversing that builder is **Phase 44** (open, no active tasks). Until Phase 44 closes, byte-identical end-to-end `vData` synthesis from scratch (without a captured plaintext) is not possible. See `research/vm-slide-stack-vm/VDATA-PIPELINE.md` §8 for the open questions.
+**What remains open**. The 112-byte plaintext is a fixed-shape (8 `=`, 7 `&`) canonical reduction that vm-slide's `proxyXHR` body computes from the full urlencoded verify POST body it intercepts via its `XMLHttpRequest.prototype.send` replacement. It is **not** built by the orchestrator (`t_captcha_slide.js` does not assemble a 112-byte string anywhere — its verify body `e` is 39 fields and ~9504 bytes urlencoded). **Phase 44.3 correction (2026-04-13)**: earlier drafts of this section stated the plaintext is a JS-environment fingerprint built from `typeof` / property enumeration / object stringification. That is incorrect — `research/vm-slide-stack-vm/FN-20539-DECOMPILE.md` proved fn 20539 performs no environment probing, and `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` showed the 112-byte reduction happens inside vm-slide's top-level send replacement (enclosing bytecode pc 24210, where the `&vData=` literal is built at pcs 24211..24223) and reads only `arguments[0]`, the caller-supplied body. Reversing the exact reduction formula is **Phase 44.4** (open). Until then, byte-identical end-to-end `vData` synthesis from scratch (without a captured plaintext) is not possible. See `research/vm-slide-stack-vm/VDATA-PIPELINE.md` §8 and `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` for the open questions.
 
 ### `nonce`
 

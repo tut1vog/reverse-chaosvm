@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "task": "44.3",
+  "method": "static-fallback",
+  "reason_for_fallback": "Live Puppeteer hook on XMLHttpRequest.prototype.send is infeasible — urlsec.qq.com/cap_union_new_show returns HTTP 403 without a valid prehandle sess (CLAUDE.md known limitation), and Phase 43 already produced full vm-slide bytecode coverage under output/vm-slide/ which is sufficient to identify the build-site statically.",
+  "orchestrator": {
+    "bundle": "sample/t_captcha_slide.js",
+    "bundle_bytes": 213162,
+    "verify_ajax_callsites": [
+      {
+        "pos": 163131,
+        "moduleId": 56,
+        "context": "IE()){var t=Object(e),n=[];for(var i in t)t.hasOwnProperty(i)&&n.push(i+\"=\"+t[i]);var o=window.getVData&&window.getVData(n.join(\"&\"));o&&(e.vData=o)}var c=$.ajax({type:\"POST\",url:\"/cap_union_new_verify\",data:e,timeout:15e3,dataType:\"json\",success:function(e){if(e){H=0,e.sess&&w(e.sess);var t=parseInt(e.errorCode,10);switch(t){case 0:g.pus"
+      }
+    ],
+    "window_getVData_callsites": [
+      {
+        "pos": 163039,
+        "moduleId": 56,
+        "context": " f;d.fpinfo=i,d.eks=R(),_.nonce&&(d.nonce=_.nonce);$.extend(d,o),l.tdc.checkTdcSuccess()||l.tdc.retryLoad(v);!function(e){if(a.isLowIE()){var t=Object(e),n=[];for(var i in t)t.hasOwnProperty(i)&&n.push(i+\"=\"+t[i]);var o=window.getVData&&window.getVData(n.join(\"&\"));o&&(e.vData=o)}var c=$.ajax({type:\"POST\",url:\"/cap_union_new_verify\",data:e,timeout:15e3,dataType:\"json\",success:function(e){if(e){H=0,e.sess&&w(e.sess);var t=parseInt(e.erro"
+      },
+      {
+        "pos": 163056,
+        "moduleId": 56,
+        "context": "ks=R(),_.nonce&&(d.nonce=_.nonce);$.extend(d,o),l.tdc.checkTdcSuccess()||l.tdc.retryLoad(v);!function(e){if(a.isLowIE()){var t=Object(e),n=[];for(var i in t)t.hasOwnProperty(i)&&n.push(i+\"=\"+t[i]);var o=window.getVData&&window.getVData(n.join(\"&\"));o&&(e.vData=o)}var c=$.ajax({type:\"POST\",url:\"/cap_union_new_verify\",data:e,timeout:15e3,dataType:\"json\",success:function(e){if(e){H=0,e.sess&&w(e.sess);var t=parseInt(e.errorCode,10);switch("
+      }
+    ]
+  },
+  "har_verify_post": {
+    "url": "https://t.captcha.qq.com/cap_union_new_verify",
+    "body_bytes": 9504,
+    "field_count": 39,
+    "fields": [
+      {
+        "name": "aid",
+        "valueLen": 10
+      },
+      {
+        "name": "protocol",
+        "valueLen": 5
+      },
+      {
+        "name": "accver",
+        "valueLen": 1
+      },
+      {
+        "name": "showtype",
+        "valueLen": 5
+      },
+      {
+        "name": "ua",
+        "valueLen": 148
+      },
+      {
+        "name": "noheader",
+        "valueLen": 1
+      },
+      {
+        "name": "fb",
+        "valueLen": 1
+      },
+      {
+        "name": "aged",
+        "valueLen": 1
+      },
+      {
+        "name": "enableAged",
+        "valueLen": 1
+      },
+      {
+        "name": "enableDarkMode",
+        "valueLen": 1
+      },
+      {
+        "name": "grayscale",
+        "valueLen": 1
+      },
+      {
+        "name": "dyeid",
+        "valueLen": 1
+      },
+      {
+        "name": "clientype",
+        "valueLen": 1
+      },
+      {
+        "name": "sess",
+        "valueLen": 322
+      },
+      {
+        "name": "fwidth",
+        "valueLen": 1
+      },
+      {
+        "name": "sid",
+        "valueLen": 19
+      },
+      {
+        "name": "wxLang",
+        "valueLen": 0
+      },
+      {
+        "name": "tcScale",
+        "valueLen": 1
+      },
+      {
+        "name": "uid",
+        "valueLen": 0
+      },
+      {
+        "name": "cap_cd",
+        "valueLen": 0
+      },
+      {
+        "name": "rnd",
+        "valueLen": 6
+      },
+      {
+        "name": "prehandleLoadTime",
+        "valueLen": 3
+      },
+      {
+        "name": "createIframeStart",
+        "valueLen": 13
+      },
+      {
+        "name": "global",
+        "valueLen": 1
+      },
+      {
+        "name": "subsid",
+        "valueLen": 2
+      },
+      {
+        "name": "cdata",
+        "valueLen": 1
+      },
+      {
+        "name": "ans",
+        "valueLen": 7
+      },
+      {
+        "name": "vsig",
+        "valueLen": 0
+      },
+      {
+        "name": "websig",
+        "valueLen": 0
+      },
+      {
+        "name": "subcapclass",
+        "valueLen": 0
+      },
+      {
+        "name": "pow_answer",
+        "valueLen": 0
+      },
+      {
+        "name": "pow_calc_time",
+        "valueLen": 1
+      },
+      {
+        "name": "collect",
+        "valueLen": 8128
+      },
+      {
+        "name": "tlg",
+        "valueLen": 4
+      },
+      {
+        "name": "fpinfo",
+        "valueLen": 0
+      },
+      {
+        "name": "eks",
+        "valueLen": 312
+      },
+      {
+        "name": "nonce",
+        "valueLen": 16
+      },
+      {
+        "name": "vlg",
+        "valueLen": 5
+      },
+      {
+        "name": "vData",
+        "valueLen": 152
+      }
+    ],
+    "includes_vData": true,
+    "vData_value_len": 152
+  },
+  "vm_slide_static_anchors": {
+    "disassembly": "output/vm-slide/disassembly-full.txt",
+    "open_hook_slash_byte_runs_pcs": [
+      20380
+    ],
+    "vdata_literal_at_pc_24211_24223": true,
+    "utf8_helper_fn_18966_create_at_pc_19451": true,
+    "ampersand_split_at_pc_19901_19903": true
+  },
+  "findings": {
+    "premise_correction": "Phase 44.3 task description asserts that the 112-byte plaintext is assembled in t_captcha_slide.js upstream of xhr.send. This is NOT supported by the HAR or the vm-slide disassembly. The HAR verify POST body is 9504 bytes with 39 fields, and vData appears as a 40th field (152 chars). vm-slide DOES append \"&vData=<b64>\" to the body it receives — see the OP_10 38/118/68/97/116/97/61 literal at pcs 24211..24223 — which contradicts 44.2.5's \"whole-body replacement\" classification of fn 20539. Resolution: fn 20539 is a NESTED pure-encrypt helper (44.2.5 is correct within its byte range), but it is NOT the top-level send hook. The top-level send hook lives in an outer function around pc 24210 and does the append-mode body rewrite.",
+    "orchestrator_trigger": "Module 56 of sample/t_captcha_slide.js contains the only verify POST callsite: $.ajax({type:\"POST\", url:\"/cap_union_new_verify\", data: e, ...}) at approximate position 163130. The variable e is assembled a few hundred bytes earlier as a plain JS object with 39 named fields (collect, eks, nonce, ans, cdata, tlg, fpinfo, sess, ua, sid, rnd, ...). Zepto ($.ajax in module 76) serializes e to application/x-www-form-urlencoded and calls xhr.send(urlencoded). This is the orchestrator-side trigger for the vData path on modern browsers.",
+    "vm_slide_open_hook": "vm-slide installs an XMLHttpRequest.prototype.open replacement (fn 20353) that compares arguments[1] to \"/cap_union_new_verify\" at pc ~20379..20425 and, on match, stores `this` (the XHR instance) into a captured closure slot. This is the source of fn 20539's guard at pc 20582 (capturedSlot7 === this): fn 20539 only encrypts bodies of the XHR instance that was observed opening the verify URL.",
+    "vm_slide_send_hook_body_rewrite": "The top-level send hook (enclosing pc 24210, not fn 20539) receives the full urlencoded body via arguments[0], splits it on \"&\" (fn 19702 / window.getVData shows the IE9-path analog at pc 19901), iterates over fields, computes a 112-byte reduction (exact reduction not yet decompiled — Phase 44.4), passes that to fn 15918 via fn 20539 which runs 14 blocks of XTEA + custom base64 to produce a 152-char ciphertext, and concatenates `body + \"&vData=\" + ciphertext` using the string literal built at pc 24211..24223. The result is forwarded via savedSend.call(this, combined).",
+    "the_112_bytes_origin": "The 112-byte plaintext that fn 15918 encrypts is NOT a random fingerprint independent of the body — it is a REDUCTION of the full body performed inside vm-slide. This is consistent with Phase 43 VDATA-PIPELINE.md §7's observation that jsdom and HAR plaintexts share the exact same 8-=/7-& shape despite environment differences (the shape is hardcoded, the content is data-dependent). The reduction uses charCodeAt/String.fromCharCode UTF-8 re-encoding (fn 18966) and appears to be a 6-bit chunking pass (OP_08 63 masks, OP_08 6 shifts at pcs 19221..19235, 19337..19351, 19431..19443 inside fn 19702) — suggesting base64-like resampling of the input body. The exact reduction is the subject of the next task (44.4)."
+  }
+}

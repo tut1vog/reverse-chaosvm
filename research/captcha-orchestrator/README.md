@@ -65,6 +65,13 @@ node research/captcha-orchestrator/trace-flow.js
 #   sample/slide-jy.js + module 76 body
 #     -> output/captcha-orchestrator/slide-jy-diff.md
 node research/captcha-orchestrator/slide-jy-diff.js
+
+# 44.3 plaintext-build origin static trace:
+#   sample/t_captcha_slide.js + sample/captcha-har.har
+#   + output/captcha-orchestrator/modules.json
+#   + output/vm-slide/disassembly-full.txt
+#     -> output/captcha-orchestrator/send-capture.json
+node research/captcha-orchestrator/trace-xhr-send.js
 ```
 
 All three scripts are idempotent and take no CLI arguments — running each
@@ -82,6 +89,16 @@ Research-side notes (under `research/captcha-orchestrator/`):
   verify POST origination table, doc reconciliation, open questions.
 - `MODULE-41-NOTES.md` — task 41.5 gate-2 bounded spike on module 41.
   Verdict: i18n caption table, parked (not on critical path).
+- `PLAINTEXT-BUILD-ORIGIN.md` — task 44.3 static trace. Resolves the
+  "where is the 112-byte vData plaintext assembled" question: **inside
+  vm-slide, not inside the orchestrator**. Pins the orchestrator-side
+  trigger (module 56, byte 163131 of `sample/t_captcha_slide.js`,
+  `$.ajax({url:"/cap_union_new_verify"})`), the vm-slide open-hook URL
+  guard (fn 20353 at bytecode pc 20379..20424), the body-rewrite anchor
+  (`&vData=` literal at pcs 24211..24223), and the UTF-8 + 6-bit reduction
+  region (fn 18966, fn 19702 at pcs 19221..19443). Corrects the Phase 43
+  CAPTCHA_ORCHESTRATOR.md §517 claim that the plaintext is a JS-environment
+  fingerprint built from `typeof`/enumeration/stringification.
 
 Public reference (under `docs/`):
 
