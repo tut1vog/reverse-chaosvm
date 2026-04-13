@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide 9504→112 reduction reversal (**re-pivoted 2026-04-13 after 44.3 found the orchestrator does NOT build a 112-byte body; vm-slide reduces the 9504-byte verify body into the 112-byte XTEA input**)
-Current task: — (none; 44.3 done, Phase 44 tasks 44.4/44.5b awaiting second plan revision)
+Current phase: Phase 44 — vm-slide 9504→112 reduction reversal (**second revision user-approved 2026-04-13**)
+Current task: 44.2.6 — fn 22317 full static decompile + reconciliation with fn 20539 (pending dispatch)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -107,11 +107,12 @@ Current task: — (none; 44.3 done, Phase 44 tasks 44.4/44.5b awaiting second pl
 | 44.1 | Encrypt-callsite back-walk + plaintext-build call graph (static + runtime caller-PC capture) | done |
 | 44.2 | Plaintext-build static decompile to pseudocode — `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` | done |
 | 44.2.5 | fn 20539 full static decompile — settle pivot premise → verdict **(A) pure encrypt stage**, orchestrator builds plaintext | done |
-| 44.3 | **Orchestrator plaintext-build JS-level trace** — hook `XHR.prototype.send` before vm-slide's proxyXHR install, capture the 112-byte body + JS stacktrace, back-walk in `t_captcha_slide.js` to name the orchestrator function that assembled it + pin the ciphertext's path to the verify POST | done (static-fallback; **inverted Phase 44 model** — orchestrator builds 39-field 9504-byte body, vm-slide reduces it to 112 bytes) |
-| 44.3.5 | Real-Chrome differential capture via Puppeteer — third fixture from production Chrome; capture target is the orchestrator pre-encrypt body + surrounding verify POST body | pending |
-| 44.4 | **Orchestrator 8-field schema pin** — run the 44.3 harness ≥20x across jsdom + real Chrome; for each captured plaintext parse the 8 `key=value` pairs; determine field names, value-source rules, order-mechanism, per-run variability source | pending |
-| 44.5a | Plaintext builder: replay-with-substitution. `tools/vdata-generator/build-plaintext.js` reads a captured plaintext + field-value override map, emits a substituted 112-byte plaintext. Early Stream-B checkpoint. | pending |
-| 44.5b | **Plaintext builder: from-scratch JS synthesis**. Extends 44.5a with `--from-env` — consumes a JS environment description, emits a fresh 112-byte plaintext matching 44.4's schema + order distribution. Pure JS, not a bytecode walker. Depends on 44.4. | pending |
+| 44.3 | Orchestrator plaintext-build JS-level trace — static-fallback deliverable; inverted Phase 44 model (orchestrator builds 39-field 9504-byte body; vm-slide reduces it to the 112-byte XTEA input; `&vData=` literal at pcs 24211..24223 lives in fn 22317, not fn 20539) | done |
+| 44.2.6 | **fn 22317 full static decompile + reconciliation with fn 20539** — decompile fn 22317 body `[22317, ~24234]` end-to-end; answer (i) is fn 22317 the installed `XMLHttpRequest.prototype.send` replacement? (ii) what is fn 20539's actual role? (iii) does fn 22317 perform the 9504→112 reduction itself or delegate? (iv) locate the `&vData=` concat + `savedSend.call` sites | pending |
+| 44.3.5 | Real-Chrome differential capture — third fixture from production Chrome; capture target is now the **full 9504-byte verify POST body + its vData ciphertext** pair so 44.4's reduction formula can be cross-checked against a non-jsdom environment | pending |
+| 44.4 | **9504→112 reduction formula reversal** — once 44.2.6 names the reduction region, decompile it; determine which of the 39 input fields feed the reduction + the per-accumulator rule. Ground truth: committed HAR fixture has both the 9504-byte body AND the XTEA-decrypted 112-byte output; candidate formulas checkable byte-for-byte. Deliverable: `research/vm-slide-stack-vm/REDUCTION-FORMULA.md` + JS reference impl | pending |
+| 44.5a | Replay-with-substitution builder. Reads a captured 9504-byte body + field override map, emits a substituted body. Thin wrapper once 44.5b lands. | pending |
+| 44.5b | **From-scratch 9504→112→encrypt pipeline**. `tools/vdata-generator/build-vdata.js`: input = a 39-field verify body (or the subset feeding the reduction); output = 152-char vData string. Pure JS, builds on Phase 43 encoder + 44.4 reduction. Deterministic (no per-run randomness to model). | pending |
 | 44.6 | Tests for the plaintext builder (different agent per impl/tests separation) — unit tests per field source rule + integration tests asserting byte-identical reproduction of all three fixtures' plaintexts → vData strings end-to-end (jsdom + HAR + real-Chrome from 44.3.5) | pending |
 | 44.7 | Docs closeout (director-owned) — expand `docs/VDATA_FORMAT.md` §1 with the complete plaintext spec; **fix `docs/CAPTCHA_ORCHESTRATOR.md` §517 + §6.2** (whole-body-replacement correction from 44.2.5); mark Phase 44 closed; bump CLAUDE.md Project Memory | pending |
 
@@ -121,51 +122,118 @@ Current task: — (none; 44.3 done, Phase 44 tasks 44.4/44.5b awaiting second pl
 
 ## Current Task
 
-— None. Phase 44 awaiting second plan revision (third-level re-pivot).
+**ID**: 44.2.6
+**Title**: fn 22317 full static decompile + reconciliation with fn 20539
+**Phase**: Phase 44 — vm-slide 9504→112 reduction reversal
+**Status**: pending — awaiting user dispatch trigger (revised plan approved 2026-04-13).
 
-**Status after 44.3 (2026-04-13)**: 44.3's investigation met its verification checklist (build-site located, docs corrected, tests green) but the **finding itself inverts the pivot model I took the user through on 2026-04-13**. Director-verified against the HAR fixture `sample/captcha-har.har`:
-- The verify POST body is **9504 bytes** with **39 fields** joined by `&`. `vData` appears as the 40th (last-ish) field at **152 chars**.
-- There is **no** `xhr.send(<112-byte body>)` call anywhere. The orchestrator builds a standard multi-field form body via Zepto's `$.ajax({data: d})` where `d` is a 39-field JS object assembled inside module 56 function `Y` (`sample/t_captcha_slide.js` byte range [159126, 167171], `$.ajax` callsite at byte 163131).
-- vm-slide appends `&vData=<ciphertext>` onto the outgoing 9504-byte body. The `&vData=` literal is built inside vm-slide bytecode at pcs **24211..24223** via `OP_10 38 118 68 97 116 97 61` — director byte-verified directly from `output/vm-slide/bytecode.json`.
-- The `&vData=` literal lives inside a **different function than fn 20539** — specifically fn 22317 (body range approximately [22317, 24234], based on FUNC_CREATE at pc 24234 targeting entry 22317). fn 20539's body [20539, 20796] contains zero `OP_10 61` or `OP_10 38` instructions, consistent with 44.2.5's static claim. Both facts are simultaneously true — vm-slide has more than one relevant function.
-- **Phase 43's "112-byte plaintext" was never a wire-observable buffer.** Phase 43 computed it by running XTEA decrypt on the observed 152-char vData ciphertext. The 112-byte result has 8 `=` / 7 `&` shape, but it is a **VM-internal XTEA input**, not something any XHR body ever contained. The label "plaintext" in `tests/fixtures/vdata-*-capture.json` has been misleading since Phase 43.1.
+### Goal
+Decompile vm-slide's fn 22317 (body approximately `[22317, 24234]`, ≈1917 instructions, spawned by `OP_58` at pc 24234) end-to-end and reconcile it with fn 20539 (the function 44.2.5 decompiled). Answer four questions with pc-grounded evidence:
+1. Is fn 22317 the installed `XMLHttpRequest.prototype.send` replacement on the Chrome code path?
+2. If so, what is fn 20539's actual role? Sibling helper? `.call`/`.apply` handler? Dead code? IE fallback? Something else?
+3. Does fn 22317's prologue perform the 9504-byte → 112-byte reduction itself, or does it delegate to helpers (and if so, which pc range)?
+4. Where inside fn 22317 is the `&vData=` concat site (we know the literal is built at pcs 24211..24223) and where is the `savedSend.call(this, body_with_vData)` call site that actually forwards to the original send?
 
-**Corrected model (post-44.3)**:
-```
-orchestrator (module 56 fn Y)
-    builds 39-field JS object d
-    calls Zepto $.ajax({data: d})         <- d has 39 fields
-    which calls xhr.send(urlencoded d)    <- 9504-byte body
-      |
-      v
-vm-slide's installed XMLHttpRequest.prototype.send replacement
-    (some function that uses fn 22317's `&vData=` literal at pc 24211;
-     relationship to fn 20539 NOT YET RECONCILED)
-    reduces the 9504-byte body to a 112-byte XTEA input
-    (44.3 hypothesizes a 6-bit / base64-style accumulator reduction
-     based on OP_08 63 / OP_08 6 / OP_08 31 mask-shift patterns at
-     pcs 19221..19443 and 24023..24084; NOT YET VERIFIED)
-    XTEA-encrypts via fn 15918 / fn 15241 chain
-    base64s via Phase 43 custom alphabet
-    appends "&vData=" + <152-char ciphertext> to the 9504-byte body
-    forwards to savedSend.call(this, body + "&vData=" + ciphertext)
-    which actually sends over the wire
-```
+Deliverable: `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md`.
 
-**What still holds from prior tasks**:
-- 44.1 (encrypt-callsite back-walk): solid. fn 15918 @ pc 16182 is the 14x XTEA call site.
-- 44.2 (fn 15918 decompile): solid for the XTEA loop. The arg-to-local mapping for slot 4 is still ambiguous (first-loop reads slot 4 as 16-byte sliceable buffer) but this does not affect the reduction-formula question.
-- 44.2.5 (fn 20539 decompile): solid for fn 20539 internally. But 44.2.5's **conclusion** that fn 20539 is "the" installed send replacement with "whole-body replacement" is **incomplete** — fn 20539 may be a secondary helper (e.g. a `.call`/`.apply` handler replacement, or a different code path) while fn 22317 is the actual `.send` replacement that does the append-mode rewrite. 44.2.5's bytecode-level claims about fn 20539's body stand; the functional-role claim does not.
+### Context (post-44.3, verified)
+- Director byte-verified directly against `output/vm-slide/bytecode.json`:
+  - pcs 24210..24224 spell `"&vData="` via `OP_04, OP_10 38, OP_10 118, OP_10 68, OP_10 97, OP_10 116, OP_10 97, OP_10 61`.
+  - FUNC_CREATE `OP_58` at pc 24234 targets entry pc 22317 — establishing fn 22317 body as `[22317, ~24234]`. The exact body end is not yet pinned; the subagent must confirm by walking from entry 22317 until the terminating `OP_13 RETURN` / `OP_16 VM_EXIT` is reached.
+  - Global `OP_10 61` count = 12 sites, `OP_10 38` count = 10 sites. fn 20539's body `[20539, 20796]` contains zero of either. Both facts are simultaneously true — the 44.2.5 scoped byte-check stands, but the global view shows fn 22317 is a separate function with its own `&vData=` emission.
+- HAR evidence (`sample/captcha-har.har`): verify POST body = 9504 bytes, 39 fields, `vData` is the 40th (last) field at 152 chars. So vm-slide **appends** `&vData=<ciphertext>` to an existing body — it does NOT perform whole-body replacement as 44.2.5 had concluded for fn 20539.
+- Phase 43's "112-byte plaintext" is a VM-internal XTEA input, not a wire body. It is computed by reducing the 9504-byte body via some chain inside vm-slide — 44.3 hypothesized a 6-bit / base64-style accumulator reduction based on `OP_08 63` / `OP_08 6` / `OP_08 31` mask-shift patterns at pcs 19221..19443 and 24023..24084, but this is unverified and lives in 44.4's scope (this task just needs to find the *entry point* and *delegation pattern*, not the full reduction formula).
+- fn 20539 decompile (Phase 44.2.5, `research/vm-slide-stack-vm/FN-20539-DECOMPILE.md`) is solid at the per-pc level:
+  - fn 20539 body `[20539, 20796]`, spawned by parent fn 20140 at pc 20797 via `OP_58 20539 3 1 7 6 8 3 9 4 3` (3 args, capture pairs).
+  - Slot 3 = `arguments[0]` at entry (string body parameter, type-guarded at pc 20604).
+  - Slot 4 = py-flag bool (first-written at pc 20618).
+  - Slot 8 = fn 15918 (captured upvalue from parent slot 3).
+  - Slot 9 = savedSend (captured upvalue from parent slot 4).
+  - Tail: at pc 20749 calls `fn 15918.apply(U, [slot3, {py: slot4?"1":"0"}])`; at pc 20751 stores return into slot 3; at pc 20770 calls `savedSend.call(this, slot3_ciphertext)`.
+  - 44.2.5 concluded fn 20539 IS the installed send replacement. Given 44.3's findings that must be **partially wrong** — either fn 20539 is a sibling/fallback path and fn 22317 is the primary replacement, OR fn 22317 is a helper fn 20539 calls under specific conditions, OR fn 20539 is dead code in the Chrome path, OR the Chrome code path has two-stage encryption through both functions. The subagent must reconcile.
+- Parent function fn 20140 (body starts at 20140; FUNC_CREATE `OP_58` at pc 20813 targets entry 20140): this is the installer. It is the function that assigns `XMLHttpRequest.prototype.send = <some closure>`. Whatever closure fn 20140 installs IS the installed send replacement. The subagent may need to read fn 20140's body to determine which closure (fn 20539, fn 22317, or a third) is the actual installation target — and whether fn 22317 is even reachable from the Chrome code path at all.
+- Other relevant sibling functions surfaced by the FUNC_CREATE scan inside this region (targets in `[20000, 24210]`, ordered by `func_create_pc`):
+  - fn 20353 (FUNC_CREATE at pc 20463) — 44.3 hypothesized this as the `open` hook; unverified.
+  - fn 20539 (FUNC_CREATE at pc 20797) — the 44.2.5-decompiled function.
+  - fn 20140 (FUNC_CREATE at pc 20813) — parent of fn 20539, likely the installer.
+  - fn 20107 (FUNC_CREATE at pc 20823).
+  - fn 20843 (FUNC_CREATE at pc 20950).
+  - fn 21045 (FUNC_CREATE at pc 21132).
+  - fn 21255 (FUNC_CREATE at pc 21321).
+  - fn 21333 (FUNC_CREATE at pc 22025).
+  - fn 22038 (FUNC_CREATE at pc 22273).
+  - fn 22400 (FUNC_CREATE at pc 22663).
+  - fn 22730 (FUNC_CREATE at pc 22972).
+  - fn 23399 (FUNC_CREATE at pc 23727).
+  - fn 23898 (FUNC_CREATE at pc 23945).
+  - fn 22317 (FUNC_CREATE at pc 24234).
+  - fn 20970 (FUNC_CREATE at pc 24257).
 
-**What needs to change**:
-1. New task **44.2.6 — fn 22317 full static decompile + reconciliation with fn 20539** (~1–2 hours, ~1917 instructions in [22317, 24234]). Analogous to 44.2.5 but for the fn 22317 body. Must answer: (i) is fn 22317 the actual installed `XMLHttpRequest.prototype.send` replacement? (ii) is fn 20539 a sibling, a helper, or dead code? (iii) what does the prologue of fn 22317 do with its argument 0 — does it reduce it to 112 bytes, or does it dispatch to fn 20539 or to fn 15918 directly?
-2. **Retarget 44.4** from "orchestrator 8-field schema pin" to **"9504→112 reduction formula reversal"**. Decompile the reduction region (will be named by 44.2.6). Determine which of the 39 fields feed into the reduction, how the 8 accumulators are shaped, and what the per-accumulator rule is. Ground truth: the committed fixtures give us both the 9504-byte body (HAR) and the 112-byte XTEA input (decrypted from vData) — so we can check any candidate reduction formula byte-for-byte against the fixtures.
-3. **Retarget 44.5b** from "from-scratch JS environment fingerprint builder" to **"from-scratch JS 9504→112→encrypt pipeline"**. Input: a 39-field verify POST body shape (or just the fields the reduction consumes). Output: the 152-char vData string. This is substantially easier than the original 44.5b draft because the reduction is deterministic given the input body — no per-run variability to model except whatever the reduction itself introduces.
-4. **44.5a (replay-with-substitution)** — still structurally valid but the substitution target is now "the 9504-byte body", not "the 112-byte intermediate". Likely ships as a slim wrapper that just calls 44.5b with a modified body.
-5. **44.6, 44.7** — structurally unchanged.
-6. **44.3.5 (real-Chrome capture)** — capture target shifts from "orchestrator pre-encrypt body" to "the full verify POST body + vData ciphertext pair". Still produces a third fixture. Unchanged shape.
+### Inputs
+- `output/vm-slide/bytecode.json` — 24,273-element decoded bytecode. Slice `[22317, 24234]` for fn 22317; slice `[20140, 20797]` or similar for fn 20140 if you need the installer.
+- `output/vm-slide/disassembly-full.txt` — Phase 40.1 full-coverage walker output. fn 22317 is reachable from the root (Phase 40.6 confirmed XTEA handlers including 15918/15241/15416 are all reachable), so the walker should have decoded it. Prefer this over re-walking.
+- `research/vm-slide-stack-vm/walker.js`, `decoder.js`, `disassembler.js` — Phase 39/40 tooling. Re-walk specific regions if `disassembly-full.txt` is sparse for fn 22317.
+- `research/vm-slide-stack-vm/FN-20539-DECOMPILE.md` — the 44.2.5 deliverable. Canonical reference for what fn 20539 does per-pc.
+- `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` — the 44.2 fn 15918 decompile. Useful for reference on the XTEA-driver's internals.
+- `research/vm-slide-stack-vm/plaintext-callgraph.md` — the 44.1 call-graph artifact. Shows that fn 20539 → fn 15918 is one live chain (`OP_66` at pc 20749). If fn 22317 is also a live caller of fn 15918 via some other `OP_66`, the runtime call-graph tracer (`research/vm-slide-stack-vm/vdata-callgraph-trace.js`) already captured that in its runtime output at `output/vm-slide/vdata-callgraph.json` — grep it for call-sites into pc 15241.
+- `docs/VM_SLIDE_OPCODES.md` — authoritative opcode table. Especially important for this task: `OP_58` FUNC_CREATE operand layout, the prototype-assignment opcodes (`OP_24` STORE_REF or equivalent), and the call opcodes (`OP_02`, `OP_25`, `OP_55`, `OP_66`).
+- `docs/VM_SLIDE_ARCHITECTURE.md` — dispatch loop and frame-entry convention.
+- `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 (post-44.3 edit) — context on the append-mode vData mechanism.
+- `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` (44.3) — 44.3's hypotheses about fn 22317 being the top-level send replacement. Use as a hypothesis, NOT as ground truth.
+- `sample/captcha-har.har` — HAR fixture with the 9504-byte verify POST body, for cross-checking.
+- `tests/fixtures/vdata-jsdom-capture.json`, `tests/fixtures/vdata-har-capture.json` — committed 112-byte XTEA inputs (still correctly named as hex even if the "plaintext" label is misleading).
 
-**Also noted**: 44.3 wrote surgical edits to `docs/CAPTCHA_ORCHESTRATOR.md` §517 and §6.2 — these corrections are **mostly** right (the §6.2 append-mode correction matches HAR evidence; the §517 "not-a-JS-environment-fingerprint" correction is right) but they rest on 44.3's un-verified claim about fn 22317 being the installed send replacement. Director will commit them as-is because (a) they are strictly better than the current text and (b) 44.2.6 will refine them further if fn 22317's actual role differs.
+### Implementation Steps
+1. **Pin fn 22317's actual body bounds.** Start walking from entry pc 22317. Use `walker.js`'s function-entry table to confirm the entry; walk forward until the first dominating `OP_13 RETURN` / `OP_16 VM_EXIT` that leaves no dangling reachable code behind (standard terminator for stack-VM functions). Record the exact `body_end` pc. The ≈24234 figure is just the FUNC_CREATE pc; the actual body may end earlier at the function's own terminator.
+2. **Read fn 20140's body** (or the section that contains `OP_58 20539 ...` at pc 20797 and `OP_58 22317 ...` at pc 24234 — they may both be inside the same parent). Identify the actual installer: find the `XMLHttpRequest.prototype.send = <closure>` assignment. The closure's FUNC_CREATE pc tells you which function (fn 20539 or fn 22317 or a third) is the true installed replacement. If both FUNC_CREATEs are inside the same parent, there may be two sibling closures installed onto *different* methods (e.g. fn 20539 = `send`, fn 22317 = `open` — or vice versa — or something subtler). Ground every claim in specific pcs.
+3. **Decompile fn 22317's prologue** (first ~100 instructions, until the first significant branching). Identify: arg count, arg-to-local mapping, closure captures, any type guards on arg 0 (analogous to fn 20539's pc 20604 `OP_52 TYPEOF arguments[0]` guard). If fn 22317 is the real send replacement, it should have a similar string guard near the top.
+4. **Find the `&vData=` concat site inside fn 22317.** We know the `"&vData="` literal is built at pcs 24211..24224 via seven `OP_10` char-append instructions. The concat site is whatever `OP_05` (or equivalent string-concat opcode per `docs/VM_SLIDE_OPCODES.md`) consumes that built string plus the already-encrypted ciphertext. The directly-following instruction after the literal is built should be the concat. Record the pc and describe the data flow.
+5. **Find the `savedSend.call(this, body_with_vData)` forwarding site.** After the `&vData=` concat, fn 22317 must eventually invoke the original `XMLHttpRequest.prototype.send` on the rewritten body. Look for `OP_02` METHOD_CALL with operand `"call"` or `OP_66` CALL_GLOBAL against a captured upvalue. Record which local holds the `savedSend` reference and which local holds the rewritten body at the call site.
+6. **Find fn 22317's reduction call.** Before the `&vData=` concat, fn 22317 must have called the reduction (9504 → 112 bytes) and then the XTEA-encrypt-and-base64 chain (which produces the 152-char ciphertext). Identify the call sites and pcs. Determine whether the reduction is:
+   - (a) inlined inside fn 22317 itself (lots of `OP_08 63` / `OP_08 6` / `OP_08 31` mask-shift ops and string-build opcodes in fn 22317's body middle region), OR
+   - (b) delegated to a helper function via `OP_66` (record which function is called), OR
+   - (c) delegated to fn 20539 (which would finally reconcile fn 20539's role).
+   Don't reverse the reduction formula itself — that's 44.4. Just find the boundary.
+7. **Pin fn 20539's actual role.** Based on what fn 22317 does and what fn 20140 installs, classify fn 20539 as one of:
+   - **(I)** The installed send replacement (fn 22317 is a helper it calls).
+   - **(II)** A helper fn 22317 calls (fn 22317 is the installed replacement).
+   - **(III)** A sibling that handles a different code path (e.g. IE fallback, `.call`/`.apply` handler, or a different URL condition).
+   - **(IV)** Dead code in the Chrome path.
+   - **(V)** Something else — document it.
+   Ground the choice in fn 20140's installer code, not in fn 20539's own body (fn 20539's own body is already 44.2.5).
+8. **Write `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md`** with exactly these sections:
+   - **Summary** (≤15 lines, with the classification verdict for fn 20539 stated unambiguously in the first sentence).
+   - **fn 22317 full pseudocode** — prologue + middle + tail with inline pc comments (~ every 5-10 lines). Scope constraint: only fn 22317 itself, not the reduction helpers if any.
+   - **Reduction boundary** — the pc at which fn 22317 either starts the inline reduction OR delegates to a helper. If delegated, name the helper function. Do NOT reverse the formula.
+   - **`&vData=` concat + forward call sites** — the pc of the concat, the pc of the `savedSend.call`, and the local slots involved.
+   - **Installer evidence** — the pcs inside fn 20140 (or whatever parent) that assign `XMLHttpRequest.prototype.send = <closure>`; which closure is installed; how fn 22317 relates.
+   - **fn 20539 role reconciliation** — the classification verdict (I-V) from step 7, with supporting pc references.
+   - **Implications for 44.4** — which region 44.4 should decompile to reverse the reduction formula.
+   - **Open questions** — anything you could not resolve.
+9. **Report the verdict first** in your reply so the director can decide 44.4's scope immediately. Then the artifact path, then the npm test tail, then open questions.
 
-**Director will present the revised plan on the next user message.** No dispatch until user confirms the second revision.
+### Verification
+- [ ] `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md` exists with all eight sections listed.
+- [ ] fn 22317's body end pc is pinned (not left as ≈24234).
+- [ ] The fn 20539 role classification (I-V) is stated unambiguously in the Summary's first sentence, with specific pc citations.
+- [ ] The `&vData=` concat pc is named explicitly.
+- [ ] The `savedSend.call` forwarding pc is named explicitly.
+- [ ] The reduction boundary is named (either an inline region inside fn 22317 with pc range, or a delegated helper function with entry pc).
+- [ ] Installer evidence: specific pc(s) inside fn 20140 (or whatever parent) where the `XMLHttpRequest.prototype.send` assignment happens, with the closure identity.
+- [ ] `npm test` passes at **411/411**.
+- [ ] No modifications to `targets/`, `sample/`, `tools/`, `tests/fixtures/`, `docs/`, `research/vm-slide-stack-vm/{FN-20539-DECOMPILE,PLAINTEXT-BUILD,plaintext-callgraph,vdata-*-trace}.*`, or `research/captcha-orchestrator/`. New artifact only.
+
+### Constraints
+- **Do not make any git commits.** Director owns all commits after verification.
+- **Do not modify `targets/`, `sample/`**. Tencent's property.
+- **Verify, don't assume.** Every pseudocode line must trace to a specific bytecode pc. Do NOT introduce hypotheses that are not byte-grounded — the point of 44.2.6 is to eliminate the remaining ambiguity about fn 20539's role, not to substitute a new un-verified hypothesis.
+- **Do not reverse the 9504→112 reduction formula.** That is 44.4's scope. 44.2.6 only pins the reduction's *location* and *delegation pattern*.
+- **Do NOT re-run any tracers, harnesses, or jsdom environments.** Pure static analysis.
+- **Pay special attention to `OP_10 & / =` global placements.** The 12 `OP_10 61` and 10 `OP_10 38` sites in the bytecode may hint at other unnoticed literal-build sites relevant to the reduction — cross-reference them with fn 22317's body range and note any that fall inside.
+- **Byte-level verification of load-bearing claims is REQUIRED.** For any claim about a specific opcode sequence (e.g. "fn 22317 ends with OP_13 RETURN at pc X"), cite the raw bytecode.json slice, not just the disassembly text.
+- **If the task reveals that the Chrome path uses THREE functions** (fn 20140 installer, fn 22317, fn 20539 all with live roles), that's a legitimate finding — document all three. Classification (V) is valid.
+- **If the task is genuinely impossible** (e.g. fn 22317 uses opcodes not documented in `docs/VM_SLIDE_OPCODES.md` and not inferrable from other functions' usage), stop, write FN-22317-DECOMPILE.md with whatever you resolved + an explicit scope-reduction note listing the unresolvable opcodes, and report. Do not leave broken files.
+
+### Suggested Agent
+`general-purpose` — pure static bytecode reading. Same shape as 44.2, 44.2.5, 44.3's fallback path. ~1–2 hours expected.
 
