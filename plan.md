@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide plaintext fingerprint reversal (**PLAN REVISION NEEDED** — 44.2 found the plaintext is built outside vm-slide)
-Current task: — (none; awaiting user confirmation of Phase 44 scope pivot)
+Current phase: Phase 44 — vm-slide plaintext fingerprint reversal (**pivot confirmed — orchestrator target; Phase 44 redraft pending user review**)
+Current task: — (none; 44.2.5 done, Phase 44 tasks 44.3/44.4/44.5b awaiting user-reviewed redraft)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -106,6 +106,7 @@ Current task: — (none; awaiting user confirmation of Phase 44 scope pivot)
 |----|------|--------|
 | 44.1 | Encrypt-callsite back-walk + plaintext-build call graph (static + runtime caller-PC capture) | done |
 | 44.2 | Plaintext-build static decompile to pseudocode — `research/vm-slide-stack-vm/PLAINTEXT-BUILD.md` | done |
+| 44.2.5 | fn 20539 full static decompile — settle pivot premise → verdict **(A) pure encrypt stage**, orchestrator builds plaintext | done |
 | 44.3 | Dynamic property-read instrumentation — tap OP_47/OP_60/string-build inside the plaintext-build pc range, dump every `(object, key, value)` tuple, cross-check against the captured 112-byte plaintext to identify the 8 fields | pending |
 | 44.3.5 | Real-Chrome differential capture via Puppeteer — capture a third fixture from production Chrome using the `tools/captcha-solver/` infrastructure; cross-validate the schema from 44.3 against a non-jsdom environment | pending |
 | 44.4 | Per-run order resolution — run the instrumented harness ≥20 times across both jsdom and real Chrome, determine whether order varies (memory iteration) or content varies (internal salt); blocking for 44.5b | pending |
@@ -120,20 +121,15 @@ Current task: — (none; awaiting user confirmation of Phase 44 scope pivot)
 
 ## Current Task
 
-— None. Phase 44 pivot pending user review (see history/20260413.md entry "44.2: plan pivot — plaintext lives in orchestrator, not vm-slide").
+— None. Phase 44 downstream redraft pending user review.
 
-**Situation**: 44.2's decompile of fn 15918 proved vm-slide is a **pure encrypt stage** — fn 20539 (the proxyXHR send-handler) intercepts `xhr.send(body)`, passes `body` (already the 112-byte plaintext) to fn 15918 as arg 0, and fn 15918's 14-iteration loop just XTEA-encrypts that buffer 8 bytes at a time. The fingerprint plaintext is therefore assembled by the **captcha orchestrator** (Phase 41 `t_captcha_slide.js`, likely module 56), NOT by vm-slide. Tasks 44.3/44.4 as originally written targeted bytecode instrumentation inside vm-slide's plaintext-build region — that region does not exist.
+**Pivot status (2026-04-13)**: 44.2.5 confirmed vm-slide is classification **(A) pure encrypt stage**, rigorously grounded:
+- fn 20539 emits **zero** `OP_10 61` (`=`) and **zero** `OP_10 38` (`&`) bytes across its full 257-instruction body (director-verified independently from `output/vm-slide/bytecode.json`). It cannot assemble a `key=value&...` fingerprint string.
+- fn 20539 has exactly **one** `OP_52 TYPEOF` in the whole function, applied to `arguments[0]` at pc 20604 as a string-type guard on the incoming body — no fingerprint-shaped environment probes.
+- Argmap `Q[0]=3` from parent `OP_58 20539 3 1 7 6 8 3 9 4 3` (pc 20797) proves **slot 3 = arguments[0]** at frame entry and is never overwritten until pc 20751 (where it is replaced with the fn 15918 return value).
+- Tail [20751, 20796]: `savedSend.call(this, slot3_ciphertext)` at pc 20770 — vm-slide actually **replaces** the caller's body with the ciphertext before forwarding to the original `XMLHttpRequest.prototype.send`. (This also partially corrects `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 which called it "injection as `vData=<cipher>`" — it's actually whole-body replacement, per 44.2.5. The orchestrator must still parse/use the ciphertext downstream; that's a 44.3 discovery item.)
 
-**What still holds**:
-- 44.3.5 (real-Chrome differential capture via Puppeteer) — still valid and still useful as a third fixture; the capture target shifts from "vm-slide fingerprint" to "orchestrator pre-encrypt body".
-- 44.5a (replay-with-substitution plaintext builder) — still valid; it consumes a captured 112-byte plaintext and emits a substituted one. Agnostic to where the plaintext was built.
-- 44.6 / 44.7 (tests + docs closeout) — structurally still valid.
+**44.2's original pivot proposal is confirmed**. The downstream Phase 44 tasks (44.3, 44.4, 44.5b) need to be redrafted against the orchestrator target before any further dispatch. Director will present the redraft on the next message.
 
-**What needs to change**:
-- 44.3: retarget from vm-slide bytecode instrumentation to **orchestrator JS-level tracing**. Use Phase 41's `docs/CAPTCHA_ORCHESTRATOR.md` module map + the existing Puppeteer harness to hook `XMLHttpRequest.prototype.send` *before* vm-slide's proxyXHR wraps it, capture the plaintext `body` string at the hook site, and back-walk in JS to find which orchestrator function assembled it.
-- 44.4: per-run order resolution still matters but now targets **JS iteration semantics** (likely `for (k in obj)` or `Object.keys()` order over a fingerprint object) rather than VM-internal order.
-- 44.5b: full synthesis becomes a JS-environment fingerprint builder mirroring the orchestrator's logic — completely different codebase than a bytecode walker.
+**Also noted for later**: the "slot 4 contradiction" 44.2 flagged inside fn 15918 (first loop reads slot 4 as 16-byte sliceable buffer, call site passes `{py}`) is still open — 44.2.5 confirmed slot 4 is a py-flag bool, so fn 15918's first loop needs a re-read. Not blocking for 44.3; parked as a micro-task for whoever re-reads fn 15918.
 
-**Also flagged for follow-up**: 44.2's static decompile surfaced a "slot 4 contradiction" inside fn 15918 (first-loop treats slot 4 as a 16-byte sliceable buffer, but fn 20539 demonstrably passes `{py:"0"|"1"}` at the call site). One plausible reading: the first loop is XTEA key expansion over a 16-byte key constant that is supplied via an upvalue under some other path, and the `{py}` arg takes a different local slot at runtime. Not blocking — 44.3's JS-level trace will incidentally resolve it or push it to a separate micro-task.
-
-**Director recommends** user confirm the pivot and let the director redraft Phase 44 tasks 44.3..44.5b against the orchestrator target before dispatching anything further.
