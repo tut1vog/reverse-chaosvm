@@ -438,6 +438,8 @@ row.
 
 ### `vData`
 
+> **For the byte-level cipher specification (XTEA key, alphabet, padding scheme, worked example, public API), see `docs/VDATA_FORMAT.md` — the authoritative Phase 43 doc.** This section covers only where `vData` enters the verify POST and how vm-slide installs the XHR proxy that calls the cipher; the cipher itself moved to `VDATA_FORMAT.md` when the standalone `tools/vdata-generator/` encoder shipped (Phase 43, 2026-04-13).
+
 **Resolved in Phase 42** via static decode of the `vm-slide.e201876f.enc.js`
 stack-VM bytecode. The orchestrator's `if (a.isLowIE()) { var o =
 window.getVData && window.getVData(n.join("&")); o && (e.vData = o) }` block
@@ -483,8 +485,8 @@ is reachable on the fall-through path.
   and splits the input query string on `"&"` and `"="` before emitting the
   ciphertext.
 
-**Crypto**. The cipher that produces the 152-char HAR value lives in
-vm-slide, outside the `getVData` function body. Static evidence from
+**Crypto** (summary — full spec in `docs/VDATA_FORMAT.md`). The cipher that produces the 152-char HAR value lives in
+vm-slide, outside the `getVData` function body. **Phase 43 closed-form result**: classical XTEA (32 rounds, delta `0x9E3779B9`, LE uint32 packing, 16-byte key `2e430f8c15b7da96`) followed by standard base64 with a custom 65-char alphabet where index 64 (`Y`) is the padding character. Pipeline = 14 × 8-byte XTEA blocks (= 112 bytes plaintext) → 152 chars of base64 ending in `YY`. **Phase 43.2 correction**: earlier notes claimed a "constant 2-byte trailer `10 40`" — that was a phantom from mis-decoding the trailing `YY` padding chars as raw 6-bit values (`(64<<6)|64 = 0x1040`). There is no trailer; the encoder input is 112 bytes flat. Static evidence from
 `research/vm-slide-stack-vm/VDATA-RESOLUTION.md`:
 
 - The **XTEA delta** `0x9E3779B9` (= 2654435769) appears as `OP_08`
@@ -510,11 +512,9 @@ Task 42.2 ran a full-bytecode enumeration of `[window, <key>] + FUNC_CREATE
 vm-slide does not expose a second global for the crypto — the XHR proxy
 keeps everything inside a closure.
 
-**What remains open** (see §8): the exact XTEA key bytes used by the vData
-pipeline, the exact plaintext being encrypted, and byte-identical
-reproducibility via a standalone vData generator. Phase 42 resolved
-mechanism, not reproducibility; Track 2's DoD did not require byte-identical
-reproducibility for `vData`.
+**What's now resolved** (Phase 43, 2026-04-13). The XTEA key is `2e430f8c15b7da96`; the cipher is classical (not modified) XTEA with LE uint32 packing; the alphabet is 65 chars with `Y` as the padding char; byte-identical reproducibility for the cipher half is achieved by `tools/vdata-generator/` against both a synthetic jsdom fixture and a real Chrome 146 HAR capture — see `docs/VDATA_FORMAT.md` for the full spec and `tests/test-vdata-generator-encoder.js` for the test coverage.
+
+**What remains open**. The 112-byte plaintext is not the verify POST body — it is a JS-environment fingerprint that vm-slide's `proxyXHR` builds at runtime from `typeof`, property enumeration, and object stringification. Reversing that builder is **Phase 44** (open, no active tasks). Until Phase 44 closes, byte-identical end-to-end `vData` synthesis from scratch (without a captured plaintext) is not possible. See `research/vm-slide-stack-vm/VDATA-PIPELINE.md` §8 for the open questions.
 
 ### `nonce`
 

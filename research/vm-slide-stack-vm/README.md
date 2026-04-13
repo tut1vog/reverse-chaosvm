@@ -62,6 +62,14 @@ Phase 43.2 research artifacts under this track:
 - `tests/fixtures/vdata-har-capture.json` — frozen HAR reference vector (real Chrome 146 vData from `sample/captcha-har.har`, with the cleartext recovered by XTEA decryption of the decoded 112-byte ciphertext).
 - `tests/fixtures/verify-vdata-fixtures.js` — pure-JS standalone verifier (no jsdom). Decodes both fixtures, round-trips base64 + XTEA in both directions, and exits 0 only when all four checks pass for both fixtures.
 
+Phase 43.3–43.5 closeout (cipher half done):
+
+- `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js, README.md}` — standalone byte-identical encoder for the cipher half of the vData pipeline. Pure JS, no deps, no jsdom. Public API: `encodeVData(buf|hex) → 152-char string`. CLI: `node tools/vdata-generator/cli.js --plaintext-hex <hex>` or stdin. Round-trips both committed fixtures byte-for-byte. Phase 43.3.
+- `tests/test-vdata-generator-encoder.js` — 14 suites, 58 tests covering fixture round-trips (jsdom + HAR), XTEA unit tests, custom-base64 unit tests, encode API tests, and a reference-verifier sanity check. Phase 43.4.
+- `docs/VDATA_FORMAT.md` — authoritative byte-level spec for the cipher half: pipeline, parameters, worked example, public API, provenance pointers back into this track. Phase 43.5.
+
+Phase 43 status: **closed for the cipher half.** Plaintext-build half is **Phase 44** (open, no active tasks) — see `VDATA-PIPELINE.md` §8.
+
 ## Notes
 
 **Phase 39 findings:**

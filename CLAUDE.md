@@ -182,6 +182,7 @@ For the current research phase — intent, scope, director permissions, and prio
 | `docs/TOKEN_DECRYPTION.md` | How to decrypt a captured token |
 | `docs/HAR_ANALYSIS.md` | Network flow analysis of the CAPTCHA protocol |
 | `docs/CAPTCHA_ORCHESTRATOR.md` | `t_captcha_slide.js` end-to-end flow + verify-body origination table (vm-slide track, Phase 41; vData mechanism resolved in Phase 42) |
+| `docs/VDATA_FORMAT.md` | Authoritative byte-level spec for the cipher half of vm-slide's `vData` field — XTEA key, custom 65-char base64 alphabet (index 64 = padding), worked example, public API for `tools/vdata-generator/`. Phase 43 closeout (cipher half only; plaintext half is Phase 44). |
 | `docs/CHAOSVM_VARIANTS.md` | Top-level comparison of register-based (`tdc.js`) vs stack-based (`vm-slide`) ChaosVM variants (Phase 39) |
 | `docs/VM_SLIDE_ARCHITECTURE.md` | Stack-based ChaosVM internals — `__TENCENT_CHAOS_STACK`, dispatch loop, register file (Phase 39 + 40) |
 | `docs/VM_SLIDE_OPCODES.md` | Opcode table for `__TENCENT_CHAOS_STACK` — 53 non-null handlers (Phase 39 + 40 full-coverage walker) |
