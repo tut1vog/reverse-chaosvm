@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-Current task: 46.5 — Tests for 46.4 (pending dispatch)
+Current task: 46.6 — Live re-measurement after 46.4 (director-owned — pending user go-ahead)
 
 **Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
@@ -115,7 +115,7 @@ Current task: 46.5 — Tests for 46.4 (pending dispatch)
 | 46.2 | Tests for 46.1 — wire-level vm-slide-fetch invariant locked offline (3 new tests, 509/509 green) | done |
 | 46.3 | Live re-measurement after 46.1 — 0/30 t01/t02 (null result; vm-slide alone does not move the lane) | done |
 | 46.4 | Add `/caplog` telemetry beacons around verify — caplog-beacon.js + solveCaptcha wiring + `--skip-caplog` flag (byte-for-byte HAR match) | done |
-| 46.5 | **Tests for 46.4** (different agent). Assert both beacons fire in the correct sequence relative to verify, assert the URL shape matches the HAR-derived template (parameter names and ordering, not values), assert `--skip-caplog` suppresses both. Use the same local-HTTP-server / httpRequest-mock approach as 46.2. | pending |
+| 46.5 | Tests for 46.4 — 9 tests locking PRE_KEYS / POST_KEYS sequences + ordering + skipCaplog suppression (518/518) | done |
 | 46.6 | **Live re-measurement after 46.4** (director-owned, live network). Same protocol as 46.3. Primary question: any `t01`/`t02` ticket. Log to `output/phase-46-errorcode-0/46.6-after-caplog.{log,jsonl}`. Verdict block appended to `docs/ERRORCODE_12_INVESTIGATION.md`. **Decision gate**: if 46.3 AND 46.6 both return zero `t01`/`t02`, the director pauses here and asks the user whether to proceed with 46.7 or jump straight to the TLS spike in 46.10. | pending |
 | 46.7 | **Reorder verify headers to match Chrome's canonical sequence.** Chrome 146 emits verify POST headers in the order: `Host → Connection → Content-Length → sec-ch-ua → X-Requested-With → sec-ch-ua-mobile → User-Agent → sec-ch-ua-platform → Content-Type → Accept → Origin → Sec-Fetch-Site → Sec-Fetch-Mode → Sec-Fetch-Dest → Referer → Accept-Encoding → Accept-Language` (derived from HAR). Node's `http.request` emits headers in JS-object-insertion order, so this is reachable without monkey-patching: the fix is to rebuild the headers object at `tools/captcha-solver/captcha-client.js:1007` in the exact Chrome order, explicitly setting `Host` and `Connection` too (Node will normally auto-insert them, but it places them in its own slots — passing them in `headers` with the right ordering overrides that). If JS object property iteration turns out to be non-deterministic for our case (it isn't in modern V8, but confirm), fall back to writing the HTTP request via a raw socket through `net.Socket` / `tls.connect`. Only the `cap_union_new_verify` request matters for this phase — do not touch the header order of prehandle / show / hycdn (we don't have a canonical order for them and they aren't what the server scores). | pending |
 | 46.8 | **Tests for 46.7** (different agent). Capture the actual outbound header sequence using a `https.request` monkey-patch in a test harness (same technique as the 2026-04-15 `/tmp/intercept.js` spike), assert the sequence matches Chrome's canonical order byte-for-byte for `/cap_union_new_verify`. Do not assert header order for other endpoints — they're out of scope. | pending |
@@ -139,10 +139,46 @@ Current task: 46.5 — Tests for 46.4 (pending dispatch)
 
 ## Current Task
 
-**ID**: 46.5
-**Title**: Tests for 46.4 — caplog beacons fire in the correct sequence
+**ID**: 46.6
+**Title**: Live re-measurement after 46.4 — 30-attempt default-path survey with caplog beacons
 **Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
-**Status**: pending dispatch
+**Status**: pending user go-ahead (live network, director-owned)
+
+### Goal
+Empirically measure whether adding the two `/caplog` telemetry beacons (46.4) flips any attempt from `t03tserver` / `errorCode -1` to `t01`/`t02` / `errorCode 0`. This is the second of the three lane-change measurement gates (46.3 → 46.6 → 46.9).
+
+### Protocol (same as 46.3)
+- 30 atomic `node tools/scraper/cli.js --captcha-only --retries 1 --verbose` invocations from `111.119.253.170`, serial, no gap, single default-path arm.
+- Log to `output/phase-46-errorcode-0/46.6-after-caplog.log` (raw verbose) and `output/phase-46-errorcode-0/46.6-after-caplog.jsonl` (one JSON row per attempt).
+- Same harness: `output/phase-46-errorcode-0/run-survey.sh 46.6-after-caplog 30 0`.
+- Primary question: **any single attempt returning `t01` or `t02` / `errorCode: 0`**.
+- Secondary: ticket-prefix distribution vs 45.6 default baseline and 46.3.
+
+### Abort rule (inherited)
+- First 5 attempts produce only transport failures (403/500/ECONNRESET) → stop and report.
+- Auto-port failure rate > 50% on first 10 → stop and report (template rotation).
+
+### Phase 46 decision gate
+> **If 46.3 AND 46.6 both return zero `t01`/`t02`, the director pauses here and asks the user whether to proceed with 46.7 (header-order fix) or jump straight to the TLS spike in 46.10.**
+
+46.3 already returned zero `t01`/`t02` (0/30). The gate triggers if 46.6 also returns zero. In that case: append verdict to `docs/ERRORCODE_12_INVESTIGATION.md`, append history, commit, pause and present options. Victory condition (any `errorCode: 0`) → pause immediately, capture fixture.
+
+### Pre-execution checklist
+- [ ] User has given explicit go-ahead for the 30-invocation live survey.
+- [ ] Source IP is `111.119.253.170` (confirmed at 46.3 dispatch time; re-confirm if more than a few hours have passed).
+- [ ] `output/phase-46-errorcode-0/` exists (it does — 46.3 artifacts are there).
+- [ ] `run-survey.sh` script is fresh (no changes since 46.3).
+
+### Verification (post-survey)
+- [ ] `output/phase-46-errorcode-0/46.6-after-caplog.jsonl` contains 30 rows (or fewer if aborted).
+- [ ] Each row has parsable errorCode + ticket prefix.
+- [ ] Comparison table appended to `docs/ERRORCODE_12_INVESTIGATION.md` under the Phase 46 section (add a 46.6 subsection).
+- [ ] history entry appended to today's `history/<YYYYMMDD>.md`.
+
+### Constraints
+- Do not run this task until the user explicitly says go.
+- Atomic serial invocations only, no concurrency.
+- Log sizes: JSONL is always safe to commit; the verbose `.log` is ~50 KB per 30 attempts (see 46.3) — safe to commit.
 
 ### Goal
 Lock in three regression-oriented invariants introduced by 46.4:
