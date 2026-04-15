@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (revised 2026-04-15 post-45.1, user-confirmed)
-Current task: 45.4 — Scraper wiring swap to `buildVDataForPost` (in-progress)
+Current task: 45.5 — Tests for scraper 45.4 wiring swap (in-progress)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -161,7 +161,7 @@ Current task: 45.4 — Scraper wiring swap to `buildVDataForPost` (in-progress)
 | 45.1a | **Decompile module 18 (`tlg` / `sess` lookups)** — new prerequisite discovered by 45.1. Module 18 is the body-parser `require(18)(body, tag)` that both fn 22730 (`key` digest) and the surrounding accumulator loop call. It is NOT decompiled anywhere in `research/vm-slide-stack-vm/`. Produce (a) a new research note `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with the decompiled function, the exact behaviour for tags `"tlg"` and `"sess"`, input/output types, edge cases (empty body, missing tag, non-ASCII bytes), and (b) a runnable reference impl `research/vm-slide-stack-vm/module18-body-parser.js` whose output on the HAR fixture's verify POST body matches the HAR `obj.key = "21L2"` when plugged through the fn 22730 accumulator loop from `PHASE-45-FIELD-SOURCES.md` §2.1. This is the gate for 45.2. | done |
 | 45.2 | **Port the `key` field digest + add `buildVDataForPost` entry point** — port fn 22730 + module 18 (via the 45.1a reference impl at `research/vm-slide-stack-vm/module18-body-parser.js`) into `tools/vdata-generator/build-key-field.js`, exporting `lookupFormField` + `computeKeyField`. Add `tools/vdata-generator/for-post.js` exporting `buildVDataForPost(postBody, {profile, overrides, order, ie9Fallback})`. Add a `for-post` CLI subcommand. Update the README with the new mode and caller preconditions. | done |
 | 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture and `buildVDataForPost` against synthetic + HAR byte-identity. 37 scenarios across 7 groups; 462/462 npm test green. | done |
-| 45.4 | **Scraper wiring swap** — in `tools/scraper/scraper.js` around line 525, replace the `generateVData` jsdom-harness call with `buildVDataForPost(serializedBody, browserProfile)`. Build the `serializedBody` the same way the current jsdom path does (`jQuery.param(postFields)` → preserved behaviour). Add a `--legacy-vdata` CLI flag to `tools/scraper/cli.js` that keeps the jsdom path available for comparison. Preserve `tools/scraper/vdata-harness.js` unmodified (it's still useful as an oracle). Add a `browserProfile` JSON under `profiles/vdata-browser-default.json` with the 45.1 defaults, loaded by default. | pending |
+| 45.4 | **Scraper wiring swap** — default path now calls `buildVDataForPost`; legacy jsdom harness retained behind `--legacy-vdata`. `profiles/vdata-browser-default.json` created. 462/462 tests still green. | done |
 | 45.5 | **Tests for 45.4** (different agent) — mock the scraper verify path end-to-end without network I/O: drive `scraper.js`'s vData generation code path with both (a) the new `buildVDataForPost` entry point and (b) `--legacy-vdata` jsdom harness, capture the generated vData strings, and assert: both are valid 152-char strings on the Phase 43 alphabet ending in `YY`, both decrypt back to 8-field kv strings, and the new path uses the browser-profile values (not jsdom-specific ones). Integration-style; do not hit the network. | pending |
 | 45.6 | **Empirical errorCode 12 re-test** (director-owned; live network) — run the 30-attempt survey from `docs/ERRORCODE_12_INVESTIGATION.md` §"Observed Pattern" against the live `cap_union_new_verify` endpoint, with the new vData pipeline. Record success rate in the same attempts-bucket shape (1, 2–9, 10–30). Then run a matched control with `--legacy-vdata` back-to-back from the same IP. Update `docs/ERRORCODE_12_INVESTIGATION.md` with both result rows and a verdict: (a) vData-pipeline swap improved the success rate (Phase 45 goal achieved), (b) neutral (swap is correct but errorCode 12 is elsewhere; refocus on behavioural / header vectors), or (c) regressed (new pipeline has a defect; roll back, investigate). Commit the updated investigation doc + any observed error bodies as the deliverable. | pending |
 
@@ -187,74 +187,70 @@ Current task: 45.4 — Scraper wiring swap to `buildVDataForPost` (in-progress)
 
 ## Current Task
 
-**ID**: 45.4
-**Title**: Scraper wiring swap to `buildVDataForPost`
+**ID**: 45.5
+**Title**: Tests for scraper 45.4 wiring swap (different agent)
 **Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
 **Status**: in-progress (dispatched 2026-04-15)
 
 ### Goal
-Replace the scraper's live-jsdom vData generation path with the Phase 45.2 standalone pipeline. The scraper today runs vm-slide inside jsdom via `tools/scraper/vdata-harness.js`, which leaks four jsdom-specific field values that differ from real Chrome: `tp`, `cLod`, `inf`, `ss`. After this task, the default path calls `buildVDataForPost` with a browser-profile JSON that carries HAR-derived values for those fields; the legacy jsdom path stays available behind a `--legacy-vdata` flag so 45.6 can run an A/B control from the same IP.
+Prove the 45.4 scraper wiring is functionally correct without hitting the network: drive `scraper.js`'s vData step through both branches (`legacyVdata: true` and `legacyVdata: false`), capture the vData strings each branch produces, and assert the observable invariants. Crucially, prove that the default path uses the browser-profile's HAR-derived fields (`cLod=loadTDC`, `inf=iframe`, etc.) rather than jsdom's leaking values.
 
 ### Context
-- **Current scraper path**: `tools/scraper/scraper.js` around line 525 calls `generateVData(...)` from `tools/scraper/vdata-harness.js` — that harness spins up jsdom, loads vm-slide live, and captures whatever vData it produces. The call happens right after the scraper has assembled the verify POST body fields via `jQuery.param(postFields)`-equivalent serialisation.
-- **What needs to change**: at that call site, branch on a new CLI flag. Default (flag absent) → use `buildVDataForPost(serializedBody, { profile })` from `tools/vdata-generator/for-post.js`. Flag present (`--legacy-vdata`) → keep calling the existing `generateVData` jsdom harness verbatim. **Preserve `tools/scraper/vdata-harness.js` unmodified** — it's still useful as an oracle and for 45.5's A/B test.
-- **`tlg` precondition (CRITICAL)**: `buildVDataForPost` requires the body it receives to contain `tlg=<digits>` where the digits are valid indices into the `sess` field value. Per 45.1a's incidental finding, `sample/t_captcha_slide.js` sets `e.tlg = e[collectdata].length` — i.e. `tlg` is the string length of the `collect` token. The scraper already computes a `collect` token; when it builds the verify body, it must ensure a `tlg` field is present with value = collect-token length. Check whether the current body builder already includes `tlg`; if not, add it before serialisation. Same check for `sess` — it's the session string from prehandle; the scraper already has this but confirm the body builder includes it.
-- **`serializedBody` shape**: `buildVDataForPost` takes a URL-encoded string (the same shape `jQuery.param` produces). Use the exact same serialisation the jsdom path currently uses — whatever string `vdata-harness.js` receives, `buildVDataForPost` should receive. Do NOT switch serialisation libraries.
-- **Browser profile file**: Create `profiles/vdata-browser-default.json` with the §3 JSON template from `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`:
-  ```json
-  {
-    "tp": "7446039806946242560",
-    "key": "__COMPUTED__",
-    "py": "0",
-    "env": "0",
-    "version": "2",
-    "cLod": "loadTDC",
-    "inf": "iframe",
-    "ss": "11%2Ctdc%2Cslide%2Cvm"
-  }
+- **What 45.4 shipped**: `tools/scraper/scraper.js` branches at step-(m) on `this.legacyVdata`. Default path (false) calls `buildVDataForPost(serializedBody, { profile: this._vdataProfile })` where the profile is loaded from `profiles/vdata-browser-default.json` at init time via the inline `loadProfile` helper. The same `serializedBody` is built by `serializePostFields` (a `URLSearchParams`-based helper) and passed to both the vData step and the verify endpoint (via `prebuiltBody`), so internal consistency is guaranteed.
+- **Scraper testability**: `tools/scraper/scraper.js` does NOT currently export the `Scraper` class (`module.exports` is empty) — I confirmed this during 45.4 verification. **The first thing 45.5 needs to decide is how to drive `scraper.js` from a test file.** Options:
+  1. **Export the class from `scraper.js`** — minimal addition: `module.exports = { Scraper };` at the bottom. This is a 1-line change to the 45.4 impl file. It IS a modification to the impl file, which the impl/tests separation rule discourages, but it's a pure export addition with zero behaviour change. Allowed for 45.5 because the alternative (shelling out to the CLI with stubbed network) is far more fragile. **Flag this as a deviation in the report.**
+  2. **Extract a pure `buildVDataStep(postFields, opts)` helper** — too invasive for 45.5; belongs in a separate refactor.
+  3. **Test via the CLI with stubbed network** — fragile; requires stubbing HTTP before `require('./tools/scraper/cli.js')`, which the scraper doesn't currently support cleanly.
+  
+  Pick option 1: add `module.exports = { Scraper };` (or use the existing `module.exports` shape if it has one) in `tools/scraper/scraper.js`, flag as a deviation.
+- **Integration test strategy**: construct a `Scraper` instance, mock every method that would hit the network or jsdom, then invoke the step-(m) branch with a synthetic `postFields` object and capture the vData output. The mocks needed:
+  - `_getVmSlideSource(sig)` — return a vm-slide source string (only called on legacy path). The jsdom harness will try to eval this; either return the real `sample/vm_slide.js` contents, or keep the body small and see if you can get away with a canned return. Read `tools/scraper/vdata-harness.js` to see what `generateVData` actually does with the string — it's jsdom-evaluated so it must be real vm-slide code. **Use `fs.readFileSync('sample/vm_slide.js', 'utf8')` in the legacy-path test.** (That's reading `sample/`, which is allowed — read-only is fine.)
+  - `_jquerySource` — set to the real jQuery source if the legacy path needs it. Peek at `vdata-harness.js` to confirm.
+  - `init()` — you probably don't need to call it. Instead, set `this._vdataProfile` manually (for the default path) or load it with `loadProfile(DEFAULT_VDATA_PROFILE_PATH)` in the test. Don't trigger network calls.
+- **Fixtures available**: `sample/vm_slide.js` (read-only), `sample/captcha-har.har` (read-only), `profiles/vdata-browser-default.json` (committed in 45.4).
+- **Phase 43 alphabet constant** (copy into the test file):
+  ```js
+  const ALPHABET = 'GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY';
   ```
-  Load this at scraper startup if no profile override is given. `buildVDataForPost` will substitute the `__COMPUTED__` sentinel with the real digest.
-- **CLI flag wiring**: `tools/scraper/cli.js` parses the scraper's CLI. Add a `--legacy-vdata` boolean flag that plumbs through to `scraper.js` and toggles the branch. Default is false (i.e. use the new path). Also add a `--vdata-profile <path>` flag that lets the user point at an alternate profile JSON; defaults to `profiles/vdata-browser-default.json`.
-- **Existing scraper tests**: `tests/test-scraper.js` and `tests/test-scraper-foundation.js` exercise the scraper without the network. You MUST run `npm test` after your wiring and confirm they still pass. 45.5 (different agent) will add new tests for the 45.4 wiring specifically.
+- **Synthetic postFields**: build a plausible verify-POST postFields object by cloning the HAR fixture's field set if possible, or hand-write a plausible one. It must contain `tlg` (set to a plausible collect-token length like `"1200"` — a 4-char digit string that yields valid sess indices), `sess` (at least 14 chars, e.g. copy from `sample/captcha-har.har`'s `sess` value or fabricate a URL-safe 20-char string), and `collect` (the serialised collect token). The rest of the fields just need to be strings — content doesn't matter for the vData test.
 
 ### Implementation Steps
-1. **Read** `tools/scraper/scraper.js` around line 525 (the `generateVData` call), `tools/scraper/vdata-harness.js` (to understand what `generateVData` currently returns and what body shape it consumes), `tools/scraper/cli.js` (to see the existing flag-parsing idiom), `tools/vdata-generator/for-post.js` (the new API you're calling), `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §3 (the profile template).
-2. **Create** `profiles/vdata-browser-default.json` with the §3 template verbatim.
-3. **Edit** `tools/scraper/scraper.js` at the `generateVData` call site. Introduce the branch:
-   ```js
-   let vdata;
-   if (opts.legacyVdata) {
-     vdata = await generateVData(serializedBody /* existing args */);
-   } else {
-     const { buildVDataForPost } = require('../vdata-generator/for-post.js');
-     const profile = loadProfile(opts.vdataProfile || 'profiles/vdata-browser-default.json');
-     vdata = buildVDataForPost(serializedBody, { profile });
-   }
-   ```
-   Implement `loadProfile(path)` as a small helper (near the top of the file or a new `tools/scraper/load-profile.js` — your call) that reads the file, `JSON.parse`s it, and returns the object. Resolve the path relative to the repo root (not cwd).
-4. **Check the body includes `tlg`.** Inspect the scraper's verify-body builder. If the body already contains `tlg=<N>`, you're good. If not, add a line that sets `postFields.tlg = collectToken.length` (or equivalent — find the correct variable name in `scraper.js`) BEFORE serialisation. If you cannot determine the correct collect-token variable, stop and report — do not hand-wave.
-5. **Edit** `tools/scraper/cli.js` to parse `--legacy-vdata` and `--vdata-profile <path>`. Plumb both through to the scraper entry point.
-6. **Preserve** `tools/scraper/vdata-harness.js` and the existing `generateVData` export untouched. Do not delete the import; do not change its signature.
-7. **Run** `npm test` and confirm 462/462 still green. If any scraper test fails, diagnose — do not mark anything skipped.
-8. **Sanity CLI dry-run** (no network): `node tools/scraper/cli.js --help` or equivalent should list the two new flags. If the scraper has a `--dry-run` or `--captcha-only` mode, prefer that for a no-network smoke test; otherwise just confirm the CLI parses the flags without erroring.
+1. **Read** `tools/scraper/scraper.js` (especially the step-(m) branch and `_buildPostFields`), `tools/scraper/vdata-harness.js`, `tools/scraper/cli.js`, `tools/vdata-generator/for-post.js`, and one existing scraper test (`tests/test-scraper.js`) for the idiom.
+2. **Decide the export strategy**. If `module.exports` in `scraper.js` is empty, add `module.exports = { Scraper };` (or append `Scraper` to the existing export if any). Flag this as a deviation in your report — it's an impl file edit that's strictly a test-accessibility change.
+3. **Create** `tests/test-scraper-vdata-swap.js` with two test groups:
+   - **Group A — default (new) path**: construct a `Scraper`, load the browser profile manually via `loadProfile` or by requiring the JSON directly, stub out any init-time network calls, invoke the step-(m) branch with a synthetic `postFields`, capture vData. Assert:
+     - `typeof vdata === 'string'`
+     - `vdata.length === 152`
+     - every char in `ALPHABET`
+     - `vdata.slice(-2) === 'YY'`
+     - the serialized body that was passed to `buildVDataForPost` contains `tlg=` and `sess=` substrings (precondition check)
+     - the resulting obj uses profile values: decrypt/decode the vData back to the kv plaintext using `tests/fixtures/verify-vdata-fixtures.js` helpers OR `tools/vdata-generator/decode.js` (whichever exists), and assert `cLod === 'loadTDC'`, `inf === 'iframe'`, `env === '0'`, `version === '2'`. This is the LOAD-BEARING assertion — it proves the swap actually uses browser-like values.
+   - **Group B — legacy path**: construct a `Scraper` with `legacyVdata: true`, provide `_vmSlideSource` from `sample/vm_slide.js`, provide `_jquerySource` if needed, invoke step-(m), capture vData. Assert:
+     - `typeof vdata === 'string'`
+     - `vdata.length === 152`
+     - every char in `ALPHABET`
+     - `vdata.slice(-2) === 'YY'`
+     - the decoded plaintext's `cLod` / `inf` / `tp` values contain jsdom-specific strings (e.g. `cLod === 'unloadTDC'` or `inf === 'top'`) — at least ONE of the known jsdom tells must be present. This proves the legacy path still produces jsdom output (not a secretly broken fallback).
+4. **Do not hit the network**. Every test in this file must run deterministically offline. If the legacy path's jsdom harness unavoidably initialises network state or tries to fetch something, mock it at the right level.
+5. **Run** `node --test tests/test-scraper-vdata-swap.js` and confirm it passes. Then run `npm test` and confirm the full suite is green.
 
 ### Verification
-- [ ] `profiles/vdata-browser-default.json` exists and matches the §3 template.
-- [ ] `tools/scraper/scraper.js` calls `buildVDataForPost` on the default path; `--legacy-vdata` flag branches to the existing `generateVData` jsdom path.
-- [ ] `tools/scraper/cli.js` parses `--legacy-vdata` and `--vdata-profile` flags.
-- [ ] `tools/scraper/vdata-harness.js` is unchanged.
-- [ ] Verify body includes a `tlg` field equal to the collect-token length before being handed to `buildVDataForPost`.
-- [ ] `npm test` exits 0 with 462/462 green (prior count).
-- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, `tools/vdata-generator/`, `research/`, `docs/`, or any existing test file. This task creates one new file (`profiles/vdata-browser-default.json`) plus optionally `tools/scraper/load-profile.js`, and edits `tools/scraper/scraper.js` + `tools/scraper/cli.js`.
-- [ ] No git commits by the subagent.
+- [ ] `tests/test-scraper-vdata-swap.js` exists.
+- [ ] Group A (default path, browser-profile values) passes. Load-bearing assertion: decoded plaintext carries `cLod='loadTDC'` and `inf='iframe'`.
+- [ ] Group B (legacy path, jsdom values) passes. Load-bearing assertion: decoded plaintext contains at least one known jsdom tell (`cLod='unloadTDC'` OR `inf='top'`).
+- [ ] `node --test tests/test-scraper-vdata-swap.js` exits 0.
+- [ ] `npm test` exits 0, full suite green (prior count + new tests).
+- [ ] The only file modifications allowed are: (a) create `tests/test-scraper-vdata-swap.js`, (b) add `tests/test-scraper-vdata-swap.js` to `package.json`'s explicit test list, (c) optionally add `module.exports = { Scraper };` at the bottom of `tools/scraper/scraper.js` if needed to make the class testable (flagged as deviation in report).
 
 ### Constraints
 - **Do not make any git commits.** The director handles all commits after verification.
-- **Do not write scraper tests.** 45.5 is a separate agent. Ad-hoc one-liners for self-check are fine.
-- **Do not modify `tools/vdata-generator/*` or `tools/scraper/vdata-harness.js`.** Both are frozen by this task.
-- **Do not hardcode the profile inside `scraper.js`.** It MUST live in `profiles/vdata-browser-default.json` so 45.6's A/B survey can swap it.
-- **Coding style**: CommonJS, `'use strict';`, 2-space indent, single quotes, semicolons, `const`/`let` only, camelCase.
+- **Do not modify the 45.4 implementation** beyond the surgical `module.exports` addition at the bottom of `scraper.js` if needed.
+- **Do not modify** `tools/vdata-generator/*`, `tools/scraper/vdata-harness.js`, `profiles/*`, `research/*`, `docs/*`, `targets/*`, `sample/*`, `tests/fixtures/*`, or any other existing test file. Exactly one new file: `tests/test-scraper-vdata-swap.js`, plus `package.json` + optional `scraper.js` export edit.
+- **Do not add fixtures.** Use `sample/vm_slide.js` (read-only) for the legacy path and inline synthetic data for the default path.
+- **Do not hit the network.** Every test must be offline-deterministic.
+- **Do not xfail, skip, or comment out any assertion.**
+- **Coding style**: CommonJS, `'use strict';`, 2-space indent, single quotes, semicolons, `const`/`let` only, camelCase. Match the existing `tests/test-scraper.js` idiom.
 - **If the task is too difficult or impossible to complete**, stop immediately and report back. Explain what you attempted, what went wrong, and why you believe the task cannot be completed as specified. Do not leave behind partial or broken changes.
 
 ### Suggested Agent
-`general-purpose` — wiring + small config file + CLI flag additions. No specialised tool needed.
+`general-purpose` — test writing against a scraper-level wiring with mocks. Requires understanding the existing scraper test idiom and deciding how to stub the network side.
