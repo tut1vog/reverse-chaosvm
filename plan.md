@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (final revision user-approved 2026-04-13)
-Current task: 44.4.1 — Sort-order contradiction resolution (44.0.1 closed 2026-04-15, verdict A)
+Current task: 44.4.5 — Orchestrator `getCaptchaData` invocation site (44.4.1 closed 2026-04-15, verdict: randomised comparator)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -111,7 +111,7 @@ Current task: 44.4.1 — Sort-order contradiction resolution (44.0.1 closed 2026
 | 44.2.6 | **fn 22317 full static decompile + reconciliation with fn 20539** — decompile fn 22317 body `[22317, 24233]` end-to-end → fn 22317 = **`exports.getCaptchaData`** (pure function at pc 24252 store to exports), NOT a send replacement; 8-key schema **hardcoded** `[tp,key,py,env,version,cLod,inf,ss]` sorted alphabetically at pc 23949; NO 9504→112 reduction exists; fn 20539 classified **(IV) dead code** on Chrome path | done |
 | 44.4 | **Per-field value-source pin + pre-cipher transform check** — outcome (2) garbled; module 40 resolved as padder (fn 13989 PKCS#7-style) → ShiftRows permuter (fn 14153, `PERM=[0,4,8,12,5,9,13,1,10,14,2,6,15,3,7,11]`) → XTEA; 3 helpers decompiled (fn 22400=tp, fn 22730=key-prep, fn 23399=ss); 5 fields inline; `FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js` byte-identical both fixtures | done |
 | 44.0.1 | **[2026-04-15]** Bytecode build reconciliation — verdict **(A) with nuance**: `sample/vm_slide.js` IS the fixture-generating build; both keys real and from same build. `34e2c8f07b5169ad` is the bytecode-literal **pre-cipher seed** pushed at pcs 13931 and 15149 into fn 13860; `2e430f8c15b7da96` is the **runtime** XTEA round key observed in the encrypt closure's local 4 after fn 13860's prologue transform. No re-decode needed; all Phase 44 pc anchors stand. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`. | done |
-| 44.4.1 | **[NEW — revision 2026-04-15]** Sort-order contradiction resolution — re-read fn 22317's `.sort()` call at pc 23949 and the comparator fn 23898 body end-to-end. Determine whether: (i) 44.2.6 misread the sort target pc / the sort call operates on a different array, (ii) fn 23898 is non-lexicographic (perhaps sorts by a hashed / index / reversed value), or (iii) the `.sort()` is conditional on a branch not taken in the fixture runs. Reconcile against both fixture orders (jsdom `[inf,env,tp,key,py,ss,cLod,version]`, HAR `[inf,env,tp,cLod,version,key,ss,py]`). Produce `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md` with the verdict + pseudocode of the comparator. If the comparator is a computable function of `obj`, encode it in `build-fingerprint-plaintext.js` so 44.5b can compute `order` from scratch without caller input. Byte-level cross-check: invoke `buildFingerprintPlaintext({obj})` (no `order` argument) against both fixtures and confirm the computed order matches observed. Depends on 44.0.1. ≤1 hour. Blocks 44.5b. | pending |
+| 44.4.1 | **[2026-04-15]** Sort-order contradiction resolution — verdict **(ii) randomised comparator**: fn 23898 body `[23898..23944]` is `Math.random() > 0.5 ? 1 : -1` (textbook JS Fisher-Yates anti-pattern). Sort call site at pc 23949 confirmed exactly where 44.2.6 reported it; only the comparator's nature was misread. Fixture orders are random draws, not derivable from `obj` alone. `build-fingerprint-plaintext.js` updated: `order` is now optional, defaults to `Object.keys(obj)`. Both committed fixtures byte-identical without caller-supplied `order`. See `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md`. **Implication for 44.5b**: no canonical default join order exists — from-scratch synthesis must either accept a pre-ordered obj or seed its own RNG. | done |
 | 44.4.5 | **Orchestrator `getCaptchaData` invocation site** — static search in `sample/t_captcha_slide.js` for the import of the vm-slide webpack export `getCaptchaData` and its call site. Pin the JS expression that builds `obj` at the call site and map its 8 properties to orchestrator-side sources (session, ua, timestamps, etc.). Closes the gap 44.3 missed. ≤1 hour static work. | pending |
 | 44.3.5 | Real-Chrome differential capture — third fixture from production Chrome; capture target simplifies to the full 9504-byte verify POST body + its 152-char vData string pair; used as a cross-check for 44.4's value-source rules across environments | pending |
 | 44.5a | Replay-with-substitution builder. Reads a captured fingerprint object (8 properties) + override map; emits a substituted `obj`; calls into 44.5b's builder. Trivial wrapper after 44.5b lands. | pending |
@@ -121,63 +121,57 @@ Current task: 44.4.1 — Sort-order contradiction resolution (44.0.1 closed 2026
 
 > **Scope decisions (user-confirmed 2026-04-13)**: 9-task variant. (1) Real-Chrome differential capture **YES** → 44.3.5 added. (2) Per-run order resolution **REQUIRED**, not nice-to-have → 44.4 is blocking for 44.5b. (3) 44.5 builder design **BOTH** → split into 44.5a (replay-with-substitution, ships first) + 44.5b (full synthesis, depends on 44.4). User explicitly asked the director to record this decision but **NOT auto-dispatch** 44.1 — dispatch is on user trigger only.
 
-> **Plan revision 2026-04-15 (pending user approval)**: 44.4 completed and surfaced two facts that warrant insertion of **44.0.1** (bytecode build reconciliation) and **44.4.1** (sort-order contradiction resolution) before continuing. New dispatch order: 44.0.1 → 44.4.1 → 44.4.5 → 44.3.5 → 44.5a → 44.5b → 44.6 → 44.7. Rationale: 44.0.1 is foundational — if `sample/vm_slide.js` isn't the fixture-generating build, every Phase 44 pc reference is suspect, and 44.4.1 would be analyzing the wrong function. 44.4.1 unblocks 44.5b's from-scratch synthesis (reference impl currently requires caller-supplied `order`).
+> **Plan revision 2026-04-15 (user-approved, in progress)**: 44.4 surfaced two facts that warranted insertion of **44.0.1** (bytecode build reconciliation — done, verdict A+nuance) and **44.4.1** (sort-order contradiction resolution — done, verdict: randomised comparator). Current dispatch order: ~~44.0.1~~ → ~~44.4.1~~ → **44.4.5** → 44.3.5 → 44.5a → 44.5b → 44.6 → 44.7. 44.4.1's outcome has a downstream implication: 44.5b cannot have a canonical default join order — from-scratch synthesis must either accept a pre-ordered obj or seed its own RNG (to be reflected in 44.5b's task spec when drafted).
 
 ---
 
 ## Current Task
 
-**ID**: 44.4.1
-**Title**: Sort-order contradiction resolution — reconcile fn 22317's `.sort()` against fixture field orders
+**ID**: 44.4.5
+**Title**: Orchestrator `getCaptchaData` invocation site — pin where `t_captcha_slide.js` calls the vm-slide webpack export and what it passes as `obj`
 **Phase**: Phase 44 — vm-slide fingerprint schema + JS vData builder
 **Status**: pending — ready for dispatch on next user trigger.
 
 ### Goal
-Resolve the sort-order contradiction left by 44.2.6 / 44.4: 44.2.6 reported that fn 22317 (`getCaptchaData`) alphabetically sorts the 8-key schema via a `.sort()` call at bytecode pc 23949 with comparator fn 23898, but neither committed fixture's observed key order is alphabetical. jsdom fixture order is `[inf,env,tp,key,py,ss,cLod,version]`; HAR fixture order is `[inf,env,tp,cLod,version,key,ss,py]`. Alphabetical would be `[cLod,env,inf,key,py,ss,tp,version]` — neither matches. Determine what the comparator actually computes, encode it in `build-fingerprint-plaintext.js` so 44.5b can derive `order` from `obj` alone, and cross-check by calling the builder with no `order` argument against both fixtures.
+Close the caller-side gap left by 44.3 / 44.2.6. 44.2.6 established that fn 22317 is the webpack export `exports.getCaptchaData` and that it consumes an `obj` with 8 properties (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`). The orchestrator bundle `sample/t_captcha_slide.js` imports this export somewhere and calls it with an `obj` argument at runtime, but the import site and the expression that constructs `obj` are not yet pinned. 44.4.5 owns static location of both: the `require()` / `__webpack_require__` call that pulls in the vm-slide module, the call site that invokes `getCaptchaData`, and the expression tree that builds the `obj` literal passed in. The output is a mapping from each of the 8 fingerprint fields to an orchestrator-side source (session token, user-agent, timestamp, a DOM probe, etc.).
 
-### Context (post-44.0.1)
-- **Build reconciliation complete** (44.0.1, verdict A+nuance): `sample/vm_slide.js` IS the fixture-generating build. `output/vm-slide/bytecode.json` is the correct decode. All Phase 44 pc anchors valid. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`.
-- 44.2.6 claimed fn 22317 body `[22317, 24233]` is `exports.getCaptchaData` (store to exports at pc 24252 — pure function), hardcodes the 8-key schema `[tp,key,py,env,version,cLod,inf,ss]`, builds it into an array or object, then calls `.sort()` at pc 23949 with comparator fn 23898.
-- Both fixtures' `plaintext` field in `tests/fixtures/vdata-{jsdom,har}-capture.json` contains the assembled `k1=v1&k2=v2&...` byte stream (112 bytes exactly). Parse the `&`-separated pairs to recover the observed key order per fixture.
-- Current `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` reference impl takes `order` as a caller-supplied argument — which means 44.5b cannot synthesize vData from an `obj` alone. 44.4.1 is the task that closes that gap.
-- Three hypotheses to evaluate: (i) 44.2.6 misread — the `.sort()` pc is wrong, or the sort target is a different array, or fn 23898 is not actually a comparator; (ii) fn 23898 is non-lexicographic — it may sort by a hashed / reversed / index-based value; (iii) the `.sort()` is conditional — a branch not taken in the fixture runs makes the call a no-op, leaving insertion order intact.
-- Phase 44.0.1 verdict also surfaced that fn 13860 applies a pre-cipher seed→key transform (seed `34e2c8f07b5169ad` → runtime key `2e430f8c15b7da96`). That is a separate follow-up and does NOT need to be solved by 44.4.1 — 44.4.1 only owns sort-order.
+### Context
+- `sample/t_captcha_slide.js` is a webpack 4 bundle, ~213 KB, 50 live modules, single-root graph rooted at module 64. Phase 41 analyzed its structure; `docs/CAPTCHA_ORCHESTRATOR.md` has the end-to-end flow and the 39-field verify-body origination table.
+- Phase 41's analysis treated vm-slide as loaded by a hardcoded `<script>` tag in the show-page HTML — NOT by the orchestrator bundle. That's still correct for *module loading*, but the orchestrator still calls into vm-slide at runtime via `window.TDC` / the webpack-exposed export registry. 44.4.5's job is to find where that call happens in the orchestrator source.
+- Phase 44.2.6 pinned fn 22317's export store at pc 24252 — it writes `getCaptchaData` onto vm-slide's module exports. The orchestrator-side consumer is the matching read site.
+- 44.3 built an inverted (and mostly wrong) hypothesis that treated fn 20539 as the plaintext builder — ultimately classified as dead code on the Chrome path in 44.2.6. Do NOT reuse 44.3's hypothesis tree; start from the orchestrator source.
+- `docs/CAPTCHA_ORCHESTRATOR.md` §6 and the per-module index in the same doc identify module 56 as the orchestrator core and list each module's responsibility. Start there for the `require(N)` that resolves to vm-slide's `getCaptchaData`.
+- ≤1 hour of static work. Pure source reading of `sample/t_captcha_slide.js`. No dynamic tracing required for this task.
 
 ### Starting inputs
-- `output/vm-slide/bytecode.json` — 24,273 elements; pc-indexed.
-- `output/vm-slide/disassembly-full.txt` — Phase 40.1 full walker output; should already cover fn 22317 and fn 23898.
-- `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md`, `FINGERPRINT-SCHEMA.md`, `PLAINTEXT-BUILD.md` — prior decompile notes from 44.2.6 / 44.4.
-- `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` — reference impl (currently requires `order`).
-- `tests/fixtures/vdata-{jsdom,har}-capture.json` — committed fixtures with `plaintext` field.
+- `sample/t_captcha_slide.js` — the orchestrator bundle (read-only).
+- `docs/CAPTCHA_ORCHESTRATOR.md` — Phase 41 flow + module index.
+- `research/captcha-orchestrator/` — Phase 41 notes, module graph.
+- `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md`, `FINGERPRINT-SCHEMA.md` — what the 8 properties are and what types they hold.
+- `tests/fixtures/vdata-{jsdom,har}-capture.json` — ground-truth values for the 8 fields, as an oracle when matching orchestrator source to observed values.
 
 ### Implementation Steps
-1. **Recover observed orders from fixtures.** Parse both fixtures' `plaintext` field into their 8 `key=value` pairs. Record exact order. Confirm they are jsdom `[inf,env,tp,key,py,ss,cLod,version]` and HAR `[inf,env,tp,cLod,version,key,ss,py]` (or correct these if 44.2.6 reported them wrong).
-2. **Re-read fn 22317's sort call site.** Read a wide window of `disassembly-full.txt` around pc 23949 (at least ±200). Verify that (a) there is actually a `.sort()` method invocation at or near pc 23949, (b) the receiver is the 8-key collection, (c) the comparator argument is fn 23898. Report what's actually there. If 44.2.6 misread the pc, find the real sort call (if any) and report its pc.
-3. **Decompile fn 23898 body end-to-end.** Resolve the function range (probably introduced by an `OP_58` elsewhere creating a closure pointing at pc 23898), walk every opcode, and express the body in pseudocode. Determine: what does the comparator return? Is it `a.localeCompare(b)`? `a.length - b.length`? A hash comparison? An index lookup into a fixed table? Cite every pc.
-4. **Apply the comparator to the 8-key schema.** Compute the order the comparator would produce when applied to `[tp,key,py,env,version,cLod,inf,ss]`. Compare against both observed fixture orders.
-5. **Decide which hypothesis holds.**
-   - **(i)** If the sort target is not the schema, or there's no comparator call, document the misread and find where the real order comes from.
-   - **(ii)** If fn 23898 IS a comparator and the computed order matches the fixtures, encode the comparator in JS and update `build-fingerprint-plaintext.js` so `order` becomes optional (derived from the comparator when omitted).
-   - **(iii)** If the sort is conditional, identify the branch condition and its value in both fixture runs; confirm the no-op path produces the observed insertion order.
-6. **Byte-level cross-check.** Run `build-fingerprint-plaintext.js` with the new order logic against both fixtures without supplying `order` — confirm output is byte-identical to each fixture's `plaintext`.
-7. **Write `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md`** (≤2 pages): the hypothesis that held, the comparator pseudocode (if any), the evidence from fn 23898 and fn 22317, and the change made to `build-fingerprint-plaintext.js`.
+1. **Find the `getCaptchaData` consumer.** Grep `sample/t_captcha_slide.js` for the literal string `getCaptchaData`. There should be exactly one or two hits — one of them is the call site. Record the enclosing module number and function.
+2. **Walk the call site.** Read the enclosing function. Identify (a) the expression that resolves to the vm-slide export (probably `__webpack_require__(N).getCaptchaData` or `TDC.getCaptchaData` or similar), (b) the expression passed as the `obj` argument, (c) any post-processing of the returned vData string (appended to query string? POST body? header?).
+3. **Expand the `obj` expression.** For each of the 8 properties `{tp, key, py, env, version, cLod, inf, ss}`, chase back to the orchestrator-side source. For literals or constants, just record the value. For property reads (`session.xxx`, `window.navigator.xxx`, a config object), pin the producing code in the orchestrator or note that it's pulled from a closure variable captured earlier. Match the observed fixture values (jsdom + HAR) against these sources to sanity-check.
+4. **Write `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`** (≤2 pages): module/function where the call lives, verbatim call-site source (or line range), the 8-field source map, and any observation about when / how often the orchestrator calls it.
+5. **Correction check.** Note any places where this new finding contradicts Phase 42's `vData` mechanism conclusion (the XHR monkey-patch on Chrome / `getVData` on IE9 described in `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 and §517). 44.7 owns the actual doc rewrite; 44.4.5 only needs to flag the contradictions so 44.7 can resolve them.
 
 ### Verification
-- [ ] `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md` exists with a clear verdict.
-- [ ] fn 22317 sort call site confirmed (or re-located) with pc citation.
-- [ ] fn 23898 body fully decompiled to pseudocode with every pc cited.
-- [ ] `build-fingerprint-plaintext.js` updated so `order` is optional; derivation rule implemented.
-- [ ] `node -e "const {build}=require('./research/vm-slide-stack-vm/build-fingerprint-plaintext.js'); ..."` against both fixtures produces byte-identical plaintext WITHOUT caller-supplied `order`.
-- [ ] No modifications to: `targets/`, `sample/`, `tools/vdata-generator/`, `tests/fixtures/`, `docs/`. New research artifacts only, plus the edit to `build-fingerprint-plaintext.js`.
+- [ ] `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md` exists with the call-site module/function ID and the verbatim code snippet.
+- [ ] Each of the 8 fingerprint fields (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`) has a documented orchestrator-side source expression with a line citation into `sample/t_captcha_slide.js`.
+- [ ] At least one field's mapped source is cross-checked against the matching observed value in a committed fixture (jsdom or HAR) and shown consistent.
+- [ ] Any contradiction with the `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 XHR-patch / IE9 `getVData` mechanism is flagged in a dedicated section of the note, for 44.7 to resolve.
+- [ ] No modifications to: `targets/`, `sample/`, `tools/`, `tests/fixtures/`, `docs/`. New research artifacts only.
 
 ### Constraints
 - **Do not make any git commits.** Director owns all commits.
 - **Do not modify `targets/` or `sample/`.** Tencent's property.
-- **Pure static analysis + local reference-impl test.** No live tracers, no jsdom runs against live vm-slide, no puppeteer.
-- **Verify, don't assume.** Every claim must cite a specific pc in `output/vm-slide/bytecode.json` or `disassembly-full.txt`.
-- **If the task is too difficult or impossible**, stop immediately and report what you attempted. Do not leave `build-fingerprint-plaintext.js` broken — if you must revert, revert cleanly.
+- **Pure static analysis.** No live tracers, no puppeteer, no jsdom runs. Source reading + grep.
+- **Verify, don't assume.** Every claim must cite a line range in `sample/t_captcha_slide.js`. If the orchestrator's 8-field construction is obfuscated beyond readable JS, beautify it mentally or with a temporary scratch file, but do not commit the beautified copy.
+- **If the task is too difficult or impossible** (e.g. the call site is buried inside an eval'd VM or the obj is constructed by a helper that can't be statically resolved), stop and report what you found. Record it as a partial and suggest a dynamic-trace follow-up.
 
 ### Suggested Agent
-`general-purpose` — bytecode walk + comparator pseudocode + reference-impl edit + local cross-check. Expected ≤1 hour.
+`general-purpose` — static bundle reading + grep + call-site tracing + a short research note. Expected ≤1 hour.
 
 
