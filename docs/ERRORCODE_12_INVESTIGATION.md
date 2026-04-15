@@ -137,3 +137,45 @@ to materially affect errorCode 12 incidence, and the default scraper path now
 uses browser-like vData values. Residual errorCode 12 is still the majority
 outcome (61.9% valid), so behavioral / header-chain investigation from the
 earlier "Next Investigation Steps" list remains relevant.
+
+## Phase 46 lane-change surveys
+
+Phase 45.6 revealed that all "successes" were `t03tserver...` bypass-lane
+tickets issued with `errorCode: -1`; a real browser gets `t01.../t02...`
+tickets with `errorCode: 0`. The content-layer changes in Phase 45 moved us
+within the bypass lane but never onto the errorCode-0 lane. Phase 46 closes
+the remaining wire-level gaps between the scraper and Chrome 146 one at a
+time with a live re-measurement after each fix. The primary metric is now
+the ticket prefix, not the success percentage.
+
+### 46.3 — after restoring `/vm-slide.enc.js` fetch on the default path
+
+30 atomic `--captcha-only --retries 1` invocations from `111.119.253.170`,
+serial, no gap. Raw logs: `output/phase-46-errorcode-0/46.3-after-vmslide.{log,jsonl}`.
+
+| Metric                               | 45.6 default (n=30) | 46.3 after-vmslide (n=30) |
+|--------------------------------------|---------------------|---------------------------|
+| t01 + t02 tickets                    | 0                   | **0**                     |
+| t03tserver tickets                   | 6                   | 7                         |
+| `errorCode: 0`                       | 0                   | **0**                     |
+| `errorCode: -1`                      | 6                   | 7                         |
+| `errorCode: 12`                      | 13                  | 19                        |
+| `errorCode: 9`                       | 2                   | 0                         |
+| null (auto-port / transport failure) | 15                  | 3                         |
+
+**Verdict — null result on the primary metric.** Restoring the `/vm-slide.enc.js`
+fetch produced zero `t01`/`t02` tickets. The `t03tserver` count moved 6 → 7
+(two-proportion z ≈ 0.31, not significant), which is noise. The drop in null
+rows (15 → 3) is consistent with fewer auto-port failures — the two tdc.js
+templates missing from the porting cache during 45.6 either rotated out of
+the live pool or sampling landed differently this run — and does not reflect
+a substantive change in the scoring outcome.
+
+**Interpretation.** The hypothesis that a missing `/vm-slide.enc.js` GET was
+the single dominant wire-level tell is falsified. The fix is still correct —
+Chrome unconditionally fetches that URL, so shipping 46.1 closed a real gap —
+but closing vm-slide alone does not move the scoring lane. The lane gate
+remains elsewhere in the request chain (telemetry beacons, header order,
+or TLS fingerprint).
+
+Next gate: 46.6 (after adding the two `/caplog` beacons).

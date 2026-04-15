@@ -1,0 +1,1186 @@
+=== 46.3-after-vmslide attempt 1/30 @ 2026-04-15T09:35:18Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s17gjK9mezDcaYtyjSnW...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22222 bytes, slice: 7428 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 144440 chars
+[scraper]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[scraper]   Source hash: e5341ccb12b78e65
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: MuRWw/oSbuLsaxwAXgXR...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 465
+[scraper]   ans: 465,62;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13696
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: -Iq3xF474Ut2Kc98LMr5FqdST7f5l5...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 16082
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 2/30 @ 2026-04-15T09:35:20Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1jKodFSbFZJ_Qa-DI6D...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 15493 bytes, slice: 3691 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 144440 chars
+[scraper]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[scraper]   Source hash: e5341ccb12b78e65
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: B4Np+739fDWZaoCcKLaX...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 486
+[scraper]   ans: 486,32;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 16800
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 7MjK5yGovGjw1scdQ6-F-9Jj-lBL_A...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 19420
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 3/30 @ 2026-04-15T09:35:21Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1oa4LmQOD5PL_0PYTlw...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 13791 bytes, slice: 5650 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: OIht8wXrt9KSi2Ktpt7F...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 462
+[scraper]   ans: 462,158;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12440
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: VVK5_cnQHC9hnWn_CA-EpxgpCjXUo2...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14621
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tserverQfzJJmVzOk2sLjn_zOgb...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tserverQfzJJmVzOk2sLjn_zOgbMirKUYAtevrg48nco0rOaV6G_UfOE5Nr30oB1xo_7slmpfhWeHHnyFv0F_9Q0ulMpHfRprMXtHWgoCwdn9mN7ZgAwyh9XpGj7MjeMGlS9X0E',
+  randstr: '@ICQ'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tserverQfzJJmVzOk2sLjn_zOgbMirKUYAtevrg48nco0rOaV6G_UfOE5Nr30oB1xo_7slmpfhWeHHnyFv0F_9Q0ulMpHfRprMXtHWgoCwdn9mN7ZgAwyh9XpGj7MjeMGlS9X0E",
+  "randstr": "@ICQ"
+}
+--- rc=0 duration=2s ---
+=== 46.3-after-vmslide attempt 4/30 @ 2026-04-15T09:35:23Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1t3grqEhxslI_SLh7HJ...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 20461 bytes, slice: 7531 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 199611 chars
+[scraper]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[scraper]   Source hash: 3429444f324c6110
+[scraper]   Template: unknown, opcodes: 91
+[scraper]   eks: 7kxpiq5PXNlzTLry2yGz...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 490
+[scraper]   ans: 490,32;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11160
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: eZRhh4slDEr7Wq7I-M6*lcUziXG4OV...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13204
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tservertoI7wn8BSjSOsRXgW4_4...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tservertoI7wn8BSjSOsRXgW4_4jzC2vZ4SbuXfBkxYStbVg6oVrXVeWlNV04_Kn-5-zoukLXkO2S67JrRPxsVBLk6XdVhAcAm1sXBYaMGQ96A5e8E9Tlk_QQLmlrF8o0S3tiTx',
+  randstr: '@lNw'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tservertoI7wn8BSjSOsRXgW4_4jzC2vZ4SbuXfBkxYStbVg6oVrXVeWlNV04_Kn-5-zoukLXkO2S67JrRPxsVBLk6XdVhAcAm1sXBYaMGQ96A5e8E9Tlk_QQLmlrF8o0S3tiTx",
+  "randstr": "@lNw"
+}
+--- rc=0 duration=2s ---
+=== 46.3-after-vmslide attempt 5/30 @ 2026-04-15T09:35:25Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1g6aPamdfYzp0gxy1jp...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 25408 bytes, slice: 5096 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 144440 chars
+[scraper]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[scraper]   Source hash: e5341ccb12b78e65
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: e/05dcMgS5hlM4zfnmmQ...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 491
+[scraper]   ans: 491,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 15072
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: hhCh4-qUiMxbkkudvjdw8Hh9mL*b_1...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 17518
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 6/30 @ 2026-04-15T09:35:27Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1D6hVOtrvLT8Pk2R6KH...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 13747 bytes, slice: 5515 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 162790 chars
+[scraper]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[scraper]   Source hash: e2170903e201e018
+[scraper]   Template: unknown, opcodes: 93
+[scraper]   eks: 8Edk8krYMjSuT6HQo2UM...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 506
+[scraper]   ans: 506,61;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10924
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: VueBKpkQNbhk8PJ_PeBGUrZa0SQPFx...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13084
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tserverYWR2ki1BwPpFl7Tl0fyA...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tserverYWR2ki1BwPpFl7Tl0fyA8pA8WBOCRBECL0FCN4VSQJVe3x7EM6-9nkWaqIM4wM2GoKU0T2pY5KKjNkfNCBjgW1GTwPCtNow4RS6nbOY6EoQV1wpm0yZcrzYwd7TNKAxH',
+  randstr: '@ld9'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tserverYWR2ki1BwPpFl7Tl0fyA8pA8WBOCRBECL0FCN4VSQJVe3x7EM6-9nkWaqIM4wM2GoKU0T2pY5KKjNkfNCBjgW1GTwPCtNow4RS6nbOY6EoQV1wpm0yZcrzYwd7TNKAxH",
+  "randstr": "@ld9"
+}
+--- rc=0 duration=1s ---
+=== 46.3-after-vmslide attempt 7/30 @ 2026-04-15T09:35:28Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s183J1e1iTNFTS99OsLQ...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 24755 bytes, slice: 6562 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 207422 chars
+[scraper]   TDC_NAME: GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV
+[scraper]   Source hash: 8f1d32beb4fcaa4d
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: F5lDQ9bhaPGOeHIUbSFf...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 502
+[scraper]   ans: 502,59;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 15072
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: -Iq3xF474Ut2Kc98LMr5FqdST7f5l5...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 17288
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 8/30 @ 2026-04-15T09:35:30Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s10eFVUkB0AFP0xD3Qdl...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22222 bytes, slice: 7428 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 129582 chars
+[scraper]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[scraper]   Source hash: e6a45ba64d246f82
+[scraper]   Template: unknown, opcodes: 98
+[scraper]   eks: Qh8Fh9f8suIxybuTOXM3...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 465
+[scraper]   ans: 465,62;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10464
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 8Mroleys8yXfO-uu-ePmRlSpnZu27u...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 12448
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tserverrsUn5H2MYXXdwlu55Z7e...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tserverrsUn5H2MYXXdwlu55Z7eAcoijUrNmda-Eu6WXUzfmIN5jA_Gp66e6BdcSs-YSJWXnOhHj36mU9csccTqyNqjH-iSYjq3nOC9hbCkwoWZ3HVspT_F58B4bcmr4yud8-58',
+  randstr: '@KuS'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tserverrsUn5H2MYXXdwlu55Z7eAcoijUrNmda-Eu6WXUzfmIN5jA_Gp66e6BdcSs-YSJWXnOhHj36mU9csccTqyNqjH-iSYjq3nOC9hbCkwoWZ3HVspT_F58B4bcmr4yud8-58",
+  "randstr": "@KuS"
+}
+--- rc=0 duration=2s ---
+=== 46.3-after-vmslide attempt 9/30 @ 2026-04-15T09:35:32Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1PHFZB33tSA0C4HKkmw...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 13726 bytes, slice: 6530 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 144440 chars
+[scraper]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[scraper]   Source hash: e5341ccb12b78e65
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: TnrZ0K4QpkK3BCSGJkEq...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 460
+[scraper]   ans: 460,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 14752
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: KsAG-bRvvM8_4iVIzk53EJikX5Owg*...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 17134
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 10/30 @ 2026-04-15T09:35:34Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1FkRzW3qMfS4uPMhSVz...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18074 bytes, slice: 5735 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 162790 chars
+[scraper]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[scraper]   Source hash: e2170903e201e018
+[scraper]   Template: unknown, opcodes: 93
+[scraper]   eks: OxcmrcluFP7GoPCZopTZ...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 456
+[scraper]   ans: 456,181;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11104
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: VueBKpkQNbhk8PJ_PeBGUD-dqbjpqT...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13145
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tservercWBK6YcAF7C3Cd-UzVrR...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tservercWBK6YcAF7C3Cd-UzVrRTAiqxV-_95271aeWnDlr4TECE3pmcl0th3Bqi6UOA80QxgS5Pkr5Ki7XTEKYKa4IWhxOYPRLvPrNHGYWsp_YMFi9PYzwsBlcfbJYTh2TDW7s',
+  randstr: '@2wz'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tservercWBK6YcAF7C3Cd-UzVrRTAiqxV-_95271aeWnDlr4TECE3pmcl0th3Bqi6UOA80QxgS5Pkr5Ki7XTEKYKa4IWhxOYPRLvPrNHGYWsp_YMFi9PYzwsBlcfbJYTh2TDW7s",
+  "randstr": "@2wz"
+}
+--- rc=0 duration=1s ---
+=== 46.3-after-vmslide attempt 11/30 @ 2026-04-15T09:35:35Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1A6-vrsNVPHNQdWli_y...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18120 bytes, slice: 5783 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: OC6DLlIWVgeQWOT3V+l1...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 504
+[scraper]   ans: 504,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11352
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 6shOuzGag3eJP-L-g6Wj-wMSTPzA5l...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13486
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 12/30 @ 2026-04-15T09:35:37Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1FelZtesgKRxjeGLoIU...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 12435 bytes, slice: 3770 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 161122 chars
+[scraper]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[scraper]   Source hash: 02fd132edb24a8c1
+[scraper]   Template: C, opcodes: 100
+[scraper]   eks: WwFEaFuBm8ZtH7tXN+GH...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 477
+[scraper]   ans: 477,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12300
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 04cicSF15K668B89cl4q_5DIi*oPhs...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14530
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tserver7QCa0CFxVtbIQLWYKwdM...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tserver7QCa0CFxVtbIQLWYKwdM7iIN664JToiwMZgFC2mAarJK5LylVGBkyf9ifkVAaNg6iW66hSSwpktmEVeSGdv26uc0EVwlVD1PoljWut8dgZVpGm4xX_4mRBQOlxvpH7NM',
+  randstr: '@Fyf'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tserver7QCa0CFxVtbIQLWYKwdM7iIN664JToiwMZgFC2mAarJK5LylVGBkyf9ifkVAaNg6iW66hSSwpktmEVeSGdv26uc0EVwlVD1PoljWut8dgZVpGm4xX_4mRBQOlxvpH7NM",
+  "randstr": "@Fyf"
+}
+--- rc=0 duration=2s ---
+=== 46.3-after-vmslide attempt 13/30 @ 2026-04-15T09:35:39Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1Z_DSkrtrr1pikXY6mr...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22315 bytes, slice: 6775 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 207422 chars
+[scraper]   TDC_NAME: GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV
+[scraper]   Source hash: 8f1d32beb4fcaa4d
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: 60VF5rk7CmYKGGAYxuop...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 469
+[scraper]   ans: 469,40;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 17580
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: -Iq3xF474Ut2Kc98LMr5FjyFxQPzt6...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 19980
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 14/30 @ 2026-04-15T09:35:40Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1n7ufq3ogp37XbHr6hJ...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 25422 bytes, slice: 4729 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 199611 chars
+[scraper]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[scraper]   Source hash: 3429444f324c6110
+[scraper]   Template: unknown, opcodes: 91
+[scraper]   eks: 6kN8fXPZ0UjpvGxDEzXp...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 489
+[scraper]   ans: 489,59;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12440
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: o0cBBvo6XHuuBrpqpQJrbBm3tvpKb8...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14610
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: -1, ticket: t03tserverYPrBB1D-fwWS9uPoih4H...
+[scraper] CAPTCHA solved: {
+  errorCode: -1,
+  ticket: 't03tserverYPrBB1D-fwWS9uPoih4HzV-ZI8xK8_jTLLU0f_MYHMtqSrGFBRarSI_UOaOs3nke7ccAFaOrapPFjJKFYeRnlhdpXcaifd6boeLCVsU9f1eF2IoLksOpQY1tyZx6OTrj',
+  randstr: '@jdn'
+}
+{
+  "errorCode": -1,
+  "ticket": "t03tserverYPrBB1D-fwWS9uPoih4HzV-ZI8xK8_jTLLU0f_MYHMtqSrGFBRarSI_UOaOs3nke7ccAFaOrapPFjJKFYeRnlhdpXcaifd6boeLCVsU9f1eF2IoLksOpQY1tyZx6OTrj",
+  "randstr": "@jdn"
+}
+--- rc=0 duration=2s ---
+=== 46.3-after-vmslide attempt 15/30 @ 2026-04-15T09:35:42Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1FMaM1_UhYCQjd1nz4W...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 27909 bytes, slice: 8735 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 144440 chars
+[scraper]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[scraper]   Source hash: e5341ccb12b78e65
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: JIBrEHOYvuJeu60eeK9q...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 378
+[scraper]   ans: 378,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 14392
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: TVNtVnOFowaDlWNBOr35O8QePTq49S...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 16716
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 9, ticket: none
+[scraper]   Failed with errorCode 9, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 9
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 9
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 16/30 @ 2026-04-15T09:35:44Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1LNHAKlk4NIL-S2oxbD...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18116 bytes, slice: 5625 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 129582 chars
+[scraper]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[scraper]   Source hash: e6a45ba64d246f82
+[scraper]   Template: unknown, opcodes: 98
+[scraper]   eks: awvpcpQbOc+jWSzl2/lB...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 523
+[scraper]   ans: 523,58;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12268
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: qGmvlzu5jfGwebSmFwCM6iCnQgZsLT...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14454
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 17/30 @ 2026-04-15T09:35:46Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1A1n6ZRCxbYeUH-suFf...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 25440 bytes, slice: 5248 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 207422 chars
+[scraper]   TDC_NAME: GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV
+[scraper]   Source hash: 8f1d32beb4fcaa4d
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: bQFjUq2sNenKjK7TfbGL...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 484
+[scraper]   ans: 484,44;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 16800
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: o0cBBvo6XHuuBrpqpQJrbBm3tvpKb8...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 19143
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 18/30 @ 2026-04-15T09:35:47Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s16Yinqlrpnze3S5VKaG...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 25343 bytes, slice: 4826 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 19/30 @ 2026-04-15T09:35:49Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1P_GQnSVzJ69sW2iUbo...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 11551 bytes, slice: 5671 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 129582 chars
+[scraper]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[scraper]   Source hash: e6a45ba64d246f82
+[scraper]   Template: unknown, opcodes: 98
+[scraper]   eks: y4CTcrWpIk6PyWzMguzL...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 468
+[scraper]   ans: 468,38;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11372
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: VueBKpkQNbhk8PJ_PeBGUDk*5Ivrwd...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13456
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 20/30 @ 2026-04-15T09:35:51Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1ypNZxbdmkDVD0G-VOW...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 15492 bytes, slice: 4288 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 207422 chars
+[scraper]   TDC_NAME: GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV
+[scraper]   Source hash: 8f1d32beb4fcaa4d
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: YSPk1T10dAbF/6jVrxMy...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 501
+[scraper]   ans: 501,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 15864
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 3xsq09l8yrfdw3Ihy*sQTUxZ-PEE9d...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 18184
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 21/30 @ 2026-04-15T09:35:52Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s15ZvQxbjnZWGA645T4X...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 11500 bytes, slice: 6291 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 207422 chars
+[scraper]   TDC_NAME: GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV
+[scraper]   Source hash: 8f1d32beb4fcaa4d
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: zO2NQuQYhXBC8aSAdfxV...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 450
+[scraper]   ans: 450,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 17612
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: -Iq3xF474Ut2Kc98LMr5FvK3kZkpZK...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 19982
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 22/30 @ 2026-04-15T09:35:54Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1B9nYUMYK4MeBaAr6G9...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18048 bytes, slice: 5462 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: iu/mm9Xt6QJrm2rSQDup...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 461
+[scraper]   ans: 461,73;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11116
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 6cvQlh92lvIP*mQv9usDp195vTSjxc...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13296
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 23/30 @ 2026-04-15T09:35:56Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1mOLZosJGNBseOXFen0...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 12354 bytes, slice: 5515 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197545 chars
+[scraper]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[scraper]   Source hash: f53142c54fc43699
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: f53142c54fc43699
+[scraper] Auto-port failed for f53142c54fc43699: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-f53142c54fc43699.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=f53142c54fc43699), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=f53142c54fc43699), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=f53142c54fc43699), auto-port failed
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 24/30 @ 2026-04-15T09:35:57Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1E_2H4meg0KlT62Y3eo...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22249 bytes, slice: 7278 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 199611 chars
+[scraper]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[scraper]   Source hash: 3429444f324c6110
+[scraper]   Template: unknown, opcodes: 91
+[scraper]   eks: 6WcFOBUvE1tp5R6vq6ZP...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 514
+[scraper]   ans: 514,54;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11552
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: wjcvIRwVDKq3aoz3ZkDKkZDIi*oPhs...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13719
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 25/30 @ 2026-04-15T09:35:59Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s134mrphAajucC3fvseh...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 24780 bytes, slice: 6537 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 199611 chars
+[scraper]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[scraper]   Source hash: 3429444f324c6110
+[scraper]   Template: unknown, opcodes: 91
+[scraper]   eks: hlT3jJrTlMGHHD6JlCN5...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 490
+[scraper]   ans: 490,68;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10912
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: KsAG-bRvvM8_4iVIzk53Eb5eDlxV2w...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13000
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 26/30 @ 2026-04-15T09:36:01Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1ik4TEBBPEijBScETCx...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 12403 bytes, slice: 3793 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 202765 chars
+[scraper]   TDC_NAME: HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA
+[scraper]   Source hash: 27dda893f81dbc4f
+[scraper]   Template: unknown, opcodes: 103
+[scraper]   eks: iwcKrdzbZpFF+HQorytW...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 456
+[scraper]   ans: 456,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13344
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: -Iq3xF474Ut2Kc98LMr5Ff-irZgGjp...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 15640
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 27/30 @ 2026-04-15T09:36:03Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1PBhspOoRasBCs7Srm9...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18094 bytes, slice: 5330 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197545 chars
+[scraper]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[scraper]   Source hash: f53142c54fc43699
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: f53142c54fc43699
+[scraper] Auto-port failed for f53142c54fc43699: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-f53142c54fc43699.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=f53142c54fc43699), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=f53142c54fc43699), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=f53142c54fc43699), auto-port failed
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 28/30 @ 2026-04-15T09:36:04Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1hNKQOcu28iLfDxr8cX...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22257 bytes, slice: 7595 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 199611 chars
+[scraper]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[scraper]   Source hash: 3429444f324c6110
+[scraper]   Template: unknown, opcodes: 91
+[scraper]   eks: /Vxpd1o07H9Gzgy2B8ED...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 481
+[scraper]   ans: 481,39;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11372
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: fWmWrQciR074cbk3Q-x2d3DIi*oPhs...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13484
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== 46.3-after-vmslide attempt 29/30 @ 2026-04-15T09:36:06Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1zc2lv7d0yn_dtXxPl8...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 27955 bytes, slice: 9043 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 129582 chars
+[scraper]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[scraper]   Source hash: e6a45ba64d246f82
+[scraper]   Template: unknown, opcodes: 98
+[scraper]   eks: I7Y5nvvk+msztfrzhP9C...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 501
+[scraper]   ans: 501,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11832
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: 5eaMxXt8XGbR6e7cj-3lqup2q1W5jO...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13972
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== 46.3-after-vmslide attempt 30/30 @ 2026-04-15T09:36:07Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] vData profile loaded from /home/ubuntu/github.com/tut1vog/reverse-chaosvm/profiles/vdata-browser-default.json
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1fUR-6ITU2liJ6aMDRa...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 27951 bytes, slice: 9263 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 161122 chars
+[scraper]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[scraper]   Source hash: 02fd132edb24a8c1
+[scraper]   Template: C, opcodes: 100
+[scraper]   eks: vG+tK4Wywd9gp/RA22xn...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 493
+[scraper]   ans: 493,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13504
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: buildVDataForPost (standalone, browser profile)
+[scraper]   vData: -Iq3xF474Ut2Kc98LMr5F3X0cQihFa...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 15780
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
