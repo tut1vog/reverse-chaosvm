@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scraper path (in-progress)
+Current task: 46.2 — Tests for 46.1 (pending dispatch)
 
 **Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
@@ -111,7 +111,7 @@ Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scra
 
 | ID | Task | Status |
 |----|------|--------|
-| 46.1 | **[in-progress]** **Restore `/vm-slide.enc.js` live fetch on the default scraper path.** Phase 45.4 made the `_getVmSlideSource` call at `tools/scraper/scraper.js:572` conditional on `this.legacyVdata` as a perf optimization — the default path never hits the vm-slide URL. Real browsers always fetch it (HAR entry 6). Undo the conditional so both paths fetch the live `/vm-slide.enc.js` from the show-page config URL, discarding the body on the default path (it still uses the committed `sample/vm_slide.js` cache for vData generation — only the network request matters here, not the parsed source). Keep the fetched-source reuse behaviour in legacy mode unchanged. Cache the fetch within a single scraper invocation. | pending |
+| 46.1 | Restore `/vm-slide.enc.js` live fetch on the default scraper path | done |
 | 46.2 | **Tests for 46.1** (different agent). Lock the wire-level invariant that both `legacyVdata=false` and `legacyVdata=true` issue at least one GET to a URL matching `/vm-slide(\.[^/]+)?\.enc\.js` per `solveCaptcha()`, via a local HTTP server that the scraper is pointed at (through a URL-rewriting test double or a globally-mocked `httpRequest`). Assert that the default path does NOT skip this request. One regression-oriented test file under `tests/`. `npm test` must stay green. | pending |
 | 46.3 | **Live re-measurement after 46.1** (director-owned, live network). 30 atomic default-path invocations from the same IP, same protocol as 45.6 (`--captcha-only --retries 1`, no gap, single arm). Record ticket prefix per attempt and bucket errorCode outcomes. Compare to the 45.6 default-arm baseline and to the Phase 45.6 gap1s follow-up. The primary question is **whether any attempt flips from `t03tserver` to `t01` or `t02`**. Log to `output/phase-46-errorcode-0/46.3-after-vmslide.{log,jsonl}`. Writes a short verdict block in `docs/ERRORCODE_12_INVESTIGATION.md` and appends a passed/failed entry to `history/<YYYYMMDD>.md`. | pending |
 | 46.4 | **Add `/caplog` telemetry beacons around verify.** Real browser sends a `/caplog?appid=20128&1=0&2=0&3=0&4=0&5=<ts>&6=<ts>&...` GET between tdc.js load and verify, and a second `/caplog?appid=20128&27=<slide_dx>&29=&31=<num>&32=0&...` GET AFTER verify. HAR entries 7 and 9 (see `sample/captcha-har.har`). Both are fire-and-forget — the response doesn't affect the scraper's state machine. Implementation goal: port the two beacon URL shapes from HAR (field-by-field table in the task's Context when dispatched), emit the pre-verify beacon after step 4 (downloadTdc) and before step 8 (verify), emit the post-verify beacon after step 8 regardless of errorCode. Use sensible placeholder values for fields we cannot synthesize (e.g. timer fields get `Date.now()` and recent deltas). Keep both beacons under a `--skip-caplog` escape hatch for isolation during 46.6 and for the existing offline tests. | pending |
@@ -139,58 +139,60 @@ Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scra
 
 ## Current Task
 
-**ID**: 46.1
-**Title**: Restore `/vm-slide.enc.js` live fetch on the default scraper path
+**ID**: 46.2
+**Title**: Tests for 46.1 — default path must issue a vm-slide GET
 **Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
-**Status**: in-progress (dispatched 2026-04-15)
+**Status**: pending dispatch
 
 ### Goal
-Undo the Phase 45.4 optimization that made `_getVmSlideSource(sig)` conditional on `this.legacyVdata` in `tools/scraper/scraper.js`. Real browsers always fetch `/vm-slide.enc.js` from `t.captcha.qq.com` as part of the verify flow (HAR entry 6). The default path currently skips this request, which is a distinctive "IP never pulled the JS it should have" tell for Tencent's bot scoring — the top-ranked gap on the Phase 46 ladder. After 46.1 the default path will make the same network observation a real browser does, while still using the committed `sample/vm_slide.js` cache to build vData (the fetched body is discarded on the default path).
+Lock in a regression test that proves both `legacyVdata=false` (default) and `legacyVdata=true` (legacy) scraper paths issue at least one GET to a URL matching `/vm-slide(\.[^/]+)?\.enc\.js` during a single `solveCaptcha()` invocation. This is the wire-level invariant that task 46.1 just restored; without a test it will quietly regress the next time someone is tempted to "optimize" the default path.
 
 ### Context
-- **File to edit**: `tools/scraper/scraper.js`
-- **Target block**: the `// (k) Get vm-slide source` conditional at lines ~571–575, currently:
-  ```js
-  // (k) Get vm-slide source (only needed by the legacy jsdom harness)
-  let vmSlideSource = null;
-  if (this.legacyVdata) {
-    vmSlideSource = await this._getVmSlideSource(sig);
-  }
-  ```
-  It must become (paraphrase — the implementing agent owns the exact form):
-  ```js
-  // (k) Fetch /vm-slide.enc.js from the show-page config URL. Real browsers
-  // always issue this request (HAR entry 6); skipping it is a distinctive
-  // bot tell. The default path discards the fetched body and still uses the
-  // committed sample/vm_slide.js cache for vData generation — only the
-  // network observation matters here.
-  const vmSlideSource = await this._getVmSlideSource(sig);
-  ```
-- **Downstream usage**: only the legacy branch at lines ~583–594 reads `vmSlideSource`. The default branch uses `buildVDataForPost` with `this._vdataProfile` and doesn't look at `vmSlideSource` at all. No further changes needed.
-- **Caching within one invocation**: `_getVmSlideSource` already memoizes via `this._vmSlideSource` (~line 407). A single `solveCaptcha()` call will issue at most one vm-slide GET per scraper instance lifetime.
-- **`.claude/settings.json` deny rule**: `Edit(./tools/scraper/**)` is denied for the Edit tool. The implementing agent must use the Bash + python3 string-replace workaround (see 45.4 history entry for the exact pattern).
+- **Task 46.1 just landed**: `tools/scraper/scraper.js` now unconditionally calls `this._getVmSlideSource(sig)` in the step-(k) block (~lines 571–576). Both paths must trigger the fetch.
+- **Fetch strategies** live in `_getVmSlideSource` (~lines 310–410 in `tools/scraper/scraper.js`). It tries three strategies in order: (1) extract the URL from the show-page HTML and fetch it; (2) extract from the config URL; (3) fallback path. The URL pattern we want to assert against is `/vm-slide(\.[^/]+)?\.enc\.js` — the hash segment is optional because the hashed filename can change build-to-build.
+- **Existing mocking patterns**: search `tests/` for other tests that exercise `Scraper` end-to-end against a local HTTP server or against a mocked `httpRequest`. Candidates to look at for the established pattern:
+  - `tests/test-scraper-foundation.js`
+  - `tests/test-scraper-vdata-switchover.js` (Phase 45.4/45.5 offline tests — most relevant; they already bypass live network)
+  - any helper under `tests/helpers/` or `tests/fixtures/` that stubs `https.request` or stands up a loopback server
+  The reuse rule: prefer extending the existing stubbing helper over inventing a new one. Read the existing helpers first and match their shape.
+- **Two legitimate approaches**:
+  1. **Local HTTP server** that the scraper is pointed at via a URL-rewriting layer or environment variable. Record received request URLs and assert on them.
+  2. **Monkey-patch `httpRequest`** (or whatever wrapper the scraper uses — check `tools/scraper/scraper.js` imports) to record call URLs and return canned responses. This is the lighter-weight approach and matches what the 45.5 offline tests already do.
+  Pick whichever fits the existing test harness. Do not invent a third approach.
+- **What to assert**: that the recorded request list contains at least one GET whose URL matches `/vm-slide(\.[^/]+)?\.enc\.js` — for BOTH `new Scraper({ legacyVdata: false })` AND `new Scraper({ legacyVdata: true })`. Two tests, one per flag. Ideally share a helper that runs a single `solveCaptcha()` under the mock and returns the recorded request list.
+- **Anti-goal**: do not assert on response bodies, vData content, or the final verify outcome. Scope is narrowly the wire-level "did we issue the vm-slide GET" invariant. Keep the canned responses minimal — just enough for `solveCaptcha()` to progress far enough that the step-(k) fetch happens. If the existing 45.5 offline tests already drive the scraper through step (k), extend them rather than building new canned responses from scratch.
+- **File location**: one new file under `tests/`, named to match project convention (e.g. `tests/test-scraper-vm-slide-fetch.js` or whatever matches neighbouring file naming). Use `node --test` — check another test file for the exact import shape (`const { test } = require('node:test');` etc.).
+- **targets/** and **sample/** remain read-only.
 
 ### Implementation Steps
-1. Read `tools/scraper/scraper.js` lines 560–600 to confirm the current shape of the step-(k) block.
-2. Apply the edit via a Bash + python3 `read → assert old in s → replace → write` block.
-3. Verify the file parses: `node -e "require('./tools/scraper/scraper');"` → exit 0.
-4. Verify the change was applied with `sed -n '568,580p' tools/scraper/scraper.js`.
-5. Smoke test: `timeout 120 node tools/scraper/cli.js --captcha-only --verbose --retries 1`. Confirm the verbose log shows a "Fetching vm-slide from …" line (one of the three strategies at lines 347 / 368 / 391) regardless of the final errorCode.
-6. Do NOT commit. The director handles all commits after 46.2 (tests) comes back green.
+1. Read `tools/scraper/scraper.js` to identify how HTTPS requests are made (`httpRequest` helper? direct `https.request`? something in `tools/scraper/` shared module?). Find the seam where the test can record requests without touching the network.
+2. Read `tests/test-scraper-vdata-switchover.js` (and any other offline scraper tests) to learn the existing mock pattern and canned-response shape. Reuse it.
+3. Read `tests/test-scraper-foundation.js` if you need a simpler template.
+4. Create the new test file. Structure:
+   - one shared helper that constructs a `Scraper`, runs `solveCaptcha()` against the mock, and returns the list of recorded request URLs
+   - test A: default path (`legacyVdata: false`) → assert the URL list contains a match for `/vm-slide(\.[^/]+)?\.enc\.js`
+   - test B: legacy path (`legacyVdata: true`) → same assertion
+5. Run `node --test tests/test-scraper-vm-slide-fetch.js` (or whatever you named it) and confirm both tests pass.
+6. Run `npm test` end-to-end and confirm the whole suite stays green. Expected count is 506 + however many tests you added (2 minimum). Report the final `# tests` / `# pass` / `# fail` counts.
+7. Do NOT commit. The director commits after verification.
 
 ### Verification
-- [ ] File parses: `node -e "require('./tools/scraper/scraper');"` → exit 0.
-- [ ] New step-(k) block unconditionally calls `_getVmSlideSource(sig)`.
-- [ ] Smoke invocation reaches step (l) without throwing and emits a vm-slide fetch log line.
-- [ ] `npm test` stays green (506/506).
+- [ ] New test file exists under `tests/` and is picked up by `npm test` (no manual wiring needed — node --test auto-discovers).
+- [ ] At least 2 new tests, one asserting the default path issues the vm-slide GET, one asserting the legacy path issues it.
+- [ ] URL match uses a regex tolerant of optional build-hash segments: `/vm-slide(\.[^/]+)?\.enc\.js`.
+- [ ] Test assertions are meaningful: they fail if the step-(k) call is reverted to the `if (this.legacyVdata)` gate. (Manually confirm by temporarily re-gating and re-running — the default-path test must go red. Revert the file change before reporting.)
+- [ ] `npm test` passes 508/508 (or whatever 506 + N_new_tests adds up to). No pre-existing tests regress.
+- [ ] No changes outside `tests/` except optional reuse of an existing test helper.
 
 ### Constraints
 - **Do not make any git commits.** The director handles all commits after verification.
-- **Do not modify `_getVmSlideSource` itself** — its three-strategy fetch logic is fine. Only the caller-side conditional changes.
-- **Do not touch the legacy branch** — its behaviour must stay identical.
-- **Do not add tests in this task** — tests are 46.2's deliverable per impl/tests separation.
-- **Do not re-run the full live-network survey in this task** — that is 46.3's deliverable.
-- **If the edit is blocked or the file shape has drifted**, stop and report with the actual current content of the step-(k) block so the director can update the task brief.
+- **Different agent from 46.1** per impl/tests separation rule. Approach the scraper code as a consumer, not as the author.
+- **Do not modify `tools/scraper/scraper.js`** or any other production code. This is a tests-only task.
+- **Do not make any live network requests from the test.** Everything must run offline.
+- **Do not add new npm dependencies.** Use Node built-ins (`node:http`, `node:test`, `node:assert`) and whatever helpers already exist under `tests/`.
+- **Follow `.claude/rules/coding-style.md`**: CommonJS, 2-space indent, single quotes, semicolons, `const`/`let`, camelCase.
+- **Follow `.claude/rules/verify-dont-assume.md`**: confirm the meaningful-failure check in the verification list — don't just trust that the test fails when broken.
+- **If the task is too difficult or impossible to complete**, stop immediately and report back with what you tried and why it's blocked. Do not leave partial or broken tests.
 
 ### Suggested Agent
-**general-purpose** — small, local, well-scoped edit. No specialised agent needed.
+**general-purpose** — tests task, no specialized agent needed. Must be a different agent instance than the one that did 46.1 (the project rule is instance-level independence, not agent-type).
