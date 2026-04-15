@@ -2,45 +2,84 @@
 'use strict';
 
 // Phase 43 task 43.3 — CLI for the standalone vData cipher encoder.
+// Phase 44.5a — extended with a `replay` subcommand for replay-with-
+// substitution from a captured 8-field fingerprint object.
 //
-// Usage:
+// Cipher-only usage (Phase 43, unchanged):
 //   node tools/vdata-generator/cli.js --plaintext-hex <224-hex-char string>
 //   echo <hex> | node tools/vdata-generator/cli.js
 //
-// Flags:
-//   --plaintext-hex <hex>   112-byte plaintext as 224 hex chars
-//   --verbose               Print key + ciphertext hex to stderr
-//   --help, -h              Print usage and exit 0
-//
-// Reads stdin if --plaintext-hex is not given. Stdout receives only
-// the 152-char vData string + newline (pipe-friendly).
+// Replay usage (Phase 44.5a):
+//   node tools/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
+//   node tools/vdata-generator/cli.js replay --self-check
+
+const fs = require('fs');
+const path = require('path');
 
 const { encodeVData, encryptOnly, XTEA_KEY_HEX, PLAINTEXT_LENGTH } = require('./encode.js');
+const { buildVData } = require('./replay.js');
+const { buildPlaintext } = require('./build-plaintext.js');
 
 const HELP_TEXT = `
-vData Cipher Encoder — Standalone CLI (Phase 43)
+vData Encoder — Standalone CLI
 
-Usage:
+Cipher-only mode (Phase 43 — supply your own 112-byte plaintext):
   node tools/vdata-generator/cli.js --plaintext-hex <hex>
   echo <hex> | node tools/vdata-generator/cli.js
 
-Required (one of):
   --plaintext-hex <hex>   112-byte plaintext as 224 hex chars
-  stdin                   Same hex via standard input (whitespace stripped)
+  --verbose               Print XTEA key + ciphertext hex to stderr
+  --help, -h              Show this help and exit
 
-Options:
-  --verbose               Print XTEA key and intermediate ciphertext to stderr
+Replay mode (Phase 44.5a — captured 8-field obj + optional overrides):
+  node tools/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
+  node tools/vdata-generator/cli.js replay --self-check
+
+  --obj <path>            JSON file: 8-field fingerprint object
+                          ({tp, key, py, env, version, cLod, inf, ss})
+  --order <path>          JSON file: optional field-order array. Defaults
+                          to Object.keys(obj) (post-overrides).
+  --overrides <path>      JSON file: optional field overrides merged onto obj
+  --self-check            Replay both committed fixtures and assert byte-identical
+  --verbose               Print intermediate plaintext hex to stderr
   --help, -h              Show this help and exit
 
 Notes:
-  This is the cipher half of vm-slide's vData pipeline. The 112-byte
-  plaintext is a JS-environment fingerprint built by vm-slide's
-  proxyXHR at runtime; reversing that builder is Phase 44 and is NOT
-  handled here. Supply the plaintext yourself.
+  Cipher-only mode runs only the XTEA + custom-base64 stage. The 112-byte
+  plaintext is the JS-environment fingerprint built by vm-slide's proxyXHR.
+  Replay mode wraps the plaintext builder (Phase 44.4) + the cipher (Phase
+  43) into one entry point — supply a captured obj and it reproduces the
+  vData string for that capture. A future from-scratch builder that does
+  not require a captured obj is planned as task 44.5b.
 `.trim();
 
-function parseArgs(argv) {
-  const args = argv.slice(2);
+// ---------- shared helpers ----------
+
+function readStdinSync() {
+  try {
+    return fs.readFileSync(0, 'utf8');
+  } catch (err) {
+    return '';
+  }
+}
+
+function readJsonFile(p, label) {
+  let raw;
+  try {
+    raw = fs.readFileSync(p, 'utf8');
+  } catch (err) {
+    throw new Error(label + ': cannot read ' + p + ': ' + err.message);
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    throw new Error(label + ': invalid JSON in ' + p + ': ' + err.message);
+  }
+}
+
+// ---------- cipher-only mode (Phase 43, unchanged behavior) ----------
+
+function parseCipherArgs(args) {
   const flags = {};
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -61,19 +100,8 @@ function parseArgs(argv) {
   return flags;
 }
 
-function readStdinSync() {
-  let data = '';
-  try {
-    const chunk = require('fs').readFileSync(0, 'utf8');
-    data = chunk;
-  } catch (err) {
-    return '';
-  }
-  return data;
-}
-
-function main() {
-  const flags = parseArgs(process.argv);
+function runCipherMode(args) {
+  const flags = parseCipherArgs(args);
 
   if (flags.error) {
     process.stderr.write('Error: ' + flags.error + '\n');
@@ -129,7 +157,7 @@ function main() {
 
   if (flags.verbose) {
     const ciphertext = encryptOnly(plaintext);
-    process.stderr.write('[verbose] xtea key hex:   ' + XTEA_KEY_HEX + '\n');
+    process.stderr.write('[verbose] xtea key hex:    ' + XTEA_KEY_HEX + '\n');
     process.stderr.write('[verbose] plaintext bytes: ' + plaintext.length + '\n');
     process.stderr.write('[verbose] ciphertext hex:  ' + ciphertext.toString('hex') + '\n');
     process.stderr.write('[verbose] vdata length:    ' + vdata.length + '\n');
@@ -137,6 +165,206 @@ function main() {
 
   process.stdout.write(vdata + '\n');
   process.exit(0);
+}
+
+// ---------- replay mode (Phase 44.5a) ----------
+
+// Hardcoded fixture-derived (obj, order) pairs. These are not captured
+// from the fixture JSON files (which only store the post-cipher artifacts);
+// they are documented in research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md
+// §"Byte-identical cross-check evidence" as the inverse-permute solution
+// for each fixture. Encoded here so --self-check is hermetic.
+const SELF_CHECK_CASES = [
+  {
+    name: 'jsdom',
+    fixturePath: 'tests/fixtures/vdata-jsdom-capture.json',
+    plaintextField: 'plaintext_hex',
+    vdataField: 'vdata_string',
+    obj: {
+      inf: 'top',
+      env: '1',
+      tp: "Cannot read properties of null (reading 'src')",
+      key: 'qLCZ',
+      py: '0',
+      ss: '0%2C',
+      cLod: 'unloadTDC',
+      version: '2',
+    },
+    order: ['inf', 'env', 'tp', 'key', 'py', 'ss', 'cLod', 'version'],
+  },
+  {
+    name: 'har',
+    fixturePath: 'tests/fixtures/vdata-har-capture.json',
+    plaintextField: 'har_decrypted_plaintext_hex',
+    vdataField: 'har_vdata_string',
+    obj: {
+      inf: 'iframe',
+      env: '0',
+      tp: '7446039806946242560',
+      cLod: 'loadTDC',
+      version: '2',
+      key: '21L2',
+      ss: '11%2Ctdc%2Cslide%2Cvm',
+      py: '0',
+    },
+    order: ['inf', 'env', 'tp', 'cLod', 'version', 'key', 'ss', 'py'],
+  },
+];
+
+function parseReplayArgs(args) {
+  const flags = {};
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--help' || arg === '-h') {
+      flags.help = true;
+    } else if (arg === '--verbose') {
+      flags.verbose = true;
+    } else if (arg === '--self-check') {
+      flags.selfCheck = true;
+    } else if (arg === '--obj') {
+      if (i + 1 >= args.length) return { error: '--obj requires a path' };
+      flags.objPath = args[++i];
+    } else if (arg === '--order') {
+      if (i + 1 >= args.length) return { error: '--order requires a path' };
+      flags.orderPath = args[++i];
+    } else if (arg === '--overrides') {
+      if (i + 1 >= args.length) return { error: '--overrides requires a path' };
+      flags.overridesPath = args[++i];
+    } else {
+      return { error: 'unknown argument: ' + arg };
+    }
+  }
+  return flags;
+}
+
+function findRepoRoot(start) {
+  let dir = start;
+  for (let i = 0; i < 10; i++) {
+    if (fs.existsSync(path.join(dir, 'package.json'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return start;
+}
+
+function runSelfCheck() {
+  const repoRoot = findRepoRoot(__dirname);
+  let allPass = true;
+  for (const c of SELF_CHECK_CASES) {
+    const fixturePath = path.join(repoRoot, c.fixturePath);
+    const fixture = readJsonFile(fixturePath, 'self-check');
+    const expectedPlaintext = fixture[c.plaintextField];
+    const expectedVData = fixture[c.vdataField];
+
+    const plaintext = buildPlaintext({ obj: c.obj, order: c.order });
+    const plaintextHex = plaintext.toString('hex');
+    const vdata = encodeVData(plaintext);
+
+    const ptMatch = plaintextHex === expectedPlaintext;
+    const vdMatch = vdata === expectedVData;
+
+    process.stdout.write(
+      '[' + c.name + '] plaintext: ' + (ptMatch ? 'MATCH' : 'MISMATCH') +
+      '  vdata: ' + (vdMatch ? 'MATCH' : 'MISMATCH') + '\n'
+    );
+
+    if (!ptMatch) {
+      process.stderr.write('  expected plaintext_hex: ' + expectedPlaintext + '\n');
+      process.stderr.write('  actual   plaintext_hex: ' + plaintextHex + '\n');
+    }
+    if (!vdMatch) {
+      process.stderr.write('  expected vdata: ' + expectedVData + '\n');
+      process.stderr.write('  actual   vdata: ' + vdata + '\n');
+    }
+
+    if (!ptMatch || !vdMatch) allPass = false;
+  }
+
+  if (!allPass) {
+    process.stderr.write('self-check: FAIL\n');
+    process.exit(1);
+  }
+  process.stdout.write('self-check: OK (both fixtures byte-identical)\n');
+  process.exit(0);
+}
+
+function runReplayMode(args) {
+  const flags = parseReplayArgs(args);
+
+  if (flags.error) {
+    process.stderr.write('Error: ' + flags.error + '\n');
+    process.stderr.write('Use --help for usage.\n');
+    process.exit(2);
+  }
+
+  if (flags.help) {
+    process.stdout.write(HELP_TEXT + '\n');
+    process.exit(0);
+  }
+
+  if (flags.selfCheck) {
+    runSelfCheck();
+    return;
+  }
+
+  if (!flags.objPath) {
+    process.stderr.write('Error: replay mode requires --obj <path> (or --self-check).\n');
+    process.stderr.write('Use --help for usage.\n');
+    process.exit(2);
+  }
+
+  let obj;
+  let order;
+  let overrides;
+  try {
+    obj = readJsonFile(flags.objPath, '--obj');
+    if (flags.orderPath) order = readJsonFile(flags.orderPath, '--order');
+    if (flags.overridesPath) overrides = readJsonFile(flags.overridesPath, '--overrides');
+  } catch (err) {
+    process.stderr.write('Error: ' + err.message + '\n');
+    process.exit(2);
+  }
+
+  let vdata;
+  let plaintext;
+  try {
+    const merged = overrides ? Object.assign({}, obj, overrides) : obj;
+    plaintext = buildPlaintext({ obj: merged, order });
+    vdata = buildVData({ obj, order, overrides });
+  } catch (err) {
+    process.stderr.write('Error: ' + err.message + '\n');
+    process.exit(1);
+  }
+
+  if (flags.verbose) {
+    process.stderr.write('[verbose] plaintext bytes: ' + plaintext.length + '\n');
+    process.stderr.write('[verbose] plaintext hex:   ' + plaintext.toString('hex') + '\n');
+    process.stderr.write('[verbose] vdata length:    ' + vdata.length + '\n');
+  }
+
+  process.stdout.write(vdata + '\n');
+  process.exit(0);
+}
+
+// ---------- top-level dispatch ----------
+
+function parseArgs(argv) {
+  // Back-compat: parseArgs() still parses the cipher-only flag set so any
+  // callers importing it from outside continue to work. The replay
+  // subcommand is handled in main().
+  return parseCipherArgs(argv.slice(2));
+}
+
+function main() {
+  const argv = process.argv.slice(2);
+
+  if (argv.length > 0 && argv[0] === 'replay') {
+    runReplayMode(argv.slice(1));
+    return;
+  }
+
+  runCipherMode(argv);
 }
 
 if (require.main === module) {
