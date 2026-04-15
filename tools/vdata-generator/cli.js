@@ -4,6 +4,8 @@
 // Phase 43 task 43.3 — CLI for the standalone vData cipher encoder.
 // Phase 44.5a — extended with a `replay` subcommand for replay-with-
 // substitution from a captured 8-field fingerprint object.
+// Phase 44.5b — extended with a `from-obj` subcommand for full-synthesis
+// from-scratch vData from an 8-field obj (no caller-supplied order).
 //
 // Cipher-only usage (Phase 43, unchanged):
 //   node tools/vdata-generator/cli.js --plaintext-hex <224-hex-char string>
@@ -12,6 +14,10 @@
 // Replay usage (Phase 44.5a):
 //   node tools/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
 //   node tools/vdata-generator/cli.js replay --self-check
+//
+// From-obj usage (Phase 44.5b):
+//   node tools/vdata-generator/cli.js from-obj --obj <obj.json> [--seed <n>] [--order <order.json>]
+//   node tools/vdata-generator/cli.js from-obj --self-check
 
 const fs = require('fs');
 const path = require('path');
@@ -19,6 +25,7 @@ const path = require('path');
 const { encodeVData, encryptOnly, XTEA_KEY_HEX, PLAINTEXT_LENGTH } = require('./encode.js');
 const { buildVData } = require('./replay.js');
 const { buildPlaintext } = require('./build-plaintext.js');
+const { buildVDataFromObj, SCHEMA } = require('./build-from-obj.js');
 
 const HELP_TEXT = `
 vData Encoder — Standalone CLI
@@ -44,13 +51,27 @@ Replay mode (Phase 44.5a — captured 8-field obj + optional overrides):
   --verbose               Print intermediate plaintext hex to stderr
   --help, -h              Show this help and exit
 
+From-obj mode (Phase 44.5b — full synthesis from an 8-field obj):
+  node tools/vdata-generator/cli.js from-obj --obj <obj.json> [--seed <n>] [--order <order.json>]
+  node tools/vdata-generator/cli.js from-obj --self-check
+
+  --obj <path>            JSON file: 8-field fingerprint object
+  --seed <n>              Integer seed for mulberry32 PRNG (deterministic)
+  --order <path>          JSON file: explicit join-order override (skips shuffle)
+  --self-check            Synthesize both committed fixtures and assert byte-identical
+  --verbose               Print shuffled order + plaintext hex to stderr
+  --help, -h              Show this help and exit
+
 Notes:
   Cipher-only mode runs only the XTEA + custom-base64 stage. The 112-byte
   plaintext is the JS-environment fingerprint built by vm-slide's proxyXHR.
   Replay mode wraps the plaintext builder (Phase 44.4) + the cipher (Phase
   43) into one entry point — supply a captured obj and it reproduces the
-  vData string for that capture. A future from-scratch builder that does
-  not require a captured obj is planned as task 44.5b.
+  vData string for that capture. From-obj mode is full synthesis: it
+  constructs the 8-field schema array in literal source order and shuffles
+  it (via Math.random by default, or seeded mulberry32 / an explicit
+  override) before joining. Nondeterministic by default, which matches
+  vm-slide's runtime behavior.
 `.trim();
 
 // ---------- shared helpers ----------
@@ -347,6 +368,169 @@ function runReplayMode(args) {
   process.exit(0);
 }
 
+// ---------- from-obj mode (Phase 44.5b) ----------
+
+// Shared fixture obj data with the replay self-check; the from-obj
+// self-check additionally exercises both the --order deterministic path
+// and the --seed deterministic path found by output/vdata-generator-smoke/
+// seed-sweep.js (Node 20 / V8 TimSort).
+const FROM_OBJ_SELF_CHECK_CASES = [
+  {
+    name: 'har',
+    mode: 'order', // deterministic via explicit override
+    fixturePath: 'tests/fixtures/vdata-har-capture.json',
+    vdataField: 'har_vdata_string',
+    obj: {
+      inf: 'iframe',
+      env: '0',
+      tp: '7446039806946242560',
+      cLod: 'loadTDC',
+      version: '2',
+      key: '21L2',
+      ss: '11%2Ctdc%2Cslide%2Cvm',
+      py: '0',
+    },
+    order: ['inf', 'env', 'tp', 'cLod', 'version', 'key', 'ss', 'py'],
+  },
+  {
+    name: 'jsdom',
+    mode: 'seed', // deterministic via mulberry32 seed; reproduces jsdom order on Node 20
+    fixturePath: 'tests/fixtures/vdata-jsdom-capture.json',
+    vdataField: 'vdata_string',
+    obj: {
+      inf: 'top',
+      env: '1',
+      tp: "Cannot read properties of null (reading 'src')",
+      key: 'qLCZ',
+      py: '0',
+      ss: '0%2C',
+      cLod: 'unloadTDC',
+      version: '2',
+    },
+    seed: 84121,
+  },
+];
+
+function parseFromObjArgs(args) {
+  const flags = {};
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--help' || arg === '-h') {
+      flags.help = true;
+    } else if (arg === '--verbose') {
+      flags.verbose = true;
+    } else if (arg === '--self-check') {
+      flags.selfCheck = true;
+    } else if (arg === '--obj') {
+      if (i + 1 >= args.length) return { error: '--obj requires a path' };
+      flags.objPath = args[++i];
+    } else if (arg === '--order') {
+      if (i + 1 >= args.length) return { error: '--order requires a path' };
+      flags.orderPath = args[++i];
+    } else if (arg === '--seed') {
+      if (i + 1 >= args.length) return { error: '--seed requires an integer' };
+      const n = parseInt(args[++i], 10);
+      if (!Number.isFinite(n)) return { error: '--seed must be an integer' };
+      flags.seed = n;
+    } else {
+      return { error: 'unknown argument: ' + arg };
+    }
+  }
+  return flags;
+}
+
+function runFromObjSelfCheck() {
+  const repoRoot = findRepoRoot(__dirname);
+  let allPass = true;
+  for (const c of FROM_OBJ_SELF_CHECK_CASES) {
+    const fixturePath = path.join(repoRoot, c.fixturePath);
+    const fixture = readJsonFile(fixturePath, 'self-check');
+    const expectedVData = fixture[c.vdataField];
+
+    const args = { obj: c.obj };
+    if (c.mode === 'order') args.order = c.order;
+    else if (c.mode === 'seed') args.seed = c.seed;
+    const vdata = buildVDataFromObj(args);
+
+    const vdMatch = vdata === expectedVData;
+    process.stdout.write(
+      '[' + c.name + '] path=' + c.mode +
+      (c.mode === 'seed' ? ('(seed=' + c.seed + ')') : '') +
+      ' vdata: ' + (vdMatch ? 'MATCH' : 'MISMATCH') + '\n'
+    );
+    if (!vdMatch) {
+      process.stderr.write('  expected vdata: ' + expectedVData + '\n');
+      process.stderr.write('  actual   vdata: ' + vdata + '\n');
+      allPass = false;
+    }
+  }
+
+  if (!allPass) {
+    process.stderr.write('from-obj self-check: FAIL\n');
+    process.exit(1);
+  }
+  process.stdout.write('from-obj self-check: OK (both fixtures byte-identical; order + seed paths)\n');
+  process.exit(0);
+}
+
+function runFromObjMode(args) {
+  const flags = parseFromObjArgs(args);
+
+  if (flags.error) {
+    process.stderr.write('Error: ' + flags.error + '\n');
+    process.stderr.write('Use --help for usage.\n');
+    process.exit(2);
+  }
+
+  if (flags.help) {
+    process.stdout.write(HELP_TEXT + '\n');
+    process.exit(0);
+  }
+
+  if (flags.selfCheck) {
+    runFromObjSelfCheck();
+    return;
+  }
+
+  if (!flags.objPath) {
+    process.stderr.write('Error: from-obj mode requires --obj <path> (or --self-check).\n');
+    process.stderr.write('Use --help for usage.\n');
+    process.exit(2);
+  }
+
+  let obj;
+  let order;
+  try {
+    obj = readJsonFile(flags.objPath, '--obj');
+    if (flags.orderPath) order = readJsonFile(flags.orderPath, '--order');
+  } catch (err) {
+    process.stderr.write('Error: ' + err.message + '\n');
+    process.exit(2);
+  }
+
+  let vdata;
+  try {
+    vdata = buildVDataFromObj({ obj, seed: flags.seed, order });
+  } catch (err) {
+    process.stderr.write('Error: ' + err.message + '\n');
+    process.exit(1);
+  }
+
+  if (flags.verbose) {
+    const source = order
+      ? 'explicit-override'
+      : flags.seed != null
+        ? 'seeded-mulberry32(' + flags.seed + ')'
+        : 'Math.random';
+    process.stderr.write('[verbose] schema:      ' + JSON.stringify(SCHEMA) + '\n');
+    process.stderr.write('[verbose] order source: ' + source + '\n');
+    process.stderr.write('[verbose] vdata length: ' + vdata.length + '\n');
+  }
+
+  process.stdout.write(vdata + '\n');
+  process.exit(0);
+}
+
 // ---------- top-level dispatch ----------
 
 function parseArgs(argv) {
@@ -361,6 +545,11 @@ function main() {
 
   if (argv.length > 0 && argv[0] === 'replay') {
     runReplayMode(argv.slice(1));
+    return;
+  }
+
+  if (argv.length > 0 && argv[0] === 'from-obj') {
+    runFromObjMode(argv.slice(1));
     return;
   }
 

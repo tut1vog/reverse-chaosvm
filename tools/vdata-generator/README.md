@@ -2,21 +2,26 @@
 
 Standalone byte-identical encoder for vm-slide's vData pipeline.
 
-**Two entry points:**
+**Three entry points:**
 
 1. **Cipher-only `encode` (Phase 43, shipped):** takes a 112-byte plaintext
    and emits the 152-char vData string. XTEA + custom base64.
-2. **Replay-with-substitution `buildVData` (Phase 44.5a, this task):** takes
-   a captured 8-field fingerprint object (`{tp, key, py, env, version, cLod,
-   inf, ss}`), an optional join-order array, and an optional override map,
-   and emits the 152-char vData string. Wraps the pre-cipher plaintext
-   builder (kv build → PKCS#7-style pad → ShiftRows-style permute) and the
-   Phase 43 cipher into one call. Both committed fixtures round-trip
-   byte-identically through this path; see `cli.js replay --self-check`.
-
-A future from-scratch builder that does **not** require a captured `obj`
-(synthesizing all 8 fields from environment introspection alone) is planned
-as task **44.5b**.
+2. **Replay-with-substitution `buildVData` (Phase 44.5a):** takes a captured
+   8-field fingerprint object (`{tp, key, py, env, version, cLod, inf, ss}`),
+   an optional join-order array, and an optional override map, and emits
+   the 152-char vData string. Wraps the pre-cipher plaintext builder
+   (kv build → PKCS#7-style pad → ShiftRows-style permute) and the Phase 43
+   cipher into one call. Both committed fixtures round-trip byte-identically
+   through this path; see `cli.js replay --self-check`.
+3. **Full-synthesis `buildVDataFromObj` (Phase 44.5b, this task):** takes the
+   same 8-field obj but does NOT require a caller-supplied join order.
+   Constructs the schema array in fn 22317's literal source order
+   (`['tp','key','py','env','version','cLod','inf','ss']`) and shuffles it
+   via the exact comparator shape fn 23898 uses at runtime
+   (`arr.sort(() => rng() > 0.5 ? -1 : 1)`) before joining. Nondeterministic
+   by default (uses `Math.random`), matching vm-slide's true runtime
+   behavior. Two deterministic escape hatches: `--seed <n>` (seeded
+   mulberry32 PRNG) and `--order <path>` (explicit override).
 
 ## Pipeline
 
@@ -111,6 +116,54 @@ node tools/vdata-generator/cli.js replay \
 # -> a new 152-char vData string on the Phase 43 alphabet
 ```
 
+### From-obj mode (Phase 44.5b)
+
+Full synthesis: give it the 8-field obj and it picks the join order itself
+(matching fn 22317's `arr.sort(() => Math.random() > 0.5 ? -1 : 1)` shuffle).
+Nondeterministic by default — different invocations produce different
+(equally valid) vData strings.
+
+```bash
+# Self-check (one fixture via --seed, the other via --order, both byte-identical):
+node tools/vdata-generator/cli.js from-obj --self-check
+
+# Nondeterministic (real Math.random, default):
+node tools/vdata-generator/cli.js from-obj --obj /tmp/jsdom-obj.json
+# -> a fresh 152-char vData each call
+
+# Deterministic via seeded mulberry32 PRNG:
+node tools/vdata-generator/cli.js from-obj --obj /tmp/jsdom-obj.json --seed 84121
+# -> reproduces the jsdom fixture's vdata_string on Node 20
+#    (HAR fixture: --seed 53818)
+
+# Deterministic via explicit order override (skips shuffle entirely):
+node tools/vdata-generator/cli.js from-obj \
+  --obj /tmp/jsdom-obj.json --order /tmp/jsdom-order.json
+# -> reproduces the jsdom fixture's vdata_string byte-for-byte
+```
+
+**Seeded-PRNG fixture reproduction note:** the `--seed` flag uses an inline
+mulberry32 PRNG (no dependencies, ~8 lines). A sweep of seeds 0..200000
+against the exact comparator shape above found working seeds for both
+committed fixtures under Node 20 / V8 TimSort:
+
+| Fixture | Captured order                              | Working seed |
+|---------|----------------------------------------------|--------------|
+| HAR     | `[inf,env,tp,cLod,version,key,ss,py]`        | `53818`      |
+| jsdom   | `[inf,env,tp,key,py,ss,cLod,version]`        | `84121`      |
+
+These seeds are stable for a given Node major version's sort algorithm
+but are NOT portable across engines — a different sort implementation
+would make a different sequence of comparator calls and produce a
+different order for the same seed. For portable deterministic reproduction
+use `--order`, which bypasses the shuffle entirely. The sweep harness
+lives at `output/vdata-generator-smoke/seed-sweep.js`.
+
+**Difference from `replay`:** `replay` takes a full `{obj, order}` pair
+captured from a real vm-slide run and re-encodes it (optionally with
+substitutions). `from-obj` takes only `obj` and picks the order itself,
+reproducing fn 22317's live behavior.
+
 Stdout receives the 152-char vData string + newline. Errors and verbose
 diagnostics go to stderr. Exit codes: `0` success, `1` runtime error,
 `2` argument error.
@@ -131,6 +184,12 @@ const out = buildVData({
   order: ['inf','env','tp','key','py','ss','cLod','version'], // optional
   overrides: { key: 'ZZZZ' },                                   // optional
 });
+
+// Full-synthesis from-scratch (Phase 44.5b):
+const { buildVDataFromObj } = require('./tools/vdata-generator/build-from-obj.js');
+const v1 = buildVDataFromObj({ obj });                  // nondeterministic
+const v2 = buildVDataFromObj({ obj, seed: 84121 });     // deterministic via seed
+const v3 = buildVDataFromObj({ obj, order: ['inf','env','tp','key','py','ss','cLod','version'] }); // explicit
 
 // Pre-cipher plaintext builder, exposed standalone:
 const { buildPlaintext } = require('./tools/vdata-generator/build-plaintext.js');
