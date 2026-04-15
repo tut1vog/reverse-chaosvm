@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (final revision user-approved 2026-04-13)
-Current task: 44.4 — Per-field value-source pin + pre-cipher transform check (pending dispatch)
+Current task: **awaiting user review** — 44.4 done 2026-04-15; two new findings surfaced (sort-order contradicts 44.2.6; XTEA key drift between `sample/vm_slide.js` and committed fixtures) may require plan restructure before dispatching next task (see history/20260415.md)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -109,7 +109,7 @@ Current task: 44.4 — Per-field value-source pin + pre-cipher transform check (
 | 44.2.5 | fn 20539 full static decompile — settle pivot premise → verdict **(A) pure encrypt stage**, orchestrator builds plaintext | done |
 | 44.3 | Orchestrator plaintext-build JS-level trace — static-fallback deliverable; inverted Phase 44 model (orchestrator builds 39-field 9504-byte body; vm-slide reduces it to the 112-byte XTEA input; `&vData=` literal at pcs 24211..24223 lives in fn 22317, not fn 20539) | done |
 | 44.2.6 | **fn 22317 full static decompile + reconciliation with fn 20539** — decompile fn 22317 body `[22317, 24233]` end-to-end → fn 22317 = **`exports.getCaptchaData`** (pure function at pc 24252 store to exports), NOT a send replacement; 8-key schema **hardcoded** `[tp,key,py,env,version,cLod,inf,ss]` sorted alphabetically at pc 23949; NO 9504→112 reduction exists; fn 20539 classified **(IV) dead code** on Chrome path | done |
-| 44.4 | **Per-field value-source pin + pre-cipher transform check** — decompile fn 22317's 3 non-comparator nested helpers (entries 22400, 22730, 23399) + spot-check webpack module 40 for any pre-XTEA byte transform; produce an 8-row schema table `(field_name, source_rule)`; deliver `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + a reference JS `buildFingerprintPlaintext(obj)`. Cheap pre-check: split fixture XTEA-input hex on `&`/`=` and see whether the 8 keys match `[cLod, env, inf, key, py, ss, tp, version]` before decompiling — if they do, 44.4 is confirmation work. | pending |
+| 44.4 | **Per-field value-source pin + pre-cipher transform check** — outcome (2) garbled; module 40 resolved as padder (fn 13989 PKCS#7-style) → ShiftRows permuter (fn 14153, `PERM=[0,4,8,12,5,9,13,1,10,14,2,6,15,3,7,11]`) → XTEA; 3 helpers decompiled (fn 22400=tp, fn 22730=key-prep, fn 23399=ss); 5 fields inline; `FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js` byte-identical both fixtures | done |
 | 44.4.5 | **Orchestrator `getCaptchaData` invocation site** — static search in `sample/t_captcha_slide.js` for the import of the vm-slide webpack export `getCaptchaData` and its call site. Pin the JS expression that builds `obj` at the call site and map its 8 properties to orchestrator-side sources (session, ua, timestamps, etc.). Closes the gap 44.3 missed. ≤1 hour static work. | pending |
 | 44.3.5 | Real-Chrome differential capture — third fixture from production Chrome; capture target simplifies to the full 9504-byte verify POST body + its 152-char vData string pair; used as a cross-check for 44.4's value-source rules across environments | pending |
 | 44.5a | Replay-with-substitution builder. Reads a captured fingerprint object (8 properties) + override map; emits a substituted `obj`; calls into 44.5b's builder. Trivial wrapper after 44.5b lands. | pending |
@@ -123,94 +123,25 @@ Current task: 44.4 — Per-field value-source pin + pre-cipher transform check (
 
 ## Current Task
 
-**ID**: 44.4
-**Title**: Per-field value-source pin + pre-cipher transform check
-**Phase**: Phase 44 — vm-slide fingerprint schema + JS vData builder
-**Status**: pending — awaiting user dispatch trigger (final revision approved 2026-04-13).
+**PAUSED — awaiting user review.** 44.4 completed 2026-04-15 with byte-identical cross-check against both committed fixtures. Two new facts surfaced that may require plan restructuring before dispatching the next task. See `history/20260415.md` for detail. Summary:
 
-### Goal
-For each of vm-slide's hardcoded 8 fingerprint fields (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss` — sorted alphabetically to `[cLod, env, inf, key, py, ss, tp, version]`), determine the value-source rule — i.e. for each field, what JS expression inside fn 22317 (or its nested helpers) produces the value that gets joined into `key=value` pairs. Also spot-check whether webpack module 40's `encryptData` applies any pre-XTEA byte transform to the joined string (candidate: UTF-8 escaping, URL encoding, prefix/suffix, or per-byte obfuscation), since the fixture XTEA-inputs look garbled vs a clean `cLod=...&env=...` read. Deliverable: `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` with an 8-row table + a reference JS `buildFingerprintPlaintext(obj)` function + a byte-identical cross-check against the committed fixtures.
+1. **Sort-order contradiction.** 44.2.6 reported fn 22317 sorts field names alphabetically via `.sort()` at pc 23949 to `[cLod,env,inf,key,py,ss,tp,version]`, but both committed fixtures ship non-alphabetical orders (jsdom `[inf,env,tp,key,py,ss,cLod,version]`, HAR `[inf,env,tp,cLod,version,key,ss,py]`). Either the 44.2.6 reading was wrong or fn 23898 comparator is non-lexicographic. Reference impl currently takes `order` as a caller-supplied input rather than computing it — 44.5b from-scratch synthesis is blocked until this is resolved.
+2. **XTEA key drift.** `sample/vm_slide.js` bakes XTEA key `34e2c8f07b5169ad` at pc 13931, but both committed fixtures encrypt with `2e430f8c15b7da96` (Phase 43 constant). The committed fixtures are from a **different vm-slide build** than `sample/vm_slide.js`. May affect whether bytecode pcs referenced throughout Phase 44 decompile work apply to the fixture-generating build.
 
-### Context (post-44.2.6, byte-verified)
-- fn 22317 (body `[22317, 24233]`) is `exports.getCaptchaData`, a pure function bound at pc 24252 inside parent fn 20970.
-- fn 22317's signature is `(body_string, obj) → body_string + "&vData=" + ciphertext`.
-- The 8 field names are hardcoded strings built at pcs 23755..23880 via `OP_04 + OP_10` chains. Sorted alphabetically at pc 23949 via `.sort()` with comparator fn 23898 (one of four nested FUNC_CREATEs inside fn 22317).
-- 8-iteration loop at pcs 23995..24083 builds `key + "=" + obj[key]` per field; `=` is `OP_10 61` at pc 24050.
-- Join with `"&"` at pc 24161 (`OP_10 38`).
-- Cipher delegated to webpack modules 40 (`encryptData`, slot 22 capture) at pc 24163 and 42 (`encode`, slot 21 capture) at pc 24165.
-- fn 22317 has **four nested FUNC_CREATEs**: entry 22400, 22730, 23399, 23898. Per 44.2.6's report, **fn 23898 is the `.sort()` comparator**; the **other three (22400, 22730, 23399) are per-field value-build helpers** and are not yet decompiled.
-- vm-slide has a webpack-style module system internally. fn 20970 is the module factory that exports `getCaptchaData`. It imports webpack modules 40 and 42 into fn 22317 via the slot-22 / slot-21 captures (see `FN-22317-DECOMPILE.md` for the capture pair details).
-- Phase 43's `tools/vdata-generator/encode.js`'s `encodeVData(112-byte buffer)` produces a byte-identical 152-char vData against both `tests/fixtures/vdata-jsdom-capture.json` and `tests/fixtures/vdata-har-capture.json`. So **Phase 43 already round-trips the cipher half byte-for-byte** — whatever happens inside webpack module 40's `encryptData` ultimately matches classical XTEA (32 rounds, delta `0x9E3779B9`, LE uint32 packing, key `2e430f8c15b7da96`). If module 40 includes a pre-transform, Phase 43's encoder must already absorb it into its "plaintext" input. This is important: **if we feed the exact correct pre-transformed string to Phase 43's encoder, we get the fixture vData**.
+**Director proposed next options (for user):**
+- **Option A** — Insert 44.4.1: re-examine fn 22317's sort call + fn 23898 comparator body to resolve contradiction (1). Cheap static task.
+- **Option B** — Insert 44.0.1: reconcile `sample/vm_slide.js` bytecode against the fixture-generating build. Determine whether Phase 44's decompile work (which reads `output/vm-slide/bytecode.json`) applies to the fixtures.
+- **Option C** — Both 44.4.1 and 44.0.1 before 44.4.5.
+- **Option D** — Proceed to 44.4.5 (orchestrator `getCaptchaData` call-site search) and let 44.5b deal with open questions 1 and 2 downstream.
 
-### Cheap first step — split-on-`&/=` pre-check (DO THIS FIRST)
-Before decompiling anything, run this sanity check against both committed fixtures:
+_Detailed planning task block intentionally removed — next task's block will be written after user picks an option._
 
-```js
-// Both fixtures store the XTEA input as plaintext_hex (jsdom) / har_decrypted_plaintext_hex (HAR).
-const hex = require('./tests/fixtures/vdata-har-capture.json').har_decrypted_plaintext_hex;
-const str = Buffer.from(hex, 'hex').toString('binary'); // or 'latin1' / utf8 as appropriate
-const pairs = str.split('&');                           // should be 8 chunks
-const kv = pairs.map(p => {
-  const eq = p.indexOf('=');
-  return { k: p.slice(0, eq), v: p.slice(eq + 1) };
-});
-console.log(kv.map(x => x.k));  // expected: [cLod, env, inf, key, py, ss, tp, version]
-```
+<details>
+<summary>Archived 44.4 Current Task block</summary>
 
-**Two possible outcomes**:
-1. **Clean split** — if the 8 `k` values exactly equal the hardcoded schema, then `encryptData` is pure XTEA-and-base64 with no pre-transform, and the 44.4 task collapses to reading off `(k, v)` pairs from both fixtures to infer value-source rules empirically. 44.4 becomes a short analysis task, not a full decompile.
-2. **Garbled keys** — if the `k` values are not recognizable as the hardcoded schema, there IS a pre-cipher transform inside webpack module 40. 44.4 then has to decompile module 40 to find the transform + decompile fn 22317's 3 per-field helpers to pin value sources. Full static decompile work.
+**ID**: 44.4 · **Status**: done 2026-04-15 · byte-identical cross-check passed both fixtures. See FINGERPRINT-SCHEMA.md §Byte-identical cross-check evidence and history/20260415.md for full record.
+</details>
 
-Report which outcome you see as the first sentence of your reply, before any other work. If outcome (1), skip directly to the 3-helper decompile with empirical cross-check. If outcome (2), decompile module 40 first, then the 3 helpers, then rebuild.
+<!-- Stale 44.4 task detail removed 2026-04-15 on completion; history/20260415.md and FINGERPRINT-SCHEMA.md hold the record. -->
 
-### Implementation Steps
-1. **Run the split-on-`&/=` pre-check** against both committed fixtures. Record the result. Decide outcome (1) or (2).
-2. **Decompile fn 22317's 3 per-field helpers** — entries 22400, 22730, 23399. Each is a nested closure spawned by a FUNC_CREATE inside fn 22317's body `[22317, 24233]`. Find the 3 FUNC_CREATE sites by scanning fn 22317's body for `OP_58` opcodes whose target matches 22400 / 22730 / 23399. Those spawn sites tell you the capture pairs, which tell you the closure's upvalues. Then decompile each helper's body end-to-end following the same methodology as 44.2.5 (fn 20539) and 44.2.6 (fn 22317). For each helper, determine:
-   - **Which field(s) it builds a value for.** A helper might handle one field or multiple. Use the call sites inside fn 22317's 8-iter loop to see which keys invoke which helper.
-   - **The value-source rule.** Common candidates: constant string, property read on `obj` (`obj[fieldName]`), property read on a captured closure upvalue, runtime read (unlikely per 44.2.5/44.2.6 evidence), string concatenation of several of the above, `toString()`-on-something, etc.
-3. **Cross-check the schema against both fixtures.** For each committed fixture, use the values observed in the XTEA input (via the split from step 1 or via field-position analysis if the split was garbled) and verify they match what each helper's value-source rule would produce. If the fixtures agree with the rules, the schema is pinned; if not, the rule(s) need refinement.
-4. **If webpack module 40 needs decompiling (outcome 2)**: module 40 is imported into fn 20970 and captured into fn 22317 slot 22. Find its entry pc by tracing the webpack `__webpack_require__(40)` mechanism inside fn 20970. Phase 41's tooling under `research/captcha-orchestrator/parse-bundle.js` can help if vm-slide uses the same webpack structure (likely; both bundles are webpack 4). Once module 40's entry pc is known, decompile its `encryptData` export (whatever function it exports). Determine whether it is pure XTEA or has a pre-transform.
-5. **Implement a reference JS `buildFingerprintPlaintext(obj)`** that replicates fn 22317 steps 1-4 (hardcoded schema, alphabetical sort, loop-build `key=value` pairs, join with `&`) plus any pre-transform from webpack module 40. Keep it under `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` for now (44.5b will productize it into `tools/vdata-generator/build-vdata.js`). **Cross-check byte-identically**: `Phase43encoder(buildFingerprintPlaintext(fixtureObj)) === fixtureVdataString` must hold for both `tests/fixtures/vdata-jsdom-capture.json` and `tests/fixtures/vdata-har-capture.json`. If it does not, the schema or the pre-transform (or both) is wrong; iterate.
-6. **Write `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md`** with:
-   - **Summary** (≤10 lines; outcome of the split pre-check + the verdict on whether module 40 has a pre-transform).
-   - **Pre-check result** — the 8 `(k, v)` pairs for each fixture as they split from the hex, commented with hex-byte slices.
-   - **Per-field source-rule table** — 8 rows, columns `(sorted_name, hardcoded_pc_range, helper_function, source_rule, jsdom_fixture_value, har_fixture_value)`.
-   - **Pre-transform finding** (if any) — the webpack module 40 `encryptData` behavior between the joined string and the XTEA input. If pure XTEA with no pre-transform, state that explicitly.
-   - **Reference JS implementation** — inline the `buildFingerprintPlaintext(obj)` code, or reference the committed file.
-   - **Byte-identical cross-check evidence** — the exact lines of output from running the reference impl against both fixtures, showing the expected vs actual vData strings match.
-   - **Open questions** — anything you could not resolve.
-
-### Verification
-- [ ] `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` exists with all six sections.
-- [ ] The split pre-check result is stated unambiguously in the Summary first sentence.
-- [ ] The 8-row per-field source-rule table has a row per sorted field name with a pinned source rule (or an explicit "unknown — refer to open questions" entry, with justification).
-- [ ] `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` exists and exports a `buildFingerprintPlaintext(obj)` function.
-- [ ] `Phase43encoder(buildFingerprintPlaintext(fixtureObj)) === fixtureVdataString` holds **byte-identically** for both the jsdom fixture and the HAR fixture. Show the comparison output in the deliverable.
-- [ ] If decompiling module 40 was required, its entry pc and behavior are documented (not handwaved).
-- [ ] `npm test` passes at **411/411**.
-- [ ] No modifications to: `targets/`, `sample/`, `tools/vdata-generator/` (44.5b owns productization), `tests/fixtures/`, `docs/`, or any existing `research/vm-slide-stack-vm/FN-*-DECOMPILE.md` / `PLAINTEXT-BUILD.md` / `plaintext-callgraph.md` / `vdata-*-trace.js`. New artifacts only.
-
-### Constraints
-- **Do not make any git commits.** Director owns all commits.
-- **Do not modify `targets/` or `sample/`.** Tencent's property.
-- **Verify, don't assume.** Every claim must trace to a specific bytecode pc OR a reproducible byte-level cross-check against a fixture.
-- **Byte-level verification of load-bearing static claims must be done globally, not scoped to one function.** The 44.2.5 scope error was function-scoped and missed fn 22317 entirely. For any claim like "module 40 has no pre-transform", cross-check by running the pure encoder against a hand-built plaintext and comparing against the fixture vData.
-- **Try the cheap split-on-`&/=` pre-check FIRST.** It may collapse the entire task to a trivial empirical analysis. Do not jump straight to decompiling three helpers before checking the fixture structurally.
-- **Do not productize into `tools/vdata-generator/`.** That is 44.5b's scope. The reference implementation for 44.4 lives under `research/vm-slide-stack-vm/` as a throwaway verification artifact.
-- **Do NOT re-run any tracers, harnesses, or jsdom environments.** Pure static analysis + fixture byte-level cross-check.
-- **If outcome (2) and decompiling module 40 is genuinely infeasible within this task scope**, report what you established, propose splitting the task, and stop. Do not leave broken files. Classification "partial — module 40 deferred to 44.4.x" is acceptable as long as the 3 fn 22317 helpers are done and the split pre-check is recorded.
-
-### Reporting
-Report back in this order:
-1. **Pre-check outcome first, one sentence**: outcome (1) clean split / outcome (2) garbled keys.
-2. For outcome (1): the 8 `(k, v)` pairs for each fixture.
-3. For each of the 3 per-field helpers (entries 22400, 22730, 23399): which field(s) it builds and its value-source rule.
-4. Pre-transform finding (module 40 is pure XTEA or has transform X).
-5. Byte-identical cross-check result (`buildFingerprintPlaintext(obj) → encodeVData → fixture vData` byte-for-byte).
-6. Path to `FINGERPRINT-SCHEMA.md` and `build-fingerprint-plaintext.js`.
-7. `npm test` tail confirming 411/411.
-8. Open questions for 44.4.5 / 44.5b / 44.7.
-
-### Suggested Agent
-`general-purpose` — static bytecode reading + fixture byte-level cross-check. Same shape as 44.2.5, 44.2.6. Expected ≤2 hours.
 
