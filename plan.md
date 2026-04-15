@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (revised 2026-04-15 post-45.1, user-confirmed)
-Current task: 45.6 — Empirical errorCode 12 re-test (director-owned, live network — awaiting user go-ahead)
+Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (CLOSED 2026-04-15)
+Current task: none — Phase 45 complete, awaiting next direction from user
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -163,7 +163,7 @@ Current task: 45.6 — Empirical errorCode 12 re-test (director-owned, live netw
 | 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture and `buildVDataForPost` against synthetic + HAR byte-identity. 37 scenarios across 7 groups; 462/462 npm test green. | done |
 | 45.4 | **Scraper wiring swap** — default path now calls `buildVDataForPost`; legacy jsdom harness retained behind `--legacy-vdata`. `profiles/vdata-browser-default.json` created. 462/462 tests still green. | done |
 | 45.5 | **Tests for 45.4** (different agent) — 44 offline subtests across 5 groups. Inline vData decoder built from existing exports proves default path carries HAR-derived values (`cLod=loadTDC`, `inf=iframe`) and legacy path carries three distinct jsdom tells. 506/506 npm test green. | done |
-| 45.6 | **Empirical errorCode 12 re-test** (director-owned; live network) — run the 30-attempt survey from `docs/ERRORCODE_12_INVESTIGATION.md` §"Observed Pattern" against the live `cap_union_new_verify` endpoint, with the new vData pipeline. Record success rate in the same attempts-bucket shape (1, 2–9, 10–30). Then run a matched control with `--legacy-vdata` back-to-back from the same IP. Update `docs/ERRORCODE_12_INVESTIGATION.md` with both result rows and a verdict: (a) vData-pipeline swap improved the success rate (Phase 45 goal achieved), (b) neutral (swap is correct but errorCode 12 is elsewhere; refocus on behavioural / header vectors), or (c) regressed (new pipeline has a defect; roll back, investigate). Commit the updated investigation doc + any observed error bodies as the deliverable. | pending |
+| 45.6 | **Empirical errorCode 12 re-test** (director-owned; live network) — 30 default-path + 30 legacy-path atomic invocations from IP `111.119.253.170`. Excluding 9/30 + 12/30 unrelated auto-port failures on two new tdc.js template hashes (`88ebeea62f566ec5`, `f53142c54fc43699`), the valid samples are N=21 default vs N=18 legacy. Result: **default 28.6% success, 61.9% errorCode 12** vs **legacy 0.0% success, 94.4% errorCode 12**. Two-proportion z-tests: errorCode 12 z = −2.40 (p ≈ 0.016), success rate z = +2.47 (p ≈ 0.014). Verdict **(a) improved** — vData fingerprint content has a statistically significant effect on errorCode 12. `docs/ERRORCODE_12_INVESTIGATION.md` updated; raw logs + summary committed under `output/phase-45-errorcode-12-survey/`. | done |
 
 > **Scope decisions for user review**:
 > 1. **Stream A porting scope**: 45.1 is the decision task. Recommendation — port ONLY the `key` digest (mandatory, body-dependent), keep the other 7 fields as profile-supplied with browser-like defaults drawn from the HAR fixture. The helpers for `tp` / `ss` (fn 22400 / fn 23399) are extra work for uncertain gain since we can't verify real-browser outputs without a live Chrome capture pipeline.
@@ -187,10 +187,14 @@ Current task: 45.6 — Empirical errorCode 12 re-test (director-owned, live netw
 
 ## Current Task
 
+_None — Phase 45 closed 2026-04-15. Awaiting next direction from user._
+
+<!-- historical 45.6 spec retained below for audit; ignore for dispatch purposes -->
+
 **ID**: 45.6
 **Title**: Empirical errorCode 12 re-test (director-owned, live network)
 **Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
-**Status**: pending — **awaiting user go-ahead before live network traffic**
+**Status**: done (2026-04-15) — verdict (a) improved, p < 0.05 on both errorCode 12 rate and success rate
 
 ### Goal
 Run the 30-attempt empirical survey from `docs/ERRORCODE_12_INVESTIGATION.md` §"Observed Pattern" against the live `cap_union_new_verify` endpoint, with the 45.4 vData pipeline as the default. Immediately re-run a matched 30-attempt control with `--legacy-vdata` from the same IP. Compare success rates in the same attempts-bucket shape (1, 2–9, 10–30) and update `docs/ERRORCODE_12_INVESTIGATION.md` with a verdict: (a) swap improved success rate (Phase 45 goal achieved), (b) neutral (swap is correct but errorCode 12 is elsewhere), or (c) regressed (roll back and investigate).
