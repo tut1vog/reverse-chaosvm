@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (revised 2026-04-15 post-45.1, user-confirmed)
-Current task: 45.3 — Tests for `computeKeyField` + `buildVDataForPost` (in-progress)
+Current task: 45.4 — Scraper wiring swap to `buildVDataForPost` (in-progress)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -160,7 +160,7 @@ Current task: 45.3 — Tests for `computeKeyField` + `buildVDataForPost` (in-pro
 | 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | done |
 | 45.1a | **Decompile module 18 (`tlg` / `sess` lookups)** — new prerequisite discovered by 45.1. Module 18 is the body-parser `require(18)(body, tag)` that both fn 22730 (`key` digest) and the surrounding accumulator loop call. It is NOT decompiled anywhere in `research/vm-slide-stack-vm/`. Produce (a) a new research note `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with the decompiled function, the exact behaviour for tags `"tlg"` and `"sess"`, input/output types, edge cases (empty body, missing tag, non-ASCII bytes), and (b) a runnable reference impl `research/vm-slide-stack-vm/module18-body-parser.js` whose output on the HAR fixture's verify POST body matches the HAR `obj.key = "21L2"` when plugged through the fn 22730 accumulator loop from `PHASE-45-FIELD-SOURCES.md` §2.1. This is the gate for 45.2. | done |
 | 45.2 | **Port the `key` field digest + add `buildVDataForPost` entry point** — port fn 22730 + module 18 (via the 45.1a reference impl at `research/vm-slide-stack-vm/module18-body-parser.js`) into `tools/vdata-generator/build-key-field.js`, exporting `lookupFormField` + `computeKeyField`. Add `tools/vdata-generator/for-post.js` exporting `buildVDataForPost(postBody, {profile, overrides, order, ie9Fallback})`. Add a `for-post` CLI subcommand. Update the README with the new mode and caller preconditions. | done |
-| 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture: extract the actual verify POST body from `sample/captcha-har.har` (the Chrome 146 capture that produced `vdata-har-capture.json`), compute the digest, assert it equals the HAR fixture's `obj.key = '21L2'`. Lock down `buildVDataForPost` against a synthetic POST body + browser-profile obj: assert output is a valid 152-char vData ending in `YY`, every char in the Phase 43 alphabet, and (if the HAR body is pin-able) reproduces the HAR fixture's vData byte-identically when called with the HAR body + HAR field values + HAR order. | pending |
+| 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture and `buildVDataForPost` against synthetic + HAR byte-identity. 37 scenarios across 7 groups; 462/462 npm test green. | done |
 | 45.4 | **Scraper wiring swap** — in `tools/scraper/scraper.js` around line 525, replace the `generateVData` jsdom-harness call with `buildVDataForPost(serializedBody, browserProfile)`. Build the `serializedBody` the same way the current jsdom path does (`jQuery.param(postFields)` → preserved behaviour). Add a `--legacy-vdata` CLI flag to `tools/scraper/cli.js` that keeps the jsdom path available for comparison. Preserve `tools/scraper/vdata-harness.js` unmodified (it's still useful as an oracle). Add a `browserProfile` JSON under `profiles/vdata-browser-default.json` with the 45.1 defaults, loaded by default. | pending |
 | 45.5 | **Tests for 45.4** (different agent) — mock the scraper verify path end-to-end without network I/O: drive `scraper.js`'s vData generation code path with both (a) the new `buildVDataForPost` entry point and (b) `--legacy-vdata` jsdom harness, capture the generated vData strings, and assert: both are valid 152-char strings on the Phase 43 alphabet ending in `YY`, both decrypt back to 8-field kv strings, and the new path uses the browser-profile values (not jsdom-specific ones). Integration-style; do not hit the network. | pending |
 | 45.6 | **Empirical errorCode 12 re-test** (director-owned; live network) — run the 30-attempt survey from `docs/ERRORCODE_12_INVESTIGATION.md` §"Observed Pattern" against the live `cap_union_new_verify` endpoint, with the new vData pipeline. Record success rate in the same attempts-bucket shape (1, 2–9, 10–30). Then run a matched control with `--legacy-vdata` back-to-back from the same IP. Update `docs/ERRORCODE_12_INVESTIGATION.md` with both result rows and a verdict: (a) vData-pipeline swap improved the success rate (Phase 45 goal achieved), (b) neutral (swap is correct but errorCode 12 is elsewhere; refocus on behavioural / header vectors), or (c) regressed (new pipeline has a defect; roll back, investigate). Commit the updated investigation doc + any observed error bodies as the deliverable. | pending |
@@ -187,50 +187,74 @@ Current task: 45.3 — Tests for `computeKeyField` + `buildVDataForPost` (in-pro
 
 ## Current Task
 
-**ID**: 45.3
-**Title**: Tests for `computeKeyField` + `buildVDataForPost` (different agent per impl/tests separation)
+**ID**: 45.4
+**Title**: Scraper wiring swap to `buildVDataForPost`
 **Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
 **Status**: in-progress (dispatched 2026-04-15)
 
 ### Goal
-Lock down the 45.2 deliverables with black-box tests so future refactors cannot silently break the HAR oracle or the new `for-post` entry point. Specifically: (a) the `computeKeyField` port must reproduce `obj.key = "21L2"` byte-identically from the real HAR verify POST body, (b) `buildVDataForPost` must produce a valid 152-char vData string ending in `YY` on every char of the Phase 43 alphabet, and (c) when given the HAR body + HAR-recovered profile + HAR field order, `buildVDataForPost` should reproduce the HAR fixture's full vData byte-identically (if field order is pinnable — see notes).
+Replace the scraper's live-jsdom vData generation path with the Phase 45.2 standalone pipeline. The scraper today runs vm-slide inside jsdom via `tools/scraper/vdata-harness.js`, which leaks four jsdom-specific field values that differ from real Chrome: `tp`, `cLod`, `inf`, `ss`. After this task, the default path calls `buildVDataForPost` with a browser-profile JSON that carries HAR-derived values for those fields; the legacy jsdom path stays available behind a `--legacy-vdata` flag so 45.6 can run an A/B control from the same IP.
 
 ### Context
-- **What landed in 45.2**: `tools/vdata-generator/build-key-field.js` (exports `lookupFormField`, `computeKeyField`), `tools/vdata-generator/for-post.js` (exports `buildVDataForPost`), `tools/vdata-generator/cli.js` (new `for-post` subcommand), README updates. Director's independent HAR-oracle spot-check on `computeKeyField` passed (`"21L2"`) and the CLI self-check printed 152 chars ending `YY`. 72/72 existing `tests/test-vdata-{builder,generator-encoder}.js` still green.
-- **Existing test conventions**: `tests/test-vdata-builder.js` and `tests/test-vdata-generator-encoder.js` are black-box suites written with `node --test`. Follow their structure — `const test = require('node:test'); const assert = require('node:assert/strict');`, one `test('name', async (t) => { ... })` per scenario, `t.test(...)` for nested subtests. See those files for the idiom.
-- **Committed fixtures**: `tests/fixtures/vdata-jsdom-capture.json` and `tests/fixtures/vdata-har-capture.json` already record the full `{obj, order, vdata, key}` of both reference sessions. The HAR one is the Chrome 146 capture that produced `obj.key = "21L2"`.
-- **HAR POST body source**: `sample/captcha-har.har` — the Chrome 146 capture. The verify entry is `cap_union_new_verify`, and its `request.postData.text` is the raw URL-encoded body. The body has `&vData=<ciphertext>` appended to the TAIL by the XHR monkey-patch at fn 20539 pc 20749 — strip that (`body.replace(/&vData=[^&]*$/, '')`) before calling `computeKeyField`. This is exactly what the 45.1a reference test harness does and what 45.2's self-check does.
-- **Phase 43 alphabet**: `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` — the 65-char custom base64 alphabet that every vm-slide `vData` uses. `Y` at index 64 is the padding character. Every vData must consist entirely of chars from this alphabet.
-- **Field-order pinning note**: The HAR fixture records `obj` AND the `order` array that produced the fixture's vData. `buildVDataForPost` without an explicit `order` uses `buildVDataFromObj`'s default nondeterministic shuffle — you CANNOT reproduce the HAR vData byte-identically without passing `order` explicitly. 45.3's byte-identical assertion should pass `order: fixture.order` through `buildVDataForPost`'s `options.order` parameter. If that still doesn't match, diff the resulting kv plaintext vs. `tests/fixtures/vdata-har-capture.json`'s `plaintext` field to isolate where it diverges.
+- **Current scraper path**: `tools/scraper/scraper.js` around line 525 calls `generateVData(...)` from `tools/scraper/vdata-harness.js` — that harness spins up jsdom, loads vm-slide live, and captures whatever vData it produces. The call happens right after the scraper has assembled the verify POST body fields via `jQuery.param(postFields)`-equivalent serialisation.
+- **What needs to change**: at that call site, branch on a new CLI flag. Default (flag absent) → use `buildVDataForPost(serializedBody, { profile })` from `tools/vdata-generator/for-post.js`. Flag present (`--legacy-vdata`) → keep calling the existing `generateVData` jsdom harness verbatim. **Preserve `tools/scraper/vdata-harness.js` unmodified** — it's still useful as an oracle and for 45.5's A/B test.
+- **`tlg` precondition (CRITICAL)**: `buildVDataForPost` requires the body it receives to contain `tlg=<digits>` where the digits are valid indices into the `sess` field value. Per 45.1a's incidental finding, `sample/t_captcha_slide.js` sets `e.tlg = e[collectdata].length` — i.e. `tlg` is the string length of the `collect` token. The scraper already computes a `collect` token; when it builds the verify body, it must ensure a `tlg` field is present with value = collect-token length. Check whether the current body builder already includes `tlg`; if not, add it before serialisation. Same check for `sess` — it's the session string from prehandle; the scraper already has this but confirm the body builder includes it.
+- **`serializedBody` shape**: `buildVDataForPost` takes a URL-encoded string (the same shape `jQuery.param` produces). Use the exact same serialisation the jsdom path currently uses — whatever string `vdata-harness.js` receives, `buildVDataForPost` should receive. Do NOT switch serialisation libraries.
+- **Browser profile file**: Create `profiles/vdata-browser-default.json` with the §3 JSON template from `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`:
+  ```json
+  {
+    "tp": "7446039806946242560",
+    "key": "__COMPUTED__",
+    "py": "0",
+    "env": "0",
+    "version": "2",
+    "cLod": "loadTDC",
+    "inf": "iframe",
+    "ss": "11%2Ctdc%2Cslide%2Cvm"
+  }
+  ```
+  Load this at scraper startup if no profile override is given. `buildVDataForPost` will substitute the `__COMPUTED__` sentinel with the real digest.
+- **CLI flag wiring**: `tools/scraper/cli.js` parses the scraper's CLI. Add a `--legacy-vdata` boolean flag that plumbs through to `scraper.js` and toggles the branch. Default is false (i.e. use the new path). Also add a `--vdata-profile <path>` flag that lets the user point at an alternate profile JSON; defaults to `profiles/vdata-browser-default.json`.
+- **Existing scraper tests**: `tests/test-scraper.js` and `tests/test-scraper-foundation.js` exercise the scraper without the network. You MUST run `npm test` after your wiring and confirm they still pass. 45.5 (different agent) will add new tests for the 45.4 wiring specifically.
 
 ### Implementation Steps
-1. **Read** `tools/vdata-generator/build-key-field.js`, `tools/vdata-generator/for-post.js`, `tests/test-vdata-builder.js` (for the idiom), `tests/fixtures/vdata-har-capture.json`, `tests/fixtures/vdata-jsdom-capture.json`, and `sample/captcha-har.har` (just the verify POST body).
-2. **Create** `tests/test-vdata-for-post.js` with the following test groups:
-   - **Group A — `lookupFormField` unit**: empty body → `""`; empty tag → `""`; single field `"foo=bar"` → `"bar"`; middle field `"a=1&foo=bar&b=2"` → `"bar"`; missing tag → `""`; tag as prefix-substring of another field (`"foobar=x&foo=y"` must return `"y"`, not `"x"`) — this exercises the `&<tag>=` vs `<tag>=` split; value containing `=` (`"a=b=c&d=e"` → `"b=c"` for tag `a`); tag-at-tail missing trailing `&` → full-to-EOF value; URL-encoded value preservation (`"tag=a%26b"` → `"a%26b"`, NOT `"a&b"`).
-   - **Group B — `computeKeyField` HAR oracle**: load `sample/captcha-har.har`, locate the `cap_union_new_verify` entry, strip the `&vData=...` tail, call `computeKeyField(body)`, assert it equals `"21L2"`. This is the load-bearing regression guard.
-   - **Group C — `computeKeyField` synthetic**: construct a tiny body `"tlg=8128&sess=s1LCqg-Z2OZiIDOktcwDJ4mtzyDd91soncHQX79s"` (the HAR-derived minimum to reproduce `"21L2"`) and assert `computeKeyField` returns `"21L2"`. This isolates the digest math from HAR parsing.
-   - **Group D — `computeKeyField` edge cases**: empty body → `""`; body with only `tlg=` (empty value) → `""`; body with only `sess=abcdefghijklmn` and no `tlg` → `""`; `ie9Fallback: true` with synthetic `sess="abcdefghijklmn"` → `"ecdk"` (walking `[4,2,3,10]`); `ie9Fallback: true` with empty body → `"ecdk"` (falls back to `"abcdefghijklmn"` default).
-   - **Group E — `buildVDataForPost` shape**: with the Group C synthetic body + the §3 browser profile, assert output is exactly 152 chars, every char is in the Phase 43 alphabet, and the last two chars are `"YY"`.
-   - **Group F — `buildVDataForPost` HAR byte-identity**: load the HAR POST body, load `tests/fixtures/vdata-har-capture.json`'s `obj` minus `key` as the profile, the fixture's `order` as `options.order`, and call `buildVDataForPost(harBody, {profile, order})`. Assert the result equals the fixture's recorded `vdata` string byte-for-byte. This is the end-to-end byte-identity proof. If it doesn't match, diff the internal plaintext at each stage and fail with a clear message.
-   - **Group G — `buildVDataForPost` input validation**: throws on non-string body; throws on empty string body; throws on `profile.key = "21L2"` (non-sentinel caller-supplied key); throws on `overrides.key` present.
-3. **Run** `node --test tests/test-vdata-for-post.js` and confirm all tests pass. Then run `npm test` and confirm the full suite is still green (should be prior 425 + your new count).
-4. **Do not add or modify fixtures**. All assertions must use existing fixtures + existing HAR + literals.
+1. **Read** `tools/scraper/scraper.js` around line 525 (the `generateVData` call), `tools/scraper/vdata-harness.js` (to understand what `generateVData` currently returns and what body shape it consumes), `tools/scraper/cli.js` (to see the existing flag-parsing idiom), `tools/vdata-generator/for-post.js` (the new API you're calling), `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §3 (the profile template).
+2. **Create** `profiles/vdata-browser-default.json` with the §3 template verbatim.
+3. **Edit** `tools/scraper/scraper.js` at the `generateVData` call site. Introduce the branch:
+   ```js
+   let vdata;
+   if (opts.legacyVdata) {
+     vdata = await generateVData(serializedBody /* existing args */);
+   } else {
+     const { buildVDataForPost } = require('../vdata-generator/for-post.js');
+     const profile = loadProfile(opts.vdataProfile || 'profiles/vdata-browser-default.json');
+     vdata = buildVDataForPost(serializedBody, { profile });
+   }
+   ```
+   Implement `loadProfile(path)` as a small helper (near the top of the file or a new `tools/scraper/load-profile.js` — your call) that reads the file, `JSON.parse`s it, and returns the object. Resolve the path relative to the repo root (not cwd).
+4. **Check the body includes `tlg`.** Inspect the scraper's verify-body builder. If the body already contains `tlg=<N>`, you're good. If not, add a line that sets `postFields.tlg = collectToken.length` (or equivalent — find the correct variable name in `scraper.js`) BEFORE serialisation. If you cannot determine the correct collect-token variable, stop and report — do not hand-wave.
+5. **Edit** `tools/scraper/cli.js` to parse `--legacy-vdata` and `--vdata-profile <path>`. Plumb both through to the scraper entry point.
+6. **Preserve** `tools/scraper/vdata-harness.js` and the existing `generateVData` export untouched. Do not delete the import; do not change its signature.
+7. **Run** `npm test` and confirm 462/462 still green. If any scraper test fails, diagnose — do not mark anything skipped.
+8. **Sanity CLI dry-run** (no network): `node tools/scraper/cli.js --help` or equivalent should list the two new flags. If the scraper has a `--dry-run` or `--captcha-only` mode, prefer that for a no-network smoke test; otherwise just confirm the CLI parses the flags without erroring.
 
 ### Verification
-- [ ] `tests/test-vdata-for-post.js` exists and `node --test tests/test-vdata-for-post.js` exits 0 with zero failures.
-- [ ] Test count includes all seven groups A–G with the specific scenarios listed above.
-- [ ] Group B (HAR oracle `"21L2"`) and Group F (HAR byte-identity) both pass — these are the load-bearing checks.
-- [ ] `npm test` exits 0, full suite green.
-- [ ] No modifications to `tools/vdata-generator/`, `tests/fixtures/`, `targets/`, `sample/`, `research/`, `docs/`, or any other existing file. This task creates exactly one new file: `tests/test-vdata-for-post.js`.
+- [ ] `profiles/vdata-browser-default.json` exists and matches the §3 template.
+- [ ] `tools/scraper/scraper.js` calls `buildVDataForPost` on the default path; `--legacy-vdata` flag branches to the existing `generateVData` jsdom path.
+- [ ] `tools/scraper/cli.js` parses `--legacy-vdata` and `--vdata-profile` flags.
+- [ ] `tools/scraper/vdata-harness.js` is unchanged.
+- [ ] Verify body includes a `tlg` field equal to the collect-token length before being handed to `buildVDataForPost`.
+- [ ] `npm test` exits 0 with 462/462 green (prior count).
+- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, `tools/vdata-generator/`, `research/`, `docs/`, or any existing test file. This task creates one new file (`profiles/vdata-browser-default.json`) plus optionally `tools/scraper/load-profile.js`, and edits `tools/scraper/scraper.js` + `tools/scraper/cli.js`.
 - [ ] No git commits by the subagent.
 
 ### Constraints
 - **Do not make any git commits.** The director handles all commits after verification.
-- **Do not modify the 45.2 implementation** — if you find a bug, stop and report it. Tests and implementation are separate tasks on separate agents exactly so implementation bugs are caught independently, not silently patched.
-- **Do not add fixtures.** The two committed fixtures + `sample/captcha-har.har` are sufficient.
-- **Coding style**: CommonJS, `'use strict';`, 2-space indent, single quotes, semicolons, `const`/`let` only, camelCase. Match the existing `tests/test-vdata-builder.js` idiom exactly.
-- **Group F is non-negotiable**. If the byte-identity doesn't hold, investigate whether it's a field-order issue (try passing `order: fixture.order`), a plaintext-builder issue (diff vs. the fixture's `plaintext` field), or a `key` issue (confirm `computeKeyField(harBody) === fixture.obj.key`). If it still fails, stop and report — do not xfail the test.
+- **Do not write scraper tests.** 45.5 is a separate agent. Ad-hoc one-liners for self-check are fine.
+- **Do not modify `tools/vdata-generator/*` or `tools/scraper/vdata-harness.js`.** Both are frozen by this task.
+- **Do not hardcode the profile inside `scraper.js`.** It MUST live in `profiles/vdata-browser-default.json` so 45.6's A/B survey can swap it.
+- **Coding style**: CommonJS, `'use strict';`, 2-space indent, single quotes, semicolons, `const`/`let` only, camelCase.
 - **If the task is too difficult or impossible to complete**, stop immediately and report back. Explain what you attempted, what went wrong, and why you believe the task cannot be completed as specified. Do not leave behind partial or broken changes.
 
 ### Suggested Agent
-`general-purpose` — test-writing task against a stable API. Requires careful reading of the existing suite idiom and the fixture shapes.
+`general-purpose` — wiring + small config file + CLI flag additions. No specialised tool needed.
