@@ -179,3 +179,38 @@ remains elsewhere in the request chain (telemetry beacons, header order,
 or TLS fingerprint).
 
 Next gate: 46.6 (after adding the two `/caplog` beacons).
+
+### 46.6 — after adding the two `/caplog` telemetry beacons
+
+30 atomic `--captcha-only --retries 1` invocations from `111.119.253.170`,
+serial, no gap. Same protocol as 46.3. Raw logs:
+`output/phase-46-errorcode-0/46.6-after-caplog.{log,jsonl}`.
+
+| Metric                               | 46.3 (vm-slide) | 46.6 (+caplog) | Δ |
+|--------------------------------------|-----------------|----------------|---|
+| t01 + t02 tickets                    | 0               | **0**          | 0 |
+| t03tserver tickets                   | 7               | 7              | 0 |
+| `errorCode: 0`                       | 0               | **0**          | 0 |
+| `errorCode: -1`                      | 7               | 7              | 0 |
+| `errorCode: 12`                      | 19              | 18             | -1 |
+| `errorCode: 9`                       | 0               | 0              | 0 |
+| null                                 | 3               | 5              | +2 |
+
+**Verdict — null result, again.** The ticket distribution is statistically
+indistinguishable from 46.3. Two content-layer fixes (restoring the
+`/vm-slide.enc.js` GET and emitting both `/caplog` telemetry beacons) have now
+each passed a 30-attempt same-IP survey and each produced zero `t01`/`t02`
+tickets. Both fixes are still correct at the wire level — Chrome really does
+fetch vm-slide and really does emit the beacons — but neither is sufficient
+to move the scoring lane.
+
+**Phase 46 decision gate: fired.** Per the Phase 46 plan, if 46.3 AND 46.6
+both return zero `t01`/`t02`, the director pauses and asks the user whether
+to proceed with 46.7 (Chrome-canonical header ordering on the verify POST)
+or jump straight to the TLS spike in 46.10. The evidence from 46.3 and 46.6
+together — two independent content-layer additions with zero effect on the
+primary metric — makes it increasingly likely that the lane gate sits below
+the content layer, in header ordering or TLS fingerprint. 46.7's expected
+effect is small; 46.10/46.11 (TLS impersonation) is the more impactful bet.
+
+Director is paused here awaiting user decision.
