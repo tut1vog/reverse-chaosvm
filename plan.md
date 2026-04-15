@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (rescoped 2026-04-15 post-44.2.7, user-approved)
-Current task: 44.2.8 — fn 20539 inner slot 8 → fn 13860 hop identity + per-run order source (hard-stop 2h)
+Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (discovery stream CLOSED 2026-04-15 post-44.2.8, awaiting user review of final rescoping)
+Current task: none — 44.2.8 done, discovery complete; Phase 44 downstream task set needs final rescoping before Stream B dispatch
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -113,8 +113,8 @@ Current task: 44.2.8 — fn 20539 inner slot 8 → fn 13860 hop identity + per-r
 | 44.0.1 | **[2026-04-15]** Bytecode build reconciliation — verdict **(A) with nuance**: `sample/vm_slide.js` IS the fixture-generating build; both keys real and from same build. `34e2c8f07b5169ad` is the bytecode-literal **pre-cipher seed** pushed at pcs 13931 and 15149 into fn 13860; `2e430f8c15b7da96` is the **runtime** XTEA round key observed in the encrypt closure's local 4 after fn 13860's prologue transform. No re-decode needed; all Phase 44 pc anchors stand. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`. | done |
 | 44.4.1 | **[2026-04-15]** Sort-order contradiction resolution — verdict **(ii) randomised comparator**: fn 23898 body `[23898..23944]` is `Math.random() > 0.5 ? 1 : -1` (textbook JS Fisher-Yates anti-pattern). Sort call site at pc 23949 confirmed exactly where 44.2.6 reported it; only the comparator's nature was misread. Fixture orders are random draws, not derivable from `obj` alone. `build-fingerprint-plaintext.js` updated: `order` is now optional, defaults to `Object.keys(obj)`. Both committed fixtures byte-identical without caller-supplied `order`. See `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md`. **Implication for 44.5b**: no canonical default join order exists — from-scratch synthesis must either accept a pre-ordered obj or seed its own RNG. | done |
 | 44.4.5 | **[2026-04-15]** Orchestrator `getCaptchaData` invocation site — **verdict: premise disproven**. `sample/t_captcha_slide.js` contains ZERO `getCaptchaData`/`CaptchaData`/`chaos` occurrences. Only vData code path is an `isLowIE()`-gated IIFE at bytes 162929..163108 calling `window.getVData` (Phase 42's IE9 path). Runtime callgraph `output/vm-slide/vdata-callgraph.json` shows 14/14 encrypt calls pass through fn 15918 — fn 22317 is not in the live trace. **Implications**: 44.2.6's "fn 22317 is live `getCaptchaData`" and "fn 20539 is dead code" classifications are both wrong on the Chrome path; Phase 42's XHR-monkey-patch mechanism stands; 44.4.1's `Math.random()` comparator finding is in a function that isn't called at runtime. See `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`. | done (partial, premise-disproving) |
-| 44.2.8 | **[NEW — revision 2026-04-15 post-44.2.7]** fn 20539 inner slot 8 → fn 13860 hop identity + per-run order source. Pin the exact FUNC_CREATE stored in fn 20140's slot 3 (fn 20539's inner slot 8) that calls fn 13860 directly with `(body, {py})`. Narrow walk of fn 20843 (proxyXHR submodule factory). Also pin where the per-run field ordering of the 8-field kv string comes from (upstream of fn 13860 — V8 enumeration order / insertion order / explicit shuffle / other). **Hard stop at 2 hours**: if static walking doesn't resolve, return a partial note naming the opaque pc and recommend a dynamic trace. Blocking 44.5b. | pending |
-| 44.4.1 | **[2026-04-15 — RETIRED post-44.2.7]** fn 23898 Math.random comparator — confirmed unreached on the Chrome path (entered 15× with `(string:3, string:2)` as a DOM helper, per `output/vm-slide/fn-20539-entry-trace.json`). Finding stands for fn 22317's code but that subtree is not live. No further action. | retired |
+| 44.2.8 | **[2026-04-15 — done]** fn 20539 inner slot 8 identity + per-run order source — **reversal-of-reversal**. Slot 8 = **fn 22317 = `module.exports.getCaptchaData`** (FUNC_CREATE pc 24234, body `[22317..24233]`, exported by webpack module fn 20970 at pc 24252). Call chain: vm-slide-internal orchestrator `init(getCaptchaData)` at fn 19604 → `require(44).proxyXHR(getCaptchaData)` at pc 19661 → fn 20140 (proxyXHR) receives it as its single arg, bound to slot 3 → fn 20539 captures fn 20140 slot 3 as inner slot 8 → fn 20539 pc 20749 `OP_66 2` calls `slot8(body, {py}) = fn 22317(body, {py})` → fn 22317 calls fn 13860 → returns rewritten body → fn 20539 does `savedSend.call(this, result)`. **Per-run order source: fn 23898's `Math.random() > 0.5 ? -1 : 1` comparator IS the live mechanism**, inside fn 22317 at pcs 23898..23949 (FUNC_CREATE 23945, sort call 23949) — 44.4.1's finding was correct all along. Runtime cross-check: `all_entry_counts[22317]=1`, `all_entry_counts[23898]=15` (TimSort compares for 8-element sort), `all_entry_counts[13860]=1`. **44.4.5 misread `vdata-callgraph.json`** — that file only captures encrypt-entry events and their reconstructed ancestors, NOT all closure entries. fn 22317 was in `all_entry_counts` all along; 44.4.5 checked the wrong field. **44.2.7's "pure gate+forward" reading of fn 20539 still stands** — fn 20539 really is a thin wrapper; the kv-string builder it calls is fn 22317 (slot 8) via the outer-function-arg binding, not via a statically-visible call. Deliverable: `research/vm-slide-stack-vm/FN-20539-SLOT8-HOP.md` (9 sections, 26 KB). No dynamic-trace extension needed. | done |
+| 44.4.1 | **[2026-04-15 — UN-RETIRED post-44.2.8]** fn 23898 Math.random comparator — finding is CORRECT. Runtime trace shows 15 entries = TimSort comparisons for one 8-element sort, first-call args `(string[3]="key", string[2]="tp")` are both members of fn 22317's 8-field schema array, direct proof fn 23898 is the comparator on the live path. 44.2.7's earlier "drop as unreached" conclusion was based on an incomplete reading of the same trace (missed that the 15 entries are sort-comparison callbacks, not unrelated DOM helper calls). | done |
 | 44.2.7 | **[2026-04-15]** fn 20539 full end-to-end decompile + real plaintext-build pin — runtime-validated. fn 20539 FUNC_CREATE pc 20797 confirmed; install onto `XHR.prototype.send` at pc 20808 (`OP_24`); sibling `.open` wrapper fn 20353 installed at pc 20473 is the shared-guard writer that records `this` when `.open("/cap_union_new_verify")` is called. fn 20539 is a pure gate+forward: receives the full 9345-byte form-encoded POST body as `arguments[0]`, calls an intermediate function (slot 8 → fn 13860) with `(body, {py})`, receives back the rewritten body, passes it to `savedSend.call`. Injection is body-append: final 9504 = 9345 + `&vData=` + 152-char base64. `ancestor_chains` in `vdata-callgraph.json` are a tracer artifact (host-JS transitions collapsed into VM ticks), NOT a real call stack — 44.4.5's chain reading was wrong on that point. **8-field schema pinned LIVE** from a runtime capture of fn 13860's 110-byte first arg: `env=1&key=qLCZ&version=2&cLod=unloadTDC&ss=0%2C&tp=<captured JS error>&py=0&inf=top`. Field set `{env,key,version,cLod,ss,tp,py,inf}` matches the 44.2.6 names — but it is a **tdc runtime-state probe**, not a navigator/screen fingerprint (`tp` is a captured JS error message; `inf` is iframe-position; `cLod` is a lifecycle marker). Runtime XTEA key = the bytecode literal `34e2c8f07b5169ad`, not the `2e430f8c15b7da96` runtime-key claim from Phase 42 — reconciliation still owed to 44.5a. **Unresolved**: the exact FUNC_CREATE stored in fn 20140's slot 3 (fn 20539's inner slot 8) that directly calls fn 13860. Deliverables: `research/vm-slide-stack-vm/FN-20539-DECOMPILE-44.2.7.md`, `research/vm-slide-stack-vm/trace-fn20539-entry.js`, `output/vm-slide/fn-20539-entry-trace.json`. | done |
 | 44.3.5 | **[NARROWED post-44.2.7]** Real-Chrome differential capture — third fixture from production Chrome; capture target = the 9345-byte pre-injection POST body + the 9504-byte post-injection body + the 152-char vData string. No longer needed for schema discovery (44.2.7 pinned it live); now a cross-environment shape cross-check — confirm the 8-field tdc-state-probe schema survives the jsdom → real Chrome transition, and confirm the `tp` field carries a different (real-Chrome) JS error than jsdom's `"Cannot read properties of null (reading 'src')"`. | pending |
 | 44.5a | Replay-with-substitution builder. Reads a captured fingerprint object (8 properties) + override map; emits a substituted `obj`; calls into 44.5b's builder. Trivial wrapper after 44.5b lands. | pending |
@@ -136,10 +136,44 @@ Current task: 44.2.8 — fn 20539 inner slot 8 → fn 13860 hop identity + per-r
 
 ## Current Task
 
-**ID**: 44.2.8
-**Title**: fn 20539 inner slot 8 → fn 13860 hop identity + per-run order source
-**Phase**: Phase 44 — vm-slide fingerprint schema + JS vData builder
-**Status**: pending — ready for dispatch on next user trigger (director holding per user instruction).
+**Status**: none — 44.2.8 passed verification. Phase 44 discovery stream (Stream A) is now CLOSED. The final task set for Stream B needs one last rescoping before dispatch.
+
+### Final rescoping proposal (awaiting user review)
+
+Based on 44.2.8's runtime-validated reversal-of-reversal:
+
+**Pipeline (fully resolved end-to-end):**
+```
+orchestrator (vm-slide internal, not t_captcha_slide.js)
+  → fn 19604 init(getCaptchaData)
+    → require(44).proxyXHR(getCaptchaData)  (pc 19661)
+      → fn 20140 (proxyXHR installer, receives getCaptchaData as arg → slot 3)
+        → installs fn 20353 onto XHR.prototype.open  (pc 20473)
+        → installs fn 20539 onto XHR.prototype.send  (pc 20808)
+On XHR send of /cap_union_new_verify:
+  fn 20539(this, body)  (slot 7 = guard object from fn 20353)
+    → reads slot 8 (= fn 20140's slot 3 = getCaptchaData = fn 22317)
+    → fn 22317(body, {py})  (pc 20749, OP_66 2)
+      → builds 8-field kv string with Math.random() shuffle (fn 23898)
+      → fn 13860 encryptData
+        → fn 13989 pad → fn 14153 permute → fn 15918 XTEA × 14 → base64
+      → returns rewritten body with &vData=<152> appended
+    → savedSend.call(this, rewrittenBody)  (9504 bytes)
+```
+
+**Task rescoping:**
+- **44.3.5** (real-Chrome differential capture): **KEEP narrowed**. Still valuable as a cross-environment shape check and to confirm the 8-field schema + Math.random shuffle mechanism survives the jsdom → real Chrome transition. But this is now a validation task, not a discovery task — could optionally be deferred until after 44.6's test suite flags something unexpected.
+- **44.5a** (replay-with-substitution): unchanged. Ships first.
+- **44.5b** (from-scratch `build-vdata.js --from-obj`): now unblocked with a clear spec. Must (1) build 8 field values from the obj (or accept them pre-built), (2) construct schema array in fixed source order `["tp","key","py","env","version","cLod","inf","ss"]`, (3) either accept an external shuffled order OR seed its own PRNG / accept a seed, (4) join as `key=value&...` for 110 bytes pre-pad, (5) pipe into the Phase 43 encoder. Fixture round-tripping requires either reproducing the captured shuffle (seeded PRNG) or accepting the captured order as input.
+- **44.6** (tests): unchanged. Tests the 44.5a and 44.5b builders byte-identically against all three fixtures.
+- **44.7** (docs closeout): **RE-SCOPE** back toward 44.2.6's original framing. Must: (a) expand `docs/VDATA_FORMAT.md` §1 with the 8-field schema + fn 22317 getCaptchaData entry-point narrative + Math.random shuffle note; (b) correct `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 + §517 — the mechanism IS orchestrator calls vm-slide's `getCaptchaData` export AND the orchestrator's `proxyXHR` installs XHR wrappers that invoke it, both layers are real and work together; (c) document the bytecode-literal-key vs seed reconciliation (runtime key observed = `"34e2c8f07b5169ad"` = the bytecode literal; Phase 42's `2e430f8c15b7da96` claim needs re-verification — may have been a different build or a misread); (d) bump `CLAUDE.md` Project Memory to record the full resolved pipeline; (e) mark Phase 44 closed.
+
+**Meta — research-process lessons (worth capturing in history, not a task):**
+- 44.4.5 failed because it searched `sample/t_captcha_slide.js` for the literal string `getCaptchaData`, but that file is the *show-page* orchestrator; the real orchestrator that passes `getCaptchaData` is INSIDE vm-slide itself (fn 19604). Grepping the wrong file produced a confident-wrong negative.
+- 44.2.7 failed to catch this because it checked `vdata-callgraph.json`'s ancestor chains (correctly flagging them as artifact) but did NOT grep its own `fn-20539-entry-trace.json` `all_entry_counts` for fn 22317 — a one-line check that would have immediately shown fn 22317 enters once per send.
+- Both failures cost a subtask each. The runtime trace's `all_entry_counts` is ground truth for liveness — future research should check it first, always.
+
+Proposed new dispatch order: **44.5a → 44.5b → 44.6 → 44.7** (with 44.3.5 optional / deferred until 44.6 motivates it). Awaiting user confirmation.
 
 ### Goal
 Close the last open hop in 44.2.7's runtime-validated call chain by pinning the exact FUNC_CREATE stored in fn 20140's slot 3 — the function that fn 20539 reads as its inner slot 8 and invokes with `(body, {py})` to obtain the rewritten body. 44.2.7 confirmed the call happens and that the callee eventually reaches fn 13860 with a 110-byte pre-pad plaintext, but the intermediate function's identity is still opaque. **Also** pin where the per-run ordering of the 8-field kv string comes from — the order divergence between the jsdom fixture (`[inf,env,tp,key,py,ss,cLod,version]`) and the HAR fixture (`[inf,env,tp,cLod,version,key,ss,py]`) is driven by something upstream of fn 13860 that 44.2.7 did not pin. This is the last discovery needed before 44.5b can produce byte-identical vData from an 8-property object.
