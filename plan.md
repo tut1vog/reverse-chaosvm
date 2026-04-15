@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test
-Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live scraper use (in-progress)
+Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (revised 2026-04-15 post-45.1, awaiting user confirmation of new 45.1a)
+Current task: 45.1a — Decompile module 18 (`tlg` / `sess` lookups) from vm-slide (pending user confirmation before dispatch)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -157,7 +157,8 @@ Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live
 
 | ID | Task | Status |
 |----|------|--------|
-| 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | in-progress |
+| 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | done |
+| 45.1a | **Decompile module 18 (`tlg` / `sess` lookups)** — new prerequisite discovered by 45.1. Module 18 is the body-parser `require(18)(body, tag)` that both fn 22730 (`key` digest) and the surrounding accumulator loop call. It is NOT decompiled anywhere in `research/vm-slide-stack-vm/`. Produce (a) a new research note `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with the decompiled function, the exact behaviour for tags `"tlg"` and `"sess"`, input/output types, edge cases (empty body, missing tag, non-ASCII bytes), and (b) a runnable reference impl `research/vm-slide-stack-vm/module18-body-parser.js` whose output on the HAR fixture's verify POST body matches the HAR `obj.key = "21L2"` when plugged through the fn 22730 accumulator loop from `PHASE-45-FIELD-SOURCES.md` §2.1. This is the gate for 45.2. | pending — awaiting user confirmation |
 | 45.2 | **Port the `key` field digest + add `buildVDataForPost` entry point** — port `fn 22730 → require(18)(body,'tlg')` from `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` into `tools/vdata-generator/build-key-field.js`, exporting `computeKeyField(postBody) → string`. Add `tools/vdata-generator/for-post.js` exporting `buildVDataForPost(postBody, options)` that (a) computes `key` from `postBody`, (b) merges the 45.1 browser-profile defaults with caller-supplied overrides for the other 7 fields, (c) calls `buildVDataFromObj` with the resulting `obj`. Add a `for-post` CLI subcommand mirroring the existing `from-obj` subcommand. Update `tools/vdata-generator/README.md` with the new mode. | pending |
 | 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture: extract the actual verify POST body from `sample/captcha-har.har` (the Chrome 146 capture that produced `vdata-har-capture.json`), compute the digest, assert it equals the HAR fixture's `obj.key = '21L2'`. Lock down `buildVDataForPost` against a synthetic POST body + browser-profile obj: assert output is a valid 152-char vData ending in `YY`, every char in the Phase 43 alphabet, and (if the HAR body is pin-able) reproduces the HAR fixture's vData byte-identically when called with the HAR body + HAR field values + HAR order. | pending |
 | 45.4 | **Scraper wiring swap** — in `tools/scraper/scraper.js` around line 525, replace the `generateVData` jsdom-harness call with `buildVDataForPost(serializedBody, browserProfile)`. Build the `serializedBody` the same way the current jsdom path does (`jQuery.param(postFields)` → preserved behaviour). Add a `--legacy-vdata` CLI flag to `tools/scraper/cli.js` that keeps the jsdom path available for comparison. Preserve `tools/scraper/vdata-harness.js` unmodified (it's still useful as an oracle). Add a `browserProfile` JSON under `profiles/vdata-browser-default.json` with the 45.1 defaults, loaded by default. | pending |
@@ -186,56 +187,69 @@ Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live
 
 ## Current Task
 
-**ID**: 45.1
-**Title**: Per-field source decisions for live scraper vData use
+**ID**: 45.1a
+**Title**: Decompile module 18 (`tlg` / `sess` body-parser lookups)
 **Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
-**Status**: in-progress (dispatched 2026-04-15)
+**Status**: pending — awaiting user confirmation of plan revision before dispatch
 
 ### Goal
-Decide, for each of the 8 fields in the vm-slide vData plaintext (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`), whether the scraper should (a) **port-as-code** — compute it per-request from runtime inputs, (b) **profile-supplied** — read it from a browser profile JSON as a caller-supplied default, or (c) **inline default** — hardcode a single browser-like value inside `buildVDataForPost`. Produce a research doc that locks these decisions in so Stream A's implementation tasks (45.2/45.3) have zero ambiguity about what to port and what to hand in. No code changes in this task — it is a decision-and-document pass.
+Decompile the body-parser helper that vm-slide references as `require(18)(body, tag)`. This helper is called twice inside the `key`-field accumulator loop (fn 22317 pcs 22972..23328) — once with `tag = "tlg"` to produce a digit-index string, and once with `tag = "sess"` to produce a charset string of length ≥ 14. Module 18 is the gate for 45.2 (`computeKeyField` port) — without it, 45.2 cannot produce a body-dependent `key` field, which in turn means `buildVDataForPost` can only emit replay-equivalent `vData` and the Phase 45 switchover loses its main point.
 
 ### Context
-- **Phase 44 deliverable to build on**: `tools/vdata-generator/` ships three modes (cipher-only, replay, from-obj). `buildVDataFromObj({obj})` takes an 8-field obj and produces a valid 152-char vData string. What's missing for live scraper use is (a) a body-dependent computation of the `key` field and (b) browser-like default values for the other 7 fields.
-- **Per-field decompile status**: `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` has the full per-field walk, including the three helper functions (fn 22400 = `tp`, fn 22730 = `key`, fn 23399 = `ss`) and the five inline fields (`py`, `env`, `version`, `cLod`, `inf`). Start there.
-- **Reference implementation**: `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` already reproduces the kv-string build for both committed fixtures byte-identically when given `{obj, order}`. Its `key` and `tp` and `ss` values are passed in by the caller, not computed — this task decides which of those should become computed-from-input in the productised version.
-- **Fixture evidence**:
-  - jsdom fixture (`tests/fixtures/vdata-jsdom-capture.json`): `obj = {inf:'top', env:'1', tp:"Cannot read properties of null (reading 'src')", key:'qLCZ', py:'0', ss:'0%2C', cLod:'unloadTDC', version:'2'}`
-  - HAR fixture (`tests/fixtures/vdata-har-capture.json`): `obj = {inf:'iframe', env:'0', tp:'7446039806946242560', cLod:'loadTDC', version:'2', key:'21L2', ss:'11%2Ctdc%2Cslide%2Cvm', py:'0'}`
-- **Browser-like target values** — the HAR fixture is the one real-Chrome data point we have. Treat HAR values as the "browser-like" ground truth for fields where we cannot compute the value from a runtime source we control.
-- **Hypothesis for the decision split** (director's recommendation — 45.1 may confirm or override):
-  - `key` → **port-as-code**. It's a char-lookup digest of the verify POST body; must be recomputed per request; load-bearing.
-  - `tp` → **profile-supplied with HAR-like default**. fn 22400 captures JS runtime errors observed during page load; we can't meaningfully reproduce Chrome's error-capture behaviour in the scraper, so hardcode the HAR value `'7446039806946242560'` (or a rotating set of snowflake-like strings) as the profile default.
-  - `ss` → **profile-supplied with HAR-like default** `'11%2Ctdc%2Cslide%2Cvm'`. fn 23399 summarises vm-slide subsystem state; Chrome-style output is what we want, and we don't have a runtime source for it in the scraper.
-  - `py` → **profile-supplied**, value from the orchestrator's `captchaConfig.py`; for a headless scraper without a real show-page, `'0'` (observed in both fixtures) is the default.
-  - `env` → **inline default** `'0'` (HAR value). Single static choice.
-  - `version` → **inline default** `'2'`. Literal in fn 22317.
-  - `cLod` → **inline default** `'loadTDC'` (HAR value — important: jsdom had `unloadTDC` and this is one of the visible jsdom tells).
-  - `inf` → **inline default** `'iframe'` (HAR value — another visible jsdom tell, jsdom has `'top'`).
-- **Why this task exists**: if we start 45.2 without fixing the decision split, the porting subagent will either over-scope (try to decompile fn 22400 and fn 23399 end-to-end, weeks of work) or under-scope (hardcode everything and miss `key`, producing invalid vData). 45.1's job is to draw the line up-front with evidence.
+- **Why this task exists**: 45.1's decision doc (`research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §2) discovered that the `key` digest has NOT been implemented anywhere in `research/vm-slide-stack-vm/`. The original 45.1 brief assumed the digest was already in `build-fingerprint-plaintext.js`, but that file only handles pad + permute and takes `obj.key` as a captured string. The actual digest is fn 22730 wrapped around `require(18)(body, "tlg")` + `require(18)(body, "sess")`, and module 18 is undecompiled.
+- **Pinned pseudocode** (from `PHASE-45-FIELD-SOURCES.md` §2.1, sourced from `FINGERPRINT-SCHEMA.md`):
+  ```js
+  // fn 22317, pcs 23007..23056
+  slot8 = require(18)(body, "sess") || "abcdefghijklmn";
+  // pcs 22972..23004
+  digitArray = fn22730(body) || new Array();
+  // pcs 23240..23328
+  slot9 = "";
+  for (var i = 0; i < digitArray.length; i++) {
+    slot9 += slot8.charAt(digitArray[i]);
+  }
+  obj.key = slot9;
+
+  // fn 22730 body (entry pc 22972, 1-arg closure):
+  function fn22730(body) {
+    return require(0)()
+      ? require(18)(body, "tlg").split("").map(function (c) { return parseInt(c, 10); })
+      : [4, 2, 3, 10];
+  }
+  ```
+- **What module 18 does (hypothesis)**: a small body-parser that takes a serialized POST body (likely `jQuery.param`-style `key=value&key=value` form) and looks up a sub-key by tag. For `tlg`, it must return a string whose every character is a decimal digit (because of `parseInt(c, 10)`). For `sess`, it must return a string of length ≥ 14. Neither claim is verified — 45.1a must verify them against the HAR fixture's actual body.
+- **Verification oracle (HAR)**: `sample/captcha-har.har` contains the real Chrome 146 verify POST that produced `tests/fixtures/vdata-har-capture.json`'s `obj.key = "21L2"`. Extract that POST body and confirm that the decompiled module 18 + fn 22730 + accumulator loop reproduces `"21L2"` exactly. Any deviation means the decompile is wrong.
+- **Where module 18 lives**: it is a webpack module in `sample/t_captcha_slide.js` or (more likely) a vm-slide bytecode function. The file `sample/vm_slide.js` (bytecode-carrier) + the `research/vm-slide-stack-vm/` disassembly artifacts under `output/vm-slide/` are the entry points. Grep for the two string literals `"tlg"` and `"sess"` first — they are the tags passed in, so module 18's body or its caller almost certainly contains them as literals.
+- **Starting inputs**:
+  - `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` — fn 22317 per-field walk
+  - `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §2 — key digest spec
+  - `output/vm-slide/*.json` / disassembly — vm-slide bytecode artifacts
+  - `sample/vm_slide.js` — bytecode carrier (read-only)
+  - `sample/t_captcha_slide.js` — orchestrator bundle (read-only)
+  - `sample/captcha-har.har` — real Chrome 146 capture; verify-POST body is the HAR oracle
+  - `tests/fixtures/vdata-har-capture.json` — target `obj.key = "21L2"`
 
 ### Implementation Steps
-1. **Read the existing decompile** — `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` end-to-end, plus the relevant sections of `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` (the reference impl) and `docs/VDATA_FORMAT.md` §7 (the authoritative public field table). Extract what is currently known about each of the 8 fields' value-source rules.
-2. **Read the jsdom and HAR fixtures** — confirm the exact `obj` values recorded in each, and note which fields differ between environments. The deltas are the fingerprinting vectors.
-3. **For each field, classify** as port-as-code / profile-supplied / inline-default. Justify each classification with: (a) the value's observed variability across fixtures, (b) whether the scraper has a runtime source for the input the field depends on, (c) the porting cost if port-as-code is chosen, (d) the risk if profile-supplied (static tell vector vs. dynamic input).
-4. **Pin browser-like default values** for every profile-supplied and inline-default field, citing the HAR fixture as the source. Where the value is a single literal (e.g. `version='2'`), note it. Where a small set of alternates might be rotated, note the set but pick one for the default.
-5. **Specify the `key` digest port scope** — from `research/vm-slide-stack-vm/build-fingerprint-plaintext.js`, identify the exact JS function(s) that implement `fn 22730`'s char-lookup over the POST body, write a one-paragraph porting spec (input: POST body string; output: 4-character digest string; dependencies: any tables or constants), and note any edge cases the scraper's POST body might hit that the research reference impl's test cases don't cover.
-6. **Write `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`** with §1 Decision Table (one row per field, columns: classification, browser-like default, justification, port scope if applicable), §2 `key` Digest Porting Spec (the input/output/impl-reference paragraph from step 5), §3 Browser Profile Template (a JSON shape that 45.4 will write to `profiles/vdata-browser-default.json`), §4 Open Questions / Rejected Alternatives (anything the decision-maker considered and rejected, so 45.2 doesn't relitigate them).
-7. **Sanity cross-check** — verify that plugging the decided defaults into `buildVDataFromObj({obj: <defaults + placeholder key>})` produces a valid 152-char vData. This is a one-liner to run at the CLI; it proves the profile shape is consumable.
+1. **Locate module 18.** Grep the vm-slide disassembly and `sample/t_captcha_slide.js` for the literal strings `"tlg"` and `"sess"`. Narrow to the function body that dispatches on the `tag` argument. Record the PC range (if it's vm-slide bytecode) or the webpack module id + function offset (if it's orchestrator JS).
+2. **Decompile module 18.** Produce a pseudocode JS function equivalent to the bytecode / minified source. Pay attention to: (a) how it parses the `body` argument — is it `body.split("&")` form-encoded, is it JSON, is it a raw string it walks character-by-character? (b) what structure it returns — the caller does `.split("")` and `.charAt()`, so both return values must be strings.
+3. **Reference impl.** Write `research/vm-slide-stack-vm/module18-body-parser.js` exporting `lookup(body, tag)` as a pure function (no DOM dependencies). Write the minimal Node.js test harness inside the same file (via `if (require.main === module) ...`) that runs against a real HAR POST body and prints the two lookup results.
+4. **Reproduce `obj.key = "21L2"` from HAR.** Extract the verify POST body from `sample/captcha-har.har` (look for the `cap_union_new_verify` POST; the pre-injection body is what gets passed to the `key` accumulator — 45.1a must determine whether it's the body with or without `&vData=...`). Plug the body through the fn 22730 accumulator loop (pseudocode above) using the new `lookup` impl. Assert that `obj.key === "21L2"`.
+5. **Document**. Write `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with: §1 Location (PC range / module id), §2 Decompiled Pseudocode, §3 Tag Behaviour Table (one row per tag the vm-slide codebase passes — start with `"tlg"` and `"sess"`; search the disassembly for any additional tags), §4 Edge Cases (empty body, missing tag, non-ASCII, multiple same-named fields), §5 HAR reproduction proof for `obj.key = "21L2"`.
+6. **Cross-check against the jsdom fixture**. `vdata-jsdom-capture.json`'s `obj.key = "qLCZ"` was produced by the jsdom harness, NOT by a real body. If the jsdom harness passes through the same accumulator loop, we can additionally reproduce "qLCZ" from whatever body the harness synthesizes — optional but strengthens the evidence.
 
 ### Verification
-- [ ] `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` exists with all four required sections (Decision Table, Key Digest Porting Spec, Browser Profile Template, Open Questions).
-- [ ] Decision Table covers all 8 fields with explicit classification + justification.
-- [ ] Browser Profile Template is a valid JSON block that `buildVDataFromObj` can consume (self-check via CLI one-liner: `node tools/vdata-generator/cli.js from-obj --obj <profile-with-placeholder-key>` exits 0 and prints a 152-char string ending in `YY`).
-- [ ] Key Digest Porting Spec names the exact function in `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` that implements the digest, and spells out input/output types.
-- [ ] No code changes in `tools/vdata-generator/`, `tools/scraper/`, or `profiles/`. This task is research-only.
-- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, or any existing research note (append-only: create a new file).
+- [ ] `research/vm-slide-stack-vm/module18-body-parser.js` exists and `node research/vm-slide-stack-vm/module18-body-parser.js` exits 0, printing the HAR body's `"tlg"` and `"sess"` lookup results.
+- [ ] `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` exists with all five required sections.
+- [ ] The reference impl + fn 22730 accumulator loop reproduces `obj.key = "21L2"` from the HAR POST body byte-identically. This check is explicitly asserted inside the test harness and its assertion passes when run.
+- [ ] Location section names the PC range (vm-slide) or webpack module id + offset (orchestrator) where module 18 was found.
+- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, `tools/`, or any existing research note or doc (append-only: two new files).
 
 ### Constraints
 - **Do not make any git commits.** The director handles all commits after verification.
-- **Do not modify `tools/vdata-generator/`, `tools/scraper/`, or any existing file.** This task produces exactly one new file: `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`.
-- **Do not start porting the `key` digest yet.** The decision document is the deliverable; 45.2 does the porting.
-- **If a field's classification is genuinely ambiguous** (e.g. you think `tp` should be port-as-code but can't pin what fn 22400 reads from), document the ambiguity in §4 Open Questions with evidence and pick the recommendation that costs the least implementation work. 45.2 can revisit if needed.
+- **Do not modify `tools/vdata-generator/` or `tools/scraper/`.** 45.1a is research-only; 45.2 imports the reference impl later.
+- **Do not modify `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` or any other existing file.** This task produces exactly two new files.
+- **Reproducing `"21L2"` is non-negotiable.** A decompile that doesn't round-trip the HAR body to the known fixture key is wrong. If you cannot reproduce it, stop and report what you got instead; the director will replan.
 - **If the task is too difficult or impossible to complete**, stop immediately and report back. Explain what you attempted, what went wrong, and why you believe the task cannot be completed as specified. Do not leave behind partial or broken changes.
 
 ### Suggested Agent
-`general-purpose` — research + writing task, no tool-specific skills needed beyond reading existing docs and producing a clean Markdown deliverable with a decision table.
+`general-purpose` — bytecode reading + decompile + Node.js reference impl + Markdown write-up. No specialised tool needed; the existing disassembly artifacts in `output/vm-slide/` are the primary reading material.
