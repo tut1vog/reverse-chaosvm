@@ -568,11 +568,12 @@ class Scraper {
           this._jquerySource = fs.readFileSync(jqueryPath, 'utf8');
         }
 
-        // (k) Get vm-slide source (only needed by the legacy jsdom harness)
-        let vmSlideSource = null;
-        if (this.legacyVdata) {
-          vmSlideSource = await this._getVmSlideSource(sig);
-        }
+        // (k) Fetch /vm-slide.enc.js from the show-page config URL. Real browsers
+        // always issue this request (HAR entry 6); skipping it is a distinctive
+        // bot tell. The default path discards the fetched body and still uses the
+        // committed sample/vm_slide.js cache for vData generation — only the
+        // network observation matters here.
+        const vmSlideSource = await this._getVmSlideSource(sig);
 
         // (l) Build the 38 verify POST fields
         const postFields = this._buildPostFields(client, session, sig, ans, collectVal, eks);
