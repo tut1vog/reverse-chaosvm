@@ -24,6 +24,7 @@ const { generateVData, parseVmSlideUrl } = require('./vdata-harness');
 const { buildVDataForPost } = require('../vdata-generator/for-post');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
+const { buildPreVerifyBeaconUrl, buildPostVerifyBeaconUrl, fireBeacon } = require('./caplog-beacon');
 const { execFile } = require('child_process');
 const os = require('os');
 
@@ -89,6 +90,8 @@ class Scraper {
     // standalone buildVDataForPost (browser-like profile). --legacy-vdata
     // keeps the jsdom harness path alive for Phase 45.6 A/B comparison.
     this.legacyVdata = !!cfg.legacyVdata;
+    // Phase 46.4: /caplog telemetry beacons. Default on; --skip-caplog disables.
+    this.skipCaplog = cfg.skipCaplog === true;
     this.vdataProfilePath = cfg.vdataProfile || DEFAULT_VDATA_PROFILE_PATH;
     this._vdataProfile = null;
 
@@ -430,6 +433,10 @@ class Scraper {
       try {
         this._log(`Attempt ${attempt}/${this.maxRetries}`);
 
+        // Phase 46.4: capture solve-start timestamp for the pre-verify caplog
+        // beacon (HAR entry 8 uses this as its reference t0 for fields 5..16).
+        const t0 = Date.now();
+
         // (a) prehandle — get session
         this._log('Step 1: prehandle');
         const session = await client.prehandle();
@@ -575,6 +582,15 @@ class Scraper {
         // network observation matters here.
         const vmSlideSource = await this._getVmSlideSource(sig);
 
+        // (k2) Phase 46.4: fire the pre-verify /caplog telemetry beacon. Real
+        // Chrome emits this between tdc.js load and the verify POST (HAR
+        // entry 8). fire-and-forget — errors are swallowed inside fireBeacon.
+        if (!this.skipCaplog) {
+          this._log('Step 7a: caplog pre-verify beacon');
+          const preUrl = buildPreVerifyBeaconUrl({ t0 });
+          await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000 });
+        }
+
         // (l) Build the 38 verify POST fields
         const postFields = this._buildPostFields(client, session, sig, ans, collectVal, eks);
 
@@ -612,6 +628,15 @@ class Scraper {
         });
 
         this._log(`  errorCode: ${result.errorCode}, ticket: ${result.ticket ? result.ticket.slice(0, 30) + '...' : 'none'}`);
+
+        // Phase 46.4: fire the post-verify /caplog telemetry beacon (HAR
+        // entry 10). Must fire on both success and failure paths. Uses the
+        // solved x-answer as the field-27 slide-dx proxy.
+        if (!this.skipCaplog) {
+          this._log('Step 9: caplog post-verify beacon');
+          const postUrl = buildPostVerifyBeaconUrl({ ans: xAnswer });
+          await fireBeacon(postUrl, { userAgent: this.userAgent, timeoutMs: 3000 });
+        }
 
         if (result.errorCode === 0 || (result.errorCode === -1 && result.ticket)) {
           return {

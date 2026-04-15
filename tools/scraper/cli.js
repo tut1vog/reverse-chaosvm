@@ -31,6 +31,8 @@ Options:
                        (default: standalone buildVDataForPost + browser profile)
   --vdata-profile <p>  Path to a vData browser-profile JSON file
                        (default: profiles/vdata-browser-default.json)
+  --skip-caplog        Suppress the /caplog telemetry beacons fired around
+                       verify (default: beacons are sent)
   --help, -h           Show this help message
 
 Examples:
@@ -48,6 +50,7 @@ function parseArgs(argv) {
     captchaOnly: false,
     legacyVdata: false,
     vdataProfile: null,
+    skipCaplog: false,
     help: false,
     url: null,
   };
@@ -63,6 +66,8 @@ function parseArgs(argv) {
       args.captchaOnly = true;
     } else if (arg === '--legacy-vdata') {
       args.legacyVdata = true;
+    } else if (arg === '--skip-caplog') {
+      args.skipCaplog = true;
     } else if (arg === '--vdata-profile') {
       args.vdataProfile = argv[++i];
       if (!args.vdataProfile) {
@@ -118,6 +123,7 @@ async function main() {
     verbose: args.verbose,
     legacyVdata: args.legacyVdata,
     vdataProfile: args.vdataProfile,
+    skipCaplog: args.skipCaplog,
     maxRetries: args.retries,
   });
   await scraper.init();
