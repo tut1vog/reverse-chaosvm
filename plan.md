@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (drafted 2026-04-15, awaiting user confirmation — HOLD DISPATCH)
-Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scraper path (drafted, not dispatched)
+Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
+Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scraper path (in-progress)
 
 **Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
@@ -93,7 +93,7 @@ Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scra
 
 ---
 
-### Phase 46: Request-chain fidelity + TLS impersonation, errorCode 0 path (drafted 2026-04-15, HOLD DISPATCH)
+### Phase 46: Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
 
 > **Framing** — Phase 45.6 surfaced the real picture: every "success" the scraper got was a `t03tserver...` ticket issued with `errorCode: -1`, which is Tencent's **bypass / pity-ticket lane**, not the full-verification lane. A real browser gets `t01...` / `t02...` tickets with `errorCode: 0`. The two lanes use different routing decisions at the verify endpoint, and everything we optimised in Phase 45 (vData plaintext content) moved us within the bypass lane only — it never put us on the `errorCode 0` path because we were never knocking on that door.
 >
@@ -111,7 +111,7 @@ Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scra
 
 | ID | Task | Status |
 |----|------|--------|
-| 46.1 | **Restore `/vm-slide.enc.js` live fetch on the default scraper path.** Phase 45.4 made the `_getVmSlideSource` call at `tools/scraper/scraper.js:572` conditional on `this.legacyVdata` as a perf optimization — the default path never hits the vm-slide URL. Real browsers always fetch it (HAR entry 6). Undo the conditional so both paths fetch the live `/vm-slide.enc.js` from the show-page config URL, discarding the body on the default path (it still uses the committed `sample/vm_slide.js` cache for vData generation — only the network request matters here, not the parsed source). Keep the fetched-source reuse behaviour in legacy mode unchanged. Cache the fetch within a single scraper invocation. | pending |
+| 46.1 | **[in-progress]** **Restore `/vm-slide.enc.js` live fetch on the default scraper path.** Phase 45.4 made the `_getVmSlideSource` call at `tools/scraper/scraper.js:572` conditional on `this.legacyVdata` as a perf optimization — the default path never hits the vm-slide URL. Real browsers always fetch it (HAR entry 6). Undo the conditional so both paths fetch the live `/vm-slide.enc.js` from the show-page config URL, discarding the body on the default path (it still uses the committed `sample/vm_slide.js` cache for vData generation — only the network request matters here, not the parsed source). Keep the fetched-source reuse behaviour in legacy mode unchanged. Cache the fetch within a single scraper invocation. | pending |
 | 46.2 | **Tests for 46.1** (different agent). Lock the wire-level invariant that both `legacyVdata=false` and `legacyVdata=true` issue at least one GET to a URL matching `/vm-slide(\.[^/]+)?\.enc\.js` per `solveCaptcha()`, via a local HTTP server that the scraper is pointed at (through a URL-rewriting test double or a globally-mocked `httpRequest`). Assert that the default path does NOT skip this request. One regression-oriented test file under `tests/`. `npm test` must stay green. | pending |
 | 46.3 | **Live re-measurement after 46.1** (director-owned, live network). 30 atomic default-path invocations from the same IP, same protocol as 45.6 (`--captcha-only --retries 1`, no gap, single arm). Record ticket prefix per attempt and bucket errorCode outcomes. Compare to the 45.6 default-arm baseline and to the Phase 45.6 gap1s follow-up. The primary question is **whether any attempt flips from `t03tserver` to `t01` or `t02`**. Log to `output/phase-46-errorcode-0/46.3-after-vmslide.{log,jsonl}`. Writes a short verdict block in `docs/ERRORCODE_12_INVESTIGATION.md` and appends a passed/failed entry to `history/<YYYYMMDD>.md`. | pending |
 | 46.4 | **Add `/caplog` telemetry beacons around verify.** Real browser sends a `/caplog?appid=20128&1=0&2=0&3=0&4=0&5=<ts>&6=<ts>&...` GET between tdc.js load and verify, and a second `/caplog?appid=20128&27=<slide_dx>&29=&31=<num>&32=0&...` GET AFTER verify. HAR entries 7 and 9 (see `sample/captcha-har.har`). Both are fire-and-forget — the response doesn't affect the scraper's state machine. Implementation goal: port the two beacon URL shapes from HAR (field-by-field table in the task's Context when dispatched), emit the pre-verify beacon after step 4 (downloadTdc) and before step 8 (verify), emit the post-verify beacon after step 8 regardless of errorCode. Use sensible placeholder values for fields we cannot synthesize (e.g. timer fields get `Date.now()` and recent deltas). Keep both beacons under a `--skip-caplog` escape hatch for isolation during 46.6 and for the existing offline tests. | pending |
@@ -142,7 +142,7 @@ Current task: 46.1 — Restore `/vm-slide.enc.js` live fetch on the default scra
 **ID**: 46.1
 **Title**: Restore `/vm-slide.enc.js` live fetch on the default scraper path
 **Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
-**Status**: drafted — **HOLD DISPATCH, awaiting user confirmation of the Phase 46 plan**
+**Status**: in-progress (dispatched 2026-04-15)
 
 ### Goal
 Undo the Phase 45.4 optimization that made `_getVmSlideSource(sig)` conditional on `this.legacyVdata` in `tools/scraper/scraper.js`. Real browsers always fetch `/vm-slide.enc.js` from `t.captcha.qq.com` as part of the verify flow (HAR entry 6). The default path currently skips this request, which is a distinctive "IP never pulled the JS it should have" tell for Tencent's bot scoring — the top-ranked gap on the Phase 46 ladder. After 46.1 the default path will make the same network observation a real browser does, while still using the committed `sample/vm_slide.js` cache to build vData (the fetched body is discarded on the default path).
