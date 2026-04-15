@@ -10,13 +10,22 @@
 //      `{cLod, env, inf, key, py, ss, tp, version}`. Field names are
 //      hardcoded in fn 22317 at pcs 23755..23880 (see FINGERPRINT-SCHEMA.md).
 //   2. fn 22317 joins `key + "=" + obj[key]` for each field with "&"
-//      (pcs 23995..24161). The field ORDER at the join boundary is NOT
-//      pure alphabetical even though a .sort() call is present at pc 23949
-//      — HAR fixture observably ships `[inf,env,tp,cLod,version,key,ss,py]`,
-//      jsdom ships `[inf,env,tp,key,py,ss,cLod,version]`. The join order is
-//      therefore a caller-supplied input to this reference implementation,
-//      not a fixed schema. Both are tracked as `FIELD_ORDER_JSDOM` /
-//      `FIELD_ORDER_HAR` below for the cross-check fixtures.
+//      (pcs 23995..24161). Before the join, the schema array is shuffled
+//      in place by `arr.sort(cmp)` at pc 23949, where `cmp` is fn 23898 —
+//      a closure whose body literally returns `Math.random() > 0.5 ? 1 : -1`
+//      (the well-known JS Fisher-Yates anti-pattern). Verified by walking
+//      fn 23898's body [23898..23944]: OP_41/OP_02 calls Math.random,
+//      OP_08 0.5 + OP_31 compares to 0.5, OP_60 23941 branches, the taken
+//      arm pushes `1` and the not-taken arm pushes `-1`. See
+//      SORT-ORDER-RESOLUTION.md for the full pseudocode and pc citations.
+//
+//      The join order is therefore non-deterministic at vm-slide runtime
+//      (a uniformly-random-ish shuffle of the 8 schema entries). For the
+//      reference impl we accept either an explicit `order` array OR an
+//      `obj` whose own enumeration order already matches the desired join
+//      order — the default uses `Object.keys(obj)`, which JS preserves
+//      in insertion order for string keys. Both committed fixtures are
+//      reproduced byte-identically with the obj built in observed order.
 //   3. fn 22317 calls `module40.encryptData(joined)` at pc 24163. Module
 //      40's encryptData (entry pc 13860) chains:
 //        step1 = padder(joined)        // fn 13989, entry pc 13989
@@ -51,9 +60,13 @@ const PAD_ALPHABET = '0abcdefghijklmnop';
 const PERM = [0, 4, 8, 12, 5, 9, 13, 1, 10, 14, 2, 6, 15, 3, 7, 11];
 
 // Hardcoded 8 fingerprint field names, built inline at pcs 23755..23880
-// of fn 22317 (exports.getCaptchaData). Alphabetical sorted order is what
-// fn 22317's .sort() call at pc 23949 requests; observed fixtures show the
-// actual shipped order differs (see FIELD_ORDER_* below).
+// of fn 22317 (exports.getCaptchaData) in literal source order. The .sort()
+// call at pc 23949 uses a randomised comparator (fn 23898), so the live
+// runtime emits a uniformly-shuffled permutation of these 8 keys per call.
+// The "alphabetical" name retained below is historical and slightly
+// misleading — the array IS alphabetical, but only by coincidence of the
+// schema; the comparator does not enforce ordering.
+const FIELD_NAMES_LITERAL = ['tp', 'key', 'py', 'env', 'version', 'cLod', 'inf', 'ss'];
 const FIELD_NAMES_ALPHABETICAL = ['cLod', 'env', 'inf', 'key', 'py', 'ss', 'tp', 'version'];
 
 // Observed field orders for the two committed fixtures. These are empirical
@@ -105,15 +118,28 @@ function buildJoined(obj, order) {
   return parts.join('&');
 }
 
-// Top-level API. Given an {obj, order} pair, returns the 112-byte Buffer
-// that fn 22317 hands to XTEA via module 40's encryptData.
+// Top-level API. Given an `obj` (and optionally an explicit `order`),
+// returns the 112-byte Buffer that fn 22317 hands to XTEA via module 40's
+// encryptData.
 //
-//   obj   — object containing all 8 fingerprint fields
-//   order — array of field names in the order fn 22317's sort step
-//           produced for this run (observed, not assumed)
+//   obj   — object containing all 8 fingerprint fields. When `order` is
+//           omitted the join order defaults to `Object.keys(obj)`, i.e.
+//           the obj's own insertion order. JS preserves insertion order
+//           for string keys, so the caller can express any desired join
+//           order simply by building the obj with keys in that order.
+//   order — optional explicit override. When supplied, it is used verbatim
+//           and the obj's insertion order is ignored. Useful for replaying
+//           a captured fixture whose obj was reconstructed key-by-key.
+//
+// Note on the missing "default sort": fn 22317's runtime uses
+// `arr.sort(Math.random()>0.5?1:-1)` (see SORT-ORDER-RESOLUTION.md and the
+// header comment above), so the join order is not statically derivable.
+// The reference impl therefore delegates the choice of order to the caller
+// — either via an explicitly-ordered `obj` or via the `order` override.
 function buildFingerprintPlaintext(input) {
   const { obj, order } = input;
-  const joined = buildJoined(obj, order);
+  const effectiveOrder = order || Object.keys(obj);
+  const joined = buildJoined(obj, effectiveOrder);
   const padded = padToBlock(joined);
   const permuted = permuteBlocks(padded);
   return Buffer.from(permuted, 'latin1');
@@ -122,6 +148,7 @@ function buildFingerprintPlaintext(input) {
 module.exports = {
   PAD_ALPHABET,
   PERM,
+  FIELD_NAMES_LITERAL,
   FIELD_NAMES_ALPHABETICAL,
   FIELD_ORDER_JSDOM,
   FIELD_ORDER_HAR,
