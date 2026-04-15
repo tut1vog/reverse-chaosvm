@@ -191,10 +191,39 @@ const v1 = buildVDataFromObj({ obj });                  // nondeterministic
 const v2 = buildVDataFromObj({ obj, seed: 84121 });     // deterministic via seed
 const v3 = buildVDataFromObj({ obj, order: ['inf','env','tp','key','py','ss','cLod','version'] }); // explicit
 
+// Scraper entry point: key computed from POST body (Phase 45.2):
+const { buildVDataForPost } = require('./tools/vdata-generator/for-post.js');
+const profile = {
+  tp: '7446039806946242560',
+  py: '0',
+  env: '0',
+  version: '2',
+  cLod: 'loadTDC',
+  inf: 'iframe',
+  ss: '11%2Ctdc%2Cslide%2Cvm',
+  // key: '__COMPUTED__'  // optional sentinel; absent is also fine
+};
+const body = 'tlg=8128&sess=s1LCqg-Z2OZiIDOktcwDJ4mtzyDd91soncHQX79s';
+const vdata = buildVDataForPost(body, { profile });
+if (vdata.length !== 152) throw new Error('expected 152-char vData');
+
 // Pre-cipher plaintext builder, exposed standalone:
 const { buildPlaintext } = require('./tools/vdata-generator/build-plaintext.js');
 const buf112 = buildPlaintext({ obj, order });
 ```
+
+### Caller preconditions for `buildVDataForPost`
+
+- The `postBody` MUST contain a `tlg=<digits>` substring where every digit
+  value is a valid index into the `sess` value (the orchestrator sets
+  `tlg = collect.length`, so the scraper wiring in Phase 45.4 must ensure
+  this before calling `buildVDataForPost`).
+- The `postBody` MUST contain a `sess=<string>` substring whose length is at
+  least `max(digits) + 1`.
+- `profile.key` must be absent or equal to the literal `'__COMPUTED__'`
+  sentinel; any other value throws. `overrides.key` is likewise rejected.
+  The computed `key` comes from `computeKeyField(postBody)` unconditionally —
+  a body-independent key would be a trivial server-side detector.
 
 `encodeVData` / `encryptOnly` accept either a `Buffer` or an even-length hex
 string and throw if the plaintext is not exactly 112 bytes. `buildVData` and

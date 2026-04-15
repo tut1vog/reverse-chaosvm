@@ -26,6 +26,7 @@ const { encodeVData, encryptOnly, XTEA_KEY_HEX, PLAINTEXT_LENGTH } = require('./
 const { buildVData } = require('./replay.js');
 const { buildPlaintext } = require('./build-plaintext.js');
 const { buildVDataFromObj, SCHEMA } = require('./build-from-obj.js');
+const { buildVDataForPost } = require('./for-post.js');
 
 const HELP_TEXT = `
 vData Encoder — Standalone CLI
@@ -60,6 +61,23 @@ From-obj mode (Phase 44.5b — full synthesis from an 8-field obj):
   --order <path>          JSON file: explicit join-order override (skips shuffle)
   --self-check            Synthesize both committed fixtures and assert byte-identical
   --verbose               Print shuffled order + plaintext hex to stderr
+  --help, -h              Show this help and exit
+
+For-post mode (Phase 45.2 — scraper entry point: key computed from POST body):
+  node tools/vdata-generator/cli.js for-post --body <string-or-@file> --profile <json-or-@file>
+                                             [--overrides <json>] [--order <json-array>]
+                                             [--ie9-fallback]
+
+  --body <val>            POST body. Either an inline string or @path to read
+                          UTF-8 from a file (trailing '\\n' is trimmed).
+  --profile <val>         7-field profile (tp, py, env, version, cLod, inf, ss).
+                          Either inline JSON or @path. Profile.key must be
+                          absent or the literal "__COMPUTED__" sentinel.
+  --overrides <json>      Optional inline JSON object merged over the profile.
+                          Must NOT contain a "key" field.
+  --order <json-array>    Optional inline JSON array passed through to
+                          buildVDataFromObj (skips the default shuffle).
+  --ie9-fallback          Take fn 22730's IE9 branch (hardcoded [4,2,3,10]).
   --help, -h              Show this help and exit
 
 Notes:
@@ -531,6 +549,128 @@ function runFromObjMode(args) {
   process.exit(0);
 }
 
+// ---------- for-post mode (Phase 45.2) ----------
+
+// Resolve a --body / --profile argument that may be either an inline value
+// or `@path`. For @path form, reads the file as UTF-8 and trims a single
+// trailing '\n' if present. Inline values are returned verbatim.
+function resolveInlineOrFile(raw, label) {
+  if (typeof raw !== 'string') {
+    throw new Error(label + ' requires a string value');
+  }
+  if (raw.length === 0) throw new Error(label + ' is empty');
+  if (raw.charAt(0) !== '@') return raw;
+  const filePath = raw.slice(1);
+  let contents;
+  try {
+    contents = fs.readFileSync(filePath, 'utf8');
+  } catch (err) {
+    throw new Error(label + ': cannot read ' + filePath + ': ' + err.message);
+  }
+  if (contents.length > 0 && contents.charAt(contents.length - 1) === '\n') {
+    contents = contents.slice(0, -1);
+  }
+  return contents;
+}
+
+function parseForPostArgs(args) {
+  const flags = {};
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--help' || arg === '-h') {
+      flags.help = true;
+    } else if (arg === '--ie9-fallback') {
+      flags.ie9Fallback = true;
+    } else if (arg === '--body') {
+      if (i + 1 >= args.length) return { error: '--body requires a value' };
+      flags.body = args[++i];
+    } else if (arg === '--profile') {
+      if (i + 1 >= args.length) return { error: '--profile requires a value' };
+      flags.profile = args[++i];
+    } else if (arg === '--overrides') {
+      if (i + 1 >= args.length) return { error: '--overrides requires a JSON string' };
+      flags.overrides = args[++i];
+    } else if (arg === '--order') {
+      if (i + 1 >= args.length) return { error: '--order requires a JSON array' };
+      flags.order = args[++i];
+    } else {
+      return { error: 'unknown argument: ' + arg };
+    }
+  }
+  return flags;
+}
+
+function runForPostMode(args) {
+  const flags = parseForPostArgs(args);
+
+  if (flags.error) {
+    process.stderr.write('Error: ' + flags.error + '\n');
+    process.stderr.write('Use --help for usage.\n');
+    process.exit(2);
+  }
+
+  if (flags.help) {
+    process.stdout.write(HELP_TEXT + '\n');
+    process.exit(0);
+  }
+
+  if (flags.body == null) {
+    process.stderr.write('Error: for-post mode requires --body <string-or-@file>.\n');
+    process.exit(2);
+  }
+  if (flags.profile == null) {
+    process.stderr.write('Error: for-post mode requires --profile <json-or-@file>.\n');
+    process.exit(2);
+  }
+
+  let body;
+  let profile;
+  let overrides;
+  let order;
+  try {
+    body = resolveInlineOrFile(flags.body, '--body');
+    const profileRaw = resolveInlineOrFile(flags.profile, '--profile');
+    try {
+      profile = JSON.parse(profileRaw);
+    } catch (err) {
+      throw new Error('--profile: invalid JSON: ' + err.message);
+    }
+    if (flags.overrides != null) {
+      try {
+        overrides = JSON.parse(flags.overrides);
+      } catch (err) {
+        throw new Error('--overrides: invalid JSON: ' + err.message);
+      }
+    }
+    if (flags.order != null) {
+      try {
+        order = JSON.parse(flags.order);
+      } catch (err) {
+        throw new Error('--order: invalid JSON: ' + err.message);
+      }
+    }
+  } catch (err) {
+    process.stderr.write('Error: ' + err.message + '\n');
+    process.exit(2);
+  }
+
+  let vdata;
+  try {
+    vdata = buildVDataForPost(body, {
+      profile,
+      overrides,
+      order,
+      ie9Fallback: !!flags.ie9Fallback,
+    });
+  } catch (err) {
+    process.stderr.write('Error: ' + err.message + '\n');
+    process.exit(1);
+  }
+
+  process.stdout.write(vdata + '\n');
+  process.exit(0);
+}
+
 // ---------- top-level dispatch ----------
 
 function parseArgs(argv) {
@@ -550,6 +690,11 @@ function main() {
 
   if (argv.length > 0 && argv[0] === 'from-obj') {
     runFromObjMode(argv.slice(1));
+    return;
+  }
+
+  if (argv.length > 0 && argv[0] === 'for-post') {
+    runForPostMode(argv.slice(1));
     return;
   }
 
