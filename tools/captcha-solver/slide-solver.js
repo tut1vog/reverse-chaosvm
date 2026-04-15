@@ -20,7 +20,7 @@ const path = require('path');
 // Resolve paths relative to this file's location
 const SCRIPT_DIR = __dirname;
 const PYTHON_SCRIPT = path.join(SCRIPT_DIR, 'slide-solver.py');
-const PROJECT_ROOT = path.resolve(SCRIPT_DIR, '..');
+const PROJECT_ROOT = path.resolve(SCRIPT_DIR, '..', '..');
 const PYTHON_BIN = path.join(PROJECT_ROOT, '.venv', 'bin', 'python3');
 
 /**

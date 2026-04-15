@@ -118,6 +118,7 @@ async function main() {
     verbose: args.verbose,
     legacyVdata: args.legacyVdata,
     vdataProfile: args.vdataProfile,
+    maxRetries: args.retries,
   });
   await scraper.init();
 

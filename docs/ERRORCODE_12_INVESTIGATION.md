@@ -40,6 +40,58 @@ If errorCode 12 is worth fixing:
 3. Test from a fresh IP — does the 8–10 attempt window reset?
 4. Test with a warm-up phase (a few "real" solves via Puppeteer before the scraper attempts start).
 
+## Phase 45.6 re-test — 2026-04-15 (vData fingerprint swap)
+
+The Phase 36 survey above pre-dated the vm-slide `vData` reversal. In Phase 43/44
+we pinned vData's cipher pipeline and plaintext schema, and in Phase 45 we swapped
+the scraper's default vData generation from live jsdom (which leaks four
+jsdom-specific field values `tp` / `cLod` / `inf` / `ss`) to the standalone
+`buildVDataForPost` pipeline using HAR-derived browser-like values from
+`profiles/vdata-browser-default.json`. Phase 45.6 measures the effect empirically.
+
+**Survey protocol.** Same IP (`111.119.253.170`), same day (2026-04-15), 30
+atomic `--captcha-only --retries 1` invocations per arm, one arm at a time, no
+delay between attempts. Auto-port failures on two new tdc.js template hashes
+(`88ebeea62f566ec5`, `f53142c54fc43699`) are unrelated to the vData payload and
+are excluded from the rate calculations. Raw logs:
+`output/phase-45-errorcode-12-survey/{default,legacy}.log`; parsed summary at
+`output/phase-45-errorcode-12-survey/summary.json`.
+
+| Arm     | Path                                   | N_total | N_valid | success (-1) | errorCode 12 | errorCode 9 |
+|---------|----------------------------------------|---------|---------|--------------|--------------|-------------|
+| default | `buildVDataForPost` + browser profile | 30      | 21      | **6 (28.6%)**| 13 (61.9%)   | 2 (9.5%)    |
+| legacy  | jsdom vm-slide (`generateVData`)       | 30      | 18      | 0 (0.0%)     | **17 (94.4%)** | 1 (5.6%)  |
+
+**Two-proportion z-tests** (errorCode 12 is primary, success rate is secondary):
+
+- errorCode 12 rate: **default 61.9% vs legacy 94.4%**, z = −2.40 (p ≈ 0.016, significant at α = 0.05).
+- Success rate: **default 28.6% vs legacy 0.0%**, z = +2.47 (p ≈ 0.014, significant at α = 0.05).
+
+**Verdict: improved.** On the same IP and same day, swapping the live jsdom
+vData path for the standalone browser-profile path recovers a non-zero success
+rate on the verify endpoint and drops the errorCode 12 rate by ~33 percentage
+points. Both effects are statistically significant at p < 0.05. This confirms
+— empirically, for the first time in this project — that errorCode 12 is
+sensitive to the content of the vData plaintext, not just to the presence of a
+well-formed cipher blob. The four jsdom tells in the legacy path (`cLod =
+'unloadTDC'`, `inf = 'top'`, `tp = 'Cannot read properties of null (reading
+'src')'`, jsdom-derived `ss`) are visible fingerprint differentiators the
+server scores on.
+
+Caveats:
+- 28.6% success is far from 100%; other sub-signals (behavioral events,
+  referer/cookie chain, TLS fingerprint) likely still contribute. The Phase 36
+  hypotheses about behavioral scoring and reputation are not displaced — this
+  survey only isolates the vData contribution.
+- Sample sizes after exclusion (21 / 18) are small; the z-tests are directional
+  evidence, not a tight effect-size estimate.
+- The browser profile was built from the HAR oracle; field values drawn from
+  that single capture may themselves become stale as Tencent rotates fixtures.
+
 ## Status
 
-Open. Token generation is verified correct; the remaining issue is on the request-presentation / behavioral side.
+**Partially mitigated (2026-04-15).** vData fingerprint content has been shown
+to materially affect errorCode 12 incidence, and the default scraper path now
+uses browser-like vData values. Residual errorCode 12 is still the majority
+outcome (61.9% valid), so behavioral / header-chain investigation from the
+earlier "Next Investigation Steps" list remains relevant.

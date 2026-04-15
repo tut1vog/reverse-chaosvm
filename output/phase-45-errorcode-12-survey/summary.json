@@ -1,0 +1,27 @@
+{
+  "arms": {
+    "default": {
+      "total": 30,
+      "autoport_fail": 9,
+      "n_valid": 21,
+      "buckets": {
+        "-1": 6,
+        "12": 13,
+        "9": 2
+      }
+    },
+    "legacy": {
+      "total": 30,
+      "autoport_fail": 12,
+      "n_valid": 18,
+      "buckets": {
+        "12": 17,
+        "9": 1
+      }
+    }
+  },
+  "interpretation_rule": "auto-port failures excluded from rate calculations (unrelated to vData payload)",
+  "ip": "111.119.253.170",
+  "date": "2026-04-15",
+  "retries_per_cli": 1
+}

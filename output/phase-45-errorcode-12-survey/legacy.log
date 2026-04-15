@@ -1,0 +1,1038 @@
+=== legacy attempt 1/30 @ 2026-04-15T07:40:21Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1GcrUtimByGemb-BtRu...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18101 bytes, slice: 5744 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 161122 chars
+[scraper]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[scraper]   Source hash: 02fd132edb24a8c1
+[scraper]   Template: C, opcodes: 100
+[scraper]   eks: hDQWk58y3JZWLhcnJ370...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 491
+[scraper]   ans: 491,32;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 15320
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: vB6RMD7RSXm7WywNzbSz_ekeHWmwPR...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 16698
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 2/30 @ 2026-04-15T07:40:23Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1mZW9dM9GrWwyvGm5Wb...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 27918 bytes, slice: 8490 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 202765 chars
+[scraper]   TDC_NAME: HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA
+[scraper]   Source hash: 27dda893f81dbc4f
+[scraper]   Template: unknown, opcodes: 103
+[scraper]   eks: Tgy41O9hA64Q12bHkFSr...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 451
+[scraper]   ans: 451,65;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13152
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14530
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 3/30 @ 2026-04-15T07:40:25Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s18TM9GDvZsbl4QdtmVt...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 11614 bytes, slice: 4640 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 202765 chars
+[scraper]   TDC_NAME: HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA
+[scraper]   Source hash: 27dda893f81dbc4f
+[scraper]   Template: unknown, opcodes: 103
+[scraper]   eks: flc59gK/f3t8wuEL2LSX...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 499
+[scraper]   ans: 499,93;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13888
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 15266
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== legacy attempt 4/30 @ 2026-04-15T07:40:26Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1yqJQESzmaxBztxcfPE...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 27975 bytes, slice: 8522 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 5/30 @ 2026-04-15T07:40:28Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s193Ft-rsq4ZMGF1u55J...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 27915 bytes, slice: 9097 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 162790 chars
+[scraper]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[scraper]   Source hash: e2170903e201e018
+[scraper]   Template: unknown, opcodes: 93
+[scraper]   eks: 8nGJt02GjuHFWdmhhGqN...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 259
+[scraper]   ans: 259,34;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10424
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 11802
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 9, ticket: none
+[scraper]   Failed with errorCode 9, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 9
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 9
+--- rc=1 duration=2s ---
+=== legacy attempt 6/30 @ 2026-04-15T07:40:30Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1bfGsTTqCT8dLUnpl_B...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 11538 bytes, slice: 5996 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: 1RvBAyeXei3X6pRSBWHr...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 469
+[scraper]   ans: 469,158;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12408
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13787
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 7/30 @ 2026-04-15T07:40:32Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1nwpNqBOI9ZBrl3bM_m...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18122 bytes, slice: 6041 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 202765 chars
+[scraper]   TDC_NAME: HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA
+[scraper]   Source hash: 27dda893f81dbc4f
+[scraper]   Template: unknown, opcodes: 103
+[scraper]   eks: CxZHAKsaTzUGCbYIFo0V...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 497
+[scraper]   ans: 497,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12568
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13946
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 8/30 @ 2026-04-15T07:40:34Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1FEVoZ0JxGGpnh2Ml5U...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 24693 bytes, slice: 6779 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 129582 chars
+[scraper]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[scraper]   Source hash: e6a45ba64d246f82
+[scraper]   Template: unknown, opcodes: 98
+[scraper]   eks: Zai0AWB0Wq7i187+JaEN...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 483
+[scraper]   ans: 483,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10552
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 11930
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 9/30 @ 2026-04-15T07:40:36Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1DINuDw1fdGPgmYlH_C...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 20449 bytes, slice: 7398 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 161122 chars
+[scraper]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[scraper]   Source hash: 02fd132edb24a8c1
+[scraper]   Template: C, opcodes: 100
+[scraper]   eks: QApEw6G1Kb8sktjYKRQZ...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 507
+[scraper]   ans: 507,30;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12928
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14306
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 10/30 @ 2026-04-15T07:40:38Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1Uj6zp62eP0qmS0dWvC...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18119 bytes, slice: 5794 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: gaG9NZuvZt4hEY0s6RhM...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 485
+[scraper]   ans: 485,36;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10892
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 12270
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=1s ---
+=== legacy attempt 11/30 @ 2026-04-15T07:40:39Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1-UJGx4NgM6V9H5sXUm...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18106 bytes, slice: 5875 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197545 chars
+[scraper]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[scraper]   Source hash: f53142c54fc43699
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: f53142c54fc43699
+[scraper] Auto-port failed for f53142c54fc43699: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-f53142c54fc43699.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=f53142c54fc43699), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=f53142c54fc43699), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=f53142c54fc43699), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 12/30 @ 2026-04-15T07:40:41Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1hvolxTA8SKDPwwwQJY...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18073 bytes, slice: 5981 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 161122 chars
+[scraper]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[scraper]   Source hash: 02fd132edb24a8c1
+[scraper]   Template: C, opcodes: 100
+[scraper]   eks: Hplr0131FIESbBx1o4QF...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 462
+[scraper]   ans: 462,46;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13240
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: nC9XTe-CKhO4vKS5ihT6mvfJ_O6M-T...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 14617
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 13/30 @ 2026-04-15T07:40:43Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1DwLHeIPW6hYggkxyQk...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18139 bytes, slice: 5837 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: G6hNF3ReMsboG/bLHwgj...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 518
+[scraper]   ans: 518,158;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 12428
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: XvOFebMiaDlehPcWw6aZQw-zQU1hE2...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13807
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 14/30 @ 2026-04-15T07:40:45Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1ShDJm9q3aL0Y1SlEsR...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 25146 bytes, slice: 5865 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 161122 chars
+[scraper]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[scraper]   Source hash: 02fd132edb24a8c1
+[scraper]   Template: C, opcodes: 100
+[scraper]   eks: ZAbuY5mgC3yakFv+p0m5...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 460
+[scraper]   ans: 460,158;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11968
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: zUa7meOeHuZ0yLkq-Rh80JIiPnCypV...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 13346
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 15/30 @ 2026-04-15T07:40:47Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s10r6J6oEgWXMU2bjze7...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22286 bytes, slice: 6547 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=1s ---
+=== legacy attempt 16/30 @ 2026-04-15T07:40:48Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1RwGWot5RqOnMlFkGA0...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 12438 bytes, slice: 4288 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 17/30 @ 2026-04-15T07:40:50Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1POw4_o5bXEyofhyglu...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 24820 bytes, slice: 6346 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 199611 chars
+[scraper]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[scraper]   Source hash: 3429444f324c6110
+[scraper]   Template: unknown, opcodes: 91
+[scraper]   eks: Eag/KwJsfYA+4qBqOvhP...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 483
+[scraper]   ans: 483,68;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10700
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: XvOFebMiaDlehPcWw6aZQc2A5NI_T8...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 12078
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 18/30 @ 2026-04-15T07:40:52Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1zTlpXgI-1s2inofmCY...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 11543 bytes, slice: 5764 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=1s ---
+=== legacy attempt 19/30 @ 2026-04-15T07:40:53Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1cHwFvGYuGC765svbcK...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 12365 bytes, slice: 4307 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: ytXaOqBv/CNpKIECxWND...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 501
+[scraper]   ans: 501,80;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10264
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: ePKmcqg7fZboOBUjxQfoV_fztkzlRR...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 11642
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 20/30 @ 2026-04-15T07:40:55Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1XfKcAH-6thTxTO4n-v...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 15390 bytes, slice: 5060 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197545 chars
+[scraper]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[scraper]   Source hash: f53142c54fc43699
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: f53142c54fc43699
+[scraper] Auto-port failed for f53142c54fc43699: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-f53142c54fc43699.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=f53142c54fc43699), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=f53142c54fc43699), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=f53142c54fc43699), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 21/30 @ 2026-04-15T07:40:57Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1aFW8NFocUHbmLCu4wt...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 12419 bytes, slice: 3817 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=1s ---
+=== legacy attempt 22/30 @ 2026-04-15T07:40:58Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s17cUZQLkkcf0lRGcahX...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18087 bytes, slice: 5607 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 162790 chars
+[scraper]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[scraper]   Source hash: e2170903e201e018
+[scraper]   Template: unknown, opcodes: 93
+[scraper]   eks: gfNNOEWNBYl086FpUAbn...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 459
+[scraper]   ans: 459,85;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10904
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: c_4_6EVb49JNXVTMH8aBWLbpQJ2pkB...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 12282
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 23/30 @ 2026-04-15T07:41:00Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1JtnH7BGAg5otSWc-5y...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 20487 bytes, slice: 6991 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 24/30 @ 2026-04-15T07:41:02Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1QY9i0a5Pzyb09cff89...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 22155 bytes, slice: 6821 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=1s ---
+=== legacy attempt 25/30 @ 2026-04-15T07:41:03Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1EdAKuMIuXQ6vJKgvLB...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 13789 bytes, slice: 5586 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: Ve+O/kEFf6pnnRldq4xx...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 481
+[scraper]   ans: 481,126;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 11128
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: 6KoKshOjaMS9c3bm4CBNN8hxLayny1...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 12507
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 26/30 @ 2026-04-15T07:41:05Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1MB-6Ul4-G5l-Rzu4u2...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 15391 bytes, slice: 4942 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 203186 chars
+[scraper]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[scraper]   Source hash: 88ebeea62f566ec5
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: 88ebeea62f566ec5
+[scraper] Auto-port failed for 88ebeea62f566ec5: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-88ebeea62f566ec5.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=88ebeea62f566ec5), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 27/30 @ 2026-04-15T07:41:07Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1_5T0ICD_Jlcs9iBxy5...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 13707 bytes, slice: 5336 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197545 chars
+[scraper]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[scraper]   Source hash: f53142c54fc43699
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: f53142c54fc43699
+[scraper] Auto-port failed for f53142c54fc43699: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-f53142c54fc43699.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=f53142c54fc43699), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=f53142c54fc43699), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=f53142c54fc43699), auto-port failed
+--- rc=1 duration=1s ---
+=== legacy attempt 28/30 @ 2026-04-15T07:41:08Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1_BZ02GRHaytQyN0fQP...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 18076 bytes, slice: 5565 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 144440 chars
+[scraper]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[scraper]   Source hash: e5341ccb12b78e65
+[scraper]   Template: unknown, opcodes: 96
+[scraper]   eks: +vFpXzFVtbPbZ4baQWCO...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 484
+[scraper]   ans: 484,80;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 13676
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: zUa7meOeHuKI6SRXr-mKkdhiFh7dL2...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 15054
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
+=== legacy attempt 29/30 @ 2026-04-15T07:41:10Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1un_S4YbihS4Xp9GEeF...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 11576 bytes, slice: 5094 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197545 chars
+[scraper]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[scraper]   Source hash: f53142c54fc43699
+[scraper]   Source hash not in cache — attempting auto-port via pipeline...
+[scraper] Auto-porting unknown template: f53142c54fc43699
+[scraper] Auto-port failed for f53142c54fc43699: Command failed: /home/ubuntu/.nvm/versions/node/v20.20.0/bin/node /home/ubuntu/github.com/tut1vog/reverse-chaosvm/tools/porting-pipeline/run.js /tmp/tdc-autoport-f53142c54fc43699.js --skip-verify
+
+[scraper]   Error: Unknown template (hash=f53142c54fc43699), auto-port failed
+[scraper] Attempt 1 failed: Unknown template (hash=f53142c54fc43699), auto-port failed
+Error: CAPTCHA solve failed after 1 attempts: Unknown template (hash=f53142c54fc43699), auto-port failed
+--- rc=1 duration=2s ---
+=== legacy attempt 30/30 @ 2026-04-15T07:41:12Z ===
+[scraper] Template cache loaded and seeded
+[scraper] Default profile loaded
+[scraper] jQuery source loaded (96410 chars)
+[scraper] vm-slide fallback loaded (43688 chars)
+[scraper] Legacy vData path enabled (jsdom harness)
+[scraper] Init complete
+[scraper] Solving CAPTCHA only (no urlsec query)
+[scraper] Attempt 1/1
+[scraper] Attempt 1/1
+[scraper] Step 1: prehandle
+[scraper]   sess: s1A6mQwYGOzwrBBM5SeT...
+[scraper] Step 2: getSig
+[scraper]   nonce: eda1152f11f1daf0
+[scraper] Step 3: downloadImages
+[scraper]   bg: 20487 bytes, slice: 6991 bytes
+[scraper] Step 4: downloadTdc
+[scraper]   tdc source: 197257 chars
+[scraper]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[scraper]   Source hash: daf0c711ccb82124
+[scraper]   Template: B, opcodes: 94
+[scraper]   eks: 0Tc7zspML7QC6f/b/EYX...
+[scraper] Step 5: solveSlider
+[scraper]   rawOffset: 463
+[scraper]   ans: 463,94;
+[scraper] Step 6: generateCollect
+[scraper]   collect length: 10936
+[scraper] Fetching vm-slide from show page HTML: https://t.captcha.qq.com/vm-slide.e201876f.enc.js
+[scraper]   Got live vm-slide (43688 chars)
+[scraper] Step 7: generateVData (legacy jsdom harness)
+[scraper]   vData: SCPx2hIEjSOoHASW4h5j2Zq4FRSoAT...
+[scraper] Step 8: verify
+  [verify] using jQuery prebuilt body, length: 12314
+  [verify] Referer: https://t.captcha.qq.com/cap_union_new_show?aid=2046626881&protocol=https&accver...
+[scraper]   errorCode: 12, ticket: none
+[scraper]   Failed with errorCode 12, retrying...
+[scraper] Attempt 1 failed: CAPTCHA verify returned errorCode 12
+Error: CAPTCHA solve failed after 1 attempts: CAPTCHA verify returned errorCode 12
+--- rc=1 duration=2s ---
