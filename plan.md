@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (Stream B — deliverables; 44.5a/44.5b/44.6 done, only 44.7 docs closeout remaining)
-Current task: 44.7 — docs closeout (director-owned) — awaiting user scope approval
+Current phase: **Phase 44 CLOSED (2026-04-15)** — vm-slide vData end-to-end reproducibility shipped. No active phase; awaiting next user direction.
+Current task: none
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -120,7 +120,7 @@ Current task: 44.7 — docs closeout (director-owned) — awaiting user scope ap
 | 44.5a | **[2026-04-15 done]** Shipped `tools/vdata-generator/{build-plaintext.js, replay.js}` + `replay` CLI subcommand + `--self-check` flag + README. `buildVData({obj, order, overrides})` reproduces both committed fixtures byte-identically (self-check green). Cipher-only mode (`--plaintext-hex`) preserved unchanged. npm test 411/411 — no regressions. No modifications to protected paths. | done |
 | 44.5b | **[2026-04-15 done]** Shipped `tools/vdata-generator/build-from-obj.js` + `from-obj` CLI subcommand with `--obj`, `--seed`, `--order`, `--self-check`. Inline mulberry32 PRNG. Seeded-PRNG experiment found working seeds for BOTH fixtures under Node 20 TimSort: HAR=53818, jsdom=84121 (beat the 30-min budget in <1s). `from-obj --self-check` exits green using `--order` for HAR and `--seed 84121` for jsdom; `--order` path works for both as the portable escape hatch. Nondeterministic default with real `Math.random` also works. npm test 411/411. No regressions. | done |
 | 44.6 | **[2026-04-15 done]** Shipped `tests/test-vdata-builder.js` (14 new tests across 5 suites, black-box discipline: only imports `buildVData` and `buildVDataFromObj`, no internals). Test groups: A replay byte-identical round-trip + no-op overrides + length-matched substitution, B from-obj `order` override, B' from-obj default-`Math.random` shape, C seeded PRNG Node-20-guarded, E fixture integrity canary. Shape helper `assertValidVData` reused across A/B/C. npm test 411→425 (+14), 0 failures, 0 skipped under Node 20.20.0. `package.json` test-script list appended with the new file (explicit file list, not glob-based). No modifications to `tools/vdata-generator/`, `tests/fixtures/`, or any other protected path. | done |
-| 44.7 | **[EXPANDED post-44.2.7]** Docs closeout (director-owned) — expand `docs/VDATA_FORMAT.md` §1 with the 8-field tdc-runtime-state-probe schema (`env, key, version, cLod, ss, tp, py, inf`) + source-rule table + the fn 20539 `proxyXHR` XHR-send-handler entry-point narrative (body-rewrite injection via `savedSend.call` at pc 20751, final 9504 = 9345 + `&vData=` + 152). **Correct `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 + §517** to restore Phase 42's XHR monkey-patch mechanism (fn 20539 installed at pc 20808 onto `XHR.prototype.send`, fn 20353 installed at pc 20473 onto `XHR.prototype.open` as the shared-guard writer) and remove 44.2.6's fn 22317 `getCaptchaData` misattribution + the 44.3-introduced 9504→112 reduction hypothesis. **Reconcile the runtime XTEA key** — document that the bytecode literal seed `34e2c8f07b5169ad` is ALSO the runtime key observed live (contradicting Phase 42/CLAUDE.md's `2e430f8c15b7da96` claim; fold the reconciliation owed by 44.5a into this task). Mark Phase 44 closed; bump CLAUDE.md Project Memory to record the full pipeline + corrected key story. | pending |
+| 44.7 | **[2026-04-15 done]** Docs closeout (director-owned). `docs/VDATA_FORMAT.md` §1 rewritten with end-to-end entry chain; new §7 adds 8-field per-field source table, per-call Fisher-Yates shuffle walk, pad+ShiftRows+XTEA transform chain; §5 public-API table adds `build-plaintext.js` / `replay.js` / `build-from-obj.js` + three-mode examples; §6 provenance table updated with Phase 44 rows; §3 adds the `2e43...`/`34e2...` key reconciliation note. `docs/CAPTCHA_ORCHESTRATOR.md` §6 `vData` subsection corrects the Phase 44.3 "caller-supplied body" misattribution with a full Phase 44.2.8 call chain and a note that `getCaptchaData` is bound inside vm-slide (not in `t_captcha_slide.js`). `CLAUDE.md` Project Memory: new "vData plaintext-build — Phase 44 solved" block, "XTEA key reconciliation" block, documentation-table row for VDATA_FORMAT.md updated to reflect end-to-end scope. Phase 44 closed; no subagent dispatched (director-owned). | done |
 
 > **Scope decisions (user-confirmed 2026-04-13)**: 9-task variant. (1) Real-Chrome differential capture **YES** → 44.3.5 added. (2) Per-run order resolution **REQUIRED**, not nice-to-have → 44.4 is blocking for 44.5b. (3) 44.5 builder design **BOTH** → split into 44.5a (replay-with-substitution, ships first) + 44.5b (full synthesis, depends on 44.4). User explicitly asked the director to record this decision but **NOT auto-dispatch** 44.1 — dispatch is on user trigger only.
 
@@ -134,70 +134,9 @@ Current task: 44.7 — docs closeout (director-owned) — awaiting user scope ap
 
 ---
 
+
+---
+
 ## Current Task
 
-**ID**: 44.6
-**Title**: Tests for the vData builders (44.5a replay + 44.5b from-obj)
-**Phase**: Phase 44 — Stream B deliverables
-**Status**: pending — ready for dispatch (**different agent** per impl/tests separation).
-
-### Goal
-Write a proper `node --test` test suite under `tests/` that locks down 44.5a and 44.5b's behavior against the two committed fixtures and exercises the builder's public API. Replaces ad-hoc CLI `--self-check` smoke tests with formal assertions that run under `npm test`. The test file(s) must be written by a different agent than the one that wrote the implementation (the `test-vdata-builder.js` file must NOT be authored by someone who has seen 44.5a/44.5b's code from the inside — they should treat the code as a consumer reading only the public `tools/vdata-generator/` API surface, not the internals).
-
-### Context
-- **Two builders to test**, both under `tools/vdata-generator/`:
-  - **44.5a replay** (`replay.js`, exports `buildVData({obj, order, overrides})`) — wraps a captured 8-field obj with optional overrides, joins in a caller-supplied `order`, encrypts via Phase 43.
-  - **44.5b from-obj** (`build-from-obj.js`, exports `buildVDataFromObj({obj, seed, order})`) — synthesizes from a fingerprint obj, handles field order internally via seeded/real PRNG shuffle OR explicit `order` override.
-- **Two committed fixtures** (do NOT modify): `tests/fixtures/vdata-jsdom-capture.json`, `tests/fixtures/vdata-har-capture.json`. Each contains the fingerprint `obj`, the observed `order`, the 110-byte `plaintext_hex`, and the 152-char `vdata_string` (or similarly named field — the test author should read the fixture shape first and not assume).
-- **Phase 43 verifier** `tests/fixtures/verify-vdata-fixtures.js` exists and may be useful as a reference for how existing tests consume the fixtures.
-- **Seeded-PRNG seeds** discovered by 44.5b under Node 20 TimSort: HAR=53818, jsdom=84121. These are Node-major-version-specific; tests that use them should skip gracefully on other Node versions OR treat a non-match under a different runtime as a "seeds are runtime-specific" caveat, not a hard failure. Preferred approach: test the `--order` deterministic path as the primary lock-down and the `--seed` path as a Node-20-only bonus guarded by a version check.
-- **Existing test style**: read 2–3 existing test files under `tests/` to mirror the project's `node --test` conventions (describe/it / `test()` style, assertion helper, fixture loading pattern, how they import from `tools/`).
-- **Existing test count**: 411/411 green. After 44.6, the count should INCREASE (new tests added) and remain all-green.
-
-### Implementation Steps
-1. **Survey existing test structure.** List `tests/*.js`, read 2–3 files that import from `tools/` (e.g. an existing Phase 43 test for the encoder if one exists — check `tests/test-vdata-*.js` or similar). Identify: the `node --test` style used (describe/it vs flat `test()`), the assertion style (`node:assert/strict` vs the Node built-in `assert`), the fixture loading pattern, and the file-naming convention.
-2. **Read the 44.5a/44.5b public API from the outside**, without reading the module internals. Specifically read only `tools/vdata-generator/README.md` and the exported symbols in `replay.js` / `build-from-obj.js` (look at the `module.exports` block). Do NOT read `build-plaintext.js`, the Phase 43 encoder internals, or `cli.js`. The point of impl/tests separation is that the tests approach the code as a consumer reading only the documented public surface — if the README is insufficient, that's a finding (flag it) but do not rely on implementation details.
-3. **Read both committed fixtures** to identify the exact field names (`obj`, `order`, `plaintext_hex`, `vdata_string`, or whatever they actually are) and capture-source metadata.
-4. **Write `tests/test-vdata-builder.js`** with at minimum these test groups:
-   - **A. 44.5a replay — byte-identical fixture round-trip**:
-     - For each fixture, call `buildVData({obj, order})` and assert the result equals the fixture's recorded vData string exactly (length 152, byte-identical).
-     - Assert that `buildVData({obj, order, overrides: {}})` is identical to `buildVData({obj, order})` (empty overrides = no-op).
-     - Assert that `buildVData({obj, order, overrides: {key: 'DIFF'}})` produces a 152-char string that is NOT equal to the fixture's vData (substitution actually substitutes).
-     - Assert that the substituted output is on the Phase 43 alphabet `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` and ends in `YY`.
-     - Assert that calling `buildVData` with a missing field in `obj` either throws a clear error OR treats the missing value as `undefined` consistently — lock down whichever behavior the implementation has.
-   - **B. 44.5b from-obj — `order` override path (primary, deterministic)**:
-     - For each fixture, call `buildVDataFromObj({obj, order})` (explicit order) and assert byte-identical against the fixture's vData.
-     - Assert that without `order` and without `seed`, the default path returns a 152-char string on the alphabet ending in `YY` (nondeterministic — just shape check). Do this over a few iterations to make sure it doesn't crash on random shuffles.
-   - **C. 44.5b from-obj — `seed` path (Node-20 bonus, conditional)**:
-     - Guard these tests with a Node major-version check. If `process.versions.node` starts with `20.`, run:
-       - `buildVDataFromObj({obj, seed: 84121})` against the jsdom fixture → byte-identical.
-       - `buildVDataFromObj({obj, seed: 53818})` against the HAR fixture → byte-identical.
-     - Else, log a `test.skip` or similar "seeds are Node-20 specific" skip reason. Do not fail on other Node versions.
-   - **D. Alphabet + length assertions on all outputs**:
-     - Every vData string produced in any test is exactly 152 chars, ends in `YY`, and every character is in the Phase 43 alphabet.
-   - **E. Fixture integrity sanity**:
-     - The two fixture files under `tests/fixtures/` exist and parse as JSON (fail loudly if the test harness can't load them — prevents silently-passing tests if the fixture file is moved).
-5. **Do not write code for edge cases the implementation doesn't handle.** If the implementation does not explicitly handle a case (e.g. missing fields, extra fields, non-string values), the test should lock down the ACTUAL current behavior (whatever happens on real inputs), not a hypothetical. If you find an implementation bug, flag it in the test's comment and write a `test.todo()` or skipped test rather than fixing the bug yourself.
-6. **Run `npm test` and confirm**: (a) the new tests pass, (b) the total test count increased, (c) previously-passing tests still pass. Report the new count.
-
-### Verification
-- [ ] `tests/test-vdata-builder.js` exists.
-- [ ] Tests import `buildVData` from `tools/vdata-generator/replay.js` and `buildVDataFromObj` from `tools/vdata-generator/build-from-obj.js`.
-- [ ] At least test groups A, B, D, E are present. Group C may be skipped with a reason on non-Node-20 runtimes but must be present.
-- [ ] `npm test` exits 0 with total count > 411 and 0 failures.
-- [ ] `tests/fixtures/` is byte-unchanged.
-- [ ] `tools/vdata-generator/` is byte-unchanged (tests are a consumer, not an editor).
-- [ ] No modifications to `targets/`, `sample/`, `docs/`, or any existing research note.
-
-### Constraints
-- **Do not make any git commits.** Director handles commits.
-- **Do not modify `tools/vdata-generator/`**. If the public API surface is insufficient to write a test, flag it as a finding and work with what exists — do not patch the code.
-- **Do not modify `tests/fixtures/`**, `targets/`, `sample/`, `docs/`, or any existing research note.
-- **Do not read `tools/vdata-generator/build-plaintext.js`, `build-from-obj.js` body, `replay.js` body, or the Phase 43 encoder internals.** You may read only the `module.exports` block at the bottom of each file to identify exported names, and the `README.md`. This is the impl/tests separation discipline — treat the module as a black box.
-- **No new npm dependencies.** Use `node:test` and `node:assert/strict` (Node built-ins).
-- **Coding style**: CommonJS, 2-space indent, single quotes, semicolons, `const`/`let`.
-- **Match existing test-file conventions** — look at 2–3 existing test files first.
-- **If the task is too difficult** (e.g. the API surface is too opaque), stop and report exactly what blocked you.
-
-### Suggested Agent
-`general-purpose` — small test-writing task with black-box discipline. **Must be a different agent than the one that wrote 44.5a/44.5b** (naturally satisfied because each Agent tool invocation spawns a fresh subagent). Skills: `node:test` familiarity, fixture loading, black-box API consumption.
+None. Phase 44 closed 2026-04-15. Awaiting next user direction.
