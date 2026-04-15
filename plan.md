@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-Current task: 46.2 — Tests for 46.1 (pending dispatch)
+Current task: 46.3 — Live re-measurement after 46.1 (director-owned, live network — pending user go-ahead)
 
 **Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
@@ -112,7 +112,7 @@ Current task: 46.2 — Tests for 46.1 (pending dispatch)
 | ID | Task | Status |
 |----|------|--------|
 | 46.1 | Restore `/vm-slide.enc.js` live fetch on the default scraper path | done |
-| 46.2 | **Tests for 46.1** (different agent). Lock the wire-level invariant that both `legacyVdata=false` and `legacyVdata=true` issue at least one GET to a URL matching `/vm-slide(\.[^/]+)?\.enc\.js` per `solveCaptcha()`, via a local HTTP server that the scraper is pointed at (through a URL-rewriting test double or a globally-mocked `httpRequest`). Assert that the default path does NOT skip this request. One regression-oriented test file under `tests/`. `npm test` must stay green. | pending |
+| 46.2 | Tests for 46.1 — wire-level vm-slide-fetch invariant locked offline (3 new tests, 509/509 green) | done |
 | 46.3 | **Live re-measurement after 46.1** (director-owned, live network). 30 atomic default-path invocations from the same IP, same protocol as 45.6 (`--captcha-only --retries 1`, no gap, single arm). Record ticket prefix per attempt and bucket errorCode outcomes. Compare to the 45.6 default-arm baseline and to the Phase 45.6 gap1s follow-up. The primary question is **whether any attempt flips from `t03tserver` to `t01` or `t02`**. Log to `output/phase-46-errorcode-0/46.3-after-vmslide.{log,jsonl}`. Writes a short verdict block in `docs/ERRORCODE_12_INVESTIGATION.md` and appends a passed/failed entry to `history/<YYYYMMDD>.md`. | pending |
 | 46.4 | **Add `/caplog` telemetry beacons around verify.** Real browser sends a `/caplog?appid=20128&1=0&2=0&3=0&4=0&5=<ts>&6=<ts>&...` GET between tdc.js load and verify, and a second `/caplog?appid=20128&27=<slide_dx>&29=&31=<num>&32=0&...` GET AFTER verify. HAR entries 7 and 9 (see `sample/captcha-har.har`). Both are fire-and-forget — the response doesn't affect the scraper's state machine. Implementation goal: port the two beacon URL shapes from HAR (field-by-field table in the task's Context when dispatched), emit the pre-verify beacon after step 4 (downloadTdc) and before step 8 (verify), emit the post-verify beacon after step 8 regardless of errorCode. Use sensible placeholder values for fields we cannot synthesize (e.g. timer fields get `Date.now()` and recent deltas). Keep both beacons under a `--skip-caplog` escape hatch for isolation during 46.6 and for the existing offline tests. | pending |
 | 46.5 | **Tests for 46.4** (different agent). Assert both beacons fire in the correct sequence relative to verify, assert the URL shape matches the HAR-derived template (parameter names and ordering, not values), assert `--skip-caplog` suppresses both. Use the same local-HTTP-server / httpRequest-mock approach as 46.2. | pending |
@@ -139,10 +139,50 @@ Current task: 46.2 — Tests for 46.1 (pending dispatch)
 
 ## Current Task
 
-**ID**: 46.2
-**Title**: Tests for 46.1 — default path must issue a vm-slide GET
+**ID**: 46.3
+**Title**: Live re-measurement after 46.1 — 30-attempt default-path survey
 **Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
-**Status**: pending dispatch
+**Status**: pending user go-ahead (live network, director-owned)
+
+### Goal
+Empirically measure whether restoring the `/vm-slide.enc.js` fetch on the default path (46.1) flips any attempt from `t03tserver...` / `errorCode -1` to `t01.../t02...` / `errorCode 0`. This is the first of three lane-change measurement gates (46.3 → 46.6 → 46.9) defined in the Phase 46 plan table.
+
+### Protocol
+- **30 atomic default-path invocations** from the same IP as 45.6 (`111.119.253.170`).
+- Same command shape: `node tools/scraper/cli.js --captcha-only --retries 1 --verbose`. No gap between invocations, single arm (default path only — no A/B against legacy).
+- Record per attempt: errorCode, ticket prefix (`t01` / `t02` / `t03tserver` / other / none), auto-port success/fail, any transport errors.
+- Log raw stdout to `output/phase-46-errorcode-0/46.3-after-vmslide.log`, structured per-attempt JSONL to `output/phase-46-errorcode-0/46.3-after-vmslide.jsonl`.
+- Primary question: **any single attempt returning `t01` or `t02`**.
+- Secondary: ticket-prefix distribution vs 45.6 default-arm baseline (0 × t01, 0 × t02, 6 × t03tserver, 15 × auto-port-fail / transport-err out of 30).
+
+### Abort rule (inherited from 45.6)
+- If the first 5 invocations return non-errorCode-12 / non-errorCode-0 transport failures (403s, 500s, ECONNRESET), stop and report.
+- If the auto-port failure rate exceeds ~50% on the first 10 invocations, stop and present — it means live tdc.js templates have rotated beyond the porting pipeline's coverage and the survey would be uninformative.
+
+### Pause-and-present triggers
+- **Any `errorCode: 0` response with `t01`/`t02` ticket** → stop immediately, capture the raw request/response as a fixture, and present to the user. This is the Phase 46 victory condition.
+- **30 attempts all complete with zero `t01`/`t02`** → append verdict to `docs/ERRORCODE_12_INVESTIGATION.md`, append history entry, then continue to 46.4.
+
+### Why this is director-owned
+Same rationale as 45.6: live network traffic from the project's known-to-Tencent IP carries reputational cost, the inspection work is narrow (tail a log, tabulate 30 rows), and subagent context overhead isn't justified.
+
+### Pre-execution checklist (must all be confirmed before running)
+- [ ] User has given explicit go-ahead for the 30-invocation live survey.
+- [ ] Network is up and `t.captcha.qq.com` resolves from the survey host.
+- [ ] The source IP is `111.119.253.170` (or the user has confirmed a different IP is acceptable).
+- [ ] `output/phase-46-errorcode-0/` directory exists (create if not — see `.claude/rules/output-versioning.md`).
+- [ ] The run-survey script is fresh (copy from or adapt `output/phase-45-errorcode-12-survey/run-survey.sh`).
+
+### Verification (post-survey)
+- [ ] `output/phase-46-errorcode-0/46.3-after-vmslide.jsonl` contains 30 rows (or the row count at which abort triggered).
+- [ ] Each row has a parsable errorCode + ticket prefix field.
+- [ ] Aggregated verdict block appended to `docs/ERRORCODE_12_INVESTIGATION.md`.
+- [ ] history/20260415.md (or next day's file) has a passed/failed entry for 46.3.
+
+### Constraints
+- Do not run this task until the user explicitly gives the go-ahead.
+- Do not run concurrent invocations — atomic, serial only.
+- Do not commit raw `.log`/`.jsonl` if they exceed a few hundred KB — see `.claude/rules/output-versioning.md`. The structured `.jsonl` is typically small enough to commit; the raw verbose `.log` may not be.
 
 ### Goal
 Lock in a regression test that proves both `legacyVdata=false` (default) and `legacyVdata=true` (legacy) scraper paths issue at least one GET to a URL matching `/vm-slide(\.[^/]+)?\.enc\.js` during a single `solveCaptcha()` invocation. This is the wire-level invariant that task 46.1 just restored; without a test it will quietly regress the next time someone is tempted to "optimize" the default path.
