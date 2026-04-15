@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (final revision user-approved 2026-04-13)
-Current task: 44.0.1 — Reconcile `sample/vm_slide.js` bytecode vs fixture-generating build (plan revision pending user review 2026-04-15)
+Current task: 44.4.1 — Sort-order contradiction resolution (44.0.1 closed 2026-04-15, verdict A)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -110,7 +110,7 @@ Current task: 44.0.1 — Reconcile `sample/vm_slide.js` bytecode vs fixture-gene
 | 44.3 | Orchestrator plaintext-build JS-level trace — static-fallback deliverable; inverted Phase 44 model (orchestrator builds 39-field 9504-byte body; vm-slide reduces it to the 112-byte XTEA input; `&vData=` literal at pcs 24211..24223 lives in fn 22317, not fn 20539) | done |
 | 44.2.6 | **fn 22317 full static decompile + reconciliation with fn 20539** — decompile fn 22317 body `[22317, 24233]` end-to-end → fn 22317 = **`exports.getCaptchaData`** (pure function at pc 24252 store to exports), NOT a send replacement; 8-key schema **hardcoded** `[tp,key,py,env,version,cLod,inf,ss]` sorted alphabetically at pc 23949; NO 9504→112 reduction exists; fn 20539 classified **(IV) dead code** on Chrome path | done |
 | 44.4 | **Per-field value-source pin + pre-cipher transform check** — outcome (2) garbled; module 40 resolved as padder (fn 13989 PKCS#7-style) → ShiftRows permuter (fn 14153, `PERM=[0,4,8,12,5,9,13,1,10,14,2,6,15,3,7,11]`) → XTEA; 3 helpers decompiled (fn 22400=tp, fn 22730=key-prep, fn 23399=ss); 5 fields inline; `FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js` byte-identical both fixtures | done |
-| 44.0.1 | **[NEW — revision 2026-04-15]** Bytecode build reconciliation — resolve whether `sample/vm_slide.js` matches the fixture-generating build. Grep `output/vm-slide/bytecode.json` for both XTEA key strings (`2e430f8c15b7da96` = Phase 43 constant vs `34e2c8f07b5169ad` = 44.4 subagent's pc 13931 finding). Trace the fn 13860 encrypt path to the key constant it actually references and confirm which key is live. Produce `research/vm-slide-stack-vm/BUILD-RECONCILE.md` (≤2 pages): which key is in the bytecode, where the 44.4 subagent's second key came from (misread vs real), and a verdict: **(A)** `sample/vm_slide.js` IS the fixture-generating build (Finding 2 dismissed), **(B)** there are two keys in one build used on different paths, or **(C)** the fixtures come from a different build entirely. If (C), identify the actual fixture-generating file (candidates: a cached `vm-slide.e201876f.enc.js` in the jsdom harness, a HAR-embedded copy, etc.) and document how to obtain it. Pure static work, ≤30 min. Blocks 44.4.1 and 44.5b. | pending |
+| 44.0.1 | **[2026-04-15]** Bytecode build reconciliation — verdict **(A) with nuance**: `sample/vm_slide.js` IS the fixture-generating build; both keys real and from same build. `34e2c8f07b5169ad` is the bytecode-literal **pre-cipher seed** pushed at pcs 13931 and 15149 into fn 13860; `2e430f8c15b7da96` is the **runtime** XTEA round key observed in the encrypt closure's local 4 after fn 13860's prologue transform. No re-decode needed; all Phase 44 pc anchors stand. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`. | done |
 | 44.4.1 | **[NEW — revision 2026-04-15]** Sort-order contradiction resolution — re-read fn 22317's `.sort()` call at pc 23949 and the comparator fn 23898 body end-to-end. Determine whether: (i) 44.2.6 misread the sort target pc / the sort call operates on a different array, (ii) fn 23898 is non-lexicographic (perhaps sorts by a hashed / index / reversed value), or (iii) the `.sort()` is conditional on a branch not taken in the fixture runs. Reconcile against both fixture orders (jsdom `[inf,env,tp,key,py,ss,cLod,version]`, HAR `[inf,env,tp,cLod,version,key,ss,py]`). Produce `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md` with the verdict + pseudocode of the comparator. If the comparator is a computable function of `obj`, encode it in `build-fingerprint-plaintext.js` so 44.5b can compute `order` from scratch without caller input. Byte-level cross-check: invoke `buildFingerprintPlaintext({obj})` (no `order` argument) against both fixtures and confirm the computed order matches observed. Depends on 44.0.1. ≤1 hour. Blocks 44.5b. | pending |
 | 44.4.5 | **Orchestrator `getCaptchaData` invocation site** — static search in `sample/t_captcha_slide.js` for the import of the vm-slide webpack export `getCaptchaData` and its call site. Pin the JS expression that builds `obj` at the call site and map its 8 properties to orchestrator-side sources (session, ua, timestamps, etc.). Closes the gap 44.3 missed. ≤1 hour static work. | pending |
 | 44.3.5 | Real-Chrome differential capture — third fixture from production Chrome; capture target simplifies to the full 9504-byte verify POST body + its 152-char vData string pair; used as a cross-check for 44.4's value-source rules across environments | pending |
@@ -127,55 +127,57 @@ Current task: 44.0.1 — Reconcile `sample/vm_slide.js` bytecode vs fixture-gene
 
 ## Current Task
 
-**ID**: 44.0.1
-**Title**: Bytecode build reconciliation — resolve XTEA key drift surfaced by 44.4
+**ID**: 44.4.1
+**Title**: Sort-order contradiction resolution — reconcile fn 22317's `.sort()` against fixture field orders
 **Phase**: Phase 44 — vm-slide fingerprint schema + JS vData builder
-**Status**: pending — revision pending user approval 2026-04-15; dispatch on user trigger only.
+**Status**: pending — ready for dispatch on next user trigger.
 
 ### Goal
-Resolve the XTEA key drift surfaced by 44.4: the subagent reported `sample/vm_slide.js` bakes key `34e2c8f07b5169ad` at bytecode pc 13931, but both committed fixtures encrypt with `2e430f8c15b7da96` (the Phase 43 constant extracted from the same file). Only one of these can be right. Determine which, and confirm whether `sample/vm_slide.js` IS the fixture-generating build — if not, every bytecode pc cited throughout Phase 44 is suspect and must be re-anchored to the correct build before 44.4.1 and 44.5b can proceed. Deliverable: `research/vm-slide-stack-vm/BUILD-RECONCILE.md` ≤2 pages.
+Resolve the sort-order contradiction left by 44.2.6 / 44.4: 44.2.6 reported that fn 22317 (`getCaptchaData`) alphabetically sorts the 8-key schema via a `.sort()` call at bytecode pc 23949 with comparator fn 23898, but neither committed fixture's observed key order is alphabetical. jsdom fixture order is `[inf,env,tp,key,py,ss,cLod,version]`; HAR fixture order is `[inf,env,tp,cLod,version,key,ss,py]`. Alphabetical would be `[cLod,env,inf,key,py,ss,tp,version]` — neither matches. Determine what the comparator actually computes, encode it in `build-fingerprint-plaintext.js` so 44.5b can derive `order` from `obj` alone, and cross-check by calling the builder with no `order` argument against both fixtures.
 
-### Context (post-44.4)
-- `sample/vm_slide.js` is the source file that `output/vm-slide/bytecode.json` (24,273 elements) was produced from by `research/vm-slide-stack-vm/decoder.js`.
-- Phase 43 established that XTEA key `2e430f8c15b7da96` is the bytecode constant — it's recorded in CLAUDE.md Project Memory under "Phase 42" as "with key `2e430f8c15b7da96` (16 ASCII bytes, bytecode constant)". Phase 43's `tools/vdata-generator/xtea.js` encodes this same key into round operations, and round-trips byte-identically against both committed fixtures.
-- The 44.4 subagent claimed fn 13860 (webpack module 40 factory entry pc 12655, encrypt body entry pc 13860) calls into a key constructed from `34e2c8f07b5169ad` at pc 13931. This is a direct conflict with Phase 43's established fact.
-- Both `tests/fixtures/vdata-jsdom-capture.json` and `tests/fixtures/vdata-har-capture.json` store XTEA key words in their `xtea_key_words_be` field and `xtea_key_hex` — both report `2e430f8c15b7da96`.
-- The jsdom fixture was produced by running `tools/scraper/vdata-harness.js` (which loads a vm-slide file into jsdom) against a captured `vm-slide.enc.js` build. The HAR fixture comes from a real Chrome 146 capture. Both use the same key → both targets ran the same vm-slide build, or both builds happen to share the key.
-- 44.4 still passed byte-level round-trip verification, which means the padder alphabet (`"0abcdefghijklmnop"` at fn 13989), the ShiftRows PERM table (at fn 14153), and the XTEA key used by the fixtures are mutually consistent. But it does NOT prove the rest of fn 22317 / fn 13860 read by the subagent matches the fixture build.
+### Context (post-44.0.1)
+- **Build reconciliation complete** (44.0.1, verdict A+nuance): `sample/vm_slide.js` IS the fixture-generating build. `output/vm-slide/bytecode.json` is the correct decode. All Phase 44 pc anchors valid. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`.
+- 44.2.6 claimed fn 22317 body `[22317, 24233]` is `exports.getCaptchaData` (store to exports at pc 24252 — pure function), hardcodes the 8-key schema `[tp,key,py,env,version,cLod,inf,ss]`, builds it into an array or object, then calls `.sort()` at pc 23949 with comparator fn 23898.
+- Both fixtures' `plaintext` field in `tests/fixtures/vdata-{jsdom,har}-capture.json` contains the assembled `k1=v1&k2=v2&...` byte stream (112 bytes exactly). Parse the `&`-separated pairs to recover the observed key order per fixture.
+- Current `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` reference impl takes `order` as a caller-supplied argument — which means 44.5b cannot synthesize vData from an `obj` alone. 44.4.1 is the task that closes that gap.
+- Three hypotheses to evaluate: (i) 44.2.6 misread — the `.sort()` pc is wrong, or the sort target is a different array, or fn 23898 is not actually a comparator; (ii) fn 23898 is non-lexicographic — it may sort by a hashed / reversed / index-based value; (iii) the `.sort()` is conditional — a branch not taken in the fixture runs makes the call a no-op, leaving insertion order intact.
+- Phase 44.0.1 verdict also surfaced that fn 13860 applies a pre-cipher seed→key transform (seed `34e2c8f07b5169ad` → runtime key `2e430f8c15b7da96`). That is a separate follow-up and does NOT need to be solved by 44.4.1 — 44.4.1 only owns sort-order.
+
+### Starting inputs
+- `output/vm-slide/bytecode.json` — 24,273 elements; pc-indexed.
+- `output/vm-slide/disassembly-full.txt` — Phase 40.1 full walker output; should already cover fn 22317 and fn 23898.
+- `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md`, `FINGERPRINT-SCHEMA.md`, `PLAINTEXT-BUILD.md` — prior decompile notes from 44.2.6 / 44.4.
+- `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` — reference impl (currently requires `order`).
+- `tests/fixtures/vdata-{jsdom,har}-capture.json` — committed fixtures with `plaintext` field.
 
 ### Implementation Steps
-1. **Grep the bytecode for both key strings.** In `output/vm-slide/bytecode.json` (a JSON array of 24,273 integers/strings), scan for the substring `2e430f8c15b7da96` and `34e2c8f07b5169ad` at string-constant positions. Expected locations: each 16-byte ASCII key appears as either (a) a single string constant emitted by `OP_04`, or (b) a concatenation of shorter chunks. Report the pc ranges for each occurrence.
-2. **Trace the fn 13860 encrypt path to the key it actually uses.** Starting from fn 13860 body `[13860, ...]`, follow the opcodes until the XTEA call (module 41). The key is loaded as an argument to the XTEA call. Walk the stack / reg file back from that call site to find which string constant supplied the key. Report the pc of the `OP_04` that built the key and the string's content.
-3. **Check pc 13931 directly.** The subagent cited pc 13931 as the location of `34e2c8f07b5169ad`. Read the opcodes at pcs 13920..13945 and confirm what's actually there. If it's a string constant, report its content. If the subagent misread, note what's actually at pc 13931.
-4. **Cross-check with Phase 43 extraction.** `tools/vdata-generator/xtea.js` encodes `2e430f8c15b7da96` as 4 uint32 words. Confirm that `research/vm-slide-stack-vm/vdata-dynamic-trace.js` (Phase 43's dynamic oracle) extracted the same key at runtime. Grep for the key string in tracer source to confirm.
-5. **Verdict.** Write `research/vm-slide-stack-vm/BUILD-RECONCILE.md` with one of three verdicts:
-   - **(A)** `sample/vm_slide.js` IS the fixture-generating build; only key `2e430f8c15b7da96` exists in the bytecode; the subagent's pc 13931 reading was a misread (explain what's actually there). Finding 2 dismissed. Phase 44 decompile work stands as-is.
-   - **(B)** Both keys exist in `sample/vm_slide.js`; different paths use different keys. Explain which path each key is used on and which one the `encryptData` export takes. Phase 44 decompile work needs to follow the live path.
-   - **(C)** `sample/vm_slide.js` and the fixture-generating build are different. Identify the actual fixture-generating file (candidates: the harness may cache `vm-slide.e201876f.enc.js` or similar under `tools/scraper/`, the HAR fixture may contain the URL the real Chrome captured). Document how to obtain the correct build and decode it into a separate `output/vm-slide-fixture/bytecode.json`. Phase 44 must then be re-anchored against that bytecode.
+1. **Recover observed orders from fixtures.** Parse both fixtures' `plaintext` field into their 8 `key=value` pairs. Record exact order. Confirm they are jsdom `[inf,env,tp,key,py,ss,cLod,version]` and HAR `[inf,env,tp,cLod,version,key,ss,py]` (or correct these if 44.2.6 reported them wrong).
+2. **Re-read fn 22317's sort call site.** Read a wide window of `disassembly-full.txt` around pc 23949 (at least ±200). Verify that (a) there is actually a `.sort()` method invocation at or near pc 23949, (b) the receiver is the 8-key collection, (c) the comparator argument is fn 23898. Report what's actually there. If 44.2.6 misread the pc, find the real sort call (if any) and report its pc.
+3. **Decompile fn 23898 body end-to-end.** Resolve the function range (probably introduced by an `OP_58` elsewhere creating a closure pointing at pc 23898), walk every opcode, and express the body in pseudocode. Determine: what does the comparator return? Is it `a.localeCompare(b)`? `a.length - b.length`? A hash comparison? An index lookup into a fixed table? Cite every pc.
+4. **Apply the comparator to the 8-key schema.** Compute the order the comparator would produce when applied to `[tp,key,py,env,version,cLod,inf,ss]`. Compare against both observed fixture orders.
+5. **Decide which hypothesis holds.**
+   - **(i)** If the sort target is not the schema, or there's no comparator call, document the misread and find where the real order comes from.
+   - **(ii)** If fn 23898 IS a comparator and the computed order matches the fixtures, encode the comparator in JS and update `build-fingerprint-plaintext.js` so `order` becomes optional (derived from the comparator when omitted).
+   - **(iii)** If the sort is conditional, identify the branch condition and its value in both fixture runs; confirm the no-op path produces the observed insertion order.
+6. **Byte-level cross-check.** Run `build-fingerprint-plaintext.js` with the new order logic against both fixtures without supplying `order` — confirm output is byte-identical to each fixture's `plaintext`.
+7. **Write `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md`** (≤2 pages): the hypothesis that held, the comparator pseudocode (if any), the evidence from fn 23898 and fn 22317, and the change made to `build-fingerprint-plaintext.js`.
 
 ### Verification
-- [ ] `research/vm-slide-stack-vm/BUILD-RECONCILE.md` exists with one of the three verdicts clearly stated.
-- [ ] Grep results for both key strings against `output/vm-slide/bytecode.json` are reported with pc ranges.
-- [ ] pc 13931's actual content is reported verbatim — either confirming or refuting the 44.4 subagent's reading.
-- [ ] The fn 13860 encrypt path → XTEA call → key-argument chain is traced and the string constant supplying the key is identified by pc.
-- [ ] If verdict (C), the path to the correct fixture-generating build is documented and a plan for re-anchoring is provided.
-- [ ] No modifications to: `targets/`, `sample/`, `tools/vdata-generator/`, `tests/fixtures/`, `docs/`, or any existing `research/vm-slide-stack-vm/FN-*-DECOMPILE.md` / `FINGERPRINT-SCHEMA.md` / `PLAINTEXT-BUILD.md` / `build-fingerprint-plaintext.js`. New artifacts only.
+- [ ] `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md` exists with a clear verdict.
+- [ ] fn 22317 sort call site confirmed (or re-located) with pc citation.
+- [ ] fn 23898 body fully decompiled to pseudocode with every pc cited.
+- [ ] `build-fingerprint-plaintext.js` updated so `order` is optional; derivation rule implemented.
+- [ ] `node -e "const {build}=require('./research/vm-slide-stack-vm/build-fingerprint-plaintext.js'); ..."` against both fixtures produces byte-identical plaintext WITHOUT caller-supplied `order`.
+- [ ] No modifications to: `targets/`, `sample/`, `tools/vdata-generator/`, `tests/fixtures/`, `docs/`. New research artifacts only, plus the edit to `build-fingerprint-plaintext.js`.
 
 ### Constraints
 - **Do not make any git commits.** Director owns all commits.
 - **Do not modify `targets/` or `sample/`.** Tencent's property.
-- **Pure static analysis.** No tracers, harnesses, jsdom runs.
-- **Verify, don't assume.** Every claim must reference a specific pc in `output/vm-slide/bytecode.json`.
-- **If the task is too difficult or impossible**, stop immediately and report. Do not leave broken files.
-
-### Reporting
-1. Grep results: pc ranges for `2e430f8c15b7da96` and `34e2c8f07b5169ad` in `output/vm-slide/bytecode.json`.
-2. pc 13931 actual content.
-3. fn 13860 → XTEA call → key pc trace.
-4. Verdict (A/B/C) with one-paragraph justification.
-5. Path to `BUILD-RECONCILE.md`.
+- **Pure static analysis + local reference-impl test.** No live tracers, no jsdom runs against live vm-slide, no puppeteer.
+- **Verify, don't assume.** Every claim must cite a specific pc in `output/vm-slide/bytecode.json` or `disassembly-full.txt`.
+- **If the task is too difficult or impossible**, stop immediately and report what you attempted. Do not leave `build-fingerprint-plaintext.js` broken — if you must revert, revert cleanly.
 
 ### Suggested Agent
-`general-purpose` — pure bytecode grep + pc walk. Expected ≤30 min.
+`general-purpose` — bytecode walk + comparator pseudocode + reference-impl edit + local cross-check. Expected ≤1 hour.
 
 
