@@ -78,13 +78,55 @@ well-formed cipher blob. The four jsdom tells in the legacy path (`cLod =
 'src')'`, jsdom-derived `ss`) are visible fingerprint differentiators the
 server scores on.
 
+**Temporal ordering of outcomes.** The Phase 36 doc above described errorCode
+12 as a saturation effect ("success on attempt 1, usually fails by attempt
+10"). The Phase 45.6 data refines that picture — success and errorCode 12 are
+**interleaved**, not strictly ordered, and the legacy arm has no cold-start
+success at all. Per-attempt sequences (✓ = success −1, `12` = errorCode 12,
+`9` = errorCode 9, `AP` = auto-port failure, excluded):
+
+```
+default:  1:✓  2:✓  3:12  4:✓  5:✓  6:12  7:12  8:AP  9:AP 10:✓
+         11:12 12:✓ 13:12 14:12 15:12 16:AP 17:12 18:AP 19:AP 20:12
+         21:AP 22:9  23:9  24:12 25:12 26:AP 27:AP 28:AP 29:12 30:12
+
+legacy:   1:12  2:12  3:12  4:AP  5:9  6:12  7:12  8:12  9:12 10:12
+         11:AP 12:12 13:12 14:12 15:AP 16:AP 17:12 18:AP 19:12 20:AP
+         21:AP 22:12 23:AP 24:AP 25:12 26:AP 27:12 28:12 29:AP 30:12
+```
+
+Reading this:
+
+1. errorCode 12 appears as early as **attempt 3** on the default arm, before
+   successes at 4, 5, 10, and 12 — so "errorCode 12 only after a success"
+   is false. The default arm produces both outcomes side-by-side in the
+   early window.
+2. There IS a saturation cutoff: the last default-arm success is at attempt
+   **12**. Attempts 13–30 on both arms produce 14 valid samples and **zero**
+   successes. Something degrades the session around attempt 10–12 regardless
+   of which vData path is used.
+3. The legacy arm **never hits a success window** — attempts 1, 2, 3 all
+   return errorCode 12. Whatever scoring gate lets the default arm slip
+   through in the first ~12 attempts is closed from attempt 1 against the
+   jsdom-flavoured vData.
+
+The sharper statement is therefore: **success requires a good vData AND an
+early attempt index**. The default path unlocks the early-window opportunity
+(without which the saturation-cutoff observation would be invisible); the
+legacy path is gated out of that window entirely. errorCode 12 is thus driven
+by at least two independent signals — one content-based (vData plaintext
+fingerprint tells) and one rate-based (per-IP / per-session saturation around
+attempt 10–12).
+
 Caveats:
 - 28.6% success is far from 100%; other sub-signals (behavioral events,
   referer/cookie chain, TLS fingerprint) likely still contribute. The Phase 36
   hypotheses about behavioral scoring and reputation are not displaced — this
   survey only isolates the vData contribution.
 - Sample sizes after exclusion (21 / 18) are small; the z-tests are directional
-  evidence, not a tight effect-size estimate.
+  evidence, not a tight effect-size estimate. The "saturation at attempt ~12"
+  observation is also a single-run finding and should be re-measured from a
+  fresh IP before it is treated as pinned.
 - The browser profile was built from the HAR oracle; field values drawn from
   that single capture may themselves become stale as Tencent rotates fixtures.
 
