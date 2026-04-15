@@ -522,7 +522,32 @@ keeps everything inside a closure.
 
 **What's now resolved** (Phase 43, 2026-04-13). The XTEA key is `2e430f8c15b7da96`; the cipher is classical (not modified) XTEA with LE uint32 packing; the alphabet is 65 chars with `Y` as the padding char; byte-identical reproducibility for the cipher half is achieved by `tools/vdata-generator/` against both a synthetic jsdom fixture and a real Chrome 146 HAR capture — see `docs/VDATA_FORMAT.md` for the full spec and `tests/test-vdata-generator-encoder.js` for the test coverage.
 
-**What remains open**. The 112-byte plaintext is a fixed-shape (8 `=`, 7 `&`) canonical reduction that vm-slide's `proxyXHR` body computes from the full urlencoded verify POST body it intercepts via its `XMLHttpRequest.prototype.send` replacement. It is **not** built by the orchestrator (`t_captcha_slide.js` does not assemble a 112-byte string anywhere — its verify body `e` is 39 fields and ~9504 bytes urlencoded). **Phase 44.3 correction (2026-04-13)**: earlier drafts of this section stated the plaintext is a JS-environment fingerprint built from `typeof` / property enumeration / object stringification. That is incorrect — `research/vm-slide-stack-vm/FN-20539-DECOMPILE.md` proved fn 20539 performs no environment probing, and `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` showed the 112-byte reduction happens inside vm-slide's top-level send replacement (enclosing bytecode pc 24210, where the `&vData=` literal is built at pcs 24211..24223) and reads only `arguments[0]`, the caller-supplied body. Reversing the exact reduction formula is **Phase 44.4** (open). Until then, byte-identical end-to-end `vData` synthesis from scratch (without a captured plaintext) is not possible. See `research/vm-slide-stack-vm/VDATA-PIPELINE.md` §8 and `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` for the open questions.
+**What's now resolved — plaintext half** (Phase 44, 2026-04-15). The 112-byte pre-cipher plaintext is NOT a reduction of the caller's 9345-byte POST body. It is a fresh **8-field tdc runtime-state probe** built inside `fn 22317 = module.exports.getCaptchaData` (webpack module fn 20970, exported at bytecode pc 24252, FUNC_CREATE at pc 24234, body `[22317..24233]`). The field schema is fixed: `{tp, key, py, env, version, cLod, inf, ss}`. Five fields are built inline (`py` = `arguments[1].py`, `env` = `require(0)() ? '0' : '1'`, `version` = literal `"2"`, `cLod` = TDC lifecycle probe, `inf` = `window===window.top?'top':'iframe'`); three delegate to helpers (`tp` = fn 22400 captures a JS runtime error string, `key` = fn 22730 via `require(18)(body,'tlg')` char-lookup digest of `arguments[0]`, `ss` = fn 23399). See `docs/VDATA_FORMAT.md` §7 for the full per-field table, source rules, and the `tools/vdata-generator/` `replay` + `from-obj` public API.
+
+**Live Chrome call chain, end-to-end** (Phase 44.2.8):
+
+```
+vm-slide internal orchestrator (fn 19604, INSIDE vm-slide — not in this bundle)
+  → init(getCaptchaData)                                          # fn 22317 passed as the arg
+  → require(44).proxyXHR(getCaptchaData)            pc 19661
+  → fn 20140 (proxyXHR) binds getCaptchaData as slot 3
+  → fn 20539 FUNC_CREATE pc 20797 captures slot 3 as inner slot 8
+  → fn 20539 installed onto XHR.prototype.send      pc 20808 (OP_24)
+  → fn 20353 .open wrapper installed                pc 20473 (guards on URL == "/cap_union_new_verify")
+  [later, on the verify POST send:]
+  → fn 20539 runs with body = arguments[0]         (9345-byte urlencoded POST body)
+  → fn 20539 pc 20749 OP_66 2 calls slot8(body, {py})  = fn 22317(body, {py})
+  → fn 22317 builds the 8-field tdc-runtime-state probe, shuffles the order
+      via fn 23898's Math.random() > 0.5 ? -1 : 1 comparator (pc 23949),
+      pads + ShiftRows-permutes + XTEA-encrypts + base64-encodes → 152-char vData
+  → fn 20539 body-appends &vData=<152 chars>        pc 20751
+  → fn 20539 calls savedSend.call(this, rewritten_body)
+      final body: 9504 = 9345 + 7 ("&vData=") + 152
+```
+
+The important mental-model correction: **`getCaptchaData` is defined and bound inside vm-slide itself, not in `t_captcha_slide.js`**. `sample/t_captcha_slide.js` contains zero references to `getCaptchaData`, `CaptchaData`, `TENCENT_CHAOS`, etc. (confirmed by `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`). The orchestrator bundle's only vData-related code is the `if (a.isLowIE())` IIFE at bytes 162929..163108 that calls `window.getVData` on the IE9 fallback path — on modern browsers this is a no-op, and the Chrome path is entirely driven by vm-slide's internal `fn 19604 → init → proxyXHR(fn 22317) → fn 20539 XHR.send patch → fn 22317 kv build + encrypt` chain described above.
+
+**Historical correction note.** An earlier draft of this section (pre-Phase 44) stated that the 112-byte plaintext is "a canonical reduction of the caller-supplied verify body (`arguments[0]`)". That was incorrect. `arguments[0]` is read by fn 22317 only as an input to the `key` digest helper (fn 22730 → `require(18)(body,'tlg')`); the other 7 fields are independent runtime-state probes with no dependence on the POST body at all. The `tp` field is a JS runtime error string captured at page load, not a field derived from the body. The `&vData=` literal at bytecode pcs 24211..24223 lives inside **fn 22317**, not inside a separate "send replacement" function at pc 24210. See `research/vm-slide-stack-vm/FN-20539-SLOT8-HOP.md` for the pc-level reconciliation of this misreading.
 
 ### `nonce`
 
