@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-Current task: 46.4 — Add `/caplog` telemetry beacons around verify (pending dispatch)
+Current task: 46.5 — Tests for 46.4 (pending dispatch)
 
 **Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
@@ -114,7 +114,7 @@ Current task: 46.4 — Add `/caplog` telemetry beacons around verify (pending di
 | 46.1 | Restore `/vm-slide.enc.js` live fetch on the default scraper path | done |
 | 46.2 | Tests for 46.1 — wire-level vm-slide-fetch invariant locked offline (3 new tests, 509/509 green) | done |
 | 46.3 | Live re-measurement after 46.1 — 0/30 t01/t02 (null result; vm-slide alone does not move the lane) | done |
-| 46.4 | **Add `/caplog` telemetry beacons around verify.** Real browser sends a `/caplog?appid=20128&1=0&2=0&3=0&4=0&5=<ts>&6=<ts>&...` GET between tdc.js load and verify, and a second `/caplog?appid=20128&27=<slide_dx>&29=&31=<num>&32=0&...` GET AFTER verify. HAR entries 7 and 9 (see `sample/captcha-har.har`). Both are fire-and-forget — the response doesn't affect the scraper's state machine. Implementation goal: port the two beacon URL shapes from HAR (field-by-field table in the task's Context when dispatched), emit the pre-verify beacon after step 4 (downloadTdc) and before step 8 (verify), emit the post-verify beacon after step 8 regardless of errorCode. Use sensible placeholder values for fields we cannot synthesize (e.g. timer fields get `Date.now()` and recent deltas). Keep both beacons under a `--skip-caplog` escape hatch for isolation during 46.6 and for the existing offline tests. | pending |
+| 46.4 | Add `/caplog` telemetry beacons around verify — caplog-beacon.js + solveCaptcha wiring + `--skip-caplog` flag (byte-for-byte HAR match) | done |
 | 46.5 | **Tests for 46.4** (different agent). Assert both beacons fire in the correct sequence relative to verify, assert the URL shape matches the HAR-derived template (parameter names and ordering, not values), assert `--skip-caplog` suppresses both. Use the same local-HTTP-server / httpRequest-mock approach as 46.2. | pending |
 | 46.6 | **Live re-measurement after 46.4** (director-owned, live network). Same protocol as 46.3. Primary question: any `t01`/`t02` ticket. Log to `output/phase-46-errorcode-0/46.6-after-caplog.{log,jsonl}`. Verdict block appended to `docs/ERRORCODE_12_INVESTIGATION.md`. **Decision gate**: if 46.3 AND 46.6 both return zero `t01`/`t02`, the director pauses here and asks the user whether to proceed with 46.7 or jump straight to the TLS spike in 46.10. | pending |
 | 46.7 | **Reorder verify headers to match Chrome's canonical sequence.** Chrome 146 emits verify POST headers in the order: `Host → Connection → Content-Length → sec-ch-ua → X-Requested-With → sec-ch-ua-mobile → User-Agent → sec-ch-ua-platform → Content-Type → Accept → Origin → Sec-Fetch-Site → Sec-Fetch-Mode → Sec-Fetch-Dest → Referer → Accept-Encoding → Accept-Language` (derived from HAR). Node's `http.request` emits headers in JS-object-insertion order, so this is reachable without monkey-patching: the fix is to rebuild the headers object at `tools/captcha-solver/captcha-client.js:1007` in the exact Chrome order, explicitly setting `Host` and `Connection` too (Node will normally auto-insert them, but it places them in its own slots — passing them in `headers` with the right ordering overrides that). If JS object property iteration turns out to be non-deterministic for our case (it isn't in modern V8, but confirm), fall back to writing the HTTP request via a raw socket through `net.Socket` / `tls.connect`. Only the `cap_union_new_verify` request matters for this phase — do not touch the header order of prehandle / show / hycdn (we don't have a canonical order for them and they aren't what the server scores). | pending |
@@ -139,10 +139,85 @@ Current task: 46.4 — Add `/caplog` telemetry beacons around verify (pending di
 
 ## Current Task
 
-**ID**: 46.4
-**Title**: Add `/caplog` telemetry beacons around verify
+**ID**: 46.5
+**Title**: Tests for 46.4 — caplog beacons fire in the correct sequence
 **Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
 **Status**: pending dispatch
+
+### Goal
+Lock in three regression-oriented invariants introduced by 46.4:
+1. Both caplog beacons fire during `solveCaptcha()` in the correct relative sequence (pre before verify, post after verify).
+2. The URL shape matches the HAR-derived templates — parameter names and order, NOT values (the values vary by t0 / ans and must not be asserted on).
+3. `--skip-caplog` / `skipCaplog: true` suppresses both beacons end-to-end.
+
+### Context
+- **46.4 just landed**:
+  - New `tools/scraper/caplog-beacon.js` exporting `CAPLOG_HOST`, `buildPreVerifyBeaconUrl({t0})`, `buildPostVerifyBeaconUrl({ans})`, `fireBeacon(url, {userAgent, timeoutMs})`.
+  - `tools/scraper/scraper.js`: `this.skipCaplog = cfg.skipCaplog === true` in the constructor (~line 94); pre-beacon block at lines 585–592 between step (k) and step (l); post-beacon block at lines 632–639 immediately after `client.verify` returns.
+  - `tools/scraper/cli.js`: `--skip-caplog` flag.
+- **Existing test harness to extend**: `tests/test-scraper-vm-slide-fetch.js` (from 46.2). It already drives `Scraper.solveCaptcha()` offline by:
+  1. Pre-requiring and stubbing `slide-solver`, `collect-generator`, `vdata-generator/for-post`, `vdata-harness` before requiring scraper.
+  2. Monkey-patching `https.request` to record outgoing URLs + return a 200/short stub body.
+  3. Subclassing `Scraper` to override `_createClient()` with an in-memory fake client serving prehandle/getSig/downloadImages/downloadTdc/verify.
+  Reuse this harness. The beacon tests want the same URL-recording seam plus an explicit check on the recorded sequence, not just presence.
+- **Two HAR-derived invariants** the test should assert on the URL shape, NOT on values:
+  - Pre-beacon: exactly 45 parameters; expected key sequence starts `['appid','1','2','3','4','5','6','7','8','9','10',...,'49','platform','flag1','flag2','flag3','subsid']` in that order; field 38..41 and 48 are absent.
+  - Post-beacon: exactly 15 parameters; expected key sequence is `['appid','27','29','31','32','33','34','37','46','48','platform','flag1','flag2','flag3','subsid']` in that order.
+  - Both beacons hit `https://t.captcha.qq.com/caplog`.
+  The test should derive the expected sequences ONCE (hardcoded arrays at the top of the file) and compare the recorded URL's actual key order to the expected array, failing with a clear diff on mismatch.
+- **Sequence assertion**: on the recorded URL list, find the indexes of the pre-beacon, verify request, and post-beacon. Assert `preIdx < verifyIdx < postIdx`. You do NOT need to assert on unrelated requests sitting between them — other HTTPS GETs (vm-slide fetch etc.) are allowed.
+- **Verify request**: on the default path, `client.verify` is called on the fake client — it does NOT issue an `https.request`. So the recorded URL list only contains the "side-channel" HTTPS calls (vm-slide fetch + caplog beacons). The verify call itself won't appear in the URL list. You have two options:
+  1. Assert on the recorded URL list containing exactly `[<vm-slide>, <pre-caplog>, <post-caplog>]` in that order (simplest).
+  2. Have the fake client record a synthetic "verify" marker into the same recorded list when its `verify()` method is called, so `preIdx < verifyIdx < postIdx` can be checked directly.
+  Option 2 is cleaner because it doesn't leak the implementation detail of which other HTTPS calls happen. Either is acceptable — pick one and document it in a comment.
+- **Why both legacyVdata values?** This is a skipCaplog-only task. The beacons must fire on both default and legacy paths because the 46.4 wiring is outside the `legacyVdata` gate. Add a smoke test asserting both arms fire the beacons.
+- **Project test-style reminders**: CommonJS, `node:test`, `node:assert/strict`. Match the neighbouring file style. Wire the new test file into `package.json`'s explicit `npm test` list (project convention — see 46.2's commit 8ff4bdc for the exact diff shape).
+
+### Implementation Steps
+1. Read `tests/test-scraper-vm-slide-fetch.js` end-to-end to understand the harness; read `tools/scraper/scraper.js` lines 580–645 to confirm the call sites before writing assertions.
+2. Create `tests/test-scraper-caplog-beacon.js` that re-uses the 46.2 harness pattern (module-level stubs before requiring scraper, `FakeClientScraper` subclass, `installHttpsRecorder`). Factor out any non-trivial duplication into a shared helper ONLY if both files end up importing the same block — otherwise copy-paste is fine; these are regression tests, not a framework.
+3. Required tests (minimum — add more if an invariant is worth pinning):
+   - `caplog pre-verify beacon fires on default path (legacyVdata: false)` — recorded URL list contains a GET to `https://t.captcha.qq.com/caplog?...` matching the 45-param sequence, ordered before any verify marker.
+   - `caplog pre-verify beacon fires on legacy path (legacyVdata: true)` — same assertion.
+   - `caplog post-verify beacon fires on default path (legacyVdata: false)` — recorded URL list contains a GET to `/caplog?...` matching the 15-param sequence, ordered after the verify marker.
+   - `caplog post-verify beacon fires on legacy path (legacyVdata: true)` — same.
+   - `caplog post-verify beacon fires even on non-zero errorCode` — fake client returns `{ errorCode: 12 }`. Post-beacon must still fire. (The default 46.2 harness may already return errorCode 0; override in a nested test with a failing fake.)
+   - `skipCaplog:true suppresses both beacons on default path` — recorded URL list contains zero `/caplog` GETs; other requests (vm-slide fetch) still present.
+   - `skipCaplog:true suppresses both beacons on legacy path` — same.
+4. Expected-sequence arrays — hardcode at the top of the file:
+   ```js
+   const PRE_KEYS = ['appid','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','29','31','32','33','34','35','36','37','42','43','44','45','46','47','49','platform','flag1','flag2','flag3','subsid'];
+   const POST_KEYS = ['appid','27','29','31','32','33','34','37','46','48','platform','flag1','flag2','flag3','subsid'];
+   ```
+   Helper: `parseCaplogKeys(url)` → returns the ordered key array from the query string. Use `new URL(url)` + `url.searchParams` does NOT preserve duplicates but preserves order on modern Node — for safety, parse manually via `url.split('?')[1].split('&').map(kv => kv.split('=')[0])`.
+5. Meaningful-failure check: **one of** the assertions must have been demonstrated to fail if 46.4 is reverted. Easiest: temporarily gate the pre-beacon block on `if (false && !this.skipCaplog)`, re-run ONLY the new test file, observe the default-path pre-beacon test go red, revert the scraper.js change. Use the Bash + python3 workaround for the toggle (Edit is denied on tools/scraper/**). Paste the red output in the report. Confirm `git diff tools/scraper/scraper.js` is empty post-revert.
+6. Wire the new file into `package.json`'s `test` script (the project enumerates each file explicitly — see 46.2 commit for pattern).
+7. `npm test` → expect 509 + N_new tests green (report the final count).
+
+### Verification
+- [ ] New file `tests/test-scraper-caplog-beacon.js` exists, picked up by `npm test`.
+- [ ] At least 6 new tests (pre/legacy/post/legacy-post/error-path/skip-default/skip-legacy). Minimum 6 — more OK.
+- [ ] Tests assert on the exact ORDERED key sequence (not just presence of individual keys). Both `PRE_KEYS` and `POST_KEYS` must be matched.
+- [ ] Sequencing check: pre-beacon comes before verify, post-beacon comes after verify.
+- [ ] `skipCaplog` suppression is end-to-end (zero `/caplog` URLs in the recorded list).
+- [ ] Meaningful-failure check performed and reported (temporarily broke the pre-beacon, saw the default-path test go red, reverted). Paste the red output.
+- [ ] `git diff tools/scraper/` → empty at report time (apart from pre-existing dirty `cache/templates.json` from earlier phases).
+- [ ] `npm test` passes all tests, report `# tests / # pass / # fail` counts.
+- [ ] No new npm dependencies.
+- [ ] Follows project coding style.
+
+### Constraints
+- **Do not make any git commits.** Director handles all commits after verification.
+- **Different agent from 46.4.** Approach the beacon code as a consumer — do not trust its call-site wiring just because 46.4 reported "match".
+- **No production code changes.** The temporary revert-check in the meaningful-failure step MUST be reverted before reporting; confirm with `git diff tools/scraper/scraper.js` showing empty output.
+- **Offline only.** All HTTPS must be mocked via the monkey-patched `https.request` seam established in 46.2. Never make a live request.
+- **No new dependencies.** Built-ins only.
+- **`targets/` / `sample/` read-only.**
+- **Follow `.claude/rules/coding-style.md`** and **`.claude/rules/verify-dont-assume.md`**.
+- **If the task is too difficult or impossible**, stop and report. Revert any partial changes before reporting.
+
+### Suggested Agent
+**general-purpose** — must be a different agent instance from the one that did 46.4 (impl/tests separation rule).
 
 ### Goal
 Real Chrome 146 emits two `/caplog` GET beacons at `t.captcha.qq.com` during a captcha solve — a 45-parameter pre-verify beacon (between tdc.js load and verify) and a 15-parameter post-verify beacon (immediately after verify, fired regardless of verify outcome). Our scraper currently emits zero caplog beacons. This is a distinctive "IP never reported telemetry" tell for Tencent's scoring and is the #2 ranked wire-level gap in the Phase 46 ladder. Port both beacons into the scraper, fire-and-forget, behind a `--skip-caplog` escape hatch.
