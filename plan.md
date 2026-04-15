@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 44 CLOSED (2026-04-15)** — vm-slide vData end-to-end reproducibility shipped. No active phase; awaiting next user direction.
-Current task: none
+Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (drafted 2026-04-15, awaiting user confirmation)
+Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live scraper use
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -132,6 +132,53 @@ Current task: none
 
 > **Mental-model status post-44.4.5** (what 44.2.7 must settle or leave standing): (1) Phase 42's XHR-patch mechanism on Chrome appears to stand — 44.2.7 should confirm fn 20539 is the live producer; (2) fn 22317 is an internal/reserved vm-slide export not called on the observed Chrome path; (3) 44.4.1's `Math.random()` comparator is in fn 23898, only referenced by fn 22317 — unreached at runtime; real per-run order source is inside fn 20539's subtree; (4) `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` is still byte-identical to both fixtures, so the padder + ShiftRows + XTEA + base64 pipeline shape is correct — 44.2.6 got the pipeline right, just attached it to the wrong function. 44.2.7's job is to move the attach point from fn 22317 to the real producer in fn 20539's subtree.
 
+### Phase 45: Scraper vData switchover + errorCode 12 re-test (drafted 2026-04-15)
+> Replace the scraper's jsdom-harness vData generation with the standalone `tools/vdata-generator/` pipeline (Phase 44 deliverable), supplying **browser-like field values** instead of the jsdom-specific ones that leak through today. Then re-run the 30-attempt survey from `docs/ERRORCODE_12_INVESTIGATION.md` to measure whether errorCode 12 improves.
+
+> **Motivation — why the swap is worth trying**. The scraper currently runs vm-slide live inside jsdom via `tools/scraper/vdata-harness.js` (step 4 of `scraper.js`:525, `generateVData` call). jsdom produces structurally distinct field values versus a real Chrome browser, visible in the two committed fixtures:
+> - `tp` — jsdom: `Cannot read properties of null (reading 'src')` (a jsdom DOM error on a missing `<img src>`); real Chrome HAR: `7446039806946242560` (a numeric snowflake-like ID). Fundamentally different shape.
+> - `cLod` — jsdom: `unloadTDC`; real Chrome HAR: `loadTDC`. The scraper never boots the register-VM `tdc.js` in the same jsdom context, so vm-slide's lifecycle probe reads "unloaded".
+> - `inf` — jsdom: `top`; real Chrome HAR: `iframe`. The scraper loads vm-slide at the top window; a real show-page runs it inside a captcha iframe.
+> - `ss`, `env` — smaller but similar divergences.
+>
+> Every one of those four mismatches is a fingerprintable tell. errorCode 12 currently starts rejecting after ~8–10 solves with no IP-level explanation (`docs/ERRORCODE_12_INVESTIGATION.md`), which is consistent with Tencent's server-side scoring accumulating these vData-tell signals over a session. The Phase 44 `tools/vdata-generator/build-from-obj.js` lets us pick every field value deliberately, so we can supply browser-like values and test the hypothesis.
+
+> **Why not "just also solve errorCode 12"**. This plan does NOT claim the swap will fix errorCode 12. It treats the swap as a one-variable experiment: change vData generation to use browser-like field values via the standalone pipeline, re-run the survey, and observe. If success rate improves, we've closed one vector; if it doesn't, we've ruled one hypothesis out and narrowed the search.
+
+> **Scope boundary**. Phase 45 only touches vData generation and its direct consumers. Out of scope: changing the behavioural event stream (`slideSd`), rewriting request headers, live Puppeteer warm-up, TLS/JA3 manipulation. Those remain candidates in `docs/ERRORCODE_12_INVESTIGATION.md` for later phases if Phase 45 doesn't move the needle.
+
+> **Key load-bearing fact**. The only vData field that is data-dependent on the POST body is `key` (= `fn 22730 → require(18)(body,'tlg')`, a char-lookup-loop digest). Every other field is either a caller-supplied constant, a runtime-probe with a small fixed set of possible values, or a piece of tdc state. So the standalone swap needs exactly one body-dependent helper ported (the `key` digest); everything else can be caller-supplied from a static "browser profile".
+
+> **Two streams**:
+> - **Stream A (45.1 → 45.2 → 45.3)**: Productise the plaintext builder. Decide per-field source (port vs. caller-supplied), add `buildVDataForPost(body, options)` entry point, tests.
+> - **Stream B (45.4 → 45.5 → 45.6)**: Wire into scraper, test, run the empirical errorCode 12 survey.
+
+> **Starting inputs**: `tools/vdata-generator/` (Phase 44 deliverable), `tools/scraper/{scraper.js, vdata-harness.js}`, `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` (per-field decompile), `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` (reference impl — now the source for porting the `key` digest), `tests/fixtures/vdata-{jsdom,har}-capture.json` (observed values for both field types), `sample/captcha-har.har` (real Chrome POST body for verifying the `key` digest), `docs/ERRORCODE_12_INVESTIGATION.md` (baseline success rate and survey protocol).
+
+| ID | Task | Status |
+|----|------|--------|
+| 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | pending |
+| 45.2 | **Port the `key` field digest + add `buildVDataForPost` entry point** — port `fn 22730 → require(18)(body,'tlg')` from `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` into `tools/vdata-generator/build-key-field.js`, exporting `computeKeyField(postBody) → string`. Add `tools/vdata-generator/for-post.js` exporting `buildVDataForPost(postBody, options)` that (a) computes `key` from `postBody`, (b) merges the 45.1 browser-profile defaults with caller-supplied overrides for the other 7 fields, (c) calls `buildVDataFromObj` with the resulting `obj`. Add a `for-post` CLI subcommand mirroring the existing `from-obj` subcommand. Update `tools/vdata-generator/README.md` with the new mode. | pending |
+| 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture: extract the actual verify POST body from `sample/captcha-har.har` (the Chrome 146 capture that produced `vdata-har-capture.json`), compute the digest, assert it equals the HAR fixture's `obj.key = '21L2'`. Lock down `buildVDataForPost` against a synthetic POST body + browser-profile obj: assert output is a valid 152-char vData ending in `YY`, every char in the Phase 43 alphabet, and (if the HAR body is pin-able) reproduces the HAR fixture's vData byte-identically when called with the HAR body + HAR field values + HAR order. | pending |
+| 45.4 | **Scraper wiring swap** — in `tools/scraper/scraper.js` around line 525, replace the `generateVData` jsdom-harness call with `buildVDataForPost(serializedBody, browserProfile)`. Build the `serializedBody` the same way the current jsdom path does (`jQuery.param(postFields)` → preserved behaviour). Add a `--legacy-vdata` CLI flag to `tools/scraper/cli.js` that keeps the jsdom path available for comparison. Preserve `tools/scraper/vdata-harness.js` unmodified (it's still useful as an oracle). Add a `browserProfile` JSON under `profiles/vdata-browser-default.json` with the 45.1 defaults, loaded by default. | pending |
+| 45.5 | **Tests for 45.4** (different agent) — mock the scraper verify path end-to-end without network I/O: drive `scraper.js`'s vData generation code path with both (a) the new `buildVDataForPost` entry point and (b) `--legacy-vdata` jsdom harness, capture the generated vData strings, and assert: both are valid 152-char strings on the Phase 43 alphabet ending in `YY`, both decrypt back to 8-field kv strings, and the new path uses the browser-profile values (not jsdom-specific ones). Integration-style; do not hit the network. | pending |
+| 45.6 | **Empirical errorCode 12 re-test** (director-owned; live network) — run the 30-attempt survey from `docs/ERRORCODE_12_INVESTIGATION.md` §"Observed Pattern" against the live `cap_union_new_verify` endpoint, with the new vData pipeline. Record success rate in the same attempts-bucket shape (1, 2–9, 10–30). Then run a matched control with `--legacy-vdata` back-to-back from the same IP. Update `docs/ERRORCODE_12_INVESTIGATION.md` with both result rows and a verdict: (a) vData-pipeline swap improved the success rate (Phase 45 goal achieved), (b) neutral (swap is correct but errorCode 12 is elsewhere; refocus on behavioural / header vectors), or (c) regressed (new pipeline has a defect; roll back, investigate). Commit the updated investigation doc + any observed error bodies as the deliverable. | pending |
+
+> **Scope decisions for user review**:
+> 1. **Stream A porting scope**: 45.1 is the decision task. Recommendation — port ONLY the `key` digest (mandatory, body-dependent), keep the other 7 fields as profile-supplied with browser-like defaults drawn from the HAR fixture. The helpers for `tp` / `ss` (fn 22400 / fn 23399) are extra work for uncertain gain since we can't verify real-browser outputs without a live Chrome capture pipeline.
+> 2. **Is `--legacy-vdata` worth keeping?** Recommendation — yes. Swap is a hypothesis test; keeping the old path behind a flag lets 45.6 run a matched A/B from the same IP in one session.
+> 3. **Directly commit to Phase 45, or narrow-scope proof-of-concept first?** Recommendation — commit. The tasks are small (each single-session), and 45.6 is the only live-network step. If 45.1's decisions turn out wrong, we'll replan at that gate.
+> 4. **Where do browser-like field defaults come from?** The HAR fixture captures one real Chrome 146 session; 45.1 will pin the default values from that fixture's `obj`. This is a single-sample profile — if Tencent fingerprints on per-session variance, we may need to rotate profiles in a future phase.
+
+> **Dispatch order (proposed)**: 45.1 → 45.2 → 45.3 → 45.4 → 45.5 → 45.6. Each transition goes through normal verify + commit gates. 45.6 is the only task with live-network side effects; all others are local and side-effect-free.
+
+> **Non-goals (out of scope)**:
+> - Rewriting the scraper's behavioural event stream (`slideSd`)
+> - Puppeteer warm-up / browser reputation building
+> - TLS/JA3 fingerprint shaping
+> - Rotating among multiple browser profiles (we ship a single default profile)
+> - Reconfirming which vm-slide build the fixtures came from (carried forward as optional Phase 45.x if needed; see Phase 44.2.7 key reconciliation note)
+
 ---
 
 
@@ -139,4 +186,56 @@ Current task: none
 
 ## Current Task
 
-None. Phase 44 closed 2026-04-15. Awaiting next user direction.
+**ID**: 45.1
+**Title**: Per-field source decisions for live scraper vData use
+**Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
+**Status**: pending — awaiting user confirmation of Phase 45 plan before dispatch
+
+### Goal
+Decide, for each of the 8 fields in the vm-slide vData plaintext (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`), whether the scraper should (a) **port-as-code** — compute it per-request from runtime inputs, (b) **profile-supplied** — read it from a browser profile JSON as a caller-supplied default, or (c) **inline default** — hardcode a single browser-like value inside `buildVDataForPost`. Produce a research doc that locks these decisions in so Stream A's implementation tasks (45.2/45.3) have zero ambiguity about what to port and what to hand in. No code changes in this task — it is a decision-and-document pass.
+
+### Context
+- **Phase 44 deliverable to build on**: `tools/vdata-generator/` ships three modes (cipher-only, replay, from-obj). `buildVDataFromObj({obj})` takes an 8-field obj and produces a valid 152-char vData string. What's missing for live scraper use is (a) a body-dependent computation of the `key` field and (b) browser-like default values for the other 7 fields.
+- **Per-field decompile status**: `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` has the full per-field walk, including the three helper functions (fn 22400 = `tp`, fn 22730 = `key`, fn 23399 = `ss`) and the five inline fields (`py`, `env`, `version`, `cLod`, `inf`). Start there.
+- **Reference implementation**: `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` already reproduces the kv-string build for both committed fixtures byte-identically when given `{obj, order}`. Its `key` and `tp` and `ss` values are passed in by the caller, not computed — this task decides which of those should become computed-from-input in the productised version.
+- **Fixture evidence**:
+  - jsdom fixture (`tests/fixtures/vdata-jsdom-capture.json`): `obj = {inf:'top', env:'1', tp:"Cannot read properties of null (reading 'src')", key:'qLCZ', py:'0', ss:'0%2C', cLod:'unloadTDC', version:'2'}`
+  - HAR fixture (`tests/fixtures/vdata-har-capture.json`): `obj = {inf:'iframe', env:'0', tp:'7446039806946242560', cLod:'loadTDC', version:'2', key:'21L2', ss:'11%2Ctdc%2Cslide%2Cvm', py:'0'}`
+- **Browser-like target values** — the HAR fixture is the one real-Chrome data point we have. Treat HAR values as the "browser-like" ground truth for fields where we cannot compute the value from a runtime source we control.
+- **Hypothesis for the decision split** (director's recommendation — 45.1 may confirm or override):
+  - `key` → **port-as-code**. It's a char-lookup digest of the verify POST body; must be recomputed per request; load-bearing.
+  - `tp` → **profile-supplied with HAR-like default**. fn 22400 captures JS runtime errors observed during page load; we can't meaningfully reproduce Chrome's error-capture behaviour in the scraper, so hardcode the HAR value `'7446039806946242560'` (or a rotating set of snowflake-like strings) as the profile default.
+  - `ss` → **profile-supplied with HAR-like default** `'11%2Ctdc%2Cslide%2Cvm'`. fn 23399 summarises vm-slide subsystem state; Chrome-style output is what we want, and we don't have a runtime source for it in the scraper.
+  - `py` → **profile-supplied**, value from the orchestrator's `captchaConfig.py`; for a headless scraper without a real show-page, `'0'` (observed in both fixtures) is the default.
+  - `env` → **inline default** `'0'` (HAR value). Single static choice.
+  - `version` → **inline default** `'2'`. Literal in fn 22317.
+  - `cLod` → **inline default** `'loadTDC'` (HAR value — important: jsdom had `unloadTDC` and this is one of the visible jsdom tells).
+  - `inf` → **inline default** `'iframe'` (HAR value — another visible jsdom tell, jsdom has `'top'`).
+- **Why this task exists**: if we start 45.2 without fixing the decision split, the porting subagent will either over-scope (try to decompile fn 22400 and fn 23399 end-to-end, weeks of work) or under-scope (hardcode everything and miss `key`, producing invalid vData). 45.1's job is to draw the line up-front with evidence.
+
+### Implementation Steps
+1. **Read the existing decompile** — `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` end-to-end, plus the relevant sections of `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` (the reference impl) and `docs/VDATA_FORMAT.md` §7 (the authoritative public field table). Extract what is currently known about each of the 8 fields' value-source rules.
+2. **Read the jsdom and HAR fixtures** — confirm the exact `obj` values recorded in each, and note which fields differ between environments. The deltas are the fingerprinting vectors.
+3. **For each field, classify** as port-as-code / profile-supplied / inline-default. Justify each classification with: (a) the value's observed variability across fixtures, (b) whether the scraper has a runtime source for the input the field depends on, (c) the porting cost if port-as-code is chosen, (d) the risk if profile-supplied (static tell vector vs. dynamic input).
+4. **Pin browser-like default values** for every profile-supplied and inline-default field, citing the HAR fixture as the source. Where the value is a single literal (e.g. `version='2'`), note it. Where a small set of alternates might be rotated, note the set but pick one for the default.
+5. **Specify the `key` digest port scope** — from `research/vm-slide-stack-vm/build-fingerprint-plaintext.js`, identify the exact JS function(s) that implement `fn 22730`'s char-lookup over the POST body, write a one-paragraph porting spec (input: POST body string; output: 4-character digest string; dependencies: any tables or constants), and note any edge cases the scraper's POST body might hit that the research reference impl's test cases don't cover.
+6. **Write `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`** with §1 Decision Table (one row per field, columns: classification, browser-like default, justification, port scope if applicable), §2 `key` Digest Porting Spec (the input/output/impl-reference paragraph from step 5), §3 Browser Profile Template (a JSON shape that 45.4 will write to `profiles/vdata-browser-default.json`), §4 Open Questions / Rejected Alternatives (anything the decision-maker considered and rejected, so 45.2 doesn't relitigate them).
+7. **Sanity cross-check** — verify that plugging the decided defaults into `buildVDataFromObj({obj: <defaults + placeholder key>})` produces a valid 152-char vData. This is a one-liner to run at the CLI; it proves the profile shape is consumable.
+
+### Verification
+- [ ] `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` exists with all four required sections (Decision Table, Key Digest Porting Spec, Browser Profile Template, Open Questions).
+- [ ] Decision Table covers all 8 fields with explicit classification + justification.
+- [ ] Browser Profile Template is a valid JSON block that `buildVDataFromObj` can consume (self-check via CLI one-liner: `node tools/vdata-generator/cli.js from-obj --obj <profile-with-placeholder-key>` exits 0 and prints a 152-char string ending in `YY`).
+- [ ] Key Digest Porting Spec names the exact function in `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` that implements the digest, and spells out input/output types.
+- [ ] No code changes in `tools/vdata-generator/`, `tools/scraper/`, or `profiles/`. This task is research-only.
+- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, or any existing research note (append-only: create a new file).
+
+### Constraints
+- **Do not make any git commits.** The director handles all commits after verification.
+- **Do not modify `tools/vdata-generator/`, `tools/scraper/`, or any existing file.** This task produces exactly one new file: `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`.
+- **Do not start porting the `key` digest yet.** The decision document is the deliverable; 45.2 does the porting.
+- **If a field's classification is genuinely ambiguous** (e.g. you think `tp` should be port-as-code but can't pin what fn 22400 reads from), document the ambiguity in §4 Open Questions with evidence and pick the recommendation that costs the least implementation work. 45.2 can revisit if needed.
+- **If the task is too difficult or impossible to complete**, stop immediately and report back. Explain what you attempted, what went wrong, and why you believe the task cannot be completed as specified. Do not leave behind partial or broken changes.
+
+### Suggested Agent
+`general-purpose` — research + writing task, no tool-specific skills needed beyond reading existing docs and producing a clean Markdown deliverable with a decision table.
