@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (revised 2026-04-15 post-45.1, user-confirmed)
-Current task: 45.1a — Decompile module 18 (`tlg` / `sess` lookups) from vm-slide (in-progress, dispatched 2026-04-15)
+Current task: 45.2 — Port `computeKeyField` + add `buildVDataForPost` entry point (in-progress)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -158,7 +158,7 @@ Current task: 45.1a — Decompile module 18 (`tlg` / `sess` lookups) from vm-sli
 | ID | Task | Status |
 |----|------|--------|
 | 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | done |
-| 45.1a | **Decompile module 18 (`tlg` / `sess` lookups)** — new prerequisite discovered by 45.1. Module 18 is the body-parser `require(18)(body, tag)` that both fn 22730 (`key` digest) and the surrounding accumulator loop call. It is NOT decompiled anywhere in `research/vm-slide-stack-vm/`. Produce (a) a new research note `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with the decompiled function, the exact behaviour for tags `"tlg"` and `"sess"`, input/output types, edge cases (empty body, missing tag, non-ASCII bytes), and (b) a runnable reference impl `research/vm-slide-stack-vm/module18-body-parser.js` whose output on the HAR fixture's verify POST body matches the HAR `obj.key = "21L2"` when plugged through the fn 22730 accumulator loop from `PHASE-45-FIELD-SOURCES.md` §2.1. This is the gate for 45.2. | in-progress |
+| 45.1a | **Decompile module 18 (`tlg` / `sess` lookups)** — new prerequisite discovered by 45.1. Module 18 is the body-parser `require(18)(body, tag)` that both fn 22730 (`key` digest) and the surrounding accumulator loop call. It is NOT decompiled anywhere in `research/vm-slide-stack-vm/`. Produce (a) a new research note `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with the decompiled function, the exact behaviour for tags `"tlg"` and `"sess"`, input/output types, edge cases (empty body, missing tag, non-ASCII bytes), and (b) a runnable reference impl `research/vm-slide-stack-vm/module18-body-parser.js` whose output on the HAR fixture's verify POST body matches the HAR `obj.key = "21L2"` when plugged through the fn 22730 accumulator loop from `PHASE-45-FIELD-SOURCES.md` §2.1. This is the gate for 45.2. | done |
 | 45.2 | **Port the `key` field digest + add `buildVDataForPost` entry point** — port `fn 22730 → require(18)(body,'tlg')` from `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` into `tools/vdata-generator/build-key-field.js`, exporting `computeKeyField(postBody) → string`. Add `tools/vdata-generator/for-post.js` exporting `buildVDataForPost(postBody, options)` that (a) computes `key` from `postBody`, (b) merges the 45.1 browser-profile defaults with caller-supplied overrides for the other 7 fields, (c) calls `buildVDataFromObj` with the resulting `obj`. Add a `for-post` CLI subcommand mirroring the existing `from-obj` subcommand. Update `tools/vdata-generator/README.md` with the new mode. | pending |
 | 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture: extract the actual verify POST body from `sample/captcha-har.har` (the Chrome 146 capture that produced `vdata-har-capture.json`), compute the digest, assert it equals the HAR fixture's `obj.key = '21L2'`. Lock down `buildVDataForPost` against a synthetic POST body + browser-profile obj: assert output is a valid 152-char vData ending in `YY`, every char in the Phase 43 alphabet, and (if the HAR body is pin-able) reproduces the HAR fixture's vData byte-identically when called with the HAR body + HAR field values + HAR order. | pending |
 | 45.4 | **Scraper wiring swap** — in `tools/scraper/scraper.js` around line 525, replace the `generateVData` jsdom-harness call with `buildVDataForPost(serializedBody, browserProfile)`. Build the `serializedBody` the same way the current jsdom path does (`jQuery.param(postFields)` → preserved behaviour). Add a `--legacy-vdata` CLI flag to `tools/scraper/cli.js` that keeps the jsdom path available for comparison. Preserve `tools/scraper/vdata-harness.js` unmodified (it's still useful as an oracle). Add a `browserProfile` JSON under `profiles/vdata-browser-default.json` with the 45.1 defaults, loaded by default. | pending |
@@ -187,69 +187,51 @@ Current task: 45.1a — Decompile module 18 (`tlg` / `sess` lookups) from vm-sli
 
 ## Current Task
 
-**ID**: 45.1a
-**Title**: Decompile module 18 (`tlg` / `sess` body-parser lookups)
+**ID**: 45.2
+**Title**: Port `computeKeyField` + add `buildVDataForPost` entry point
 **Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
-**Status**: in-progress (dispatched 2026-04-15, user confirmed plan revision)
+**Status**: in-progress (dispatched 2026-04-15, unblocked by 45.1a)
 
 ### Goal
-Decompile the body-parser helper that vm-slide references as `require(18)(body, tag)`. This helper is called twice inside the `key`-field accumulator loop (fn 22317 pcs 22972..23328) — once with `tag = "tlg"` to produce a digit-index string, and once with `tag = "sess"` to produce a charset string of length ≥ 14. Module 18 is the gate for 45.2 (`computeKeyField` port) — without it, 45.2 cannot produce a body-dependent `key` field, which in turn means `buildVDataForPost` can only emit replay-equivalent `vData` and the Phase 45 switchover loses its main point.
+Productise the `key`-field digest chain into `tools/vdata-generator/` so the scraper can generate live `vData` strings from a URL-encoded POST body + a browser-profile object of the other 7 fields. Deliver three things: (a) a `computeKeyField(postBody) → string` helper that reproduces the HAR oracle `"21L2"`, (b) a `buildVDataForPost(postBody, options)` entry point that merges `computeKeyField` with a browser profile and hands the obj to `buildVDataFromObj`, and (c) a matching `for-post` CLI subcommand. Tests come in 45.3 (different agent).
 
 ### Context
-- **Why this task exists**: 45.1's decision doc (`research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §2) discovered that the `key` digest has NOT been implemented anywhere in `research/vm-slide-stack-vm/`. The original 45.1 brief assumed the digest was already in `build-fingerprint-plaintext.js`, but that file only handles pad + permute and takes `obj.key` as a captured string. The actual digest is fn 22730 wrapped around `require(18)(body, "tlg")` + `require(18)(body, "sess")`, and module 18 is undecompiled.
-- **Pinned pseudocode** (from `PHASE-45-FIELD-SOURCES.md` §2.1, sourced from `FINGERPRINT-SCHEMA.md`):
-  ```js
-  // fn 22317, pcs 23007..23056
-  slot8 = require(18)(body, "sess") || "abcdefghijklmn";
-  // pcs 22972..23004
-  digitArray = fn22730(body) || new Array();
-  // pcs 23240..23328
-  slot9 = "";
-  for (var i = 0; i < digitArray.length; i++) {
-    slot9 += slot8.charAt(digitArray[i]);
-  }
-  obj.key = slot9;
-
-  // fn 22730 body (entry pc 22972, 1-arg closure):
-  function fn22730(body) {
-    return require(0)()
-      ? require(18)(body, "tlg").split("").map(function (c) { return parseInt(c, 10); })
-      : [4, 2, 3, 10];
-  }
-  ```
-- **What module 18 does (hypothesis)**: a small body-parser that takes a serialized POST body (likely `jQuery.param`-style `key=value&key=value` form) and looks up a sub-key by tag. For `tlg`, it must return a string whose every character is a decimal digit (because of `parseInt(c, 10)`). For `sess`, it must return a string of length ≥ 14. Neither claim is verified — 45.1a must verify them against the HAR fixture's actual body.
-- **Verification oracle (HAR)**: `sample/captcha-har.har` contains the real Chrome 146 verify POST that produced `tests/fixtures/vdata-har-capture.json`'s `obj.key = "21L2"`. Extract that POST body and confirm that the decompiled module 18 + fn 22730 + accumulator loop reproduces `"21L2"` exactly. Any deviation means the decompile is wrong.
-- **Where module 18 lives**: it is a webpack module in `sample/t_captcha_slide.js` or (more likely) a vm-slide bytecode function. The file `sample/vm_slide.js` (bytecode-carrier) + the `research/vm-slide-stack-vm/` disassembly artifacts under `output/vm-slide/` are the entry points. Grep for the two string literals `"tlg"` and `"sess"` first — they are the tags passed in, so module 18's body or its caller almost certainly contains them as literals.
-- **Starting inputs**:
-  - `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` — fn 22317 per-field walk
-  - `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §2 — key digest spec
-  - `output/vm-slide/*.json` / disassembly — vm-slide bytecode artifacts
-  - `sample/vm_slide.js` — bytecode carrier (read-only)
-  - `sample/t_captcha_slide.js` — orchestrator bundle (read-only)
-  - `sample/captcha-har.har` — real Chrome 146 capture; verify-POST body is the HAR oracle
-  - `tests/fixtures/vdata-har-capture.json` — target `obj.key = "21L2"`
+- **45.1a reference impl**: `research/vm-slide-stack-vm/module18-body-parser.js` exports `lookup(body, tag)` (vm-slide's `require(18)` semantics — form-urlencoded field extractor with NO URL-decoding) and `computeKeyField(body)`. The reference impl reproduces the HAR fixture's `obj.key = "21L2"` byte-identically via digit array `[8,1,2,8]` walked over the 322-byte `sess` value. `node research/vm-slide-stack-vm/module18-body-parser.js` exits 0 on PASS — 45.3 will re-use this as the test oracle.
+- **Field-source decisions**: `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §1 is the decision table. `key` is the only port-as-code field; `tp` / `ss` / `py` are profile-supplied; `env` / `version` / `cLod` / `inf` are inline defaults. §3 has the browser-profile JSON template.
+- **Existing `tools/vdata-generator/` shape**: see `tools/vdata-generator/README.md`. Public entry points today are `encodeVData` (cipher-only), `buildVData` (replay-with-substitution), `buildVDataFromObj` (from-obj synthesis). The new mode is a fourth entry point `buildVDataForPost` that composes `computeKeyField` + `buildVDataFromObj`. CLI file is `tools/vdata-generator/cli.js` with existing `from-obj` subcommand — mirror its shape.
+- **fn 22730 fallback branch**: `require(0)() ? <digest-from-tlg> : [4, 2, 3, 10]`. `require(0)` is the same predicate that controls the `env` field (`env = require(0)() ? '0' : '1'`). HAR fixture has `env = '0'`, so the truthy branch ran — `computeKeyField` must implement the truthy branch. The `[4, 2, 3, 10]` fallback is vm-slide's "I am running under IE9" path; the scraper does not need it, but `computeKeyField` should still honour it if a caller explicitly requests the false-branch behaviour (optional; the primary API is "use the truthy branch").
+- **URL-encoding subtlety (CRITICAL)**: module 18 does NOT URL-decode. Values are extracted as raw bytes between `&<tag>=` and the next `&`. The `tlg` field in the HAR body is `8128` (4 plain digits) and the `sess` field is a base64url-ish blob — both happen to be URL-safe. But if the scraper ever feeds a body where `sess` or `tlg` contains percent-encoding, the digit-indexing is over the encoded bytes, not the decoded value. Preserve that invariant when porting.
+- **Who supplies `tlg`**: per 45.1a's incidental finding, `sample/t_captcha_slide.js` sets `e.tlg = e[collectdata].length` on the orchestrator object before serialising — so `tlg` is the string length of the `collect` token. The scraper already produces a `collect` token, so this is free: the caller of `buildVDataForPost` must ensure the serialised body contains a `tlg=<N>` field where N is the collect-token length. Document this in the README and make it a precondition of the API (do NOT silently compute it inside `computeKeyField` — that would couple the `key` digest to the scraper's token-generator path, which belongs in the scraper wiring, not in `tools/vdata-generator/`).
+- **Don't regenerate 45.1a's reference impl from scratch**: port it. The CommonJS file at `research/vm-slide-stack-vm/module18-body-parser.js` is already battle-tested against the HAR oracle. Copy its `lookup` + the fn 22730 accumulator loop verbatim into `tools/vdata-generator/build-key-field.js`, dropping only the `require.main === module` test harness. The research file stays in place as the authoritative source.
 
 ### Implementation Steps
-1. **Locate module 18.** Grep the vm-slide disassembly and `sample/t_captcha_slide.js` for the literal strings `"tlg"` and `"sess"`. Narrow to the function body that dispatches on the `tag` argument. Record the PC range (if it's vm-slide bytecode) or the webpack module id + function offset (if it's orchestrator JS).
-2. **Decompile module 18.** Produce a pseudocode JS function equivalent to the bytecode / minified source. Pay attention to: (a) how it parses the `body` argument — is it `body.split("&")` form-encoded, is it JSON, is it a raw string it walks character-by-character? (b) what structure it returns — the caller does `.split("")` and `.charAt()`, so both return values must be strings.
-3. **Reference impl.** Write `research/vm-slide-stack-vm/module18-body-parser.js` exporting `lookup(body, tag)` as a pure function (no DOM dependencies). Write the minimal Node.js test harness inside the same file (via `if (require.main === module) ...`) that runs against a real HAR POST body and prints the two lookup results.
-4. **Reproduce `obj.key = "21L2"` from HAR.** Extract the verify POST body from `sample/captcha-har.har` (look for the `cap_union_new_verify` POST; the pre-injection body is what gets passed to the `key` accumulator — 45.1a must determine whether it's the body with or without `&vData=...`). Plug the body through the fn 22730 accumulator loop (pseudocode above) using the new `lookup` impl. Assert that `obj.key === "21L2"`.
-5. **Document**. Write `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` with: §1 Location (PC range / module id), §2 Decompiled Pseudocode, §3 Tag Behaviour Table (one row per tag the vm-slide codebase passes — start with `"tlg"` and `"sess"`; search the disassembly for any additional tags), §4 Edge Cases (empty body, missing tag, non-ASCII, multiple same-named fields), §5 HAR reproduction proof for `obj.key = "21L2"`.
-6. **Cross-check against the jsdom fixture**. `vdata-jsdom-capture.json`'s `obj.key = "qLCZ"` was produced by the jsdom harness, NOT by a real body. If the jsdom harness passes through the same accumulator loop, we can additionally reproduce "qLCZ" from whatever body the harness synthesizes — optional but strengthens the evidence.
+1. **Read** `research/vm-slide-stack-vm/module18-body-parser.js` end-to-end, plus `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §2 + §3, plus `tools/vdata-generator/README.md`, `tools/vdata-generator/cli.js`, and `tools/vdata-generator/build-from-obj.js` to understand the existing module shape.
+2. **Create** `tools/vdata-generator/build-key-field.js`. Export two functions: `lookupFormField(body, tag)` (vm-slide module-18 semantics — raw substring, no URL-decoding) and `computeKeyField(body, options)`. The `options` object supports `{ ie9Fallback: boolean }` which defaults to `false`; when `true`, `computeKeyField` returns the digit array `[4, 2, 3, 10]` walked over `sess` (honouring the fn 22730 false branch). Module-level JSDoc should cite the 45.1a reference and the PC ranges from `MODULE-18-BODY-PARSER.md`. Follow `.claude/rules/coding-style.md`: CommonJS, `'use strict'`, 2-space indent, single quotes, semicolons, `const`/`let` only.
+3. **Create** `tools/vdata-generator/for-post.js`. Export `buildVDataForPost(postBody, options)` where `options` supports `{ profile, overrides, order, ie9Fallback }`. Semantics:
+   - `profile` — an object shaped like the `PHASE-45-FIELD-SOURCES.md` §3 browser-profile template. `key` may be the literal `"__COMPUTED__"` sentinel or absent — it will be replaced by `computeKeyField(postBody, {ie9Fallback})`. If `profile.key` is any other string, throw — we do not want silent collisions between a caller-supplied key and the computed one.
+   - `overrides` — optional field-level overrides merged over the profile (useful for rotating `tp`/`ss` without reloading the profile).
+   - `order` — optional explicit field order passed through to `buildVDataFromObj`. When omitted, `buildVDataFromObj`'s default (nondeterministic Fisher-Yates shuffle) is used.
+   - Returns the 152-char vData string from `buildVDataFromObj`.
+4. **Wire the CLI.** In `tools/vdata-generator/cli.js`, add a `for-post` subcommand that mirrors the existing `from-obj` shape: `--body <string-or-@file>`, `--profile <json-or-@file>`, `--overrides <json>` (optional), `--order <json-array>` (optional), `--ie9-fallback` (boolean flag). Reuse the existing JSON / @file parsing helpers. When `--body @path` is given, read the file as UTF-8 and trim a trailing newline if present (HAR bodies do not have trailing newlines, but scraper-captured bodies might).
+5. **Update** `tools/vdata-generator/README.md`: add a fourth mode to the "Programmatic API" section (`for-post`), with a minimal usage example that (a) loads the browser profile from `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §3, (b) passes a URL-encoded body that contains `tlg=` and `sess=` as substrings, (c) asserts the result length is 152. Document the `tlg`-is-caller-supplied precondition explicitly under a "Caller preconditions" subsection.
+6. **Self-check** — after wiring, run `node tools/vdata-generator/cli.js for-post --body "tlg=8128&sess=s1LCqg-Z2OZiIDOktcwDJ4mtzyDd91soncHQX79s" --profile '<inline JSON from §3 with key omitted>'`. Confirm it prints a 152-char string ending in `YY` and exits 0. This is NOT a substitute for 45.3's HAR-oracle test; it just proves the CLI wires through without crashing.
 
 ### Verification
-- [ ] `research/vm-slide-stack-vm/module18-body-parser.js` exists and `node research/vm-slide-stack-vm/module18-body-parser.js` exits 0, printing the HAR body's `"tlg"` and `"sess"` lookup results.
-- [ ] `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md` exists with all five required sections.
-- [ ] The reference impl + fn 22730 accumulator loop reproduces `obj.key = "21L2"` from the HAR POST body byte-identically. This check is explicitly asserted inside the test harness and its assertion passes when run.
-- [ ] Location section names the PC range (vm-slide) or webpack module id + offset (orchestrator) where module 18 was found.
-- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, `tools/`, or any existing research note or doc (append-only: two new files).
+- [ ] `tools/vdata-generator/build-key-field.js` exists and exports `lookupFormField` + `computeKeyField`.
+- [ ] `tools/vdata-generator/for-post.js` exists and exports `buildVDataForPost`.
+- [ ] `tools/vdata-generator/cli.js` has a working `for-post` subcommand; the self-check command from step 6 exits 0 and prints a 152-char string whose last two chars are `YY`.
+- [ ] `computeKeyField` reproduces `"21L2"` when handed the full HAR POST body. (Spot-check: director will run `node -e "const {computeKeyField}=require('./tools/vdata-generator/build-key-field.js'); const fs=require('fs'); const har=JSON.parse(fs.readFileSync('sample/captcha-har.har','utf8')); /* locate verify post body */ ..."` as part of verification — do not add test files yourself, that is 45.3.)
+- [ ] `tools/vdata-generator/README.md` has the new `for-post` mode documented, including the `tlg`-is-caller-supplied precondition.
+- [ ] No modifications to `research/vm-slide-stack-vm/module18-body-parser.js`, `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md`, `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md`, or any file under `targets/`, `sample/`, `tests/`, `tools/scraper/`, `profiles/`. This task only touches `tools/vdata-generator/`.
+- [ ] No git commits by the subagent.
 
 ### Constraints
 - **Do not make any git commits.** The director handles all commits after verification.
-- **Do not modify `tools/vdata-generator/` or `tools/scraper/`.** 45.1a is research-only; 45.2 imports the reference impl later.
-- **Do not modify `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` or any other existing file.** This task produces exactly two new files.
-- **Reproducing `"21L2"` is non-negotiable.** A decompile that doesn't round-trip the HAR body to the known fixture key is wrong. If you cannot reproduce it, stop and report what you got instead; the director will replan.
+- **Do not write test files.** 45.3 is a separate agent dispatched after 45.2 verifies. You may and should run ad-hoc one-liners to confirm your implementation works, but do NOT add files under `tests/`, `tests/fixtures/`, or `tools/vdata-generator/tests/`.
+- **Do not modify the 45.1a reference impl** — it is frozen research. Port it by copying the logic, not by rewriting or relocating the source file.
+- **Do not modify the scraper.** 45.4 wires this into `tools/scraper/scraper.js`; 45.2 only produces the library.
+- **Follow `.claude/rules/coding-style.md` and `.claude/rules/targets-readonly.md`.**
 - **If the task is too difficult or impossible to complete**, stop immediately and report back. Explain what you attempted, what went wrong, and why you believe the task cannot be completed as specified. Do not leave behind partial or broken changes.
 
 ### Suggested Agent
-`general-purpose` — bytecode reading + decompile + Node.js reference impl + Markdown write-up. No specialised tool needed; the existing disassembly artifacts in `output/vm-slide/` are the primary reading material.
+`general-purpose` — straightforward porting + module wiring + README update. No specialised tool needed.
