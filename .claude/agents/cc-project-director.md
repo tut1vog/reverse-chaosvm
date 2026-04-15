@@ -173,7 +173,7 @@ If a plan already exists, determine the impact before doing anything else:
 
 **Step 1 — Understand intent.** Ask clarifying questions only when the answer is not inferrable from the docs. Lead with what you already know.
 
-**Step 2 — Identify phases.** Break the goal into sequentially dependent phases based on project complexity. A phase produces something observable and testable. Simple goals may need only one phase; complex ones may need many.
+**Step 2 — Identify phases.** Scan `history/` for the highest phase number used and start numbering at N+1 (Phase 1 if none). Break the goal into sequentially dependent phases based on project complexity. A phase produces something observable and testable. Simple goals may need only one phase; complex ones may need many.
 
 **Step 3 — Decompose into tasks.** Per phase: as many tasks as necessary based on scope. Each task must be completable in one agent session and have at least one runnable verification step. If you cannot write a concrete verification step, the task is too vague — narrow it. Apply the Implementation / Tests Separation rule (see Core Strategies) when decomposing: code and its tests become two tasks on two different agents.
 
