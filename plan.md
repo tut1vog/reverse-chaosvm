@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test (drafted 2026-04-15, awaiting user confirmation)
-Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live scraper use
+Current phase: **Phase 45** — Scraper vData switchover + errorCode 12 re-test
+Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live scraper use (in-progress)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -157,7 +157,7 @@ Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live
 
 | ID | Task | Status |
 |----|------|--------|
-| 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | pending |
+| 45.1 | **Per-field source decisions** — read `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js`, classify each of the 8 fields as (a) **port-as-code** (must be computed per-request from inputs), (b) **profile-supplied** (caller hands in a browser-like value from a config), or (c) **inline default** (single hardcoded browser-like value). Produce `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` with the decision table, browser-like default values grounded in the HAR fixture, and the porting scope for Stream A. No code. | in-progress |
 | 45.2 | **Port the `key` field digest + add `buildVDataForPost` entry point** — port `fn 22730 → require(18)(body,'tlg')` from `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` into `tools/vdata-generator/build-key-field.js`, exporting `computeKeyField(postBody) → string`. Add `tools/vdata-generator/for-post.js` exporting `buildVDataForPost(postBody, options)` that (a) computes `key` from `postBody`, (b) merges the 45.1 browser-profile defaults with caller-supplied overrides for the other 7 fields, (c) calls `buildVDataFromObj` with the resulting `obj`. Add a `for-post` CLI subcommand mirroring the existing `from-obj` subcommand. Update `tools/vdata-generator/README.md` with the new mode. | pending |
 | 45.3 | **Tests for 45.2** (different agent per impl/tests separation) — lock down `computeKeyField` against the HAR fixture: extract the actual verify POST body from `sample/captcha-har.har` (the Chrome 146 capture that produced `vdata-har-capture.json`), compute the digest, assert it equals the HAR fixture's `obj.key = '21L2'`. Lock down `buildVDataForPost` against a synthetic POST body + browser-profile obj: assert output is a valid 152-char vData ending in `YY`, every char in the Phase 43 alphabet, and (if the HAR body is pin-able) reproduces the HAR fixture's vData byte-identically when called with the HAR body + HAR field values + HAR order. | pending |
 | 45.4 | **Scraper wiring swap** — in `tools/scraper/scraper.js` around line 525, replace the `generateVData` jsdom-harness call with `buildVDataForPost(serializedBody, browserProfile)`. Build the `serializedBody` the same way the current jsdom path does (`jQuery.param(postFields)` → preserved behaviour). Add a `--legacy-vdata` CLI flag to `tools/scraper/cli.js` that keeps the jsdom path available for comparison. Preserve `tools/scraper/vdata-harness.js` unmodified (it's still useful as an oracle). Add a `browserProfile` JSON under `profiles/vdata-browser-default.json` with the 45.1 defaults, loaded by default. | pending |
@@ -189,7 +189,7 @@ Current task: 45.1 — Per-field source decisions (`key` / `tp` / `ss`) for live
 **ID**: 45.1
 **Title**: Per-field source decisions for live scraper vData use
 **Phase**: Phase 45 — Scraper vData switchover + errorCode 12 re-test
-**Status**: pending — awaiting user confirmation of Phase 45 plan before dispatch
+**Status**: in-progress (dispatched 2026-04-15)
 
 ### Goal
 Decide, for each of the 8 fields in the vm-slide vData plaintext (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`), whether the scraper should (a) **port-as-code** — compute it per-request from runtime inputs, (b) **profile-supplied** — read it from a browser profile JSON as a caller-supplied default, or (c) **inline default** — hardcode a single browser-like value inside `buildVDataForPost`. Produce a research doc that locks these decisions in so Stream A's implementation tasks (45.2/45.3) have zero ambiguity about what to port and what to hand in. No code changes in this task — it is a decision-and-document pass.
