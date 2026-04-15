@@ -27,6 +27,10 @@ Options:
   --calibration <n>    Slide calibration offset (default: -25)
   --retries <n>        Max CAPTCHA solve attempts (default: 3)
   --captcha-only       Only solve CAPTCHA (don't query urlsec.qq.com)
+  --legacy-vdata       Use the legacy jsdom vm-slide harness for vData
+                       (default: standalone buildVDataForPost + browser profile)
+  --vdata-profile <p>  Path to a vData browser-profile JSON file
+                       (default: profiles/vdata-browser-default.json)
   --help, -h           Show this help message
 
 Examples:
@@ -42,6 +46,8 @@ function parseArgs(argv) {
     calibration: -25,
     retries: 3,
     captchaOnly: false,
+    legacyVdata: false,
+    vdataProfile: null,
     help: false,
     url: null,
   };
@@ -55,6 +61,13 @@ function parseArgs(argv) {
       args.verbose = true;
     } else if (arg === '--captcha-only') {
       args.captchaOnly = true;
+    } else if (arg === '--legacy-vdata') {
+      args.legacyVdata = true;
+    } else if (arg === '--vdata-profile') {
+      args.vdataProfile = argv[++i];
+      if (!args.vdataProfile) {
+        throw new Error('--vdata-profile requires a path');
+      }
     } else if (arg === '--ratio') {
       args.ratio = parseFloat(argv[++i]);
       if (isNaN(args.ratio)) {
@@ -103,6 +116,8 @@ async function main() {
     slideRatio: args.ratio,
     calibration: args.calibration,
     verbose: args.verbose,
+    legacyVdata: args.legacyVdata,
+    vdataProfile: args.vdataProfile,
   });
   await scraper.init();
 

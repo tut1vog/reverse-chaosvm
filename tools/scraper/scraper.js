@@ -21,12 +21,45 @@ const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/ca
 const { solveSlider } = require('../captcha-solver/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-harness');
+const { buildVDataForPost } = require('../vdata-generator/for-post');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
 const { execFile } = require('child_process');
 const os = require('os');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const DEFAULT_VDATA_PROFILE_PATH = path.join(
+  PROJECT_ROOT,
+  'profiles',
+  'vdata-browser-default.json'
+);
+
+/**
+ * Load a vData browser-fingerprint profile from an absolute path.
+ * @param {string} absolutePath
+ * @returns {Object}
+ */
+function loadProfile(absolutePath) {
+  const raw = fs.readFileSync(absolutePath, 'utf8');
+  return JSON.parse(raw);
+}
+
+/**
+ * Serialize a flat POST-fields object into an application/x-www-form-urlencoded
+ * string. Matches the shape that jQuery.param() produces for a flat object with
+ * string values, which is what buildVDataForPost and the verify endpoint both
+ * expect.
+ * @param {Object} fields
+ * @returns {string}
+ */
+function serializePostFields(fields) {
+  const params = new URLSearchParams();
+  for (const name of Object.keys(fields)) {
+    const value = fields[name];
+    params.append(name, value == null ? '' : String(value));
+  }
+  return params.toString();
+}
 
 const DEFAULT_AID = '2046626881';
 const DEFAULT_USER_AGENT =
@@ -51,6 +84,13 @@ class Scraper {
     this.profile = cfg.profile || null;
     this.maxRetries = cfg.maxRetries !== undefined ? cfg.maxRetries : 3;
     this.verbose = !!cfg.verbose;
+
+    // Phase 45.4: vData source selection. Default path is the Phase 45.2
+    // standalone buildVDataForPost (browser-like profile). --legacy-vdata
+    // keeps the jsdom harness path alive for Phase 45.6 A/B comparison.
+    this.legacyVdata = !!cfg.legacyVdata;
+    this.vdataProfilePath = cfg.vdataProfile || DEFAULT_VDATA_PROFILE_PATH;
+    this._vdataProfile = null;
 
     /** @type {TemplateCache|null} */
     this._templateCache = null;
@@ -200,6 +240,20 @@ class Scraper {
     if (fs.existsSync(vmSlidePath)) {
       this._vmSlideSource = fs.readFileSync(vmSlidePath, 'utf8');
       this._log(`vm-slide fallback loaded (${this._vmSlideSource.length} chars)`);
+    }
+
+    // Load vData browser profile for the default (non-legacy) path.
+    if (!this.legacyVdata) {
+      try {
+        this._vdataProfile = loadProfile(this.vdataProfilePath);
+        this._log(`vData profile loaded from ${this.vdataProfilePath}`);
+      } catch (err) {
+        throw new Error(
+          `Failed to load vData profile from ${this.vdataProfilePath}: ${err.message}`
+        );
+      }
+    } else {
+      this._log('Legacy vData path enabled (jsdom harness)');
     }
 
     this._log('Init complete');
@@ -514,20 +568,33 @@ class Scraper {
           this._jquerySource = fs.readFileSync(jqueryPath, 'utf8');
         }
 
-        // (k) Get vm-slide source
-        const vmSlideSource = await this._getVmSlideSource(sig);
+        // (k) Get vm-slide source (only needed by the legacy jsdom harness)
+        let vmSlideSource = null;
+        if (this.legacyVdata) {
+          vmSlideSource = await this._getVmSlideSource(sig);
+        }
 
         // (l) Build the 38 verify POST fields
         const postFields = this._buildPostFields(client, session, sig, ans, collectVal, eks);
 
         // (m) Generate vData
-        this._log('Step 7: generateVData');
-        const { vData, serializedBody } = generateVData(
-          postFields,
-          vmSlideSource,
-          this._jquerySource,
-          { userAgent: this.userAgent }
-        );
+        let vData;
+        let serializedBody;
+        if (this.legacyVdata) {
+          this._log('Step 7: generateVData (legacy jsdom harness)');
+          const legacy = generateVData(
+            postFields,
+            vmSlideSource,
+            this._jquerySource,
+            { userAgent: this.userAgent }
+          );
+          vData = legacy.vData;
+          serializedBody = legacy.serializedBody;
+        } else {
+          this._log('Step 7: buildVDataForPost (standalone, browser profile)');
+          serializedBody = serializePostFields(postFields);
+          vData = buildVDataForPost(serializedBody, { profile: this._vdataProfile });
+        }
         this._log(`  vData: ${vData.slice(0, 30)}...`);
 
         // (n) Submit verify
