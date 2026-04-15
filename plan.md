@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (Stream B — deliverables, rescoping user-approved 2026-04-15)
-Current task: 44.5a — replay-with-substitution vData builder (productize `build-fingerprint-plaintext.js` into `tools/vdata-generator/`)
+Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (Stream B — deliverables)
+Current task: 44.5b — from-scratch `build-vdata.js --from-obj` (full synthesis builder)
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -117,7 +117,7 @@ Current task: 44.5a — replay-with-substitution vData builder (productize `buil
 | 44.4.1 | **[2026-04-15 — UN-RETIRED post-44.2.8]** fn 23898 Math.random comparator — finding is CORRECT. Runtime trace shows 15 entries = TimSort comparisons for one 8-element sort, first-call args `(string[3]="key", string[2]="tp")` are both members of fn 22317's 8-field schema array, direct proof fn 23898 is the comparator on the live path. 44.2.7's earlier "drop as unreached" conclusion was based on an incomplete reading of the same trace (missed that the 15 entries are sort-comparison callbacks, not unrelated DOM helper calls). | done |
 | 44.2.7 | **[2026-04-15]** fn 20539 full end-to-end decompile + real plaintext-build pin — runtime-validated. fn 20539 FUNC_CREATE pc 20797 confirmed; install onto `XHR.prototype.send` at pc 20808 (`OP_24`); sibling `.open` wrapper fn 20353 installed at pc 20473 is the shared-guard writer that records `this` when `.open("/cap_union_new_verify")` is called. fn 20539 is a pure gate+forward: receives the full 9345-byte form-encoded POST body as `arguments[0]`, calls an intermediate function (slot 8 → fn 13860) with `(body, {py})`, receives back the rewritten body, passes it to `savedSend.call`. Injection is body-append: final 9504 = 9345 + `&vData=` + 152-char base64. `ancestor_chains` in `vdata-callgraph.json` are a tracer artifact (host-JS transitions collapsed into VM ticks), NOT a real call stack — 44.4.5's chain reading was wrong on that point. **8-field schema pinned LIVE** from a runtime capture of fn 13860's 110-byte first arg: `env=1&key=qLCZ&version=2&cLod=unloadTDC&ss=0%2C&tp=<captured JS error>&py=0&inf=top`. Field set `{env,key,version,cLod,ss,tp,py,inf}` matches the 44.2.6 names — but it is a **tdc runtime-state probe**, not a navigator/screen fingerprint (`tp` is a captured JS error message; `inf` is iframe-position; `cLod` is a lifecycle marker). Runtime XTEA key = the bytecode literal `34e2c8f07b5169ad`, not the `2e430f8c15b7da96` runtime-key claim from Phase 42 — reconciliation still owed to 44.5a. **Unresolved**: the exact FUNC_CREATE stored in fn 20140's slot 3 (fn 20539's inner slot 8) that directly calls fn 13860. Deliverables: `research/vm-slide-stack-vm/FN-20539-DECOMPILE-44.2.7.md`, `research/vm-slide-stack-vm/trace-fn20539-entry.js`, `output/vm-slide/fn-20539-entry-trace.json`. | done |
 | 44.3.5 | **[DEFERRED post-44.2.8 — optional]** Real-Chrome differential capture — validation step, not discovery. May be picked up before or after 44.6 if test suite motivates it. | deferred |
-| 44.5a | **[2026-04-15 rescoped post-44.2.8]** Productize the existing `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` replay tool into `tools/vdata-generator/` as a replay-with-substitution CLI + library. Accepts a captured 8-field fingerprint object JSON + optional override map; builds the 110-byte `key=value&...` string in a caller-supplied order (or a supplied seed for the Math.random shuffle); pipes through the already-shipped Phase 43 encoder to emit the 152-char vData string. **Does not synthesize field values** — that is 44.5b's job. Ships first because it only wraps already-working pieces. | pending |
+| 44.5a | **[2026-04-15 done]** Shipped `tools/vdata-generator/{build-plaintext.js, replay.js}` + `replay` CLI subcommand + `--self-check` flag + README. `buildVData({obj, order, overrides})` reproduces both committed fixtures byte-identically (self-check green). Cipher-only mode (`--plaintext-hex`) preserved unchanged. npm test 411/411 — no regressions. No modifications to protected paths. | done |
 | 44.5b | **[2026-04-15 unblocked post-44.2.8]** From-scratch `tools/vdata-generator/build-from-obj.js`. Input: the 8-field fingerprint object (`{tp,key,py,env,version,cLod,inf,ss}`) OR a captured window/document environment to probe. Output: 152-char vData string. Replicates fn 22317's field-order schema array `["tp","key","py","env","version","cLod","inf","ss"]`, the `Math.random()>0.5?-1:1` shuffle (optionally with a seeded PRNG for deterministic fixture round-trips), the `&`-joined kv string, and the Phase 43 encoder. | pending |
 | 44.6 | Tests for the vData builder (different agent per impl/tests separation) — unit tests per field source rule + integration tests asserting byte-identical reproduction of all three fixtures' vData strings end-to-end from an `(obj, body)` pair (jsdom + HAR + real-Chrome from 44.3.5) | pending |
 | 44.7 | **[EXPANDED post-44.2.7]** Docs closeout (director-owned) — expand `docs/VDATA_FORMAT.md` §1 with the 8-field tdc-runtime-state-probe schema (`env, key, version, cLod, ss, tp, py, inf`) + source-rule table + the fn 20539 `proxyXHR` XHR-send-handler entry-point narrative (body-rewrite injection via `savedSend.call` at pc 20751, final 9504 = 9345 + `&vData=` + 152). **Correct `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 + §517** to restore Phase 42's XHR monkey-patch mechanism (fn 20539 installed at pc 20808 onto `XHR.prototype.send`, fn 20353 installed at pc 20473 onto `XHR.prototype.open` as the shared-guard writer) and remove 44.2.6's fn 22317 `getCaptchaData` misattribution + the 44.3-introduced 9504→112 reduction hypothesis. **Reconcile the runtime XTEA key** — document that the bytecode literal seed `34e2c8f07b5169ad` is ALSO the runtime key observed live (contradicting Phase 42/CLAUDE.md's `2e430f8c15b7da96` claim; fold the reconciliation owed by 44.5a into this task). Mark Phase 44 closed; bump CLAUDE.md Project Memory to record the full pipeline + corrected key story. | pending |
@@ -136,49 +136,62 @@ Current task: 44.5a — replay-with-substitution vData builder (productize `buil
 
 ## Current Task
 
-**ID**: 44.5a
-**Title**: Replay-with-substitution vData builder (productize `build-fingerprint-plaintext.js` into `tools/vdata-generator/`)
+**ID**: 44.5b
+**Title**: From-scratch `build-vdata.js --from-obj` (full synthesis builder)
 **Phase**: Phase 44 — Stream B deliverables
 **Status**: pending — ready for dispatch.
 
 ### Goal
-Ship the first deliverable of Phase 44 Stream B: a standalone replay-with-substitution vData builder under `tools/vdata-generator/` that takes a captured 8-field fingerprint object JSON (`{tp, key, py, env, version, cLod, inf, ss}`), applies an optional override map, joins it in a caller-supplied order (or with a supplied PRNG seed reproducing fn 22317's Math.random shuffle), and emits a byte-identical 152-char vData string by piping through the already-working Phase 43 cipher encoder. This is NOT from-scratch synthesis — it wraps the known-correct replay tool (`research/vm-slide-stack-vm/build-fingerprint-plaintext.js`) and the Phase 43 encoder (`tools/vdata-generator/encode.js` etc., if they exist — otherwise the Phase 43 modules). Fixture round-trip is the pass/fail gate: the committed jsdom and HAR fixtures must reproduce byte-identically from an `(obj, order)` pair derived from the fixture.
+Ship the full-synthesis from-scratch vData builder under `tools/vdata-generator/`: a `build-from-obj.js` module + `from-obj` CLI subcommand that accepts the 8-field fingerprint object (`{tp, key, py, env, version, cLod, inf, ss}`) and emits a 152-char vData string **without** requiring a caller-supplied field order. The builder must replicate fn 22317's runtime behavior: construct the schema array in the fixed source order `["tp","key","py","env","version","cLod","inf","ss"]`, shuffle via a `Math.random()>0.5?-1:1` comparator (with an optional `--seed` flag that swaps in a seeded PRNG for deterministic fixture round-trips), join as `&`-separated `key=value` pairs to produce 110 bytes pre-pad, and pipe through the already-shipped Phase 43 cipher encoder (via 44.5a's `buildPlaintext` + `encode`) to emit the 152-char vData string.
 
 ### Context
-- **Phase 44 discovery is closed.** 44.2.8 pinned the full pipeline: fn 20539 calls fn 22317 (= `getCaptchaData`) with `(body, {py})`, which builds the 8-field kv string (schema array `["tp","key","py","env","version","cLod","inf","ss"]`), shuffles via fn 23898's `Math.random()>0.5?-1:1` comparator, joins with `&`, and feeds fn 13860 `encryptData` (PKCS#7-style pad → ShiftRows permute → XTEA×14 → custom base64).
-- **The replay tool already exists and is byte-identical to both fixtures.** `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` (44.4 + 44.4.1 deliverable) exports `buildFingerprintPlaintext({obj, order})` which produces the exact 110-byte pre-pad string that fn 13860 receives. Post-44.4.1 its `order` parameter is optional — when absent it defaults to `Object.keys(obj)`.
-- **The Phase 43 cipher encoder already exists under `tools/vdata-generator/`.** 43.3 shipped `tools/vdata-generator/{xtea.js, custom-base64.js, encode.js, cli.js}`. The `encode(plaintext)` function takes a 110-byte buffer (or a string) and emits the 152-char vData string, byte-identical to both committed fixtures.
-- **What's missing**: a productized API / CLI that composes the two — takes a fingerprint object, builds the kv string, runs the encoder, returns the vData string. Plus override-map support so tests (and later 44.5b / 44.6) can substitute individual fields.
-- **Fixtures as oracle**: `tests/fixtures/vdata-{jsdom,har}-capture.json` contain the 110-byte plaintexts and the 152-char vData strings. 44.5a must reproduce both byte-identically given the captured `obj` and `order`.
-- **Do not touch `research/vm-slide-stack-vm/build-fingerprint-plaintext.js`.** It stays as a research artifact. If 44.5a needs to reuse its logic, copy it into `tools/vdata-generator/` (not re-export from `research/`). Research directories are source-only per `.claude/rules/research-artifacts.md`.
+- **Phase 44 discovery is fully resolved (44.2.8).** The pipeline in fn 22317: (1) build 8 field values, (2) construct the schema array in fixed source order `["tp","key","py","env","version","cLod","inf","ss"]` at pcs 23753..23894, (3) `arr.sort(fn 23898)` at pc 23949 where fn 23898 is `Math.random() > 0.5 ? -1 : 1`, (4) per-element loop emits `name + "=" + obj[name]` in shuffled order at pcs 23985..24084, (5) `arr.join("&")` at pc 24161, (6) `encryptData` (fn 13860).
+- **44.5a shipped the replay wrapper** (`tools/vdata-generator/{build-plaintext.js, replay.js}`) and a `replay` CLI subcommand. It requires the caller to pass `order` explicitly — that works for fixture replay but is unfriendly for real use. 44.5b adds the from-scratch entry point that handles order internally.
+- **Math.random shuffle means nondeterminism by default.** For from-scratch use, different runs will produce different valid vData strings. Byte-identical fixture round-trip requires either: (a) swapping in a seeded PRNG whose `Math.random()` call sequence matches the captured shuffle, or (b) accepting the captured field order as an override. Provide BOTH via `--seed <n>` (seeded Node-compatible xorshift or mulberry32 PRNG) and `--order <path>` (captured order override). Default behavior with no flags: real `Math.random`.
+- **Seeded-PRNG fixture replay is a stretch goal.** Node's Array.prototype.sort uses TimSort, which makes a specific sequence of comparison calls (the HAR fixture captured 15 comparisons per 8-element sort per 44.2.8). Reproducing the exact shuffle from a seed requires knowing the exact comparator call sequence the runtime took. If you can't get this to work in a reasonable time, **document the limitation** and ship with `--order` override as the deterministic escape hatch — do not rabbit-hole on PRNG reverse engineering.
+- **Reuse 44.5a's building blocks.** `buildPlaintext({obj, order})` in `tools/vdata-generator/build-plaintext.js` already does the kv-join + pad + permute. Do not duplicate that logic; call it. You only need to add the shuffle step that produces the `order` array before calling it, plus the seeded-PRNG hook.
+- **Fixtures**: `tests/fixtures/vdata-{jsdom,har}-capture.json`. The HAR fixture's captured order `[inf,env,tp,cLod,version,key,ss,py]` is the reference for "what the shuffle produced in one real-Chrome run".
+- **Impl/tests separation**: do NOT write test files under `tests/`. 44.6 owns tests.
 
 ### Implementation Steps
-1. **Survey existing `tools/vdata-generator/`.** List the files and read `encode.js` and `cli.js` to understand the current surface. The new replay-with-substitution entry point must integrate cleanly, not clash with the existing encoder API.
-2. **Add a `build-plaintext.js` (or similar) under `tools/vdata-generator/`.** Port the core of `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` into `tools/vdata-generator/build-plaintext.js`. Do not re-export from `research/`. Export a function `buildPlaintext({obj, order})` that returns the 110-byte `key=value&...` string.
-3. **Add a `replay.js` composition module.** Export a function `buildVData({obj, order, overrides})` that: (a) applies `overrides` on top of `obj` to produce a substituted object, (b) calls `buildPlaintext({obj: substituted, order})`, (c) calls the existing `encode(plaintext)`, (d) returns the 152-char vData string.
-4. **Extend the CLI** (`tools/vdata-generator/cli.js`) with a `replay` subcommand or flag that: reads a fingerprint object JSON from `--obj path.json`, optionally reads an order JSON array from `--order path.json` or `--order-csv`, optionally reads an overrides JSON from `--overrides path.json`, and prints the resulting vData string to stdout. Keep the existing cipher-only entry point working.
-5. **Do NOT write tests in this task.** Tests are 44.6 and go to a different agent per the project's impl/tests separation rule. You MAY add a smoke assertion inside the CLI that errors out if the captured-fixture round-trip disagrees, but keep it optional behind `--self-check`.
-6. **Update `tools/vdata-generator/README.md`** (or create it) with: (a) what the tool does, (b) how the two entry points differ (replay-with-substitution = 44.5a, from-scratch = 44.5b, future), (c) CLI usage examples using both committed fixtures.
+1. **Read the 44.5a files** (`tools/vdata-generator/build-plaintext.js`, `replay.js`, `cli.js`, `README.md`) to understand the current API surface. Your new code composes with them.
+2. **Add `tools/vdata-generator/build-from-obj.js`.** Export `buildVDataFromObj({obj, seed})`:
+   - Start with the schema array `['tp','key','py','env','version','cLod','inf','ss']`.
+   - If `seed` is provided, create a seeded PRNG (pure JS, e.g. mulberry32 — small, well-known, single-function); otherwise use real `Math.random`.
+   - Shuffle the schema array using `arr.sort(() => rng() > 0.5 ? -1 : 1)` — matching fn 23898's comparator exactly.
+   - Call `buildPlaintext({obj, order: shuffled})` from 44.5a.
+   - Call the Phase 43 `encode` to get the 152-char vData.
+   - Return the vData string.
+3. **Add `from-obj` CLI subcommand** in `tools/vdata-generator/cli.js`:
+   - `--obj <path>` — required, 8-field fingerprint JSON.
+   - `--seed <n>` — optional integer seed for deterministic output.
+   - `--order <path>` — optional explicit order override (escape hatch if seeded PRNG can't reproduce a target). When provided, bypasses the shuffle entirely.
+   - Prints the resulting 152-char vData string to stdout.
+   - Keep `replay` and the existing cipher-only mode working unchanged.
+4. **Attempt seeded-PRNG fixture round-trip.** Try to find a seed that, under mulberry32 + `arr.sort(cmp)` with Node's TimSort, reproduces the HAR fixture's captured order `[inf,env,tp,cLod,version,key,ss,py]` starting from schema-source order. If you find one in ≤ 30 minutes of experimentation, record it in a comment. If you don't find one, **document the limitation** in the README (see step 6) and continue — the `--order` override is the deterministic path. Do NOT rabbit-hole.
+5. **Add a `--self-check` mode** to the `from-obj` subcommand that: reads both fixtures, runs `buildVDataFromObj({obj, seed: <discovered-seed-or-null>})` with `--order` fallback if no seed works, asserts byte-identical match, exits non-zero on mismatch.
+6. **Update `tools/vdata-generator/README.md`** to add a `from-obj` section: explain the mode, document the shuffle behavior (nondeterministic by default, `--seed` for deterministic, `--order` for explicit override), show CLI examples, and clearly state the seeded-PRNG limitation if step 4 couldn't find a reproducing seed.
 
 ### Verification
-- [ ] `tools/vdata-generator/build-plaintext.js` exists and exports `buildPlaintext({obj, order})`.
-- [ ] `tools/vdata-generator/replay.js` (or equivalent) exists and exports `buildVData({obj, order, overrides})`.
-- [ ] CLI `replay` subcommand works: `node tools/vdata-generator/cli.js replay --obj <jsdom-fixture-derived.json> --order <jsdom-order.json>` prints the exact 152-char vData string from `tests/fixtures/vdata-jsdom-capture.json` to stdout.
-- [ ] Same CLI call against the HAR-fixture-derived obj + order prints the exact 152-char vData string from `tests/fixtures/vdata-har-capture.json`.
-- [ ] With an `--overrides` flag substituting one field, the output is still a syntactically valid 152-char vData string (length + alphabet check — not byte-identical because the input changed).
-- [ ] Existing `npm test` suite still green (or unchanged from the pre-task baseline). This task should not touch anything under `tests/`.
-- [ ] `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` unchanged.
-- [ ] `tests/fixtures/` unchanged.
-- [ ] No modifications to `targets/`, `sample/`, existing `docs/`, or any existing committed research note.
+- [ ] `tools/vdata-generator/build-from-obj.js` exists and exports `buildVDataFromObj({obj, seed})`.
+- [ ] `node tools/vdata-generator/cli.js from-obj --obj <fixture-derived>.json` prints a 152-char string on the Phase 43 alphabet (length + alphabet check; byte content varies because default is real Math.random).
+- [ ] `node tools/vdata-generator/cli.js from-obj --obj <jsdom-obj>.json --order <jsdom-order>.json` prints the exact jsdom fixture vData string.
+- [ ] Same with HAR fixture.
+- [ ] `from-obj --self-check` exits 0 (using whichever mechanism works: seeded PRNG or `--order` fallback).
+- [ ] `replay --self-check` still exits 0 (44.5a's path is unbroken).
+- [ ] Cipher-only mode (`--plaintext-hex`) still works.
+- [ ] `npm test` still 411/411.
+- [ ] No modifications to `targets/`, `sample/`, `tests/fixtures/`, existing `docs/`, any existing research note, or `research/vm-slide-stack-vm/build-fingerprint-plaintext.js`.
 
 ### Constraints
-- **Do not make any git commits.** Director handles all commits.
-- **Do not modify** `targets/`, `sample/`, `tests/fixtures/`, existing docs, or existing research notes. `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` is specifically off-limits — copy its logic, don't import from it.
-- **No new npm deps.** Pure Node.js built-ins + existing project files only.
-- **Impl/tests separation**: do NOT write test files under `tests/`. 44.6 is a separate task assigned to a different agent. You MAY add a `--self-check` flag to the CLI but not a formal test file.
-- **Follow project coding style**: CommonJS, 2-space indent, single quotes, semicolons, `const`/`let`.
-- **Match existing tools/vdata-generator/ conventions.** Read the Phase 43 files first and mirror their module layout, naming, and CLI style.
+- **Do not make any git commits.** Director handles commits.
+- **Do not modify** `targets/`, `sample/`, `tests/fixtures/`, existing docs, or any existing research note or research tool.
+- **No new npm dependencies.** Pure Node.js built-ins + existing project files only. mulberry32 is ~8 lines of JS — write it inline, don't npm-install a PRNG library.
+- **Impl/tests separation**: no files under `tests/`. 44.6 owns tests.
+- **Match 44.5a's conventions.** Read 44.5a's output first and mirror the module layout, naming, and CLI style.
+- **Coding style**: CommonJS, 2-space indent, single quotes, semicolons, `const`/`let`.
+- **Hard time budget on seeded-PRNG experimentation: 30 minutes.** If it doesn't work, document the limitation and move on.
 - **If the task is too difficult**, stop and report exactly what blocked you.
 
 ### Suggested Agent
-`general-purpose` — small productization task composing two existing working pieces, plus a thin CLI extension and a README. Expected ~1–2 hours. Skills: CommonJS module layout, Node CLI argv handling, familiarity with reading the existing Phase 43 encoder.
+`general-purpose` — small composition task with one interesting unknown (seeded-PRNG shuffle reproduction). Skills: CommonJS, CLI argv, basic PRNG implementation (mulberry32), understanding of Node's Array.prototype.sort behavior. Expected ~1–2 hours.
