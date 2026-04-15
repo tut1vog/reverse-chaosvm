@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (final revision user-approved 2026-04-13)
-Current task: 44.4.5 — Orchestrator `getCaptchaData` invocation site (44.4.1 closed 2026-04-15, verdict: randomised comparator)
+Current phase: Phase 44 — vm-slide fingerprint schema + JS vData builder (major plan revision needed 2026-04-15 post-44.4.5)
+Current task: **plan revision pending user review** — 44.4.5 disproved 44.2.6's premise; remaining Phase 44 tasks need restructure before dispatch
 
 **Phase 43 closed 2026-04-13** in dispatch order 43.0 ✅ → 43.1 ✅ → 43.2 ✅ → 43.3 ✅ → 43.4 ✅ → 43.5 ✅. Cipher half of vm-slide's vData is now byte-identical reproducible via `tools/vdata-generator/` against both jsdom and real Chrome 146 HAR fixtures.
 
@@ -112,7 +112,7 @@ Current task: 44.4.5 — Orchestrator `getCaptchaData` invocation site (44.4.1 c
 | 44.4 | **Per-field value-source pin + pre-cipher transform check** — outcome (2) garbled; module 40 resolved as padder (fn 13989 PKCS#7-style) → ShiftRows permuter (fn 14153, `PERM=[0,4,8,12,5,9,13,1,10,14,2,6,15,3,7,11]`) → XTEA; 3 helpers decompiled (fn 22400=tp, fn 22730=key-prep, fn 23399=ss); 5 fields inline; `FINGERPRINT-SCHEMA.md` + `build-fingerprint-plaintext.js` byte-identical both fixtures | done |
 | 44.0.1 | **[2026-04-15]** Bytecode build reconciliation — verdict **(A) with nuance**: `sample/vm_slide.js` IS the fixture-generating build; both keys real and from same build. `34e2c8f07b5169ad` is the bytecode-literal **pre-cipher seed** pushed at pcs 13931 and 15149 into fn 13860; `2e430f8c15b7da96` is the **runtime** XTEA round key observed in the encrypt closure's local 4 after fn 13860's prologue transform. No re-decode needed; all Phase 44 pc anchors stand. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`. | done |
 | 44.4.1 | **[2026-04-15]** Sort-order contradiction resolution — verdict **(ii) randomised comparator**: fn 23898 body `[23898..23944]` is `Math.random() > 0.5 ? 1 : -1` (textbook JS Fisher-Yates anti-pattern). Sort call site at pc 23949 confirmed exactly where 44.2.6 reported it; only the comparator's nature was misread. Fixture orders are random draws, not derivable from `obj` alone. `build-fingerprint-plaintext.js` updated: `order` is now optional, defaults to `Object.keys(obj)`. Both committed fixtures byte-identical without caller-supplied `order`. See `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md`. **Implication for 44.5b**: no canonical default join order exists — from-scratch synthesis must either accept a pre-ordered obj or seed its own RNG. | done |
-| 44.4.5 | **Orchestrator `getCaptchaData` invocation site** — static search in `sample/t_captcha_slide.js` for the import of the vm-slide webpack export `getCaptchaData` and its call site. Pin the JS expression that builds `obj` at the call site and map its 8 properties to orchestrator-side sources (session, ua, timestamps, etc.). Closes the gap 44.3 missed. ≤1 hour static work. | pending |
+| 44.4.5 | **[2026-04-15]** Orchestrator `getCaptchaData` invocation site — **verdict: premise disproven**. `sample/t_captcha_slide.js` contains ZERO `getCaptchaData`/`CaptchaData`/`chaos` occurrences. Only vData code path is an `isLowIE()`-gated IIFE at bytes 162929..163108 calling `window.getVData` (Phase 42's IE9 path). Runtime callgraph `output/vm-slide/vdata-callgraph.json` shows 14/14 encrypt calls pass through fn 15918 — fn 22317 is not in the live trace. **Implications**: 44.2.6's "fn 22317 is live `getCaptchaData`" and "fn 20539 is dead code" classifications are both wrong on the Chrome path; Phase 42's XHR-monkey-patch mechanism stands; 44.4.1's `Math.random()` comparator finding is in a function that isn't called at runtime. See `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`. | done (partial, premise-disproving) |
 | 44.3.5 | Real-Chrome differential capture — third fixture from production Chrome; capture target simplifies to the full 9504-byte verify POST body + its 152-char vData string pair; used as a cross-check for 44.4's value-source rules across environments | pending |
 | 44.5a | Replay-with-substitution builder. Reads a captured fingerprint object (8 properties) + override map; emits a substituted `obj`; calls into 44.5b's builder. Trivial wrapper after 44.5b lands. | pending |
 | 44.5b | **From-scratch `build-vdata.js --from-obj`**. Input: an 8-property fingerprint object JSON. Output: 152-char vData string. Pure JS: replicates fn 22317's alphabetical sort + key=value join, then calls the Phase 43 encoder. Deterministic, no runtime env probing. Depends on 44.4. | pending |
@@ -125,53 +125,34 @@ Current task: 44.4.5 — Orchestrator `getCaptchaData` invocation site (44.4.1 c
 
 ---
 
+---
+
+## Pending Plan Revision (2026-04-15, awaiting user approval)
+
+**Trigger**: 44.4.5 disproved 44.2.6's core premise. fn 22317 is not the live Chrome producer — the orchestrator never imports or calls `getCaptchaData`. The live producer is in fn 20539's callgraph (the `proxyXHR` XHR monkey-patch path, installed at pc 20808 as `XMLHttpRequest.prototype.send`), which 44.2.6 had reclassified as dead code.
+
+**Proposed restructure** (9 Phase 44 items pending become 8, plus one insertion):
+
+1. **Insert 44.2.7 — fn 20539 full end-to-end decompile.** Walk fn 20539's body, identify its plaintext-build call chain, pin the caller of fn 15918 (the runtime frame the callgraph recorded), and determine which function in fn 20539's subtree actually constructs the 112-byte XTEA input. Replaces 44.2.6's wrong classification of fn 20539 as dead code. Expected ~2–4 hours static + optional dynamic trace.
+2. **Re-open the per-run order question.** 44.4.1's `Math.random()` comparator is in fn 23898, which is only referenced by fn 22317 — unreachable on the Chrome path. The real source of jsdom/HAR order divergence must be in fn 20539's callgraph. Fold this into 44.2.7's scope, or add a 44.2.8 subtask after 44.2.7 identifies the real plaintext builder.
+3. **Retain `build-fingerprint-plaintext.js` as-is.** The padder + ShiftRows permuter + XTEA + base64 pipeline is structurally correct and round-trips both fixtures byte-identical. 44.2.6 correctly reverse-engineered the pipeline shape; it just attached it to the wrong function. The reference impl is still valid as a replay tool — only the caller-side `obj` construction story needs to be rewritten.
+4. **Cancel or rescope 44.4.5 follow-up on `getCaptchaData`.** The export exists in vm-slide but the orchestrator doesn't call it. Options: (a) leave it as documented dead/reserved code and move on, (b) add a narrow task to search for whoever (if anyone) reads `n[4].getCaptchaData` — possibly via a wider dynamic trace across UA branches.
+5. **Keep 44.3.5 (real-Chrome differential capture) as planned.** Still valuable — maybe more so now, since it would let us cross-check fn 20539's plaintext build against real Chrome output without trusting the jsdom harness.
+6. **Unblock 44.5a (replay-with-substitution builder).** Does not depend on the caller-side question being answered — it replays a captured fingerprint via the already-correct reference impl.
+7. **44.5b (from-scratch builder) now depends on 44.2.7**, not 44.4.1. From-scratch synthesis needs the real plaintext-build rules from fn 20539's subtree, not the dead fn 22317/fn 23898 randomiser.
+8. **44.6 (tests) unchanged in scope** but will run against whatever 44.5a/44.5b produces.
+9. **44.7 (docs closeout)**: revert 44.2.6's reclassification of Phase 42 mechanism; restore the XHR-patch narrative; document fn 22317 as internal/reserved; document fn 20539 as the live Chrome producer.
+
+**Proposed new dispatch order**: **44.2.7** → 44.3.5 → 44.5a → (44.2.8 if needed) → 44.5b → 44.6 → 44.7.
+
+**Director recommends** confirming this revision before dispatching anything. 44.2.7 is the immediate next task and is the foundation for everything downstream — it's worth scoping carefully.
+
+**Alternative (minimal-change)**: if you'd rather not reopen the mental model yet, keep 44.2.7 as the ONLY change and defer the rest until 44.2.7's findings come back. This is the lower-risk path.
+
+---
+
 ## Current Task
 
-**ID**: 44.4.5
-**Title**: Orchestrator `getCaptchaData` invocation site — pin where `t_captcha_slide.js` calls the vm-slide webpack export and what it passes as `obj`
-**Phase**: Phase 44 — vm-slide fingerprint schema + JS vData builder
-**Status**: pending — ready for dispatch on next user trigger.
-
-### Goal
-Close the caller-side gap left by 44.3 / 44.2.6. 44.2.6 established that fn 22317 is the webpack export `exports.getCaptchaData` and that it consumes an `obj` with 8 properties (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`). The orchestrator bundle `sample/t_captcha_slide.js` imports this export somewhere and calls it with an `obj` argument at runtime, but the import site and the expression that constructs `obj` are not yet pinned. 44.4.5 owns static location of both: the `require()` / `__webpack_require__` call that pulls in the vm-slide module, the call site that invokes `getCaptchaData`, and the expression tree that builds the `obj` literal passed in. The output is a mapping from each of the 8 fingerprint fields to an orchestrator-side source (session token, user-agent, timestamp, a DOM probe, etc.).
-
-### Context
-- `sample/t_captcha_slide.js` is a webpack 4 bundle, ~213 KB, 50 live modules, single-root graph rooted at module 64. Phase 41 analyzed its structure; `docs/CAPTCHA_ORCHESTRATOR.md` has the end-to-end flow and the 39-field verify-body origination table.
-- Phase 41's analysis treated vm-slide as loaded by a hardcoded `<script>` tag in the show-page HTML — NOT by the orchestrator bundle. That's still correct for *module loading*, but the orchestrator still calls into vm-slide at runtime via `window.TDC` / the webpack-exposed export registry. 44.4.5's job is to find where that call happens in the orchestrator source.
-- Phase 44.2.6 pinned fn 22317's export store at pc 24252 — it writes `getCaptchaData` onto vm-slide's module exports. The orchestrator-side consumer is the matching read site.
-- 44.3 built an inverted (and mostly wrong) hypothesis that treated fn 20539 as the plaintext builder — ultimately classified as dead code on the Chrome path in 44.2.6. Do NOT reuse 44.3's hypothesis tree; start from the orchestrator source.
-- `docs/CAPTCHA_ORCHESTRATOR.md` §6 and the per-module index in the same doc identify module 56 as the orchestrator core and list each module's responsibility. Start there for the `require(N)` that resolves to vm-slide's `getCaptchaData`.
-- ≤1 hour of static work. Pure source reading of `sample/t_captcha_slide.js`. No dynamic tracing required for this task.
-
-### Starting inputs
-- `sample/t_captcha_slide.js` — the orchestrator bundle (read-only).
-- `docs/CAPTCHA_ORCHESTRATOR.md` — Phase 41 flow + module index.
-- `research/captcha-orchestrator/` — Phase 41 notes, module graph.
-- `research/vm-slide-stack-vm/FN-22317-DECOMPILE.md`, `FINGERPRINT-SCHEMA.md` — what the 8 properties are and what types they hold.
-- `tests/fixtures/vdata-{jsdom,har}-capture.json` — ground-truth values for the 8 fields, as an oracle when matching orchestrator source to observed values.
-
-### Implementation Steps
-1. **Find the `getCaptchaData` consumer.** Grep `sample/t_captcha_slide.js` for the literal string `getCaptchaData`. There should be exactly one or two hits — one of them is the call site. Record the enclosing module number and function.
-2. **Walk the call site.** Read the enclosing function. Identify (a) the expression that resolves to the vm-slide export (probably `__webpack_require__(N).getCaptchaData` or `TDC.getCaptchaData` or similar), (b) the expression passed as the `obj` argument, (c) any post-processing of the returned vData string (appended to query string? POST body? header?).
-3. **Expand the `obj` expression.** For each of the 8 properties `{tp, key, py, env, version, cLod, inf, ss}`, chase back to the orchestrator-side source. For literals or constants, just record the value. For property reads (`session.xxx`, `window.navigator.xxx`, a config object), pin the producing code in the orchestrator or note that it's pulled from a closure variable captured earlier. Match the observed fixture values (jsdom + HAR) against these sources to sanity-check.
-4. **Write `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`** (≤2 pages): module/function where the call lives, verbatim call-site source (or line range), the 8-field source map, and any observation about when / how often the orchestrator calls it.
-5. **Correction check.** Note any places where this new finding contradicts Phase 42's `vData` mechanism conclusion (the XHR monkey-patch on Chrome / `getVData` on IE9 described in `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 and §517). 44.7 owns the actual doc rewrite; 44.4.5 only needs to flag the contradictions so 44.7 can resolve them.
-
-### Verification
-- [ ] `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md` exists with the call-site module/function ID and the verbatim code snippet.
-- [ ] Each of the 8 fingerprint fields (`tp`, `key`, `py`, `env`, `version`, `cLod`, `inf`, `ss`) has a documented orchestrator-side source expression with a line citation into `sample/t_captcha_slide.js`.
-- [ ] At least one field's mapped source is cross-checked against the matching observed value in a committed fixture (jsdom or HAR) and shown consistent.
-- [ ] Any contradiction with the `docs/CAPTCHA_ORCHESTRATOR.md` §6.2 XHR-patch / IE9 `getVData` mechanism is flagged in a dedicated section of the note, for 44.7 to resolve.
-- [ ] No modifications to: `targets/`, `sample/`, `tools/`, `tests/fixtures/`, `docs/`. New research artifacts only.
-
-### Constraints
-- **Do not make any git commits.** Director owns all commits.
-- **Do not modify `targets/` or `sample/`.** Tencent's property.
-- **Pure static analysis.** No live tracers, no puppeteer, no jsdom runs. Source reading + grep.
-- **Verify, don't assume.** Every claim must cite a line range in `sample/t_captcha_slide.js`. If the orchestrator's 8-field construction is obfuscated beyond readable JS, beautify it mentally or with a temporary scratch file, but do not commit the beautified copy.
-- **If the task is too difficult or impossible** (e.g. the call site is buried inside an eval'd VM or the obj is constructed by a helper that can't be statically resolved), stop and report what you found. Record it as a partial and suggest a dynamic-trace follow-up.
-
-### Suggested Agent
-`general-purpose` — static bundle reading + grep + call-site tracing + a short research note. Expected ≤1 hour.
+**Status**: **HELD — plan revision pending user review.** 44.4.5 closed 2026-04-15 with a premise-disproving verdict (see above). No task is in-progress. Director is waiting for user to confirm the proposed restructure in the "Pending Plan Revision" section above before rewriting this block and dispatching the next task.
 
 
