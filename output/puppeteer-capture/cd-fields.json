@@ -1,0 +1,415 @@
+[
+  {
+    "_state": 0,
+    "architecture": "",
+    "bitness": "",
+    "brands": [],
+    "fullVersionList": [],
+    "mobile": false,
+    "model": "",
+    "platform": "",
+    "platformVersion": "",
+    "uaFullVersion": "",
+    "wow64": false
+  },
+  {
+    "_state": -2
+  },
+  "UTF-8",
+  600,
+  "1;0",
+  "+08",
+  0,
+  1,
+  0,
+  "",
+  {
+    "brands": [],
+    "mobile": false,
+    "platform": ""
+  },
+  [
+    {
+      "codec": "AAC",
+      "support": "probably"
+    },
+    {
+      "codec": "MP3",
+      "support": "probably"
+    },
+    {
+      "codec": "Ogg Vorbis",
+      "support": "probably"
+    },
+    {
+      "codec": "Ogg Opus",
+      "support": "probably"
+    },
+    {
+      "codec": "WAV",
+      "support": "probably"
+    },
+    {
+      "codec": "FLAC",
+      "support": "probably"
+    },
+    {
+      "codec": "WebM Vorbis",
+      "support": "probably"
+    },
+    {
+      "codec": "WebM Opus",
+      "support": "probably"
+    },
+    {
+      "codec": "M4A",
+      "support": "maybe"
+    }
+  ],
+  "",
+  "Intel Iris OpenGL Engine",
+  "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+  0.4289999008178711,
+  "srgb",
+  "7450441658890645504",
+  0,
+  {
+    "_state": 0,
+    "quota": 10737418240,
+    "usage": null,
+    "usageDetails": {}
+  },
+  0,
+  0,
+  "windows",
+  "",
+  "",
+  1776323715,
+  "Linux x86_64",
+  0,
+  0,
+  [
+    [
+      4,
+      -1,
+      -1,
+      1776323715323,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      159,
+      812,
+      1286,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      0,
+      0,
+      182,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      54,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      249,
+      0,
+      44,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      137,
+      -2,
+      59,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      118,
+      1,
+      41,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      97,
+      0,
+      59,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      78,
+      -1,
+      47,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      36,
+      0,
+      37,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      56,
+      1,
+      66,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      43,
+      -1,
+      67,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      32,
+      1,
+      66,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      20,
+      0,
+      67,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      15,
+      -1,
+      49,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      9,
+      0,
+      68,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      2,
+      1,
+      67,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      -1,
+      41,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      3,
+      0,
+      0,
+      141,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "",
+  "Intel Inc.",
+  [
+    {
+      "codec": "H.264",
+      "support": "probably"
+    },
+    {
+      "codec": "H.264 High",
+      "support": "probably"
+    },
+    {
+      "codec": "H.265/HEVC",
+      "support": ""
+    },
+    {
+      "codec": "VP8",
+      "support": "probably"
+    },
+    {
+      "codec": "VP9",
+      "support": "probably"
+    },
+    {
+      "codec": "AV1",
+      "support": "probably"
+    },
+    {
+      "codec": "Theora",
+      "support": ""
+    },
+    {
+      "codec": "MPEG-4",
+      "support": ""
+    }
+  ],
+  "top",
+  "unknown",
+  "800-600-600-24-*-*-|-*",
+  "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+  1023,
+  "",
+  [
+    "en-US",
+    "en"
+  ],
+  [
+    {
+      "name": "PDF Viewer",
+      "description": "Portable Document Format",
+      "filename": "internal-pdf-viewer"
+    },
+    {
+      "name": "Chrome PDF Viewer",
+      "description": "Portable Document Format",
+      "filename": "internal-pdf-viewer"
+    },
+    {
+      "name": "Chromium PDF Viewer",
+      "description": "Portable Document Format",
+      "filename": "internal-pdf-viewer"
+    },
+    {
+      "name": "Microsoft Edge PDF Viewer",
+      "description": "Portable Document Format",
+      "filename": "internal-pdf-viewer"
+    },
+    {
+      "name": "WebKit built-in PDF",
+      "description": "Portable Document Format",
+      "filename": "internal-pdf-viewer"
+    }
+  ],
+  null,
+  2,
+  [
+    1280,
+    1400
+  ],
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+  [
+    {
+      "type": "application/pdf",
+      "suffixes": "pdf"
+    },
+    {
+      "type": "text/pdf",
+      "suffixes": "pdf"
+    }
+  ],
+  1,
+  37437602,
+  4,
+  {
+    "nt_vc_output": {
+      "ac-baseLatency": 0.01,
+      "ac-outputLatency": 0,
+      "ac-sampleRate": 44100,
+      "ac-maxChannelCount": 2,
+      "ac-numberOfInputs": 1,
+      "ac-numberOfOutputs": 0,
+      "ac-channelCount": 2,
+      "ac-channelCountMode": "explicit",
+      "ac-channelInterpretation": "speakers",
+      "an-fftSize": 2048,
+      "an-frequencyBinCount": 1024,
+      "an-minDecibels": -100,
+      "an-maxDecibels": -30,
+      "an-smoothingTimeConstant": 0.8,
+      "an-numberOfInputs": 1,
+      "an-numberOfOutputs": 1,
+      "an-channelCount": 2,
+      "an-channelCountMode": "max",
+      "an-channelInterpretation": "speakers"
+    },
+    "pxi_output": 10240
+  },
+  1,
+  1776323717,
+  0,
+  "98k",
+  800,
+  1283372547,
+  1776323715,
+  {
+    "timeZone": "Asia/Shanghai",
+    "calendar": "gregory",
+    "numberingSystem": "latn",
+    "locale": "en-US"
+  },
+  24,
+  8
+]

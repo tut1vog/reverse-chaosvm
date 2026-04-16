@@ -1,10 +1,10 @@
 # Plan
 
 ## Status
-Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-Current task: **46.11** — Design review gate (awaiting user decision on 46.10 findings)
+Current phase: **Phase 47** — Chrome-profile collect replay
+Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator
 
-**Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
+**Phases 38–46 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
 ---
 
@@ -70,91 +70,110 @@ Current task: **46.11** — Design review gate (awaiting user decision on 46.10 
 | 43.0–43.5 | Rename + hybrid extraction + fixtures + encoder + tests + docs | done |
 
 ### Phase 44: vm-slide plaintext fingerprint reversal — DONE (2026-04-15)
-> Reversed the 8-field tdc runtime-state probe (`{tp,key,py,env,version,cLod,inf,ss}`) inside fn 22317 = `module.exports.getCaptchaData`, pinned the pre-cipher transform chain (pad fn 13989 → ShiftRows fn 14153 → XTEA fn 13860), and shipped three-mode `tools/vdata-generator/` (cipher-only, replay-with-substitution, from-obj synthesis). Per-call order is driven by fn 23898's `Math.random() > 0.5 ? -1 : 1` comparator (classical Fisher-Yates anti-pattern). Authoritative spec: `docs/VDATA_FORMAT.md` §1+§7. Call-chain: `docs/CAPTCHA_ORCHESTRATOR.md` §6. Deliverable: `tools/vdata-generator/{build-plaintext,replay,build-from-obj}.js` + `tests/test-vdata-builder.js` (14 tests), 425/425 npm test green.
+> Reversed the 8-field tdc runtime-state probe, pinned the pre-cipher transform chain, and shipped three-mode `tools/vdata-generator/`. 425/425 tests green.
 
 | ID | Task | Status |
 |----|------|--------|
-| 44.1–44.4 | Stream A: callsite back-walk, static decompile, orchestrator trace, per-field source pin, pre-cipher transform chain | done |
-| 44.0.1 / 44.4.1 / 44.4.5 / 44.2.5 / 44.2.6 / 44.2.7 / 44.2.8 | Discovery corrections: bytecode-build reconciliation (`34e2…` seed vs `2e43…` runtime key), sort-order = `Math.random` comparator, `getCaptchaData` invocation site, fn 20539 slot 8 hop, fn 22317 as live producer | done |
-| 44.5a / 44.5b | Stream B: replay-with-substitution + from-obj synthesis + seeded PRNG | done |
-| 44.6 | Tests (14 new, different agent) | done |
-| 44.7 | Docs closeout: `VDATA_FORMAT.md` §1+§7, `CAPTCHA_ORCHESTRATOR.md` §6, CLAUDE.md project memory | done |
-| 44.3.5 | Real-Chrome differential capture (optional) | deferred |
+| 44.1–44.7 | Stream A + Stream B + tests + docs | done |
 
 ### Phase 45: Scraper vData switchover + errorCode 12 re-test — DONE (2026-04-15)
-> Swapped the scraper's default vData generation from live jsdom (leaked `tp`/`cLod`/`inf`/`ss` as jsdom tells) to standalone `buildVDataForPost` + HAR-derived `profiles/vdata-browser-default.json`; legacy jsdom path retained behind `--legacy-vdata`. 30+30 A/B from IP `111.119.253.170`: default 28.6% success vs legacy 0.0%; default 61.9% errorCode 12 vs legacy 94.4%. Two-proportion z-tests significant at p<0.05 on both metrics — verdict **(a) improved**. Follow-up analysis revealed every default-path "success" was a `t03tserver` bypass-lane ticket (`errorCode: -1`), never a `t01`/`t02` full-verify ticket (`errorCode: 0`); this finding motivates Phase 46. `docs/ERRORCODE_12_INVESTIGATION.md` updated; raw logs under `output/phase-45-errorcode-12-survey/`.
+> Swapped vData generation to standalone builder with HAR-derived profile. 30+30 A/B showed improvement (28.6% vs 0.0% success, p<0.05) but all successes were `t03tserver` bypass-lane tickets.
 
 | ID | Task | Status |
 |----|------|--------|
-| 45.1 / 45.1a | Per-field source decisions + module 18 body-parser decompile (HAR oracle `obj.key="21L2"` reproduced) | done |
-| 45.2 / 45.3 | Port `computeKeyField` + `buildVDataForPost` entry point; 37 black-box tests (462/462 green) | done |
-| 45.4 / 45.5 | Scraper wiring swap behind `--legacy-vdata`; 44 offline tests proving default vs legacy divergence (506/506 green) | done |
-| 45.6 | Empirical errorCode 12 re-test (director-owned, live network) — verdict (a) improved, p<0.05 | done |
+| 45.1–45.6 | Per-field source decisions + port + wiring + tests + live re-test | done |
 
----
-
-### Phase 46: Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-
-> **Framing** — Phase 45.6 surfaced the real picture: every "success" the scraper got was a `t03tserver...` ticket issued with `errorCode: -1`, which is Tencent's **bypass / pity-ticket lane**, not the full-verification lane. A real browser gets `t01...` / `t02...` tickets with `errorCode: 0`. The two lanes use different routing decisions at the verify endpoint, and everything we optimised in Phase 45 (vData plaintext content) moved us within the bypass lane only — it never put us on the `errorCode 0` path because we were never knocking on that door.
->
-> Wire-level diff of the scraper's verify POST against `sample/captcha-har.har` (see 2026-04-15 conversation log): all 17 header **values** match Chrome 146, HTTP/1.1 matches, `Connection: keep-alive` matches (Node's `https.globalAgent` defaults to `keepAlive=true`), the POST body matches byte-for-byte (Phase 45.5 locked this down), and Tencent's `t.captcha.qq.com` doesn't use cookies at all — both sides send an empty Cookie header. What actually differs is **request-chain fidelity** (which JS files and telemetry beacons the IP fetched before and after verify), **header insertion order**, and **TLS fingerprint (JA3/JA4)**.
->
-> Phase 46's goal is to close these gaps in order of estimated impact, with a live-network re-measurement after each content fix, and decide whether to commit to TLS impersonation based on whether the content-layer fixes alone are enough to flip at least one attempt from `errorCode -1` / `t03tserver` to `errorCode 0` / `t01`. This is a lane-change phase, not a rate-improvement phase — the primary success metric is the ticket prefix, not the success percentage.
-
-**Goal**: obtain at least one `errorCode: 0` response with a `t01...` / `t02...` ticket from the scraper, from the same IP we've been running from, without resorting to Puppeteer.
-
-**Success metric (primary)**: any single invocation returning `errorCode: 0`. Secondary: the distribution of ticket prefixes (`t01` / `t02` / `t03tserver`) across a 30-attempt survey compared to the Phase 45.6 default-arm baseline (0 × `t01`, 0 × `t02`, 6 × `t03tserver`, 15 × non-success).
-
-**Abort / pivot conditions**:
-- If 46.3, 46.6, and 46.9 all show zero `t01`/`t02` tickets in their post-fix surveys, the remaining gate is almost certainly TLS/JA3. At that point the director will pause, present the evidence to the user, and ask whether to (i) commit to the TLS spike in 46.10/46.11, (ii) declare the content-layer exhausted and close Phase 46 with the gate documented, or (iii) pivot to a Puppeteer-based path.
-- If any earlier task produces `errorCode: 0`, pause immediately and present — we will want to freeze the state, capture a fixture, and decide whether to keep going for rate improvement or declare victory.
+### Phase 46: Request-chain fidelity + TLS impersonation — CLOSED (2026-04-16)
+> Content-layer fixes (vm-slide fetch, caplog beacons) produced 0/60 t01/t02 tickets across two live surveys. TLS spike confirmed Puppeteer JA3 matches Chrome 146 exactly (JA3 `8061a5ed...`), but **live Puppeteer test** (5/5 errorCode 0) still produced only `t03tserver` tickets — proving **TLS is not the lane gate**. The `t03tserver` routing decision is upstream of TLS fingerprinting. New finding: the collect token content (fingerprint values) differs significantly between the scraper's jsdom-synthesized profile and real Chrome — this is the next hypothesis.
 
 | ID | Task | Status |
 |----|------|--------|
 | 46.1 | Restore `/vm-slide.enc.js` live fetch on the default scraper path | done |
-| 46.2 | Tests for 46.1 — wire-level vm-slide-fetch invariant locked offline (3 new tests, 509/509 green) | done |
-| 46.3 | Live re-measurement after 46.1 — 0/30 t01/t02 (null result; vm-slide alone does not move the lane) | done |
-| 46.4 | Add `/caplog` telemetry beacons around verify — caplog-beacon.js + solveCaptcha wiring + `--skip-caplog` flag (byte-for-byte HAR match) | done |
-| 46.5 | Tests for 46.4 — 9 tests locking PRE_KEYS / POST_KEYS sequences + ordering + skipCaplog suppression (518/518) | done |
-| 46.6 | Live re-measurement after 46.4 — 0/30 t01/t02 (null result; caplog does not move the lane). **Decision gate fired — awaiting user decision.** | done |
-| 46.7 | Chrome-canonical verify header ordering — **deferred 2026-04-15** per user decision after the 46.6 gate. Content-layer is empirically exhausted (two null results in 46.3 and 46.6), header order is the weakest remaining fingerprint axis, so jump straight to the TLS spike. May be revisited if 46.10/46.11 land without lane change. | deferred |
-| 46.8 | Tests for 46.7 — **deferred 2026-04-15** (paired with 46.7). | deferred |
-| 46.9 | Live re-measurement after 46.7 — **deferred 2026-04-15** (paired with 46.7). | deferred |
-| 46.10 | TLS impersonation — Puppeteer-reuse feasibility + integration design spike | done |
-| 46.11 | Design review gate — present 46.10 findings for user decision | in-progress |
+| 46.2 | Tests for 46.1 | done |
+| 46.3 | Live re-measurement — 0/30 t01/t02 | done |
+| 46.4 | Add `/caplog` telemetry beacons around verify | done |
+| 46.5 | Tests for 46.4 | done |
+| 46.6 | Live re-measurement — 0/30 t01/t02 | done |
+| 46.7–46.9 | Header ordering — deferred | deferred |
+| 46.10 | TLS impersonation spike — Puppeteer JA3 matches Chrome 146 | done |
+| 46.11 | Design review — **pivoted**: Puppeteer live test showed TLS is not the lane gate. `t03tserver` persists even with real Chrome. New direction: Chrome-profile collect replay (Phase 47). | done |
 
-**Decisions made at plan time**:
-1. **Why fix in this order and not parallel?** Each fix is a hypothesis test against the same endpoint. Running them in parallel would conflate which fix flipped which outcome. The live re-measurement gates (46.3, 46.6, 46.9) are how we learn.
-2. **Why director-owned surveys, not subagent?** Same reason as Phase 45.6 — live network traffic with reputational cost, and the inspection work is small enough that a subagent's context overhead isn't justified.
-3. **Why no tests for 46.10?** It's research, not code. If 46.11 greenlights implementation, tests get dispatched as follow-up tasks at that point.
-4. **Impl/tests separation**: 46.1/46.2, 46.4/46.5, 46.12/46.13 are paired with different agents per project rule.
-7. **Why pre-select Puppeteer reuse (option c) without running the three-way matrix?** User decision 2026-04-15 after the 46.6 decision gate. Rationale: Puppeteer is already an in-repo dependency (`tools/captcha-solver/` runs it live today), so the install-cost and maintenance-risk columns of the original matrix are zero for option (c) and unambiguously worse for (a) curl-impersonate binary and (b) Node native binding. Headless Chromium shares the networking stack with headful Chrome, so JA3/JA4 match is expected by construction — the spike still captures it empirically to avoid surprises (some headless builds disable GREASE or strip extensions). Runtime cost per request is the only dimension where (c) is meaningfully worse than (a)/(b), and the scraper's target rate is low enough that a few hundred ms of browser-side latency per verify is acceptable. Collapsing the original three-way matrix into "verify (c) empirically + design the integration" cuts the spike's scope roughly in half.
-5. **Abort protocol**: each live-measurement task (46.3, 46.6, 46.9) inherits Phase 45.6's abort rule — if the first 5 invocations return non-errorCode-12 / non-errorCode-0 failures (transport errors, 403s, 500s), stop and report.
-6. **Auto-port failures**: the 45.6 survey showed two new tdc.js template hashes the porting pipeline cannot map. These will reduce N_valid in every live survey this phase. If the failure rate exceeds ~50% on any arm, the director will pause and ask whether to extend the porting pipeline first — that would be a separate phase (47?).
+---
 
-**Open questions deferred out of Phase 46**:
-- Rate/session saturation around attempt ~12 (the Phase 45.6 follow-up hypothesis). Phase 46 assumes surveys are short enough that saturation is a background constant affecting both pre- and post-fix runs equally. If we ever see a fix that flips a bunch of attempts on attempts 1–10 but nothing on 11–30, saturation becomes foreground again.
-- Template pool extension. The auto-port failures on `88ebeea62f566ec5` / `f53142c54fc43699` point at a real gap in `tools/porting-pipeline/template-cache.json` but fixing it is out of scope here.
+### Phase 47: Chrome-profile collect replay
+
+> **Framing** — Phase 46.11's live Puppeteer test (5/5 `errorCode: 0`, all `t03tserver`) proved that even with real Chrome's TLS stack, the verify endpoint still routes to the bypass lane. The `t03tserver` decision is not driven by TLS fingerprint, header order, or request-chain fidelity (all of which Puppeteer matches perfectly). The remaining hypothesis: **the collect token's fingerprint content** from the scraper's jsdom environment is detectably different from a real Chrome session.
+>
+> Evidence: the scraper's collect token was ~10K–19K chars while Chrome's is ~4.9K chars. Decryption revealed the plaintext structure is identical (`{cd:[60 fields], sd:{8 keys}}`), and both tokens round-trip byte-identically through the XTEA pipeline. The difference is in the cd field values: the scraper synthesizes them from a manually-constructed `profiles/default.json`, while Chrome populates them from real browser APIs. Of 60 cd fields, only 7 are per-session (timestamps, sid, eventLog, pageUrl); the other 53 are static fingerprint values that can be replayed from a Chrome capture.
+>
+> Phase 47's goal: make the scraper use real Chrome-captured fingerprint values for the collect token, then re-test to see if this changes the lane assignment.
+
+**Goal**: scraper produces a `collect` token whose plaintext cd array matches a real Chrome session's values (except for the 7 per-session fields), and we re-test whether this moves us off `t03tserver`.
+
+**Success metric**: any improvement in ticket prefix distribution (t01/t02 appearance) or errorCode distribution compared to the Phase 45.6 / 46.3 / 46.6 baselines.
+
+| ID | Task | Status |
+|----|------|--------|
+| 47.1 | Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator — load Chrome cd array, substitute per-session fields, encrypt with template-appropriate XTEA params in single-blob mode | pending |
+| 47.2 | Tests for 47.1 — round-trip verification: decrypt(scraper_collect) produces cd values matching the Chrome profile (modulo per-session fields); token length in the ~4.9K range; offline comparison with the Puppeteer capture | pending |
+| 47.3 | Live re-measurement (director-owned, 30 attempts) — compare ticket prefix distribution against Phase 46 baselines | pending |
+
+**Decisions**:
+1. **Why not just use Puppeteer for everything?** The scraper's value is that it runs without a browser (jsdom only). Puppeteer is heavy, slow, and detectable in other ways. If Chrome-profile replay works, we keep the lightweight path.
+2. **What about per-template field order?** The Chrome profile was captured from Template C. If the server serves a different template, the field order will differ. The scraper already handles this via `cdFieldOrder` from the porting pipeline. But the cd VALUES should be template-independent (they're browser fingerprint data, not template-specific). The scraper will use the Chrome profile values and reorder them per the served template's field order.
+3. **What about the eventLog and slideValue?** These are per-session behavioral data. The scraper already generates synthetic mouse trajectories. The eventLog (cd[29]) needs realistic Chrome-style event entries — the current scraper may generate a different format. Task 47.1 should inspect and match the Chrome format.
 
 ---
 
 ## Current Task
 
-**ID**: 46.11
-**Title**: Design review gate — present 46.10 findings for user decision
-**Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
-**Status**: in-progress — awaiting user review
+**ID**: 47.1
+**Title**: Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator
+**Phase**: Phase 47 — Chrome-profile collect replay
+**Status**: pending
 
 ### Goal
-Present the 46.10 TLS impersonation spike findings and integration design to the user. User accepts → dispatch 46.12 (implementation) + 46.13 (tests). User revises → update plan accordingly. User rejects → revisit alternatives or pivot.
+Make the scraper's collect token use real Chrome-captured fingerprint values for all PER-MACHINE and STATIC cd fields, substituting only the 7 PER-SESSION fields at runtime. The resulting token should be ~4.9K chars (matching Chrome) instead of ~10K–19K chars.
 
-### 46.10 Findings Summary
-- **Puppeteer JA3 matches Chrome 146 exactly**: `8061a5edbfa5eab7663a5e5aff0118ab`. Node.js is trivially distinguishable (`0cce74b0...`, 59 cipher suites, no GREASE, HTTP/1.1 only). No red flags.
-- **Recommended routing**: `page.evaluate(fetch(...))` from a page navigated to `t.captcha.qq.com` origin. Empirically confirmed: same-origin fetch produces correct Origin, Referer, Sec-Fetch-* headers. Chrome's H2 HPACK handles header order by construction.
-- **Browser lifecycle**: one long-lived `Browser` + one reusable `Page` across the 30-attempt survey run. Re-launch on crash, limit to 1 retry.
-- **Integration seam**: new `tools/captcha-solver/puppeteer-transport.js` with `sendVerify({url, method, headers, body}) → {statusCode, headers, body}`. Conditional in `captcha-client.js` verify method, gated behind `--chrome-tls` / `usePuppeteerTransport` flag.
-- **Files for 46.12**: (1) new `puppeteer-transport.js`, (2) edit `captcha-client.js`, (3) edit `captcha-solver/cli.js`, (4) edit `scraper/cli.js`.
-- Full detail: `research/scraper-tls-impersonation/README.md`
+### Context
+- **Chrome profile**: `profiles/chrome-fingerprint.json` — captured 2026-04-16 from headless Puppeteer/Chrome 146. Contains the full 60-field cd array in Template C order, plus the sd object. The `perSessionIndices` map identifies which fields to substitute.
+- **Scraper collect generator**: `tools/scraper/collect-generator.js` — already supports `cdArrayOverride` (line 382) and `singleBlob: true` (line 412). The wiring work is to:
+  1. Load the Chrome profile
+  2. Clone the cd array
+  3. Substitute per-session fields (sid, timestamps, pageUrl, eventLog)
+  4. Pass as `cdArrayOverride` with `singleBlob: true`
+- **Template handling**: the Chrome profile was captured from Template C (`gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR`). If the server serves a different template, the field order differs. The cd VALUES are template-independent (browser fingerprint data), but they need to be reordered per the served template's `fieldOrder` from `pipeline-config.json`. The `cdArrayOverride` path in `generateCollect()` currently bypasses reordering — the subagent must check whether reordering is needed and either apply it before passing to `cdArrayOverride`, or extend the code path.
+- **Per-session field sources at runtime**:
+  - `cd[17]` (sid): from `session.sid` — already available in the scraper's `solveCaptcha` flow
+  - `cd[25]`, `cd[56]` (timestamps): `Math.round(Date.now()/1000)`
+  - `cd[51]` (timestamp end): `cd[25] + 2` (Chrome shows ~2s collection time)
+  - `cd[29]` (eventLog): needs a synthetic Chrome-format event array. Check what format Chrome uses (the capture shows `[[4,-1,-1,<ms_ts>,0,0,0,0], [1,x,y,dt,...], ...]`). The scraper already generates behavioral events — check if the format matches.
+  - `cd[36]` (pageUrl): the show page URL with rand param — already available from `sig.showUrl`
+- **sd object**: the scraper already builds this via `buildSlideSd()`. The Chrome capture's sd matches the existing format. No change needed except ensuring `coordinate` uses the actual ratio from the slide puzzle.
+- **Existing scraper flow**: `tools/scraper/scraper.js` method `_generateCollect()` (find it) calls `generateCollect()` with the pipeline config. Read it to understand the current wiring.
+- **XTEA params**: come from the auto-ported template's `pipeline-config.json` (or `xtea-params.json`). The scraper already loads these dynamically per template. No change needed.
+- **Field order**: the `pipeline-config.json` for each template includes `structureParams.fieldOrder`. The Chrome profile's cd is already in Template C's order. For other templates, the VALUES (keyed by semantic meaning, not position) need to be mapped into the target template's order. The simplest approach: store the Chrome profile as a **semantic map** (keyed by schema index 0–58, Template A order) and let the existing `reorderCdArray()` handle template-specific ordering. This means the profile's cd array should be in Template A canonical order, not Template C order.
+- **Docs**: `docs/COLLECT_FINGERPRINT_ANALYSIS.md` — records the 60-field analysis, round-trip verification, and the Chrome-profile replay strategy.
 
-### Decision required
-Accept, revise, or reject the integration design before dispatching 46.12.
+### Implementation Steps
+1. **Read** `tools/scraper/scraper.js` — find `_generateCollect()` and understand how it calls `generateCollect()` today.
+2. **Read** `tools/scraper/collect-generator.js` — understand `cdArrayOverride`, `singleBlob`, `cdFieldOrder`, and `buildSlideSd()`.
+3. **Read** `profiles/chrome-fingerprint.json` — understand the captured cd array structure.
+4. **Convert** the Chrome profile's cd from Template C order back to Template A canonical order (using the inverse of the fieldOrder mapping from `output/tdc-pptr-capture/pipeline-config.json`). Save as `profiles/chrome-fingerprint.json` with a `cdCanonical` array (59 fields, Template A order) alongside the raw `cd` (60 fields, Template C order). The -1 (behavioral event) positions in fieldOrder map to the eventLog entries.
+5. **Add** a `--chrome-profile` flag (or make it the default) to the scraper that:
+   - Loads `profiles/chrome-fingerprint.json`
+   - Clones the `cdCanonical` array
+   - Substitutes per-session fields by schema index (not Template C position)
+   - Passes to `generateCollect()` via `cdArrayOverride` + `cdFieldOrder` + `singleBlob: true`
+6. **Handle** the sd object — use the existing `buildSlideSd()` with the actual slide answer, trajectory, and coordinate from the captcha session.
+7. **Verify** offline: decrypt the generated collect token and confirm the cd values match the Chrome profile (modulo per-session fields). Token length should be ~4.9K chars.
+
+### Verification
+- [ ] Scraper with `--chrome-profile` (or default) produces a collect token ~4.9K chars (not 10K–19K)
+- [ ] Decrypting the scraper's token yields cd values matching `profiles/chrome-fingerprint.json` for all non-per-session fields
+- [ ] Per-session fields (sid, timestamps, pageUrl, eventLog) are correctly substituted from runtime values
+- [ ] `npm test` still passes (no regressions in existing tests)
+- [ ] Offline round-trip: encrypt(decrypt(scraper_collect)) === scraper_collect
+
+### Suggested Agent
+`general-purpose` — code changes to `tools/scraper/` and `profiles/`, reading existing pipeline code, wiring integration.

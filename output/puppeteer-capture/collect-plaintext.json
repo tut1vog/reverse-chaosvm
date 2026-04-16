@@ -1,16 +1,4 @@
 {
-  "_source": "Captured from headless Puppeteer/Chrome 146 on 2026-04-16",
-  "_template": "C",
-  "_tdcName": "gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR",
-  "_notes": "cd array is in Template C field order (post-shuffle). PER-SESSION indices must be substituted at generation time.",
-  "perSessionIndices": {
-    "17": "sessionId (sid from prehandle)",
-    "25": "timestampInit (unix seconds)",
-    "29": "eventLog (mouse/touch/key events)",
-    "36": "pageUrl (show page URL with rand param)",
-    "51": "timestampCollectionEnd (unix seconds)",
-    "56": "timestampCollectionStart (unix seconds)"
-  },
   "cd": [
     {
       "_state": 0,
