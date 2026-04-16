@@ -148,7 +148,8 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | 48.4 | Request timing — add realistic inter-request delays matching HAR timing profile | deferred |
 | 48.5 | Tests for 48.4 | deferred |
 | 48.6 | Live re-measurement (director-owned, 30 attempts) — compare errorCode distribution | done |
-| 48.7 | Decision gate: if 48.6 shows no improvement, investigate IP reputation (try from a different IP) or Puppeteer-only path | pending |
+| 48.6.1 | TLS fingerprint rotation + errorCode 12 investigation | done |
+| 48.7 | Decision gate — closed, pivoted to Phase 49 | done |
 
 **Key findings from investigation**:
 - HAR request chain (12 entries): prehandle → show → hycdn×2 → tdc.js → **tcaptcha-slide.js** → vm-slide.enc.js → **slide-jy.js** → caplog → verify → caplog → urlsec
@@ -156,28 +157,51 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 - Zero cookies in both HAR and scraper — cookies are not a differentiator.
 - Prehandle response structure is identical (same keys, same extra/rainbow config).
 - The `sess` token is opaque and server-generated — it may already encode routing at prehandle time.
-- The Puppeteer result (`errorCode: 0` + `t03tserver`) proves the payload content is sufficient for errorCode 0 — the gap is in the request chain or session behavior, not the verify POST body.
+- **errorCode 12 = pure IP rate limit** (frequency-based, ~3 attempts per time window). Not TLS-fingerprint-differentiated — tested with 14 distinct JA3 hashes via curl-impersonate + Node.js cipher permutations; all profiles exhausted simultaneously. User confirmed: triggering errorCode 9 too frequently on a real browser also produces errorCode 12.
+- **errorCode -1 is the real signal gap**: scraper always gets -1, Puppeteer always gets 0. Both get `t03tserver` tickets. The -1 vs 0 difference is in the **verify POST body content** (collect token, vData, behavioral data), not in HTTP transport, TLS, headers, or request chain.
+- `t03tserver` may simply be the normal ticket prefix for this appid — even Puppeteer with real Chrome gets it.
+
+---
+
+### Phase 49: errorCode -1 root cause — verify POST body diff
+
+> **Framing** — Phase 48 narrowed the problem: errorCode 12 is pure IP rate limiting (solved by backing off). The real gap is **errorCode -1** (scraper) vs **errorCode 0** (Puppeteer). Both get `t03tserver` tickets. The difference must be in the verify POST body content — something the server inspects in the collect token, vData, behavioral data, or field relationships that the scraper gets wrong.
+>
+> **Approach**: capture the exact verify POST body from both Puppeteer (ec=0) and the scraper (ec=-1), decrypt both collect tokens and both vData payloads, and diff field-by-field to identify what the scraper produces differently.
+
+**Goal**: identify which field(s) in the verify POST body cause the server to return errorCode -1 instead of 0, and fix them.
+
+**Success metric**: scraper achieves errorCode 0 on verify responses.
+
+| ID | Task | Status |
+|----|------|--------|
+| 49.1 | Capture Puppeteer verify POST body (ec=0) — run Puppeteer once, save full POST body + decrypted collect + decrypted vData to `output/phase-49-body-diff/puppeteer/` | pending |
+| 49.2 | Capture scraper verify POST body (ec=-1) — run scraper once, save full POST body + decrypted collect + decrypted vData to `output/phase-49-body-diff/scraper/` | pending |
+| 49.3 | Field-by-field diff — compare all POST fields, decrypted collect cd/sd arrays, and vData plaintext between the two captures. Document every difference. | pending |
+| 49.4 | Hypothesis + fix — based on the diff, identify the causal field(s) and patch the scraper | pending |
+| 49.5 | Tests for 49.4 | pending |
+| 49.6 | Live re-measurement (director-owned) — verify errorCode 0 achieved | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 48.7
-**Title**: Decision gate — interpret 48.6 results and decide next direction
-**Phase**: Phase 48 — Session-level signal investigation
+**ID**: 49.1
+**Title**: Capture Puppeteer verify POST body (errorCode 0 reference)
+**Phase**: Phase 49 — errorCode -1 root cause
 **Status**: pending
 
 ### Goal
-Interpret the 48.6 survey results and decide next steps.
+Run Puppeteer once to get an errorCode 0 result, and save the full verify POST body (raw URL-encoded), the decrypted collect token (cd array + sd object), and the decrypted vData plaintext to `output/phase-49-body-diff/puppeteer/`.
 
-### 48.6 Results Summary
-30 attempts:
-- 10/30 (33.3%) got tickets — ALL `t03tserver`, ALL with `errorCode: -1`
-- 10/30 got `errorCode: 12` (rate limiting / scoring rejection)
-- 10/30 failed with auto-port errors (unknown template hashes — new templates rotated in)
-- 0/30 t01/t02 tickets
-
-**Comparison to baselines**: errorCode -1 with t03tserver tickets is UNCHANGED from prior phases. The request-chain fixes did NOT change the lane assignment. However, the auto-port failure rate (33%) is new and may indicate template rotation accelerating.
+### Context
+- The Puppeteer solver at `tools/captcha-solver/captcha-solver.js` already captures the verify POST body in `ticket._capture.verifyPostBody` (see cli.js lines 100–110).
+- The POST body fields include `collect` (encrypted fingerprint token) and `vData` (encrypted vm-slide data). Both need to be decrypted for comparison.
+- Collect decryption: use `tools/token-generator/` — the token is XTEA-encrypted, template-specific. Need to identify the template from the tdc.js source hash, get the XTEA key, then decrypt.
+- vData decryption: use `tools/vdata-generator/encode.js` `decodeVData()` — custom base64 + XTEA decrypt.
+- Save three files: `post-body.json` (all POST fields as key-value), `collect-decrypted.json` (cd array + sd), `vdata-decrypted.json` (plaintext object).
 
 ### Verification
-- [ ] Decision documented in plan
+- [ ] `output/phase-49-body-diff/puppeteer/post-body.json` exists with all verify POST fields
+- [ ] `output/phase-49-body-diff/puppeteer/collect-decrypted.json` exists with cd array
+- [ ] `output/phase-49-body-diff/puppeteer/vdata-decrypted.json` exists with plaintext fields

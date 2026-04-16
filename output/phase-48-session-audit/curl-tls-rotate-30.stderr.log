@@ -1,0 +1,636 @@
+[curl-tls] Starting 30 attempts, rotating across 5 TLS profiles
+[curl-tls] --- Attempt 1 | profile=chrome99 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1JSRsP_QrxlY-ndO_U1...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543560338423808&t=1905171776&appid=2046626881&js_data=d04GX7WpHvzoPLNoUEGbAF77b54bpENbgtejBVsZAT4PFeTTpw9apcS8a9XywPD6qapPiZb4CXJ0axedy1YdvCVqYUzYD7tO_6qha1-dR-XpxYMQze3ozs2ZBuoIBs4KsDi7Hil6FbI3gD96zU20dnOAWqtIJoKMRY4&a=b?t=1776348009
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197545 chars
+[curl-tls]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[curl-tls]   Source hash: f53142c54fc43699
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=f53142c54fc43699)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 2 | profile=chrome110 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1ETJuAh_p-6zudZWdpE...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543576073826304&t=549761567&appid=2046626881&js_data=d04On1nf9tJZ2xSGCkmYDIEvNznjXgutElHoMtPLu02O74ItFqIMfmpJ7C1McYamufa0ZoT_IUuqozipK82_mTE3Wirf_vX1Mw3X6z3ExtpugNhX7q4J-_pvFWiyP2OH0cJ-Y_vDoDPVI1UNALcVmWCzvJmouAIG3Ch&a=b?t=1776348013
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: tc5Fp7YR1s3Rlx1Dr+3i...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 20390 bytes, slice: 8123 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 502
+[curl-tls]   ans: 502,158;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6272
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: VueBKpkQNbhk8PJ_PeBGUD-dqbjpqT...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 3 | profile=chrome116 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1HucgRRAGjxutCAjrfa...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543595491037184&t=1703083397&appid=2046626881&js_data=d04oyNJ2kkAf-PwDcL31YX_sFXNu-0vTzWU8hCm4Fu4X-DEAXg7rVigsueCjdlceq4Mc4LSB1Zh5unYWm5bHGpOlRnWHAMllrMrPI4JQJaRumQ-FKuZOs0kODIQNEIhsyQeWfvIlWi3KX01M2o1qNxh8yIcwXBVYqqE&a=b?t=1776348017
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197545 chars
+[curl-tls]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[curl-tls]   Source hash: f53142c54fc43699
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=f53142c54fc43699)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 4 | profile=safari15_3 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1VG0C1z1FZbMWEi0iUj...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543611008233472&t=1231612713&appid=2046626881&js_data=d04ES-5VToMltpvD4lAgz-Jm9RlOt02K3lj9wIHbjwYjuagt-_PZdM8AlyJoSCkNodYerVnEs1J_Vyne4_hDJHFbw7ZMRgk3fzYM43SVJcc_N3bhUXxwyC3fehfZ0hrgh4TQTy4xsLej9nx9QFgZSHZRZ_IcD5PaeAb&a=b?t=1776348021
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: xwFIkwPg2MJDhUVE5zja...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 24707 bytes, slice: 6323 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 534
+[curl-tls]   ans: 534,98;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 5984
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: VueBKpkQNbhk8PJ_PeBGU6NmzxyIi8...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 5 | profile=safari15_5 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1dfUeCARyen_0Cp-crC...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543630427860992&t=861821808&appid=2046626881&js_data=d04O7h4cTvR4CXUP6cuBQrhNyPKKg7qmdeiYWla145vhsHBwAY9xBDcqFtEp93IsQyu4AE9SoIpMx1WfuaUUjjnb91VnJz2DEKe4wIuK94I4byWhNqvzh3Im96x0XtWVSaT-WqYY0ajTuYS7JvgVqFAVsg-Ld8_JQ0A&a=b?t=1776348026
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 199611 chars
+[curl-tls]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[curl-tls]   Source hash: 3429444f324c6110
+[curl-tls]   Template: unknown, opcodes: 91
+[curl-tls]   eks: XRLQwQpWvQnH9KT9/OcJ...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 18171 bytes, slice: 5598 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 500
+[curl-tls]   ans: 500,32;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6200
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: -Iq3xF474Ut2Kc98LMr5Fxhckloj0-...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 6 | profile=chrome99 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1jfmsbEgPZyVmarZ1th...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543649584824320&t=564437716&appid=2046626881&js_data=d04oGYSU4axTnq3UM6Ci-BeIFWA0Kbq1TQFuMgjb2DAWUAOChk6tvfb2ms0YGC6fzQuG3e1foOtt3UK40boZmXwfwhVSR4LmdBwnPoeTvHyJCWuMsyB3_pVBh622vSnYmivUL-pc9fr_M9dQXNmQCbwWn7T0DVPytrv&a=b?t=1776348030
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197545 chars
+[curl-tls]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[curl-tls]   Source hash: f53142c54fc43699
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=f53142c54fc43699)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 7 | profile=chrome110 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1ecY64TKKhlODLjDY6T...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543664913379328&t=85841120&appid=2046626881&js_data=d04jj5JNrnlCmepkyyu7Hp68Xl5KGkirJJMAGCjCtD2YyO0CMyj9J-ZR7E7YDU6NabeA0lWWX8Nuwr73SqlO-7xRR6Af910HZmr7UnLWwQz4CgmNY_SzJ9MbQ33KAgYmx765Vm2l072dnpRsHc3VVrlYSnJyQ2ZzEAO&a=b?t=1776348034
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: F9+gsDT4wTeQ1VZKz53N...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 22226 bytes, slice: 7546 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 521
+[curl-tls]   ans: 521,30;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6316
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: -Iq3xF474Ut2Kc98LMr5FMVe2SDDc8...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 8 | profile=chrome116 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1CvKMitI_d5pJHuaMem...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543683913625600&t=1928424233&appid=2046626881&js_data=d041Egz4rLXN35uB9j1p2X-jlR-gDgvIROulGF6vur9Z4JjrI5elU92Vv2TlHUAHKYlVneu1KrdyVVFNikywJ3CC7lF6lfdVwlSCsX-T39MdxYn3T6BynlB-CUNuh3aEtH5WUEX0Bn63rpGEP7HlpB1rbjRV9590NON&a=b?t=1776348038
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197257 chars
+[curl-tls]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[curl-tls]   Source hash: daf0c711ccb82124
+[curl-tls]   Template: B, opcodes: 94
+[curl-tls]   eks: hEePrrG35p26JH6UEY/G...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 11554 bytes, slice: 5935 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 492
+[curl-tls]   ans: 492,35;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6092
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: dSaPMguxRdN4iUjzW8IGu9X0i_qRFK...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 9 | profile=safari15_3 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s19xLKZiMhYfq5b48mbM...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543702783799296&t=1574332978&appid=2046626881&js_data=d04O4kHIlV22AuZhb4gTt_eIm8bR-PThUZcfKGh8Ttz8deVjO2EX3-SAdB0KCWEjKEoQ1AnlxQ8W_43XiZRmWB4fZzeFIH_aoxoRMA-xK5e1ykmgQzR5sfr6iQ37-gPm0fMHxlN7QdG-NteTBLfkwrOYUiHmp4jCKda&a=b?t=1776348043
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197545 chars
+[curl-tls]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[curl-tls]   Source hash: f53142c54fc43699
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=f53142c54fc43699)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 10 | profile=safari15_5 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1CHEPeMgD_0Hh2wRmsN...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543718044991488&t=1456606226&appid=2046626881&js_data=d04X9qPR-bw2SQ13eb03zNn_7Ny2Fie4z7UShgrZcVCXNrN_TTiBV0e6GxVOX5qgyasrN0m4lTkYJiiAZwF11lIlMx3xnr74Os8DALELVcDs-t3irGS79ACZup61DzXidq6WGykO6E1_36BXGp9KD11d8PdLXYyQnqO&a=b?t=1776348046
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: 6slToZMk+WpzXbM3F++R...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 25422 bytes, slice: 4557 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 501
+[curl-tls]   ans: 501,107;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6540
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: aUV_xBFckJ32tI87aQr9LPGjtb-ubm...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 11 | profile=chrome99 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1XE64SvUhw7VPOGvQAo...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543736696475648&t=87278266&appid=2046626881&js_data=d04GlDFlVA_hF4w8NwgnLBL-DbeGbpgD3qvkoN2SppfqbLwGgsfPjqZRPVdGWO4NljsvHAk4IAdAkJdRX095FFDU_9NSZKKoe4RT1iEr-24ybEWU80JOhxrHSOuw8z37vMfMqz13CDHwDvOdgzDLNbiyRkoy7cO9ZE7&a=b?t=1776348051
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197257 chars
+[curl-tls]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[curl-tls]   Source hash: daf0c711ccb82124
+[curl-tls]   Template: B, opcodes: 94
+[curl-tls]   eks: 687t/ru/Qr7ZWDrqfr7y...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 24990 bytes, slice: 6033 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 453
+[curl-tls]   ans: 453,30;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6424
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: -cba2z9HUEP3PCTPymiz5RUvWTam-4...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 12 | profile=chrome110 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s15IZoXN9bK0sQV-O5Yo...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543755627835392&t=1949886582&appid=2046626881&js_data=d04k1ok4u-NkujYSuy5r9VMIP80V1phW3ZYrHlFBy2li6ktdCvPTKW7uuTwOiJ8z0dnrvju4Rck8Cms-zKxWkOFCEz9sz-b_LsIS0oiXL5XPW_NEH-uXhEVLco-bgUoKeYNRdyJGNfOWQWVnhKkhLUtq7gm_vZ77mUE&a=b?t=1776348055
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 129582 chars
+[curl-tls]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[curl-tls]   Source hash: e6a45ba64d246f82
+[curl-tls]   Template: unknown, opcodes: 98
+[curl-tls]   eks: 1z+VG0e43zkRkgsL9g+v...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 20624 bytes, slice: 6551 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 465
+[curl-tls]   ans: 465,51;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6496
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: dzVkp3XO*uHpXXxIkzflsLHBwadV0E...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 13 | profile=chrome116 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1v65KW019JXGqunc9IT...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543774384762880&t=1684898000&appid=2046626881&js_data=d04tqo-qrxidCYYStnig5Agbaf6vUJ1ODAXyNmpEJmwa6-4dEHO9cCIurcF8RWznAtrYXDnk7IBESrQ7tGvKWMeoAad5ybaz_4LHdMu1ZF6-9rza3ZP19lRIzZJQCZilwlxywMyP7tEpQlguOVbyB_3VYXDqVhhNZJh&a=b?t=1776348060
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 202765 chars
+[curl-tls]   TDC_NAME: HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA
+[curl-tls]   Source hash: 27dda893f81dbc4f
+[curl-tls]   Template: unknown, opcodes: 103
+[curl-tls]   eks: nSjgoeF1G2Cp35Ap6nTz...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 18121 bytes, slice: 5385 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 491
+[curl-tls]   ans: 491,80;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6104
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: -Iq3xF474Ut2Kc98LMr5F3FEs0bfDA...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 14 | profile=safari15_3 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1QAyUIbMnaavPBMuhe8...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543793850527744&t=682442727&appid=2046626881&js_data=d04pIQ-TI1knjedhvuSnkBqofn9axna5z-Te6J-coXiQ6TJVhp-aOhhAepEnilHIg89G613Xu_xTRkwVAsLPp3vG-8uX78xglfk3aaxz8gH9C_tp4xACUeBKj8AYhkIfA76uTFfxbCdG-34EuF2e4IGvbsk_Y5Zs9vo&a=b?t=1776348065
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 199611 chars
+[curl-tls]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[curl-tls]   Source hash: 3429444f324c6110
+[curl-tls]   Template: unknown, opcodes: 91
+[curl-tls]   eks: gRxee6s5ADY+FqDF/a6y...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 13763 bytes, slice: 5295 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 469
+[curl-tls]   ans: 469,102;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6156
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: 7MjK5yGovGjw1scdQ6-F-MLyRuseS_...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 15 | profile=safari15_5 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1vLCfS7bqOzL77anLuR...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543812512563200&t=1559635830&appid=2046626881&js_data=d04uPGiUN641Hop5IgjMeZJOOKMBs859NtnDohJoTZAsX5iaSxzs2p0K9TDtlDGF13HCi5PFoxCPGZWchgVPuKQwEYmG0UDNvT8OLxHoK_PJj1nEKMo13BFKErRBoNpgLJGdhXB-B5x7JTBEQR2LFsUgxs8ziFtZDE-&a=b?t=1776348069
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 144440 chars
+[curl-tls]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[curl-tls]   Source hash: e5341ccb12b78e65
+[curl-tls]   Template: unknown, opcodes: 96
+[curl-tls]   eks: pHsrCaSjHiaeoctuiYSg...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 18098 bytes, slice: 6086 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 453
+[curl-tls]   ans: 453,30;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6572
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: VueBKpkQNbhk8PJ_PeBGU6u*hvkJW-...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 16 | profile=chrome99 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s17gh_aiRAmFqGChkMSK...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543831731015680&t=317953746&appid=2046626881&js_data=d049Gb05U64le3gQoaS0R34hCoxQC8YfLKLEZMOr4KU1973Zh_qmU_nUR9ZouO1E61jFmijPFcgzSGJEkiPPWBXTkYt7pAzOaXmBC9isKt4v58UVl-vwyTFt3zmjUi4YYWlPJGt5yRCVscy6UXPm1DYpozcHYXTGSph&a=b?t=1776348074
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 203186 chars
+[curl-tls]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[curl-tls]   Source hash: 88ebeea62f566ec5
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=88ebeea62f566ec5)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 17 | profile=chrome110 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s15r1bVNjD-OqRxLEcgn...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543847451115520&t=607101847&appid=2046626881&js_data=d04TpMDtoNjMqU0HUsGCssG9DNbuWpkEG6702Y03RU38jqPNOajVoG5aNB1sBBw4cghvbS_fBWjnyxCGwKTV7A1i7kD5EIokTqrD8bebR8kl-EgmN6YUM4I1RTSau4f9cCLPO3r_5hQCS0oPyGo79OL__fZJYwIDw-W&a=b?t=1776348077
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197545 chars
+[curl-tls]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[curl-tls]   Source hash: f53142c54fc43699
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=f53142c54fc43699)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 18 | profile=chrome116 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1PvbhE7qRCOYmnZSYqL...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543862806462464&t=2072326981&appid=2046626881&js_data=d048ornPANpMNay3JHi1IPfk8duJkNVJhSvUsbleXpYv9N9foSjgcgAlMdsm9pbSywB5ViVlNK7zbYxlkyi7W_Ma-lrw5SGOa13OkQnm8_rlDA9eHrraEavo0_ZzdTtnSF46TGou5np1MZWvy78bw9cAoLZaMgYjDwU&a=b?t=1776348081
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 144440 chars
+[curl-tls]   TDC_NAME: SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk
+[curl-tls]   Source hash: e5341ccb12b78e65
+[curl-tls]   Template: unknown, opcodes: 96
+[curl-tls]   eks: l54MKj4zqy9e0YatEftt...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 11486 bytes, slice: 6077 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 459
+[curl-tls]   ans: 459,30;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6456
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: -Iq3xF474Ut2Kc98LMr5FjyFxQPzt6...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 19 | profile=safari15_3 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1c-esPlaEZDpHyV4dUa...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543881790619648&t=1645043033&appid=2046626881&js_data=d04xCSOUAlGFd8nx3D60datZzLHu-zUSLll2JgE-w75MQQeUXOyHJanCOn5kymLvxlO-_NoPTIcaN5OPtes7KAbORfRmy47ZwWaNDqwCGOUk7KP_3ZCL-pOCEfYAuMituvJEcz5QZAtD-sEmUWMzAaJ1LJA73pVGhSY&a=b?t=1776348086
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 129582 chars
+[curl-tls]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[curl-tls]   Source hash: e6a45ba64d246f82
+[curl-tls]   Template: unknown, opcodes: 98
+[curl-tls]   eks: xdl/zYK2cILQMRkmdhop...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 13722 bytes, slice: 5418 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 462
+[curl-tls]   ans: 462,76;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6040
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: fFwj1eBh*PVG9OM9e1Q973rq9p0c7s...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 20 | profile=safari15_5 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1TLGQj7MStd8-os_6pF...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543900413329408&t=376296019&appid=2046626881&js_data=d04c9OaIUC0BVRpCurjLnjVJhiZKI8UIdRGInstW77z_FpoolUvVSgyIfmlQbYz2TTwkPAyTtl6Xl-EtEXJa1Jm4wuG5b6qeC90Pozqe61vlhsavhAlM7_tlPPSX8VW73-mdPbmHMYirY1_O1d0SLeD8AMKLNPcUjpH&a=b?t=1776348090
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: hyvUARu9tUP3gM0tBpOM...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 20540 bytes, slice: 6727 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 456
+[curl-tls]   ans: 456,54;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6208
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: hHvazyNFyuhvQi0y263Bx4SttVlaaQ...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 21 | profile=chrome99 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1fVfJQf68K4jdFOyT0p...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543919291305984&t=1228841366&appid=2046626881&js_data=d04Im1u39166KJjdzGHfhqMBXO30N5T2Mr_2knfGp38SXkfiV0OdLSjoBL1xN1Uo6e2olLMePcloJfyqHkhofgw7dQ30nWZYHZsvGYErIYtbJeZsscE4ODtvVVrei4V_KA9KIO3sPAORBN_IFzvC7XqwqyY3o6Ft-Ec&a=b?t=1776348095
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 203186 chars
+[curl-tls]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[curl-tls]   Source hash: 88ebeea62f566ec5
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=88ebeea62f566ec5)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 22 | profile=chrome110 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1fhcXHQdzMASu76PDZD...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543934906699776&t=681768658&appid=2046626881&js_data=d04ZB93Zk2rGOT96LOHWd5KEGXkXl_3W8vSPXQ-xxcAqlTSGINxY_ndaV1pQVFPuASzEdadrcIETqheM4TWcLmsTdrO9iVmEaXpxM0vQT2vF7o1AuHemr7P20_I3DD6OtIONRCw-8yAw-VU1dNHmh_Xxbqh8VSALalv&a=b?t=1776348098
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 129582 chars
+[curl-tls]   TDC_NAME: XcabTONObCYZeEGNPRmPGBQbTmYKEAHj
+[curl-tls]   Source hash: e6a45ba64d246f82
+[curl-tls]   Template: unknown, opcodes: 98
+[curl-tls]   eks: RP7TaMa2vK4iIL+GiH0g...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 27932 bytes, slice: 9261 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 492
+[curl-tls]   ans: 492,30;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6252
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: qtSqVaiizbddNhK-fRM4iy-A11C1Jj...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 23 | profile=chrome116 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1qWZgaTlmyzVxABlfNV...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543954813452288&t=1803617677&appid=2046626881&js_data=d04pHIIaE-b_5O0n6-in3AkcLKr7cZ7aQQ3-sdeL9eWpCykAq6nwz6CnuHK2-wNP0pt4ssDU4jrpYYHdlS9_v2K2OWKJf5w0e2mDqPcpd2TP0xxh8EFtC6XiEc1GZ6Q82lIqF65EeAM04er-tDeEK_ULYsKQ29nd2pb&a=b?t=1776348103
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197545 chars
+[curl-tls]   TDC_NAME: dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH
+[curl-tls]   Source hash: f53142c54fc43699
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=f53142c54fc43699)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 24 | profile=safari15_3 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1tHo-qxQ_YLTOfHxNWS...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543970201616384&t=1560605340&appid=2046626881&js_data=d046k1qmknqxliI--l5gxU15CFeKClu2uziOmiHlBfVTlXFlcfA-7vxZ2z5v0HzWK2mY3ivlmrzvnKpSe9T11L4fm6VaIdqQbLmpTEeWtf17x1w82wgiOImc4F7lw-jpuvhfJmSLC3rn8kUVnnw7vy6A3U_Le4ymB0K&a=b?t=1776348107
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 199611 chars
+[curl-tls]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[curl-tls]   Source hash: 3429444f324c6110
+[curl-tls]   Template: unknown, opcodes: 91
+[curl-tls]   eks: 6seeqWeC2kuESVM/yvdA...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 15416 bytes, slice: 4919 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 510
+[curl-tls]   ans: 510,101;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6092
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: 0FJUQ0D-sAwjtkI3veZg_pCFFKc4XB...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 25 | profile=safari15_5 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1bj-_sVhWLgmEVAZIai...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450543989730295808&t=395518055&appid=2046626881&js_data=d04iajH5Wd_OMDRxaIpnLawqsdZ8wRrai_rcoJvC9-QSJYLGDZ0A0w18ar9Qs-XPMLdfJ6Roe3VlVJ_HXv6eG2AFPoOgK9JYSQa7ksqllmeuPyu5so5tBOM9jJJ38UE8YjftHfJHPaS1-k_g4v06O7To8CuzWOMxBUb&a=b?t=1776348111
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: B3FBwijxHhaRv7adKso/...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 27884 bytes, slice: 9376 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 481
+[curl-tls]   ans: 481,40;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6264
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: ed0FNEDmGsgjfhnCwiBahHLln7UM_j...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 26 | profile=chrome99 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1-YDK8h9BNVVeDO0Dsw...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450544008649175040&t=1680265272&appid=2046626881&js_data=d04h2bYua9rzoo5_OAbsP0cv7-uc4RObSsCJEdboYE2VmwGjmMq1RxzqrOcmMMRBhPMiCOqHc3MZcYVgL8G6wioPwxF6OIR7VPQE1RBcJ2DHWOWq3h8CAlUx-OTp-xxu-AF8vVcQ6sO2CRxhWaBJd8UxEqslDrdRhXg&a=b?t=1776348116
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 197257 chars
+[curl-tls]   TDC_NAME: FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF
+[curl-tls]   Source hash: daf0c711ccb82124
+[curl-tls]   Template: B, opcodes: 94
+[curl-tls]   eks: LQjU8QDBYPcu/o9ndIUc...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 11493 bytes, slice: 5812 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 463
+[curl-tls]   ans: 463,32;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6476
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: 3i516XFNwJ3JbegSWlwyOFrq9p0c7s...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 27 | profile=chrome110 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1xlDqPm-2HLUwV07BK5...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450544027235762176&t=1054532765&appid=2046626881&js_data=d04F-0ZlJ1YQrSYrhzHSWWw_69qkQvhlHDQNPwxHn9qZGohxnpT5YoOi69s7OB8BvSJ5oJedzTKK2SfLF_NMfip7MzE6F03fuuK6Qrh1yLgB_EUUxT7l6CZUSlsIdGhI3QOhSaVqRuLv_7EhXMbQyPFwuPMptBJSU4L&a=b?t=1776348120
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 199611 chars
+[curl-tls]   TDC_NAME: BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ
+[curl-tls]   Source hash: 3429444f324c6110
+[curl-tls]   Template: unknown, opcodes: 91
+[curl-tls]   eks: t5WQsgL5tLnkBE9IkHXs...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 20573 bytes, slice: 7348 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 462
+[curl-tls]   ans: 462,30;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6592
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: VVK5_cnQHC9hnWn_CA-EpCs8pD*l4r...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 28 | profile=chrome116 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1s_1ZJXkdWN9_Ioee0t...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450544046360211456&t=646236573&appid=2046626881&js_data=d04XUiY-RZw7D2Phs0v7AeUV49jIzQvGsLof1Z9V-Dm2nlhx4kfofQYXWvD_YiZAlcAFkXFOFUJqOKCjSOwUC6zRywS1MMei8eqZWPbT5usCtzDENwhMso4ZwfN00vqqbGl3hIkvrcI8r1JaEniFH0KSJjF4CEydHQW&a=b?t=1776348125
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 203186 chars
+[curl-tls]   TDC_NAME: UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS
+[curl-tls]   Source hash: 88ebeea62f566ec5
+[curl-tls]   Source hash not in cache — skipping (unknown template)
+[curl-tls]   ERROR: Unknown template (hash=88ebeea62f566ec5)
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 29 | profile=safari15_3 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1JZPn17cLqgrE7CKFx3...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450544061818535936&t=694434142&appid=2046626881&js_data=d04baMdOz8WAn61WjcRXy_1snNTtwX0xrVUuAm5c9BsFdXKqYF85r57qGE0RGKWrZJZTJUKgfIf69wSeLJtOuEUDYJKv_ysIGxbvDi0_9zPQ3dkLnbiAFFTHYDQypGPQZTEOs1PgYrejqDVxLUujxmvlNzzuqExaPIi&a=b?t=1776348128
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 162790 chars
+[curl-tls]   TDC_NAME: DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG
+[curl-tls]   Source hash: e2170903e201e018
+[curl-tls]   Template: unknown, opcodes: 93
+[curl-tls]   eks: HhsMGm/dH9vI2G91xJKl...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 27930 bytes, slice: 8278 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 497
+[curl-tls]   ans: 497,58;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6540
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: -Iq3xF474Ut2Kc98LMr5FCdANj1e*Z...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] Waiting 3 seconds...
+[curl-tls] --- Attempt 30 | profile=safari15_5 ---
+[curl-tls] Step 1: prehandle
+[curl-tls]   sess: s1TJQxYw0Z41EW4byijC...
+[curl-tls] Step 2: getSig (show page)
+[curl-tls]   nonce: eda1152f11f1daf0
+[curl-tls]   dcFileName: tdc.js?app_data=7450544083359744000&t=57229619&appid=2046626881&js_data=d04fSZHwosxNoRYNoJSHwCeGfWXNYXaAdXsZxpGK44XpGCm8Lb5NVijeqP740nEf97wlSZYKlgljQSlLMGk-sQPVDTXJLrUwSV5bw9ES3VuevJxEFbwmk5eCeSSGK_a0Fqj-Z0U6f_N9eMYANF3cy1lKOD4tLQYZMUu&a=b?t=1776348134
+[curl-tls] Step 2b: downloadTdc
+[curl-tls]   tdc source: 161122 chars
+[curl-tls]   TDC_NAME: gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR
+[curl-tls]   Source hash: 02fd132edb24a8c1
+[curl-tls]   Template: C, opcodes: 100
+[curl-tls]   eks: tn8He7a4aDicegPgCg4t...
+[curl-tls] Step 3: downloadImages
+[curl-tls]   bg: 18061 bytes, slice: 6015 bytes
+[curl-tls] Step 4: solveSlider
+[curl-tls]   rawOffset: 455
+[curl-tls]   ans: 455,54;
+[curl-tls] Step 5: generateCollect
+[curl-tls]   collect length: 6284
+[curl-tls] Step 6: build POST fields + vData
+[curl-tls]   vData: VueBKpkQNbhk8PJ_PeBGUrZa0SQPFx...
+[curl-tls] Step 7: verify
+[curl-tls]   errorCode: 12, ticket: none
+[curl-tls] 
+════════════════════════════════════════════════════
+[curl-tls] SUMMARY
+[curl-tls] ════════════════════════════════════════════════════
+[curl-tls] errorCode distribution:
+[curl-tls]   errorCode 12: 21/30
+[curl-tls]   errorCode ERROR: 9/30
+[curl-tls] 
+Per-profile breakdown:
+[curl-tls]   chrome99 (cd08e31...): 6 attempts — ec12=2, ecERROR=4
+[curl-tls]   chrome110 (9cecacb...): 6 attempts — ec12=5, ecERROR=1
+[curl-tls]   chrome116 (5464024...): 6 attempts — ec12=3, ecERROR=3
+[curl-tls]   safari15_3 (656b9a2...): 6 attempts — ec12=5, ecERROR=1
+[curl-tls]   safari15_5 (773906b...): 6 attempts — ec12=6
+[curl-tls] ════════════════════════════════════════════════════
