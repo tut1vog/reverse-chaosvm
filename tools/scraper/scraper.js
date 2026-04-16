@@ -374,7 +374,24 @@ class Scraper {
               ? sig._raw[field]
               : `https://t.captcha.qq.com/${sig._raw[field].replace(/^\//, '')}`;
             this._log(`Fetching vm-slide from config field '${field}': ${url}`);
-            const resp = await httpRequest(url, { timeout: 10000 });
+            const resp = await httpRequest(url, {
+              timeout: 10000,
+              headers: {
+                'User-Agent': this.userAgent,
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Accept-Encoding': 'gzip, deflate, br, zstd',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Referer': sig.showUrl || this._lastShowUrl || 'https://t.captcha.qq.com/',
+                'Sec-Fetch-Dest': 'script',
+                'Sec-Fetch-Mode': 'no-cors',
+                'Sec-Fetch-Site': 'same-origin',
+                'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+              },
+            });
             if (resp.statusCode === 200 && resp.body.length > 100) {
               this._log(`  Got live vm-slide (${resp.body.length} chars)`);
               return resp.body;
@@ -395,7 +412,24 @@ class Scraper {
             ? vmSlideUrl
             : `https://t.captcha.qq.com/${vmSlideUrl.replace(/^\//, '')}`;
           this._log(`Fetching vm-slide from show page HTML: ${fullUrl}`);
-          const resp = await httpRequest(fullUrl, { timeout: 10000 });
+          const resp = await httpRequest(fullUrl, {
+            timeout: 10000,
+            headers: {
+              'User-Agent': this.userAgent,
+              'Accept': '*/*',
+              'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+              'Accept-Encoding': 'gzip, deflate, br, zstd',
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Referer': sig.showUrl || this._lastShowUrl || 'https://t.captcha.qq.com/',
+              'Sec-Fetch-Dest': 'script',
+              'Sec-Fetch-Mode': 'no-cors',
+              'Sec-Fetch-Site': 'same-origin',
+              'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+              'sec-ch-ua-mobile': '?0',
+              'sec-ch-ua-platform': '"Windows"',
+            },
+          });
           if (resp.statusCode === 200 && resp.body.length > 100) {
             this._log(`  Got live vm-slide (${resp.body.length} chars)`);
             return resp.body;
@@ -418,7 +452,24 @@ class Scraper {
               ? vmSlideUrl
               : `https://t.captcha.qq.com/${vmSlideUrl.replace(/^\//, '')}`;
             this._log(`  Found vm-slide URL in show page: ${fullUrl}`);
-            const vmResp = await httpRequest(fullUrl, { timeout: 10000 });
+            const vmResp = await httpRequest(fullUrl, {
+              timeout: 10000,
+              headers: {
+                'User-Agent': this.userAgent,
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Accept-Encoding': 'gzip, deflate, br, zstd',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Referer': sig.showUrl || this._lastShowUrl || 'https://t.captcha.qq.com/',
+                'Sec-Fetch-Dest': 'script',
+                'Sec-Fetch-Mode': 'no-cors',
+                'Sec-Fetch-Site': 'same-origin',
+                'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+              },
+            });
             if (vmResp.statusCode === 200 && vmResp.body.length > 100) {
               this._log(`  Got live vm-slide (${vmResp.body.length} chars)`);
               return vmResp.body;
@@ -559,6 +610,35 @@ class Scraper {
         const tdcSource = await client.downloadTdc(sig);
         this._log(`  tdc source: ${tdcSource.length} chars`);
 
+        // (d2) Fetch tcaptcha-slide.js from CDN (HAR entry 6).
+        // Real browser loads this via <script> tag in show page HTML.
+        // We don't use the response — only the network request matters.
+        if (sig._html) {
+          const slideScriptMatch = sig._html.match(/src="(https?:\/\/captcha\.gtimg\.com\/[^"]*tcaptcha-slide[^"]*)"/);
+          if (slideScriptMatch) {
+            const slideScriptUrl = slideScriptMatch[1];
+            this._log('Step 4b: fetch tcaptcha-slide.js (HAR entry 6)');
+            try {
+              await httpRequest(slideScriptUrl, {
+                headers: {
+                  'User-Agent': this.userAgent,
+                  'Accept': '*/*',
+                  'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                  'Accept-Encoding': 'gzip, deflate, br, zstd',
+                  'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
+                  'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+                  'sec-ch-ua-mobile': '?0',
+                  'sec-ch-ua-platform': '"Windows"',
+                },
+                timeout: 10000,
+              });
+              this._log('  tcaptcha-slide.js fetched');
+            } catch (err) {
+              this._log('  tcaptcha-slide.js fetch failed (non-fatal): ' + err.message);
+            }
+          }
+        }
+
         // (e) Extract TDC_NAME (for logging) and source hash (cache key)
         const tdcName = extractTdcName(tdcSource);
         if (!tdcName) {
@@ -695,13 +775,42 @@ class Scraper {
         // network observation matters here.
         const vmSlideSource = await this._getVmSlideSource(sig);
 
+        // (k1) Fetch slide-jy.js from CDN (HAR entry 8).
+        // Real browser loads this via <script> tag in show page HTML.
+        // We don't use the response — only the network request matters.
+        if (sig._html) {
+          const jyScriptMatch = sig._html.match(/src="(https?:\/\/captcha\.gtimg\.com\/[^"]*slide-jy[^"]*)"/);
+          if (jyScriptMatch) {
+            const jyScriptUrl = jyScriptMatch[1];
+            this._log('Step 6b: fetch slide-jy.js (HAR entry 8)');
+            try {
+              await httpRequest(jyScriptUrl, {
+                headers: {
+                  'User-Agent': this.userAgent,
+                  'Accept': '*/*',
+                  'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                  'Accept-Encoding': 'gzip, deflate, br, zstd',
+                  'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
+                  'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+                  'sec-ch-ua-mobile': '?0',
+                  'sec-ch-ua-platform': '"Windows"',
+                },
+                timeout: 10000,
+              });
+              this._log('  slide-jy.js fetched');
+            } catch (err) {
+              this._log('  slide-jy.js fetch failed (non-fatal): ' + err.message);
+            }
+          }
+        }
+
         // (k2) Phase 46.4: fire the pre-verify /caplog telemetry beacon. Real
         // Chrome emits this between tdc.js load and the verify POST (HAR
         // entry 8). fire-and-forget — errors are swallowed inside fireBeacon.
         if (!this.skipCaplog) {
           this._log('Step 7a: caplog pre-verify beacon');
           const preUrl = buildPreVerifyBeaconUrl({ t0 });
-          await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000 });
+          await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl });
         }
 
         // (l) Build the 38 verify POST fields
@@ -748,7 +857,7 @@ class Scraper {
         if (!this.skipCaplog) {
           this._log('Step 9: caplog post-verify beacon');
           const postUrl = buildPostVerifyBeaconUrl({ ans: xAnswer });
-          await fireBeacon(postUrl, { userAgent: this.userAgent, timeoutMs: 3000 });
+          await fireBeacon(postUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl });
         }
 
         if (result.errorCode === 0 || (result.errorCode === -1 && result.ticket)) {

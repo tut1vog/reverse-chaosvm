@@ -143,7 +143,7 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | ID | Task | Status |
 |----|------|--------|
 | 48.1 | Full request-chain diff — scraper vs HAR: instrument the scraper to log every outbound request, compare against HAR entry-by-entry, document all gaps | done |
-| 48.2 | Complete the request chain — add `tcaptcha-slide.js` and `slide-jy.js` fetches at the correct positions with correct Referer/Sec-Fetch headers | pending |
+| 48.2 | Complete the request chain — add missing fetches, fix headers, remove legacy getsig | done |
 | 48.3 | Tests for 48.2 | pending |
 | 48.4 | Request timing — add realistic inter-request delays matching HAR timing profile (prehandle→show: ~100ms, show→images: ~50ms, images→tdc: ~200ms, etc.) | pending |
 | 48.5 | Tests for 48.4 | pending |
@@ -165,7 +165,7 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 **ID**: 48.2
 **Title**: Complete the request chain — add missing fetches, fix headers, remove legacy getsig
 **Phase**: Phase 48 — Session-level signal investigation
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
 Close the 5 HIGH-severity gaps found in 48.1 so the scraper's request chain matches a real Chrome 146 session: add `tcaptcha-slide.js` + `slide-jy.js` fetches, remove the legacy getsig 404 round-trip, fix vm-slide fetch headers, and fix caplog beacon headers.

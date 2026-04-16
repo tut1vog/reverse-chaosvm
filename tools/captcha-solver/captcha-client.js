@@ -5,7 +5,7 @@
  *
  * Implements the complete network protocol:
  *   1. prehandle()      → GET /cap_union_prehandle   → {sess, sid, ...}
- *   2. getSig(session)  → GET /cap_union_new_getsig  → {bgUrl, sliceUrl, vsig, websig, nonce, spt, ...}
+ *   2. getSig(session)  → GET /cap_union_new_show    → {bgUrl, sliceUrl, vsig, websig, nonce, spt, ...}
  *   3. downloadImages() → GET /hycdn?index=1,2       → {bgBuffer, sliceBuffer}
  *   4. verify(params)   → POST /cap_union_new_verify → {errorCode, ticket, randstr}
  *
@@ -359,25 +359,15 @@ class CaptchaClient {
   /**
    * Get verification signature and image URLs.
    *
-   * Tries the legacy /cap_union_new_getsig endpoint first. If it returns 404
-   * (endpoint removed in newer API versions), falls back to parsing the config
-   * embedded in the /cap_union_new_show HTML page.
+   * Calls _getShowConfig() to parse the config embedded in the
+   * /cap_union_new_show HTML page. The legacy /cap_union_new_getsig endpoint
+   * returns 404 as of 2026; real Chrome never hits it.
    *
    * @param {object} session — result from prehandle()
    * @returns {Promise<object>} — {bgUrl, sliceUrl, vsig, websig, nonce, spt, ...}
    */
   async getSig(session) {
-    // Try legacy endpoint first
-    try {
-      const result = await this._getSigLegacy(session);
-      return result;
-    } catch (err) {
-      // If 404 (endpoint removed), fall back to show page config
-      if (err.message && err.message.includes('HTTP 404')) {
-        return this._getShowConfig(session);
-      }
-      throw err;
-    }
+    return this._getShowConfig(session);
   }
 
   /**

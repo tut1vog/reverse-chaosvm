@@ -157,14 +157,25 @@ function buildPostVerifyBeaconUrl(opts) {
  * @param {Object} [opts]
  * @param {string} [opts.userAgent]
  * @param {number} [opts.timeoutMs=3000]
+ * @param {string} [opts.referer] - Referer URL (defaults to t.captcha.qq.com)
  * @returns {Promise<void>}
  */
 async function fireBeacon(url, opts) {
   const o = opts || {};
   const timeout = typeof o.timeoutMs === 'number' ? o.timeoutMs : 3000;
   const headers = {
-    'Accept': '*/*',
-    'Referer': 'https://t.captcha.qq.com/',
+    'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+    'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Referer': o.referer || 'https://t.captcha.qq.com/',
+    'Sec-Fetch-Dest': 'image',
+    'Sec-Fetch-Mode': 'no-cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
   };
   if (o.userAgent) {
     headers['User-Agent'] = o.userAgent;
