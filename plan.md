@@ -116,7 +116,7 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 |----|------|--------|
 | 47.1 | Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator — load Chrome cd array, substitute per-session fields, encrypt with template-appropriate XTEA params in single-blob mode | done |
 | 47.2 | Tests for 47.1 — Chrome-profile collect token round-trip verification | done |
-| 47.3 | Live re-measurement (director-owned, 30 attempts) — compare ticket prefix distribution against Phase 46 baselines | pending |
+| 47.3 | Live re-measurement (director-owned, 30 attempts) — compare ticket prefix distribution against Phase 46 baselines | done |
 
 **Decisions**:
 1. **Why not just use Puppeteer for everything?** The scraper's value is that it runs without a browser (jsdom only). Puppeteer is heavy, slow, and detectable in other ways. If Chrome-profile replay works, we keep the lightweight path.
@@ -127,14 +127,16 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ## Current Task
 
-**ID**: 47.3
-**Title**: Live re-measurement (director-owned, 30 attempts)
-**Phase**: Phase 47 — Chrome-profile collect replay
-**Status**: pending
+Phase 47 complete. No current task.
 
-### Goal
-Run a 30-attempt live survey with the Chrome-profile collect token to compare ticket prefix distribution against Phase 45.6/46.3/46.6 baselines (all 0/30 t01/t02).
+### Phase 47.3 Results — Chrome-profile collect survey (30 attempts, 2026-04-16)
 
-### Verification
-- [ ] 30 attempts complete with results logged
-- [ ] Ticket prefix distribution compared against baselines
+| Metric | Phase 45.6 | Phase 46.3 | Phase 46.6 | **Phase 47.3** |
+|--------|-----------|-----------|-----------|--------------|
+| Total | 30 | 30 | 30 | **30** |
+| Success (rc=0) | ~9 | ~10 | ~10 | **10** |
+| t01/t02 tickets | 0 | 0 | 0 | **0** |
+| t03 tickets | ~9 | ~10 | ~10 | **10** |
+| errorCode 12 | ~10 | ~10 | ~10 | **11** |
+
+**Conclusion**: Chrome-profile collect replay produced **no change** in ticket prefix distribution. All 10 successful tickets remain `t03tserver`. The `t03tserver` routing decision is not driven by the collect token's fingerprint content (field values or token size). The ~5K Chrome-profile token behaves identically to the ~10K synthetic token from the server's perspective.
