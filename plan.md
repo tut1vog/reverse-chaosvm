@@ -142,7 +142,7 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 | ID | Task | Status |
 |----|------|--------|
-| 48.1 | Full request-chain diff — scraper vs HAR: instrument the scraper to log every outbound request, compare against HAR entry-by-entry, document all gaps | pending |
+| 48.1 | Full request-chain diff — scraper vs HAR: instrument the scraper to log every outbound request, compare against HAR entry-by-entry, document all gaps | done |
 | 48.2 | Complete the request chain — add `tcaptcha-slide.js` and `slide-jy.js` fetches at the correct positions with correct Referer/Sec-Fetch headers | pending |
 | 48.3 | Tests for 48.2 | pending |
 | 48.4 | Request timing — add realistic inter-request delays matching HAR timing profile (prehandle→show: ~100ms, show→images: ~50ms, images→tdc: ~200ms, etc.) | pending |
@@ -162,25 +162,42 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ## Current Task
 
-**ID**: 48.1
-**Title**: Full request-chain diff — scraper vs HAR
+**ID**: 48.2
+**Title**: Complete the request chain — add missing fetches, fix headers, remove legacy getsig
 **Phase**: Phase 48 — Session-level signal investigation
 **Status**: pending
 
 ### Goal
-Produce a detailed side-by-side comparison of every HTTP request in the scraper's session vs the HAR capture, identifying missing requests, ordering differences, header mismatches, and timing anomalies.
+Close the 5 HIGH-severity gaps found in 48.1 so the scraper's request chain matches a real Chrome 146 session: add `tcaptcha-slide.js` + `slide-jy.js` fetches, remove the legacy getsig 404 round-trip, fix vm-slide fetch headers, and fix caplog beacon headers.
 
-### Context
-The HAR shows 11 requests before the final urlsec check: prehandle → show → hycdn×2 → tdc.js → tcaptcha-slide.js → vm-slide.enc.js → slide-jy.js → caplog → verify → caplog. The scraper is known to skip `tcaptcha-slide.js` (entry 6) and `slide-jy.js` (entry 8) fetches entirely. These are observable server-side gaps. The `sess` token is opaque and may encode server-side routing decisions — this task should note it but cannot decode it.
+### Context (from 48.1 findings — `output/phase-48-session-audit/request-chain-diff.md`)
+
+**5 HIGH-severity gaps to fix:**
+1. **Missing `tcaptcha-slide.js` fetch** (HAR entry 6): `GET captcha.gtimg.com/1/tcaptcha-slide.29a33140.js`. Must be fetched after `tdc.js` and before `vm-slide.enc.js`. The URL comes from the show page HTML (a `<script src="...">` tag). HAR shows no `Sec-Fetch-*` headers on this request.
+2. **Missing `slide-jy.js` fetch** (HAR entry 8): `GET captcha.gtimg.com/1/slide-jy.js`. Must be fetched after `vm-slide.enc.js` and before the caplog beacon. The URL also comes from the show page HTML. HAR shows no `Sec-Fetch-*` headers.
+3. **Extra `GET /cap_union_new_getsig` 404** (between entries 1 and 2): `captcha-client.js:369` tries legacy `_getSigLegacy()` first, gets 404, then falls back to `_getShowConfig()`. Real Chrome never hits this endpoint. Fix: make `getSig()` go directly to `_getShowConfig()`.
+4. **`_getVmSlideSource` headers missing** (entry 7): `scraper.js:377` calls `httpRequest(url, { timeout: 10000 })` with NO headers. Must send `User-Agent`, `Referer` (show page URL), `Accept: */*`, `Sec-Fetch-Dest: script`, `Sec-Fetch-Mode: no-cors`, `Sec-Fetch-Site: same-origin`, `sec-ch-ua*`.
+5. **`fireBeacon` headers wrong** (entries 9, 11): `caplog-beacon.js:162-177` sends `Accept: */*` and `Referer: https://t.captcha.qq.com/`. Must send `Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8`, Referer = full show page URL, `Sec-Fetch-Dest: image`, `Sec-Fetch-Mode: no-cors`, `Sec-Fetch-Site: same-origin`, plus `sec-ch-ua*`.
+
+**Files to edit:**
+- `tools/captcha-solver/captcha-client.js` — remove legacy getsig path from `getSig()` (line 369-381)
+- `tools/scraper/scraper.js` — add `tcaptcha-slide.js` and `slide-jy.js` fetches after tdc.js download and before caplog; fix `_getVmSlideSource` header arguments; pass show page URL to `fireBeacon`
+- `tools/scraper/caplog-beacon.js` — update `fireBeacon` to accept and use show page URL as Referer, send correct Accept and Sec-Fetch headers
+
+**Request chain after fix (must match HAR order):**
+1. prehandle → 2. show → 3. hycdn bg → 4. hycdn slice → 5. tdc.js → 6. tcaptcha-slide.js → 7. vm-slide.enc.js → 8. slide-jy.js → 9. caplog pre → 10. verify POST → 11. caplog post → 12. urlsec
 
 ### Implementation Steps
-1. Add request logging to `captcha-client.js` and `scraper.js` that captures every outbound URL, method, and key headers (Referer, Sec-Fetch-*, Cookie)
-2. Run a single scraper invocation with `--verbose` and capture the full request log
-3. Produce a side-by-side table comparing each request against the HAR
-4. Document all gaps: missing requests, wrong Referer, wrong Sec-Fetch headers, ordering, timing
+1. In `captcha-client.js`, change `getSig()` to skip the legacy `_getSigLegacy()` attempt and go directly to `_getShowConfig()`.
+2. In `scraper.js`, after `downloadTdc()` returns, parse the show page HTML (available via `sig._html`) to extract the `tcaptcha-slide.js` URL and `slide-jy.js` URL, then fire GET requests for both (fire-and-forget, discard bodies). Use appropriate headers matching HAR.
+3. In `scraper.js`, update all `_getVmSlideSource` httpRequest calls to include the full `_headers()` set with `Sec-Fetch-Dest: script`, `Sec-Fetch-Mode: no-cors`, `Sec-Fetch-Site: same-origin`, `Referer: <show page URL>`.
+4. In `caplog-beacon.js`, update `fireBeacon` signature to accept `referer` option, and fix the headers to send `Accept: image/avif,...`, correct Referer, and `Sec-Fetch-*`.
+5. In `scraper.js`, pass the show page URL to `fireBeacon` calls.
 
 ### Verification
-- [ ] Comparison table produced in `output/phase-48-session-audit/` with clear per-request diff
+- [ ] `npm test` passes (all 425+ tests green)
+- [ ] `node -e "const S = require('./tools/scraper/scraper'); const s = new S({verbose:true}); s.init().then(() => console.log('ok'))"` succeeds
+- [ ] Reading the modified code confirms: no legacy getsig call, tcaptcha-slide.js + slide-jy.js fetches present, vm-slide headers fixed, caplog headers fixed
 
 ### Suggested Agent
-`general-purpose` — request chain instrumentation and HAR analysis
+`general-purpose` — HTTP client + scraper code edits
