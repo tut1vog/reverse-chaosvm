@@ -1,0 +1,29 @@
+{
+  "args": {},
+  "data": "",
+  "files": {},
+  "form": {
+    "baz": "qux",
+    "foo": "bar"
+  },
+  "headers": {
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Content-Length": "15",
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "Host": "httpbin.org",
+    "Origin": "https://httpbin.org",
+    "Priority": "u=1, i",
+    "Referer": "https://httpbin.org/",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "X-Amzn-Trace-Id": "Root=1-69e086d2-5be8a5ba67e1f55628e5940b",
+    "X-Requested-With": "XMLHttpRequest"
+  },
+  "json": null,
+  "origin": "111.119.253.170",
+  "url": "https://httpbin.org/post"
+}

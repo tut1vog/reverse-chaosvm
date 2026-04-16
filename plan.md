@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 46** — Request-chain fidelity + TLS impersonation, errorCode 0 path (confirmed 2026-04-15)
-Current task: **46.10** — TLS fingerprint impersonation research spike (HOLD DISPATCH — plan drafted 2026-04-15, awaiting user confirmation)
+Current task: **46.11** — Design review gate (awaiting user decision on 46.10 findings)
 
 **Phases 38–45 closed.** Detail lives in `history/<YYYYMMDD>.md` and in the per-track docs under `docs/` + `research/`. Single-row summaries below.
 
@@ -120,8 +120,8 @@ Current task: **46.10** — TLS fingerprint impersonation research spike (HOLD D
 | 46.7 | Chrome-canonical verify header ordering — **deferred 2026-04-15** per user decision after the 46.6 gate. Content-layer is empirically exhausted (two null results in 46.3 and 46.6), header order is the weakest remaining fingerprint axis, so jump straight to the TLS spike. May be revisited if 46.10/46.11 land without lane change. | deferred |
 | 46.8 | Tests for 46.7 — **deferred 2026-04-15** (paired with 46.7). | deferred |
 | 46.9 | Live re-measurement after 46.7 — **deferred 2026-04-15** (paired with 46.7). | deferred |
-| 46.10 | **TLS impersonation — Puppeteer-reuse feasibility + integration design spike** (research subagent, no production code). **Approach pre-selected by user 2026-04-15**: option (c) from the original three-way matrix — reuse the in-repo Puppeteer install (already a dep of `tools/captcha-solver/`) as the TLS transport for the verify POST. Deliverable: (a) empirical JA3/JA4 capture from headless Puppeteer Chromium confirming it matches a real Chrome 146 fingerprint on the wire, (b) integration-design doc under `research/scraper-tls-impersonation/` covering browser-lifecycle strategy, verify-POST routing mechanism, header-order preservation, error / timeout handling, and the integration seam in `tools/captcha-solver/captcha-client.js`, (c) a single concrete recommendation for 46.12's implementation shape (e.g. long-lived shared page vs per-request, `page.evaluate(fetch(...))` vs CDP `Network.continueRequest`). | in-progress |
-| 46.11 | **Design review gate** (director + user). Present 46.10's JA3 capture + integration design. User accepts, revises, or rejects. On accept → dispatch 46.12 (impl, subagent), 46.13 (tests, different subagent), 46.14 (director-owned live re-measurement with same protocol as 46.3 / 46.6). On reject → revisit alternative approaches (a)/(b) or pivot. | pending |
+| 46.10 | TLS impersonation — Puppeteer-reuse feasibility + integration design spike | done |
+| 46.11 | Design review gate — present 46.10 findings for user decision | in-progress |
 
 **Decisions made at plan time**:
 1. **Why fix in this order and not parallel?** Each fix is a hypothesis test against the same endpoint. Running them in parallel would conflate which fix flipped which outcome. The live re-measurement gates (46.3, 46.6, 46.9) are how we learn.
@@ -140,62 +140,21 @@ Current task: **46.10** — TLS fingerprint impersonation research spike (HOLD D
 
 ## Current Task
 
-**ID**: 46.10
-**Title**: TLS impersonation — Puppeteer-reuse feasibility + integration design spike
+**ID**: 46.11
+**Title**: Design review gate — present 46.10 findings for user decision
 **Phase**: Phase 46 — Request-chain fidelity + TLS impersonation, errorCode 0 path
-**Status**: HOLD DISPATCH — plan drafted 2026-04-15, approach pre-selected by user, awaiting user confirmation of the task spec below
+**Status**: in-progress — awaiting user review
 
 ### Goal
-Produce enough empirical evidence and integration design to greenlight (or reject) a 46.12 implementation that routes the scraper's `cap_union_new_verify` POST through the already-installed headless Puppeteer / Chromium as the TLS layer. Deliverable is a research doc + captured fingerprint artifacts, not production code. After this task the director + user will decide in 46.11 whether to dispatch implementation.
+Present the 46.10 TLS impersonation spike findings and integration design to the user. User accepts → dispatch 46.12 (implementation) + 46.13 (tests). User revises → update plan accordingly. User rejects → revisit alternatives or pivot.
 
-### Context
-- **Approach pre-selected by user decision 2026-04-15**: option (c) from the original three-way impersonation matrix — reuse the in-repo Puppeteer install as the TLS transport. Rationale is captured in the phase-46 "Decisions made at plan time" section (item 7). The three-way matrix is OFF the table for this spike; do not spend time surveying curl-impersonate binaries or Node native bindings.
-- **Where we are in Phase 46**: 46.3 (restored `/vm-slide.enc.js` fetch) and 46.6 (added both `/caplog` beacons) each shipped offline-verified, each passed their live gate with 0/30 `t01`+`t02` tickets. The content layer is empirically exhausted. Remaining plausible lane gate: TLS fingerprint (header order is deferred as the weakest remaining axis).
-- **What already exists in-repo that we are reusing**:
-  - `tools/captcha-solver/` uses Puppeteer 24 with `puppeteer-extra-plugin-stealth`. `npm install` already wires this up; the captcha-solver CLI (`node tools/captcha-solver/cli.js --domain example.com`) exercises it live today. Read `tools/captcha-solver/cli.js` and `tools/captcha-solver/captcha-solver.js` first to confirm the launch flags, stealth plugin hookup, and whether a reusable `Browser` / `Page` is exposed.
-  - `tools/captcha-solver/captcha-client.js` contains the verify POST builder (the construction seam that 46.12 would route through a different transport). Read around line 1007 (the current `https.request` call site) to understand the exact shape of the request object that needs to cross the Node↔Chromium boundary.
-- **What headless vs headful Chromium may differ on**: headless Chromium historically shares the same Chrome networking stack as headful, so JA3/JA4 ought to match a real Chrome 146 ClientHello on the wire. But some build flags (`--headless=new` vs the old headless, `--disable-features=...`, stealth-plugin tweaks) can change TLS extension ordering or GREASE emission. The spike must verify empirically — do not assume.
-- **Integration-design open questions** the deliverable must answer:
-  1. **Browser lifecycle**: one long-lived `Browser` + one reusable `Page` kept alive across many scraper invocations, or spun up per invocation? Per-invocation is simpler to reason about but adds ~500–1500 ms per verify; shared is faster but introduces a global and a cleanup story.
-  2. **Request routing mechanism**: `await page.evaluate(async (req) => fetch(req.url, {...})...)` (simple, preserves Chrome's TLS + HTTP stack, but `fetch` reorders headers — does Chrome's `fetch` preserve the HAR-observed Chrome header order?) vs `CDP Network.continueRequest` interception (lets us set headers in an explicit order but is a more complex setup) vs `page.setRequestInterception(true)` + a dummy navigation (hybrid). Pick one with a concrete justification.
-  3. **Header-order preservation**: Chrome 146's verify POST header sequence is already pinned from HAR (see the 46.7 task body above in the Phase 46 table for the list). Does the chosen routing mechanism preserve that exact sequence on the wire? If not, document what order it produces and judge whether the difference is server-detectable.
-  4. **User-Agent / navigator plumbing**: current scraper UA is `Chrome/146.0.0.0` (pinned in `tools/scraper/scraper.js:66`). When the verify POST rides through Puppeteer, the UA string in the HTTP headers must still match. Does `page.setUserAgent(ua)` also change the `sec-ch-ua` / client hints headers to match? If not, that is a gap to document.
-  5. **Error handling**: what happens when the page crashes mid-request, when Chromium OOMs, when the verify returns a transport error vs an `errorCode 12` response? Implementation design must specify a fallback (retry on a fresh page, fall through to the current Node HTTPS path, hard-fail, etc).
-  6. **Cookie isolation**: verify that the Puppeteer-routed POST does NOT inherit cookies from earlier pages in the same browser context (Phase 46 framing confirmed `t.captcha.qq.com` uses no cookies, so this is a safety check, not a feature).
-  7. **Integration seam**: should 46.12 introduce a new `tools/captcha-solver/puppeteer-transport.js` module with a `async sendVerify(request): Response` interface that the existing `captcha-client.js` calls via a feature flag (`--via-puppeteer`, default off until 46.14 greenlights it)? Recommend exactly one shape for 46.12 to implement.
-- **Research-artifact track**: this task creates a brand-new track `research/scraper-tls-impersonation/` per `.claude/rules/research-artifacts.md`. Track directory is source-only; captured fingerprint artifacts go under `output/scraper-tls/`.
-- **Network access required**: the spike hits one public JA3-reporting endpoint. Candidates in preference order: `https://tls.peet.ws/api/all`, `https://tls.browserleaks.com/json`, `https://check.ja3.zone/`. If all three are unreachable from the sandbox, fall back to a cited reference from the curl-impersonate release notes for Chrome 146 and document the fallback. Do NOT hit `t.captcha.qq.com` from the spike — that endpoint is reserved for director-owned live surveys.
+### 46.10 Findings Summary
+- **Puppeteer JA3 matches Chrome 146 exactly**: `8061a5edbfa5eab7663a5e5aff0118ab`. Node.js is trivially distinguishable (`0cce74b0...`, 59 cipher suites, no GREASE, HTTP/1.1 only). No red flags.
+- **Recommended routing**: `page.evaluate(fetch(...))` from a page navigated to `t.captcha.qq.com` origin. Empirically confirmed: same-origin fetch produces correct Origin, Referer, Sec-Fetch-* headers. Chrome's H2 HPACK handles header order by construction.
+- **Browser lifecycle**: one long-lived `Browser` + one reusable `Page` across the 30-attempt survey run. Re-launch on crash, limit to 1 retry.
+- **Integration seam**: new `tools/captcha-solver/puppeteer-transport.js` with `sendVerify({url, method, headers, body}) → {statusCode, headers, body}`. Conditional in `captcha-client.js` verify method, gated behind `--chrome-tls` / `usePuppeteerTransport` flag.
+- **Files for 46.12**: (1) new `puppeteer-transport.js`, (2) edit `captcha-client.js`, (3) edit `captcha-solver/cli.js`, (4) edit `scraper/cli.js`.
+- Full detail: `research/scraper-tls-impersonation/README.md`
 
-### Implementation Steps
-1. **Read the seam first**. `tools/captcha-solver/cli.js`, `tools/captcha-solver/captcha-solver.js`, and `tools/captcha-solver/captcha-client.js` (focus on the verify POST construction near line 1007). Write down in the README what concrete request object shape crosses the boundary today (method, URL, header map, body).
-2. **Create the track scaffolding**. `research/scraper-tls-impersonation/README.md` with the sections required by `.claude/rules/research-artifacts.md` (open question, status = partial, inputs, reproduction, findings placeholder). Note in the status section that the three-way matrix was collapsed by user decision on 2026-04-15.
-3. **Capture Node scraper ClientHello** as a baseline. Small script at `research/scraper-tls-impersonation/capture-node-ja3.js` using Node built-ins only — an HTTPS GET to one of the JA3-reporting endpoints with the scraper's exact `DEFAULT_USER_AGENT`. Save raw response to `output/scraper-tls/node-default.json`. Extract and record JA3 + JA3_hash + JA4 + JA4_hash in the README.
-4. **Capture headless Puppeteer ClientHello**. Small script at `research/scraper-tls-impersonation/capture-puppeteer-ja3.js` that launches headless Chromium via the existing `puppeteer` dep (reuse the same launch flags as `tools/captcha-solver/` if possible to stay consistent), navigates to the JA3-reporting endpoint, reads the JSON, closes the browser. Save raw response to `output/scraper-tls/chrome-puppeteer.json`. Extract JA3/JA4 hashes into the README.
-5. **Diff the three** (Node baseline, Puppeteer capture, published Chrome 146 reference). Tabulate cipher suite ordering, GREASE presence, extension order, signature algorithms, ALPN. Expected outcome: Puppeteer ≈ Chrome 146, Node ≠ both. If Puppeteer diverges meaningfully from Chrome 146 on a detectable axis, that is a red flag the deliverable must surface prominently and 46.11 must see.
-6. **Answer each of the seven integration-design open questions** from the Context section above, in their own subsection of the README. Concrete, specific answers — not "TBD". If an answer requires empirical confirmation (e.g. "does `page.evaluate(fetch)` preserve Chrome's header order on the wire?"), write the small script that confirms it and save the artifact under `output/scraper-tls/`. Questions whose answers depend on runtime verification must cite the artifact; questions answered from documentation must cite the doc URL.
-7. **Produce a single recommendation** for 46.12 at the bottom of the README under `## Recommendation for 46.12`. Name the concrete module/file layout, the chosen routing mechanism, the browser-lifecycle strategy, and the feature-flag shape. 2–6 sentences. This is what 46.11 will accept, revise, or reject.
-8. Leave `tools/`, `tests/`, and `package.json` untouched. No dependency additions. No production code changes.
-
-### Verification
-- [ ] `research/scraper-tls-impersonation/README.md` exists, follows the track template, and explicitly records that the three-way matrix was collapsed by user decision 2026-04-15.
-- [ ] `research/scraper-tls-impersonation/capture-node-ja3.js` and `capture-puppeteer-ja3.js` exist as reproducible source.
-- [ ] `output/scraper-tls/node-default.json` contains a real Node HTTPS JA3/JA4 capture.
-- [ ] `output/scraper-tls/chrome-puppeteer.json` contains a real headless Puppeteer JA3/JA4 capture. (If Puppeteer cannot reach the JA3 endpoint from the sandbox, a cited published reference for Chrome 146 is the fallback — README must document which path was used.)
-- [ ] README prints the three hashes side-by-side (Node baseline, Puppeteer, Chrome 146 reference) and states whether Puppeteer matches Chrome 146 empirically.
-- [ ] README answers all seven integration-design open questions with concrete, specific answers. Empirical answers cite their `output/scraper-tls/*` artifact; documentation answers cite their URL.
-- [ ] `## Recommendation for 46.12` section names exactly one integration shape: routing mechanism, browser lifecycle, feature-flag shape, target files.
-- [ ] `git diff tools/ tests/ package.json package-lock.json` is empty at report time.
-- [ ] `npm test` still 518/518 green (smoke check — no production code touched).
-
-### Constraints
-- **Approach is pre-selected**. Do NOT survey curl-impersonate or Node native bindings. Do NOT produce a three-way matrix. The user has already picked option (c).
-- **No production code changes**. Writes are allowed only under `research/scraper-tls-impersonation/` (source) and `output/scraper-tls/` (artifacts).
-- **No dependency additions**. `puppeteer` is already in `package.json`; use it. Capture scripts for the Node baseline use only Node built-ins.
-- **No requests to `t.captcha.qq.com`** from the spike. That endpoint is reserved for director-owned live surveys (46.14).
-- **`targets/` and `sample/` are read-only** per `.claude/rules/targets-readonly.md`.
-- **If Puppeteer is not actually reusable on this box** (install broken, Chromium missing, sandbox blocks browser launch), stop and report — do not attempt a fix. That finding is itself the deliverable and will reopen the approach decision in 46.11.
-- **If headless Puppeteer Chromium's JA3 diverges from real Chrome 146 in a detectable way**, surface that loudly in the README. The recommendation section must then either propose a mitigation (e.g. headful mode, specific launch flags) or flag the approach as blocked and ask 46.11 to reconsider.
-- **Do not make any git commits.** The director handles all commits after verification.
-
-### Suggested Agent
-`general-purpose` — the task mixes reading existing Puppeteer integration code, running capture scripts (both Node HTTPS and headless Chromium), and technical writing (the README and design answers). No specialised agent fits better.
+### Decision required
+Accept, revise, or reject the integration design before dispatching 46.12.
