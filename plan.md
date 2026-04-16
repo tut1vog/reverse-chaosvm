@@ -145,9 +145,9 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | 48.1 | Full request-chain diff — scraper vs HAR: instrument the scraper to log every outbound request, compare against HAR entry-by-entry, document all gaps | done |
 | 48.2 | Complete the request chain — add missing fetches, fix headers, remove legacy getsig | done |
 | 48.3 | Tests for 48.2 | done |
-| 48.4 | Request timing — add realistic inter-request delays matching HAR timing profile (prehandle→show: ~100ms, show→images: ~50ms, images→tdc: ~200ms, etc.) | pending |
-| 48.5 | Tests for 48.4 | pending |
-| 48.6 | Live re-measurement (director-owned, 30 attempts) — compare errorCode distribution | pending |
+| 48.4 | Request timing — add realistic inter-request delays matching HAR timing profile | deferred |
+| 48.5 | Tests for 48.4 | deferred |
+| 48.6 | Live re-measurement (director-owned, 30 attempts) — compare errorCode distribution | done |
 | 48.7 | Decision gate: if 48.6 shows no improvement, investigate IP reputation (try from a different IP) or Puppeteer-only path | pending |
 
 **Key findings from investigation**:
@@ -162,21 +162,22 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ## Current Task
 
-**ID**: 48.3
-**Title**: Tests for 48.2 — request chain completion
+**ID**: 48.7
+**Title**: Decision gate — interpret 48.6 results and decide next direction
 **Phase**: Phase 48 — Session-level signal investigation
-**Status**: in-progress
+**Status**: pending
 
 ### Goal
-Write tests that verify the 5 fixes from 48.2: (1) getSig() goes directly to _getShowConfig, (2) tcaptcha-slide.js fetch, (3) vm-slide fetch headers, (4) slide-jy.js fetch, (5) fireBeacon headers.
+Interpret the 48.6 survey results and decide next steps.
 
-### Context
-Existing test files: `tests/test-scraper-foundation.js`, `tests/test-caplog-beacon.js`, `tests/test-captcha-client.js`. The changes are in `tools/captcha-solver/captcha-client.js`, `tools/scraper/scraper.js`, `tools/scraper/caplog-beacon.js`.
+### 48.6 Results Summary
+30 attempts:
+- 10/30 (33.3%) got tickets — ALL `t03tserver`, ALL with `errorCode: -1`
+- 10/30 got `errorCode: 12` (rate limiting / scoring rejection)
+- 10/30 failed with auto-port errors (unknown template hashes — new templates rotated in)
+- 0/30 t01/t02 tickets
+
+**Comparison to baselines**: errorCode -1 with t03tserver tickets is UNCHANGED from prior phases. The request-chain fixes did NOT change the lane assignment. However, the auto-port failure rate (33%) is new and may indicate template rotation accelerating.
 
 ### Verification
-- [ ] New test file exists and runs via `npm test`
-- [ ] Tests cover all 5 fixes with meaningful assertions
-- [ ] Full suite still passes (518+ tests)
-
-### Suggested Agent
-`general-purpose`
+- [ ] Decision documented in plan
