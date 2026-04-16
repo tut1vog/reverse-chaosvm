@@ -27,6 +27,8 @@ Options:
   --calibration <n>    Slide calibration offset (default: -25)
   --retries <n>        Max CAPTCHA solve attempts (default: 3)
   --captcha-only       Only solve CAPTCHA (don't query urlsec.qq.com)
+  --no-chrome-profile  Use synthetic fingerprint profile instead of the
+                       real Chrome capture (profiles/chrome-fingerprint.json)
   --legacy-vdata       Use the legacy jsdom vm-slide harness for vData
                        (default: standalone buildVDataForPost + browser profile)
   --vdata-profile <p>  Path to a vData browser-profile JSON file
@@ -48,6 +50,7 @@ function parseArgs(argv) {
     calibration: -25,
     retries: 3,
     captchaOnly: false,
+    chromeProfile: true,
     legacyVdata: false,
     vdataProfile: null,
     skipCaplog: false,
@@ -64,6 +67,8 @@ function parseArgs(argv) {
       args.verbose = true;
     } else if (arg === '--captcha-only') {
       args.captchaOnly = true;
+    } else if (arg === '--no-chrome-profile') {
+      args.chromeProfile = false;
     } else if (arg === '--legacy-vdata') {
       args.legacyVdata = true;
     } else if (arg === '--skip-caplog') {
@@ -121,6 +126,7 @@ async function main() {
     slideRatio: args.ratio,
     calibration: args.calibration,
     verbose: args.verbose,
+    chromeProfile: args.chromeProfile,
     legacyVdata: args.legacyVdata,
     vdataProfile: args.vdataProfile,
     skipCaplog: args.skipCaplog,

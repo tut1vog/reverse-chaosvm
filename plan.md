@@ -114,8 +114,8 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 | ID | Task | Status |
 |----|------|--------|
-| 47.1 | Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator — load Chrome cd array, substitute per-session fields, encrypt with template-appropriate XTEA params in single-blob mode | pending |
-| 47.2 | Tests for 47.1 — round-trip verification: decrypt(scraper_collect) produces cd values matching the Chrome profile (modulo per-session fields); token length in the ~4.9K range; offline comparison with the Puppeteer capture | pending |
+| 47.1 | Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator — load Chrome cd array, substitute per-session fields, encrypt with template-appropriate XTEA params in single-blob mode | done |
+| 47.2 | Tests for 47.1 — Chrome-profile collect token round-trip verification | pending |
 | 47.3 | Live re-measurement (director-owned, 30 attempts) — compare ticket prefix distribution against Phase 46 baselines | pending |
 
 **Decisions**:
@@ -127,53 +127,33 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ## Current Task
 
-**ID**: 47.1
-**Title**: Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator
+**ID**: 47.2
+**Title**: Tests for 47.1 — Chrome-profile collect token round-trip verification
 **Phase**: Phase 47 — Chrome-profile collect replay
 **Status**: pending
 
 ### Goal
-Make the scraper's collect token use real Chrome-captured fingerprint values for all PER-MACHINE and STATIC cd fields, substituting only the 7 PER-SESSION fields at runtime. The resulting token should be ~4.9K chars (matching Chrome) instead of ~10K–19K chars.
+Add black-box tests that verify the Chrome-profile collect token path: decrypt the token, confirm cd values match the Chrome profile (modulo per-session fields), confirm token length in the ~4.5K–5.5K range, and run an offline round-trip (encrypt→decrypt→re-encrypt).
 
 ### Context
-- **Chrome profile**: `profiles/chrome-fingerprint.json` — captured 2026-04-16 from headless Puppeteer/Chrome 146. Contains the full 60-field cd array in Template C order, plus the sd object. The `perSessionIndices` map identifies which fields to substitute.
-- **Scraper collect generator**: `tools/scraper/collect-generator.js` — already supports `cdArrayOverride` (line 382) and `singleBlob: true` (line 412). The wiring work is to:
-  1. Load the Chrome profile
-  2. Clone the cd array
-  3. Substitute per-session fields (sid, timestamps, pageUrl, eventLog)
-  4. Pass as `cdArrayOverride` with `singleBlob: true`
-- **Template handling**: the Chrome profile was captured from Template C (`gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR`). If the server serves a different template, the field order differs. The cd VALUES are template-independent (browser fingerprint data), but they need to be reordered per the served template's `fieldOrder` from `pipeline-config.json`. The `cdArrayOverride` path in `generateCollect()` currently bypasses reordering — the subagent must check whether reordering is needed and either apply it before passing to `cdArrayOverride`, or extend the code path.
-- **Per-session field sources at runtime**:
-  - `cd[17]` (sid): from `session.sid` — already available in the scraper's `solveCaptcha` flow
-  - `cd[25]`, `cd[56]` (timestamps): `Math.round(Date.now()/1000)`
-  - `cd[51]` (timestamp end): `cd[25] + 2` (Chrome shows ~2s collection time)
-  - `cd[29]` (eventLog): needs a synthetic Chrome-format event array. Check what format Chrome uses (the capture shows `[[4,-1,-1,<ms_ts>,0,0,0,0], [1,x,y,dt,...], ...]`). The scraper already generates behavioral events — check if the format matches.
-  - `cd[36]` (pageUrl): the show page URL with rand param — already available from `sig.showUrl`
-- **sd object**: the scraper already builds this via `buildSlideSd()`. The Chrome capture's sd matches the existing format. No change needed except ensuring `coordinate` uses the actual ratio from the slide puzzle.
-- **Existing scraper flow**: `tools/scraper/scraper.js` method `_generateCollect()` (find it) calls `generateCollect()` with the pipeline config. Read it to understand the current wiring.
-- **XTEA params**: come from the auto-ported template's `pipeline-config.json` (or `xtea-params.json`). The scraper already loads these dynamically per template. No change needed.
-- **Field order**: the `pipeline-config.json` for each template includes `structureParams.fieldOrder`. The Chrome profile's cd is already in Template C's order. For other templates, the VALUES (keyed by semantic meaning, not position) need to be mapped into the target template's order. The simplest approach: store the Chrome profile as a **semantic map** (keyed by schema index 0–58, Template A order) and let the existing `reorderCdArray()` handle template-specific ordering. This means the profile's cd array should be in Template A canonical order, not Template C order.
-- **Docs**: `docs/COLLECT_FINGERPRINT_ANALYSIS.md` — records the 60-field analysis, round-trip verification, and the Chrome-profile replay strategy.
+- **47.1 deliverables**: `tools/scraper/scraper.js` now has `_generateCollectChrome()` which loads `profiles/chrome-fingerprint.json`, substitutes per-session fields (canonical indices 16, 22, 52, 53), reorders via `cdFieldOrder` with smart -1 slot handling (events only at `hashPosition`), and passes via `cdArrayOverride` + `singleBlob: true`.
+- **Chrome profile**: `profiles/chrome-fingerprint.json` has `cdCanonical` (59-field Template A order), `perSessionCanonical`, `chromeFieldOrder`.
+- **Smoke test**: `output/chrome-profile-smoke/verify.js` already demonstrates the flow works (5184 chars, 51% reduction).
+- **Existing test patterns**: see `tests/test-vdata-builder.js` and `tests/test-scraper-foundation.js` for style.
+- **XTEA decrypt**: `tools/token-generator/crypto-core.js` has `decryptBlock`; `tools/scraper/collect-generator.js` has the encrypt path. For round-trip, encrypt plaintext → decrypt → compare.
 
 ### Implementation Steps
-1. **Read** `tools/scraper/scraper.js` — find `_generateCollect()` and understand how it calls `generateCollect()` today.
-2. **Read** `tools/scraper/collect-generator.js` — understand `cdArrayOverride`, `singleBlob`, `cdFieldOrder`, and `buildSlideSd()`.
-3. **Read** `profiles/chrome-fingerprint.json` — understand the captured cd array structure.
-4. **Convert** the Chrome profile's cd from Template C order back to Template A canonical order (using the inverse of the fieldOrder mapping from `output/tdc-pptr-capture/pipeline-config.json`). Save as `profiles/chrome-fingerprint.json` with a `cdCanonical` array (59 fields, Template A order) alongside the raw `cd` (60 fields, Template C order). The -1 (behavioral event) positions in fieldOrder map to the eventLog entries.
-5. **Add** a `--chrome-profile` flag (or make it the default) to the scraper that:
-   - Loads `profiles/chrome-fingerprint.json`
-   - Clones the `cdCanonical` array
-   - Substitutes per-session fields by schema index (not Template C position)
-   - Passes to `generateCollect()` via `cdArrayOverride` + `cdFieldOrder` + `singleBlob: true`
-6. **Handle** the sd object — use the existing `buildSlideSd()` with the actual slide answer, trajectory, and coordinate from the captcha session.
-7. **Verify** offline: decrypt the generated collect token and confirm the cd values match the Chrome profile (modulo per-session fields). Token length should be ~4.9K chars.
+1. Create `tests/test-chrome-profile-collect.js` using `node:test`.
+2. Test cases:
+   - Load Chrome profile, generate a collect token via `generateCollect()` with `cdArrayOverride` + `singleBlob: true`, verify token length is 4500–5500 chars.
+   - Decrypt the token, parse cd array, verify field count is 60.
+   - Verify non-per-session cd fields match `cdCanonical` values (after reordering).
+   - Verify per-session fields are substituted (not equal to profile values).
+   - Round-trip: re-encrypt decrypted plaintext, verify identical to original token.
 
 ### Verification
-- [ ] Scraper with `--chrome-profile` (or default) produces a collect token ~4.9K chars (not 10K–19K)
-- [ ] Decrypting the scraper's token yields cd values matching `profiles/chrome-fingerprint.json` for all non-per-session fields
-- [ ] Per-session fields (sid, timestamps, pageUrl, eventLog) are correctly substituted from runtime values
-- [ ] `npm test` still passes (no regressions in existing tests)
-- [ ] Offline round-trip: encrypt(decrypt(scraper_collect)) === scraper_collect
+- [ ] `node --test tests/test-chrome-profile-collect.js` passes
+- [ ] `npm test` passes (no regressions)
 
 ### Suggested Agent
-`general-purpose` — code changes to `tools/scraper/` and `profiles/`, reading existing pipeline code, wiring integration.
+`general-purpose` — test authoring, reads existing test patterns and crypto modules.

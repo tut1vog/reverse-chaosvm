@@ -19,7 +19,7 @@ const path = require('path');
 
 const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/captcha-client');
 const { solveSlider } = require('../captcha-solver/slide-solver');
-const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('./collect-generator');
+const { generateCollect, generateBehavioralEvents, buildSlideSd, reorderCdArray } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-harness');
 const { buildVDataForPost } = require('../vdata-generator/for-post');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
@@ -33,6 +33,11 @@ const DEFAULT_VDATA_PROFILE_PATH = path.join(
   PROJECT_ROOT,
   'profiles',
   'vdata-browser-default.json'
+);
+const DEFAULT_CHROME_PROFILE_PATH = path.join(
+  PROJECT_ROOT,
+  'profiles',
+  'chrome-fingerprint.json'
 );
 
 /**
@@ -83,6 +88,10 @@ class Scraper {
     this.referer = cfg.referer || 'https://urlsec.qq.com/';
     this.userAgent = cfg.userAgent || DEFAULT_USER_AGENT;
     this.profile = cfg.profile || null;
+    // Phase 47.1: Chrome fingerprint profile for realistic collect tokens.
+    // Default on; --no-chrome-profile falls back to synthetic buildDefaultCdArray.
+    this.chromeProfile = cfg.chromeProfile !== false;
+    this._chromeProfileData = null;
     this.maxRetries = cfg.maxRetries !== undefined ? cfg.maxRetries : 3;
     this.verbose = !!cfg.verbose;
 
@@ -259,6 +268,23 @@ class Scraper {
       this._log('Legacy vData path enabled (jsdom harness)');
     }
 
+    // Load Chrome fingerprint profile for collect token generation
+    if (this.chromeProfile) {
+      try {
+        this._chromeProfileData = JSON.parse(
+          fs.readFileSync(DEFAULT_CHROME_PROFILE_PATH, 'utf8')
+        );
+        if (!this._chromeProfileData.cdCanonical || !Array.isArray(this._chromeProfileData.cdCanonical)) {
+          throw new Error('Missing cdCanonical array in chrome-fingerprint.json');
+        }
+        this._log('Chrome fingerprint profile loaded (' + this._chromeProfileData.cdCanonical.length + ' canonical fields)');
+      } catch (err) {
+        this._log('WARNING: Failed to load Chrome profile, falling back to synthetic: ' + err.message);
+        this.chromeProfile = false;
+        this._chromeProfileData = null;
+      }
+    }
+
     this._log('Init complete');
   }
 
@@ -416,6 +442,82 @@ class Scraper {
   }
 
   /**
+   * Build a collect token from the Chrome fingerprint profile.
+   *
+   * Loads the 59-field canonical cd array from chrome-fingerprint.json,
+   * substitutes per-session fields (timestamps, pageUrl), reorders for
+   * the live template's cdFieldOrder, and passes via cdArrayOverride
+   * so buildDefaultCdArray is bypassed entirely.
+   *
+   * @param {Object} xteaParams - XTEA parameters for the live template
+   * @param {Object} cached - Template cache entry (has cdFieldOrder, etc.)
+   * @param {Object} sig - From getSig() (has showUrl, nonce)
+   * @param {Object} slideSd - Slide sd object
+   * @param {Array} behavioralEvents - 8-element event tuples
+   * @param {number} now - Current timestamp in ms
+   * @returns {string} URL-encoded collect token
+   */
+  _generateCollectChrome(xteaParams, cached, sig, slideSd, behavioralEvents, now) {
+    const cp = this._chromeProfileData;
+    const nowSec = Math.round(now / 1000);
+
+    // Clone the canonical array so we can substitute per-session fields
+    const cdCanonical = JSON.parse(JSON.stringify(cp.cdCanonical));
+
+    // Substitute per-session canonical fields:
+    // canonical 16 = timestampInit
+    cdCanonical[16] = nowSec;
+    // canonical 22 = pageUrl
+    cdCanonical[22] = sig.showUrl || cdCanonical[22];
+    // canonical 52 = timestampCollectionEnd
+    cdCanonical[52] = nowSec + 2;
+    // canonical 53 = timestampCollectionStart
+    cdCanonical[53] = nowSec;
+
+    // Reorder from canonical to the live template's field order.
+    // Unlike reorderCdArray (which inserts behavioralEvents at every -1 slot),
+    // we only place events at the designated hashPosition and use empty values
+    // for other -1 slots. This matches real Chrome behavior and produces tokens
+    // of the correct ~5K size instead of bloated ~11K tokens.
+    const cdFieldOrder = cached.cdFieldOrder || null;
+    let cdArray;
+    if (cdFieldOrder) {
+      const hashPos = cached.hashPosition;
+      cdArray = [];
+      for (let i = 0; i < cdFieldOrder.length; i++) {
+        const idx = cdFieldOrder[i];
+        if (idx === -1) {
+          // Only the hashPosition -1 slot gets behavioral events
+          if (i === hashPos) {
+            cdArray.push(behavioralEvents);
+          } else {
+            cdArray.push('');
+          }
+        } else {
+          cdArray.push(cdCanonical[idx]);
+        }
+      }
+    } else {
+      // No field order — use canonical order directly (Template A reference build)
+      cdArray = cdCanonical;
+    }
+
+    this._log('  Chrome profile: ' + cdArray.length + ' cd fields (canonical ' +
+      cdCanonical.length + ', reordered via ' + (cdFieldOrder ? cdFieldOrder.length + '-slot cdFieldOrder' : 'identity') + ')');
+
+    return generateCollect(null, xteaParams, {
+      cdArrayOverride: cdArray,
+      appid: this.aid,
+      nonce: sig.nonce,
+      sdOverride: slideSd,
+      timestamp: now,
+      serializationDiffs: cached.serializationDiffs || null,
+      headerSplit: cached.headerSplit || null,
+      singleBlob: true,
+    });
+  }
+
+  /**
    * Solve one CAPTCHA challenge.
    *
    * @returns {Promise<{ticket: string, randstr: string, errorCode: number}>}
@@ -541,27 +643,38 @@ class Scraper {
 
         // (j) Generate collect token
         this._log('Step 6: generateCollect');
-        const nowSec = Math.round(Date.now() / 1000);
-        const profileOverrides = Object.assign({}, this.profile, {
-          pageUrl: sig.showUrl || this.profile.pageUrl,
-          timestamp: nowSec,
-          timestampCollectionStart: nowSec,
-          timestampCollectionEnd: nowSec + 3,
-          canvasHash: Math.floor(Math.random() * 0xFFFFFFFF) >>> 0,
-          mathFingerprint: Math.random(),
-          performanceHash: Math.floor(Math.random() * 0xFFFFFFFF) >>> 0,
-        });
-        const collectEncoded = generateCollect(profileOverrides, xteaParams, {
-          appid: this.aid,
-          nonce: sig.nonce,
-          sdOverride: slideSd,
-          cdFieldOrder: cached.cdFieldOrder || null,
-          behavioralEvents: behavioralEvents,
-          timestamp: now,
-          serializationDiffs: cached.serializationDiffs || null,
-          headerSplit: cached.headerSplit || null,
-          singleBlob: true,
-        });
+        let collectEncoded;
+        if (this.chromeProfile && this._chromeProfileData) {
+          // Chrome profile mode: use real Chrome fingerprint values in canonical
+          // order, substitute per-session fields, reorder for the live template,
+          // and pass via cdArrayOverride.
+          collectEncoded = this._generateCollectChrome(
+            xteaParams, cached, sig, slideSd, behavioralEvents, now
+          );
+        } else {
+          // Legacy synthetic mode: build cd from profiles/default.json
+          const nowSec = Math.round(Date.now() / 1000);
+          const profileOverrides = Object.assign({}, this.profile, {
+            pageUrl: sig.showUrl || this.profile.pageUrl,
+            timestamp: nowSec,
+            timestampCollectionStart: nowSec,
+            timestampCollectionEnd: nowSec + 3,
+            canvasHash: Math.floor(Math.random() * 0xFFFFFFFF) >>> 0,
+            mathFingerprint: Math.random(),
+            performanceHash: Math.floor(Math.random() * 0xFFFFFFFF) >>> 0,
+          });
+          collectEncoded = generateCollect(profileOverrides, xteaParams, {
+            appid: this.aid,
+            nonce: sig.nonce,
+            sdOverride: slideSd,
+            cdFieldOrder: cached.cdFieldOrder || null,
+            behavioralEvents: behavioralEvents,
+            timestamp: now,
+            serializationDiffs: cached.serializationDiffs || null,
+            headerSplit: cached.headerSplit || null,
+            singleBlob: true,
+          });
+        }
         // Decode URI-encoded collect for the POST fields (captcha-client does this too)
         let collectVal = collectEncoded;
         if (collectVal.includes('%')) {

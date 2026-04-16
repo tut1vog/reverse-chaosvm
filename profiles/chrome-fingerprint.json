@@ -585,5 +585,309 @@
     ],
     "dragobj": 1,
     "ft": "6f_7Pfn_H"
+  },
+  "cdCanonical": [
+    1,
+    "windows",
+    2,
+    800,
+    "",
+    "",
+    [
+      "en-US",
+      "en"
+    ],
+    "",
+    8,
+    [
+      1280,
+      1400
+    ],
+    1,
+    0,
+    [
+      {
+        "codec": "H.264",
+        "support": "probably"
+      },
+      {
+        "codec": "H.264 High",
+        "support": "probably"
+      },
+      {
+        "codec": "H.265/HEVC",
+        "support": ""
+      },
+      {
+        "codec": "VP8",
+        "support": "probably"
+      },
+      {
+        "codec": "VP9",
+        "support": "probably"
+      },
+      {
+        "codec": "AV1",
+        "support": "probably"
+      },
+      {
+        "codec": "Theora",
+        "support": ""
+      },
+      {
+        "codec": "MPEG-4",
+        "support": ""
+      }
+    ],
+    1,
+    0,
+    37437602,
+    1776323715,
+    0.4289999008178711,
+    {
+      "nt_vc_output": {
+        "ac-baseLatency": 0.01,
+        "ac-outputLatency": 0,
+        "ac-sampleRate": 44100,
+        "ac-maxChannelCount": 2,
+        "ac-numberOfInputs": 1,
+        "ac-numberOfOutputs": 0,
+        "ac-channelCount": 2,
+        "ac-channelCountMode": "explicit",
+        "ac-channelInterpretation": "speakers",
+        "an-fftSize": 2048,
+        "an-frequencyBinCount": 1024,
+        "an-minDecibels": -100,
+        "an-maxDecibels": -30,
+        "an-smoothingTimeConstant": 0.8,
+        "an-numberOfInputs": 1,
+        "an-numberOfOutputs": 1,
+        "an-channelCount": 2,
+        "an-channelCountMode": "max",
+        "an-channelInterpretation": "speakers"
+      },
+      "pxi_output": 10240
+    },
+    [
+      {
+        "type": "application/pdf",
+        "suffixes": "pdf"
+      },
+      {
+        "type": "text/pdf",
+        "suffixes": "pdf"
+      }
+    ],
+    "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+    {
+      "_state": 0,
+      "quota": 10737418240,
+      "usage": null,
+      "usageDetails": {}
+    },
+    "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+    [
+      {
+        "name": "PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Chrome PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Chromium PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Microsoft Edge PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "WebKit built-in PDF",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      }
+    ],
+    0,
+    4,
+    "+08",
+    0,
+    "srgb",
+    [
+      {
+        "codec": "AAC",
+        "support": "probably"
+      },
+      {
+        "codec": "MP3",
+        "support": "probably"
+      },
+      {
+        "codec": "Ogg Vorbis",
+        "support": "probably"
+      },
+      {
+        "codec": "Ogg Opus",
+        "support": "probably"
+      },
+      {
+        "codec": "WAV",
+        "support": "probably"
+      },
+      {
+        "codec": "FLAC",
+        "support": "probably"
+      },
+      {
+        "codec": "WebM Vorbis",
+        "support": "probably"
+      },
+      {
+        "codec": "WebM Opus",
+        "support": "probably"
+      },
+      {
+        "codec": "M4A",
+        "support": "maybe"
+      }
+    ],
+    0,
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "UTF-8",
+    "1;0",
+    {
+      "timeZone": "Asia/Shanghai",
+      "calendar": "gregory",
+      "numberingSystem": "latn",
+      "locale": "en-US"
+    },
+    null,
+    "Intel Inc.",
+    {
+      "_state": 0,
+      "architecture": "",
+      "bitness": "",
+      "brands": [],
+      "fullVersionList": [],
+      "mobile": false,
+      "model": "",
+      "platform": "",
+      "platformVersion": "",
+      "uaFullVersion": "",
+      "wow64": false
+    },
+    "98k",
+    "unknown",
+    "Intel Iris OpenGL Engine",
+    "top",
+    {
+      "_state": -2
+    },
+    "",
+    600,
+    0,
+    {
+      "brands": [],
+      "mobile": false,
+      "platform": ""
+    },
+    "800-600-600-24-*-*-|-*",
+    "Linux x86_64",
+    24,
+    "",
+    0,
+    1776323715,
+    1776323717,
+    1283372547,
+    "",
+    0,
+    1023,
+    ""
+  ],
+  "chromeFieldOrder": [
+    37,
+    42,
+    32,
+    44,
+    33,
+    26,
+    11,
+    0,
+    24,
+    5,
+    46,
+    29,
+    7,
+    -1,
+    20,
+    17,
+    28,
+    -1,
+    27,
+    21,
+    30,
+    45,
+    1,
+    43,
+    50,
+    16,
+    48,
+    51,
+    56,
+    -1,
+    55,
+    -1,
+    12,
+    41,
+    -1,
+    47,
+    22,
+    57,
+    58,
+    6,
+    23,
+    35,
+    2,
+    9,
+    31,
+    19,
+    10,
+    15,
+    25,
+    18,
+    13,
+    53,
+    14,
+    38,
+    3,
+    54,
+    52,
+    34,
+    49,
+    8
+  ],
+  "perSessionCanonical": {
+    "16": "timestampInit (unix seconds)",
+    "22": "pageUrl (show page URL with rand param)",
+    "52": "timestampCollectionEnd (unix seconds)",
+    "53": "timestampCollectionStart (unix seconds)"
+  },
+  "_missingCanonical": {
+    "4": "detectedFonts — not collected by this build, set to empty string",
+    "36": "vendor — mapped from -1 slot cd[31] (webgl vendor = Intel Inc.)",
+    "39": "connectionType — mapped from -1 slot cd[34] (unknown)",
+    "40": "webglRenderer — mapped from -1 slot cd[13] (Intel Iris OpenGL Engine)"
+  },
+  "_behavioralSlots": {
+    "13": "webglRenderer value (Intel Iris OpenGL Engine) — also fills canonical[40]",
+    "17": "sessionId (sid from prehandle) — NOT a canonical field, injected into -1 slot",
+    "29": "eventLog (mouse/touch/key events) — NOT a canonical field, injected into -1 slot",
+    "31": "vendor value (Intel Inc.) — also fills canonical[36]",
+    "34": "connectionType value (unknown) — also fills canonical[39]"
   }
 }
