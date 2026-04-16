@@ -115,7 +115,7 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | ID | Task | Status |
 |----|------|--------|
 | 47.1 | Wire `profiles/chrome-fingerprint.json` into the scraper's collect generator — load Chrome cd array, substitute per-session fields, encrypt with template-appropriate XTEA params in single-blob mode | done |
-| 47.2 | Tests for 47.1 — Chrome-profile collect token round-trip verification | pending |
+| 47.2 | Tests for 47.1 — Chrome-profile collect token round-trip verification | done |
 | 47.3 | Live re-measurement (director-owned, 30 attempts) — compare ticket prefix distribution against Phase 46 baselines | pending |
 
 **Decisions**:
@@ -127,33 +127,14 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ## Current Task
 
-**ID**: 47.2
-**Title**: Tests for 47.1 — Chrome-profile collect token round-trip verification
+**ID**: 47.3
+**Title**: Live re-measurement (director-owned, 30 attempts)
 **Phase**: Phase 47 — Chrome-profile collect replay
 **Status**: pending
 
 ### Goal
-Add black-box tests that verify the Chrome-profile collect token path: decrypt the token, confirm cd values match the Chrome profile (modulo per-session fields), confirm token length in the ~4.5K–5.5K range, and run an offline round-trip (encrypt→decrypt→re-encrypt).
-
-### Context
-- **47.1 deliverables**: `tools/scraper/scraper.js` now has `_generateCollectChrome()` which loads `profiles/chrome-fingerprint.json`, substitutes per-session fields (canonical indices 16, 22, 52, 53), reorders via `cdFieldOrder` with smart -1 slot handling (events only at `hashPosition`), and passes via `cdArrayOverride` + `singleBlob: true`.
-- **Chrome profile**: `profiles/chrome-fingerprint.json` has `cdCanonical` (59-field Template A order), `perSessionCanonical`, `chromeFieldOrder`.
-- **Smoke test**: `output/chrome-profile-smoke/verify.js` already demonstrates the flow works (5184 chars, 51% reduction).
-- **Existing test patterns**: see `tests/test-vdata-builder.js` and `tests/test-scraper-foundation.js` for style.
-- **XTEA decrypt**: `tools/token-generator/crypto-core.js` has `decryptBlock`; `tools/scraper/collect-generator.js` has the encrypt path. For round-trip, encrypt plaintext → decrypt → compare.
-
-### Implementation Steps
-1. Create `tests/test-chrome-profile-collect.js` using `node:test`.
-2. Test cases:
-   - Load Chrome profile, generate a collect token via `generateCollect()` with `cdArrayOverride` + `singleBlob: true`, verify token length is 4500–5500 chars.
-   - Decrypt the token, parse cd array, verify field count is 60.
-   - Verify non-per-session cd fields match `cdCanonical` values (after reordering).
-   - Verify per-session fields are substituted (not equal to profile values).
-   - Round-trip: re-encrypt decrypted plaintext, verify identical to original token.
+Run a 30-attempt live survey with the Chrome-profile collect token to compare ticket prefix distribution against Phase 45.6/46.3/46.6 baselines (all 0/30 t01/t02).
 
 ### Verification
-- [ ] `node --test tests/test-chrome-profile-collect.js` passes
-- [ ] `npm test` passes (no regressions)
-
-### Suggested Agent
-`general-purpose` — test authoring, reads existing test patterns and crypto modules.
+- [ ] 30 attempts complete with results logged
+- [ ] Ticket prefix distribution compared against baselines
