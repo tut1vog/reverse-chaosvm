@@ -125,18 +125,62 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ---
 
+### Phase 48: Session-level signal investigation
+
+> **Framing** — Phases 45–47 eliminated all client-side payload differences (vData, collect content, TLS, beacons) without changing the lane assignment. The scraper gets `errorCode: -1` + `t03tserver` while real Chrome (both manual HAR and Puppeteer) gets `errorCode: 0` + `t03tserver`. Critically, even **Puppeteer** (real Chrome, real TLS, real JS execution) gets `errorCode: 0` but still `t03tserver` — so `t03tserver` may be the normal ticket for this appid. The actionable gap is `errorCode: -1` vs `errorCode: 0`.
+>
+> **Primary hypothesis**: the server tracks the request chain per `sess` token. A real browser session issues 11 requests in a specific order with specific timing; the scraper skips some (notably `tcaptcha-slide.js` and `slide-jy.js` fetches) and issues others in a different order/timing. The server observes these gaps and downgrades the session to `errorCode: -1`.
+>
+> **Secondary hypotheses** (lower priority, investigated only if request-chain completion doesn't help):
+> - IP reputation: this IP has been hammering the endpoint for weeks
+> - `sess` token contains pre-baked routing: the server decides the lane at prehandle time based on IP/history, and no subsequent behavior can change it
+> - Puppeteer automation detection: `navigator.webdriver` or other automation signals leak into the collect token despite stealth plugin
+
+**Goal**: identify which session-level signal(s) cause the scraper to get `errorCode: -1` instead of `errorCode: 0`, and fix them.
+
+**Success metric**: scraper achieves `errorCode: 0` on at least some verify responses.
+
+| ID | Task | Status |
+|----|------|--------|
+| 48.1 | Full request-chain diff — scraper vs HAR: instrument the scraper to log every outbound request, compare against HAR entry-by-entry, document all gaps | pending |
+| 48.2 | Complete the request chain — add `tcaptcha-slide.js` and `slide-jy.js` fetches at the correct positions with correct Referer/Sec-Fetch headers | pending |
+| 48.3 | Tests for 48.2 | pending |
+| 48.4 | Request timing — add realistic inter-request delays matching HAR timing profile (prehandle→show: ~100ms, show→images: ~50ms, images→tdc: ~200ms, etc.) | pending |
+| 48.5 | Tests for 48.4 | pending |
+| 48.6 | Live re-measurement (director-owned, 30 attempts) — compare errorCode distribution | pending |
+| 48.7 | Decision gate: if 48.6 shows no improvement, investigate IP reputation (try from a different IP) or Puppeteer-only path | pending |
+
+**Key findings from investigation**:
+- HAR request chain (12 entries): prehandle → show → hycdn×2 → tdc.js → **tcaptcha-slide.js** → vm-slide.enc.js → **slide-jy.js** → caplog → verify → caplog → urlsec
+- Scraper skips entries 6 (`tcaptcha-slide.29a33140.js` from `captcha.gtimg.com`) and 8 (`slide-jy.js` from `captcha.gtimg.com`). These are loaded from local `sample/` instead.
+- Zero cookies in both HAR and scraper — cookies are not a differentiator.
+- Prehandle response structure is identical (same keys, same extra/rainbow config).
+- The `sess` token is opaque and server-generated — it may already encode routing at prehandle time.
+- The Puppeteer result (`errorCode: 0` + `t03tserver`) proves the payload content is sufficient for errorCode 0 — the gap is in the request chain or session behavior, not the verify POST body.
+
+---
+
 ## Current Task
 
-Phase 47 complete. No current task.
+**ID**: 48.1
+**Title**: Full request-chain diff — scraper vs HAR
+**Phase**: Phase 48 — Session-level signal investigation
+**Status**: pending
 
-### Phase 47.3 Results — Chrome-profile collect survey (30 attempts, 2026-04-16)
+### Goal
+Produce a detailed side-by-side comparison of every HTTP request in the scraper's session vs the HAR capture, identifying missing requests, ordering differences, header mismatches, and timing anomalies.
 
-| Metric | Phase 45.6 | Phase 46.3 | Phase 46.6 | **Phase 47.3** |
-|--------|-----------|-----------|-----------|--------------|
-| Total | 30 | 30 | 30 | **30** |
-| Success (rc=0) | ~9 | ~10 | ~10 | **10** |
-| t01/t02 tickets | 0 | 0 | 0 | **0** |
-| t03 tickets | ~9 | ~10 | ~10 | **10** |
-| errorCode 12 | ~10 | ~10 | ~10 | **11** |
+### Context
+The HAR shows 11 requests before the final urlsec check: prehandle → show → hycdn×2 → tdc.js → tcaptcha-slide.js → vm-slide.enc.js → slide-jy.js → caplog → verify → caplog. The scraper is known to skip `tcaptcha-slide.js` (entry 6) and `slide-jy.js` (entry 8) fetches entirely. These are observable server-side gaps. The `sess` token is opaque and may encode server-side routing decisions — this task should note it but cannot decode it.
 
-**Conclusion**: Chrome-profile collect replay produced **no change** in ticket prefix distribution. All 10 successful tickets remain `t03tserver`. The `t03tserver` routing decision is not driven by the collect token's fingerprint content (field values or token size). The ~5K Chrome-profile token behaves identically to the ~10K synthetic token from the server's perspective.
+### Implementation Steps
+1. Add request logging to `captcha-client.js` and `scraper.js` that captures every outbound URL, method, and key headers (Referer, Sec-Fetch-*, Cookie)
+2. Run a single scraper invocation with `--verbose` and capture the full request log
+3. Produce a side-by-side table comparing each request against the HAR
+4. Document all gaps: missing requests, wrong Referer, wrong Sec-Fetch headers, ordering, timing
+
+### Verification
+- [ ] Comparison table produced in `output/phase-48-session-audit/` with clear per-request diff
+
+### Suggested Agent
+`general-purpose` — request chain instrumentation and HAR analysis
