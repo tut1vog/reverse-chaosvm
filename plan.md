@@ -176,27 +176,27 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | ID | Task | Status |
 |----|------|--------|
 | 49.1 | Write POST body diff script — reconstruct scraper's Chrome-profile verify POST body (collect + vData + all fields) without live network, compare against committed Puppeteer capture, save diff to `output/phase-49-body-diff/` | done |
-| 49.2 | Fix scraper collect+sd to match Puppeteer: coordinate ratio, detectedFonts, per-session hash randomization, chrome profile refresh | in-progress |
-| 49.3 | Tests for 49.2 | pending |
-| 49.4 | Live re-measurement (director-owned) — verify errorCode 0 achieved | pending |
+| 49.2 | Fix scraper collect+sd to match Puppeteer: coordinate ratio, detectedFonts, per-session hash randomization, chrome profile refresh | done |
+| 49.3 | Tests for 49.2 — verify chrome profile values + coordinate ratio + diff script | done |
+| 49.4 | Live re-measurement (director-owned) — null result: 0/5 errorCode 0 | done |
 
 ---
 
 ## Current Task
 
-**ID**: 49.2
-**Title**: Fix scraper collect+sd to close the gap with Puppeteer
+**ID**: 49.4
+**Title**: Live re-measurement — null result
 **Phase**: Phase 49 — errorCode -1 root cause
-**Status**: in-progress
+**Status**: done
 
-### Goal
-Fix the differences identified in 49.1's diff report so the scraper's verify POST body is indistinguishable from Puppeteer's.
+### Result
+5/5 errorCode -1 (plus 1 errorCode 12 rate-limit). Profile + coordinate fixes did NOT change the errorCode. The root cause is NOT in the collect token's static fingerprint values or sd.coordinate ratio.
 
-### Context
-See 49.1 diff report: `output/phase-49-body-diff/diff-report.json`. 53/60 cd match, 6/8 sd match. Fixes target chrome-fingerprint.json stale values and sd.coordinate[2] ratio.
+### Remaining hypotheses (priority order)
+1. **vData content mismatch** — the standalone vData generator builds from a static profile; the real vm-slide computes live values. Fields like `tp` (JS runtime error string), `ss` (TDC lifecycle state), `py` (orchestrator argument) may differ.
+2. **Behavioral events quality** — synthetic mouse trajectories may be statistically distinguishable from real ones.
+3. **Collect token encryption keyMods** — the live Template C build (`gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR`, 100 opcodes) may use different keyMod constants than what the auto-porting pipeline extracts.
+4. **Session-level server decision** — the server may decide errorCode at prehandle time based on IP/history, making the verify body content irrelevant.
 
-### Verification
-- [ ] `node scripts/diff-verify-bodies.js` shows 0 static cd diffs (only per-session diffs remain)
-- [ ] `profiles/chrome-fingerprint.json` has non-empty detectedFonts, consistent maxTouchPoints
-- [ ] `sd.coordinate[2]` is no longer hardcoded 1.0
-- [ ] `npm test` — all tests pass
+### Decision gate
+Profile/coordinate fixes are preserved (they're correct regardless). Phase 49 closes as a **partial result** — 49.2 fixes were valid improvements, but errorCode -1 persists. Need user input on next direction.
