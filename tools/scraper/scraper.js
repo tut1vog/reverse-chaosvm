@@ -52,20 +52,22 @@ function loadProfile(absolutePath) {
 }
 
 /**
- * Serialize a flat POST-fields object into an application/x-www-form-urlencoded
- * string. Matches the shape that jQuery.param() produces for a flat object with
- * string values, which is what buildVDataForPost and the verify endpoint both
- * expect.
+ * Serialize a flat POST-fields object into a raw `key=value&...` string with
+ * NO percent-encoding.  This matches the real browser behaviour: the
+ * orchestrator (`t_captcha_slide.js`) builds the verify POST body via plain
+ * string concatenation, so base64 characters (`+`, `/`, `=`) are never
+ * encoded.  URLSearchParams would turn `+` → `%2B` etc., which causes
+ * errorCode -1 on the verify endpoint.
  * @param {Object} fields
  * @returns {string}
  */
 function serializePostFields(fields) {
-  const params = new URLSearchParams();
+  const parts = [];
   for (const name of Object.keys(fields)) {
     const value = fields[name];
-    params.append(name, value == null ? '' : String(value));
+    parts.push(name + '=' + (value == null ? '' : String(value)));
   }
-  return params.toString();
+  return parts.join('&');
 }
 
 const DEFAULT_AID = '2046626881';
@@ -349,7 +351,7 @@ class Scraper {
       ans: ans,
       vsig: sig.vsig || '',
       websig: sig.websig || '',
-      subcapclass: sig.subcapclass || '',
+      subcapclass: '',
       pow_answer: '',
       pow_calc_time: '0',
       collect: collectVal,

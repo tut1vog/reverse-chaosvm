@@ -146,8 +146,8 @@ Decrypted both collect tokens and ran semantic field matching across different t
 
 | ID | Task | Status |
 |----|------|--------|
-| 56.1 | Replace `serializePostFields()` (URLSearchParams) with a raw-concat serializer that matches the browser's format: `key=value` joined by `&`, NO percent-encoding of base64 chars. Also fix `vData` to be appended raw (not via `encodeURIComponent`). Fix `subcapclass` to match Puppeteer (empty string). | pending |
-| 56.2 | Re-run audit with the encoding fix and check errorCode. Run verify-body-diff to confirm encoding now matches. | pending |
+| 56.1 | Replace `serializePostFields()` (URLSearchParams) with a raw-concat serializer that matches the browser's format: `key=value` joined by `&`, NO percent-encoding of base64 chars. Also fix `vData` to be appended raw (not via `encodeURIComponent`). Fix `subcapclass` to match Puppeteer (empty string). | done |
+| 56.2 | Re-run audit with the encoding fix and check errorCode. Run verify-body-diff to confirm encoding now matches. | in-progress |
 
 ---
 

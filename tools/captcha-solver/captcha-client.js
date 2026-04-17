@@ -1044,7 +1044,7 @@ class CaptchaClient {
     if (prebuiltBody) {
       // Use the jQuery-serialized body + append vData
       body = vData
-        ? prebuiltBody + '&vData=' + encodeURIComponent(vData)
+        ? prebuiltBody + '&vData=' + vData
         : prebuiltBody;
     } else {
       // Fallback: manual encoding (for backward compat / when vData not needed)
@@ -1052,7 +1052,7 @@ class CaptchaClient {
         postFields.vData = vData;
       }
       body = Object.entries(postFields)
-        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .map(([k, v]) => `${k}=${v == null ? '' : String(v)}`)
         .join('&');
     }
 
