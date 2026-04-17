@@ -91,13 +91,64 @@ Decrypted both collect tokens and ran semantic field matching across different t
 - Scraper: **errorCode -1** (failure — unchanged)
 - Collect size gap narrowed from 1396 chars (27%) to 468 chars (9%) — pageUrl fix working
 - All 4 fixes confirmed working: pageUrl short, Accept-Language matches, slide-jy.js fetched, 2.2s delay applied
-- **Remaining suspects**:
-  1. 4 missing browser-API fields: `detectedFonts`, `sid`, `webglImage`, `webglRenderer` (empty in scraper)
-  2. 33+ unidentified fields may contain bot-detectable values
-  3. Collect token size is still ~9% larger — may itself be a signal
+
+---
+
+### Phase 54: Fix dropped -1 slot values in collect generation
+
+> **Root cause identified**: `chromeFieldOrder` maps 6 template positions to `-1` (unmapped canonical index). `_generateCollectChrome` treats ALL `-1` slots as behavioral event slots — only placing events at the `hashPosition`, and pushing empty strings for the rest. But 5 of these 6 slots contain real fingerprint data captured from Chrome: `webglVendor` (cd[7]), `webglRenderer` (cd[19]), an unknown field (cd[34]), `webglImage` (cd[36]), and `sid` (cd[49]). Only cd[28] is the real behavioral events slot. The empty strings are a clear bot signal.
+
+| ID | Task | Status |
+|----|------|--------|
+| 54.1 | Fix `_generateCollectChrome` to preserve captured values for non-hashPosition -1 slots instead of emptying them. | pending |
+| 54.2 | Re-run audit and verify collect-diff shows the 4 missing fields now present, check errorCode. | pending |
 
 ---
 
 ## Current Task
 
-*Phase 53 complete. All 6 tasks done. Awaiting direction.*
+**ID**: 54.1
+**Title**: Fix -1 slot value preservation in _generateCollectChrome
+**Phase**: Phase 54 — Fix dropped -1 slot values
+**Status**: pending
+
+### Goal
+Fix `_generateCollectChrome` in `tools/scraper/scraper.js` so that non-hashPosition `-1` slots in the `cdFieldOrder` pass through the captured Chrome values from the profile's `cd` array, instead of being replaced with empty strings.
+
+### Context
+
+**The bug** is at lines 554-559 of `tools/scraper/scraper.js`:
+```js
+if (idx === -1) {
+  if (i === hashPos) {
+    cdArray.push(behavioralEvents);
+  } else {
+    cdArray.push('');  // ← BUG: should push cp.cd[i] instead
+  }
+}
+```
+
+The profile's `cd` array (template-ordered, 60 entries) has the real captured Chrome values at these positions. The fix is: `cdArray.push(cp.cd[i])` instead of `cdArray.push('')`.
+
+**Affected fields** (5 of 6 `-1` slots):
+- cd[7] = `"Intel Inc."` (webglVendor)
+- cd[19] = `"Intel Iris OpenGL Engine"` (webglRenderer)
+- cd[34] = `"unknown"` (unidentified field)
+- cd[36] = WebGL canvas fingerprint (base64, ~1KB)
+- cd[49] = `"7450533642822729728"` (session ID)
+
+Only cd[28] is the real behavioral events slot (correctly handled by hashPosition logic).
+
+**Note on `sid`**: cd[49] is a session-specific value. It should NOT be the stale captured value — it should be the current session's `sid` from `sig.sid` or `session.sid`. Consider substituting it per-session like timestamps are.
+
+### Implementation Steps
+1. Change `cdArray.push('')` to `cdArray.push(cp.cd[i])` for non-hashPosition -1 slots
+2. Add per-session substitution for sid (cd[49]) using the live session's sid value
+3. Run `npm test` to verify
+
+### Verification
+- [ ] `npm test` passes (530/530)
+- [ ] Running collect-diff shows webglImage, webglRenderer, webglVendor, sid now present in scraper token
+
+### Suggested Agent
+general-purpose — targeted fix in _generateCollectChrome
