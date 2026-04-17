@@ -101,7 +101,8 @@ Decrypted both collect tokens and ran semantic field matching across different t
 | ID | Task | Status |
 |----|------|--------|
 | 54.1 | Fix `_generateCollectChrome` to preserve captured values for non-hashPosition -1 slots instead of emptying them. | done |
-| 54.2 | Re-run audit and verify collect-diff shows the missing fields now present, check errorCode. | in-progress |
+| 54.2 | Re-run audit — errorCode still -1. 2 of 4 missing fields now present (webglRenderer, detectedFonts). webglImage and sid still missing due to template rotation: cp.cd[i] indexes by profile template order, not live template order. | done |
+| 54.3 | Store unmapped -1 values as named fields in profile; content-match them to live template's -1 slots. | pending |
 
 ---
 
