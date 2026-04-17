@@ -47,75 +47,71 @@ Current task: **53.1** — Decrypt both collect tokens and diff cd field arrays
 
 Side-by-side audit identified 4 concrete differences between Puppeteer (errorCode=0) and scraper (errorCode=-1):
 
-1. **🔴 Collect token length: 5144 vs 6540 (+27%)**. Scraper's 60-slot cdFieldOrder produces 55 cd fields + 5 behavioral events. Chrome's real TDC produces a shorter token — likely fewer fields or different serialization. Primary detection vector.
+1. **~~🔴 Collect token length: 5144 vs 6540 (+27%)~~** — **DEBUNKED by 53.1**: both tokens have exactly 60 cd fields. Size difference is from content (pageUrl 715 chars + behavioral events 524 chars), not structure.
 2. **🟡 Accept-Language mismatch**: scraper sends `en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7` on every request; Chrome sends `en-US,en;q=0.9`. Inconsistent with English-Chrome User-Agent.
 3. **🟡 Missing slide-jy.js fetch**: regex `slide-jy` doesn't match live show page HTML; request silently skipped. Chrome always fetches it.
 4. **🟡 Timing: scraper completes in 1.2s, Puppeteer in 5.0s**. Scraper caplog-pre→verify gap is 41ms vs 3314ms. No human-like delay simulation at the network level.
 
+## Phase 53.1 Findings (2026-04-17)
+
+Decrypted both collect tokens and ran semantic field matching across different template orderings:
+- **Both tokens have exactly 60 cd fields** — field count is NOT the issue.
+- **22 of 27 semantically identified fields match exactly** between Puppeteer and scraper.
+- **pageUrl**: scraper sends the full `cap_union_new_show?aid=...&protocol=...` URL (779 chars); Puppeteer's TDC only captures `?rand=...` (64 chars). This is a detection vector — the full URL leaks the captcha context.
+- **3 fields in Puppeteer but missing/empty in scraper**: `sid` (session ID), `webglImage` (WebGL canvas fingerprint), `webglRenderer` ("Intel Iris OpenGL Engine"). These are jsdom limitations — jsdom can't render WebGL canvases.
+- **33 Puppeteer fields and 36 scraper fields remain unidentified** by pattern matching — need semantic mapping to determine if any differ materially.
+- **sd object**: 6/8 keys match; `slideValue` and `ft` differ as expected (session-specific).
+
+**Updated hypothesis**: The collect structural mismatch is NOT the root cause. New suspects:
+1. **pageUrl** leaking full captcha URL (easy fix)
+2. **Missing WebGL fingerprint** in jsdom (hard — may need a static fingerprint value)
+3. **Some of the 33 unidentified fields** may contain bot-detectable values (need mapping)
+4. Accept-Language, timing, slide-jy.js fetch (original items 2-4)
+
 ---
 
-### Phase 53: Collect token structural fix + audit-derived fixes
+### Phase 53: Audit-derived fixes + collect field investigation
 
-> Fix all 4 differences identified by the Phase 52 audit. The collect token structural mismatch is the highest-priority item; the other three are quick fixes that reduce the scraper's overall bot fingerprint.
+> Fix the concrete differences identified by the Phase 52 audit and Phase 53.1 collect diff. The collect token length difference is debunked — both have 60 fields. Focus shifts to pageUrl content, Accept-Language, timing, and unidentified field mapping.
 
 | ID | Task | Status |
 |----|------|--------|
-| 53.1 | Decrypt both collect tokens (Puppeteer + scraper) and diff the cd field arrays to identify exactly which fields/serialization differ. Write a script `scripts/collect-diff.js` that takes two collect strings + XTEA params and outputs a field-by-field comparison. | pending |
-| 53.2 | Fix the scraper's collect generation to match Chrome's real cd field count and serialization for the live template. | pending |
-| 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests (captcha-client.js, scraper.js direct calls, caplog-beacon.js). | pending |
-| 53.4 | Fix the slide-jy.js fetch: update the regex in scraper.js to match the live show page HTML, or use a broader pattern. | pending |
-| 53.5 | Re-run the full audit (Puppeteer + scraper + diff) and verify that the fixes narrow or eliminate the errorCode -1. | pending |
+| 53.1 | Decrypt both collect tokens and diff cd field arrays | done |
+| 53.2 | Fix pageUrl in collect: scraper should capture only the short `?rand=...` URL, not the full show URL with all params. | pending |
+| 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests. | pending |
+| 53.4 | Fix the slide-jy.js fetch: update the regex in scraper.js to match the live show page HTML. | pending |
+| 53.5 | Add human-like timing delays: randomized pause between show page load and verify POST (2-5s). | pending |
+| 53.6 | Re-run the full audit (Puppeteer + scraper + collect-diff) and verify that fixes narrow or eliminate errorCode -1. | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 53.1
-**Title**: Decrypt both collect tokens and diff cd field arrays
-**Phase**: Phase 53 — Collect token structural fix
+**ID**: 53.2
+**Title**: Fix pageUrl in collect token
+**Phase**: Phase 53 — Audit-derived fixes
 **Status**: pending
 
 ### Goal
-Decrypt the Puppeteer and scraper collect tokens captured during the Phase 52 audit, extract their cd field arrays, and produce a field-by-field diff that pinpoints exactly what the scraper sends differently from Chrome's real TDC.
+Fix the scraper's collect generator so that the `pageUrl` cd field contains a short `?rand=...` URL (matching Chrome's real TDC behavior) instead of the full `cap_union_new_show?aid=...&protocol=...` URL which leaks captcha context.
 
 ### Context
 
-**Inputs**:
-- Puppeteer collect: 5144 chars, from `output/phase-52-audit/puppeteer-audit.json` → `tokens.collectEncoded`
-- Scraper collect: 6540 chars, from `output/phase-52-audit/scraper-audit.json` → `tokens.collectEncoded`
-- Puppeteer's TDC source: `output/puppeteer-capture/tdc-source.js` (162790 chars) — need XTEA key extraction
-- Scraper's TDC auto-ported as hash `e6a45ba64d246f82` in `tools/scraper/cache/templates.json` — XTEA key already available
+The collect-diff (53.1) showed Puppeteer's pageUrl is `"https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347"` while the scraper sends the full show URL with all query parameters (779 chars). The real TDC.js running in Chrome's iframe only sees `location.href` which is the short rand-only URL after the redirect — the full URL with all params is the initial navigation URL, not what the iframe sees.
 
-**The two flows got DIFFERENT tdc.js builds** (different sessions, Tencent may serve different builds per request). Both are "unknown" auto-ported templates with 60-slot cdFieldOrders. The scraper's template has 55 cd fields + 5 behavioral; the pipeline-config shows 54 cd + 6 behavioral for the other build.
-
-**Collect token structure** (from `docs/TOKEN_FORMAT.md`):
-- Base64 encoded → XTEA encrypted → plaintext is: `header|cd_string|sd_string` where `|` is the segment separator, cd_string is comma-separated values, sd_string is a JSON object.
-
-**Decryption tools**:
-- `tools/token-generator/decrypt.js` exports `decryptCollect(collectStr, params)` → `{ plaintext, parsed }`
-- `decryptXtea(inputBytes, params)` does the raw XTEA decryption
-- XTEA params format: `{ key: [4 uint32s], delta, rounds, keyModConstants: [4 ints], keyMods: {...} }`
-
-**Key extraction**: To decrypt Puppeteer's collect, we need the XTEA key for its TDC build. Options:
-1. Run the porting pipeline on `output/puppeteer-capture/tdc-source.js` to extract the key
-2. Use the key-extractor agent/tool directly
+**Files to investigate**:
+- `tools/scraper/collect-generator.js` — where `pageUrl` is set in the cd array
+- `profiles/default.json` — may contain a `pageUrl` field
+- The scraper's template cdFieldOrder to find which index `pageUrl` maps to
 
 ### Implementation Steps
-1. Extract XTEA key from the Puppeteer TDC source (run porting pipeline or key-extractor on `output/puppeteer-capture/tdc-source.js`)
-2. Decrypt both collect tokens using their respective XTEA keys
-3. Parse the plaintext: split by segment separator, extract cd array (comma-separated), extract sd JSON
-4. Build `scripts/collect-diff.js` that:
-   - Takes two audit JSON paths as args
-   - Loads the collect tokens + XTEA params for each
-   - Decrypts both
-   - Compares: header segment, cd field count, cd field values (positionally), sd fields
-   - Outputs a clear field-by-field diff
-5. Run it on the Phase 52 captures
+1. Find where `pageUrl` is populated in `tools/scraper/collect-generator.js`
+2. Change it to generate a short `https://t.captcha.qq.com/cap_union_new_show?rand=<timestamp>` URL
+3. Verify the change doesn't break test suite
 
 ### Verification
-- [ ] Both collect tokens decrypt successfully (plaintext is valid, not garbled)
-- [ ] `scripts/collect-diff.js` runs without error and produces a clear diff showing field count differences, specific field value differences, and serialization differences
-- [ ] The diff clearly explains the 1396-char length difference
+- [ ] `npm test` passes (296/296)
+- [ ] Running `node scripts/collect-diff.js` shows pageUrl now matches the short format
 
 ### Suggested Agent
-general-purpose — needs to run the porting pipeline, write decrypt/diff script, handle XTEA params from two different templates
+general-purpose — simple code change in the collect generator
