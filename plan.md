@@ -207,61 +207,44 @@ general-purpose — targeted serializer fix
 |----|------|--------|
 | 57.1 | Capture multiple Puppeteer behavioral event arrays via collect-diff (3+ runs), document the exact schema: event type codes, timestamp format (absolute vs delta), coordinate semantics (absolute screen vs incremental drag), event sequence order, count ranges, dx/dy value ranges. Write `output/phase-57/behavioral-event-schema.json`. | done |
 | 57.2 | Rewrite `generateBehavioralEvents()` in `tools/scraper/collect-generator.js` to match the documented schema: correct event sequence, delta timestamps, correct coordinate system. | done |
-| 57.3 | Write tests for the new `generateBehavioralEvents()` that assert: correct event type sequence, timestamps are deltas (not absolute), first move uses screen coordinates, total drag dx ≈ xAnswer. | pending |
-| 57.4 | Re-run audit (Puppeteer + scraper + collect-diff) and check errorCode. | pending |
+| 57.3 | Write tests for the new `generateBehavioralEvents()` that assert: correct event type sequence, timestamps are deltas (not absolute), first move uses screen coordinates, total drag dx ≈ xAnswer. | done |
+| 57.4 | Re-run audit (Puppeteer + scraper + collect-diff) and check errorCode. | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 57.2
-**Title**: Rewrite generateBehavioralEvents() to match real browser schema
+**ID**: 57.3
+**Title**: Write tests for generateBehavioralEvents()
 **Phase**: Phase 57 — Fix behavioral event format
 **Status**: in-progress
 
 ### Goal
-Rewrite `generateBehavioralEvents()` in `tools/scraper/collect-generator.js` so the output matches the schema documented in `output/phase-57/behavioral-event-schema.json`.
+Write a test file that validates `generateBehavioralEvents()` output matches the real browser schema. Tests exercise the function as a consumer — asserting shape, sequence, timestamp format, coordinate semantics, and dx sum.
 
 ### Context
-**Schema** (from 3 real Puppeteer captures, `output/phase-57/behavioral-event-schema.json`):
-- 8-element tuples: `[type, dx, dy, timestamp, 0, 0, 0, 0]`
-- Event[0] `type=4`: init, dx=-1, dy=-1, **absolute** epoch ms
-- Event[1] `type=1`: cursor-to-handle, dx=159, dy=811 (absolute screen coords), ts=delta ms (1222–1513)
-- Event[2] `type=2`: mousedown, dx=0, dy=0, ts=delta ms (167–201)
-- Events[3..N-1] `type=1`: drag moves, dx=incremental (decelerating, total≈xAnswer), dy=[-1,2] jitter, ts=delta ms (30–84)
-- Event[N] `type=3`: mouseup, dx=[-2,1], dy=[0,1], ts=delta ms (141–153)
-- Total events: 21–22 (17–18 drag moves)
-- Trailing fields [4-7] always zero
+**Function**: `generateBehavioralEvents(xAnswer, slideY, timestamp)` in `tools/scraper/collect-generator.js`, exported at line 450.
+**Returns**: `Array<number[]>` — array of 8-element tuples.
 
-**Current bugs in the scraper's `generateBehavioralEvents()`** (line 228–278):
-1. ALL timestamps are absolute epoch ms — should be delta ms for events[1+]
-2. Sequence is init→drag→mousedown→jitter→mouseup — should be init→cursor→mousedown→drag→mouseup
-3. No cursor-position event (event[1] with absolute screen coords)
-4. No decelerating dx pattern (real data shows large dx early, small dx late)
+**Expected behavior** (from schema `output/phase-57/behavioral-event-schema.json`):
+- Event[0]: `[4, -1, -1, <abs_epoch>, 0,0,0,0]` — init
+- Event[1]: `[1, 159, slideY, <delta_1222-1513>, 0,0,0,0]` — cursor position
+- Event[2]: `[2, 0, 0, <delta_167-201>, 0,0,0,0]` — mousedown
+- Events[3..N-1]: `[1, dx, dy, <delta_30-84>, 0,0,0,0]` — drag moves (17-18 of them)
+- Event[N]: `[3, dx, dy, <delta_141-153>, 0,0,0,0]` — mouseup
+- Total events: 21-22
+- Sum of drag move dx = xAnswer exactly
+- Fields [4-7] always 0
 
-**File to modify**: `tools/scraper/collect-generator.js`, function `generateBehavioralEvents` at line 228.
-
-**Function signature**: `generateBehavioralEvents(xAnswer, slideY, timestamp)` — keep the same signature.
-
-### Implementation Steps
-1. Read `output/phase-57/behavioral-event-schema.json` for exact ranges
-2. Rewrite the function body:
-   - Event[0]: `[4, -1, -1, timestamp, 0, 0, 0, 0]` (absolute epoch — already correct)
-   - Event[1]: `[1, 159, slideY || 811, randInt(1222,1513), 0, 0, 0, 0]` (cursor position, delta ms)
-   - Event[2]: `[2, 0, 0, randInt(167,201), 0, 0, 0, 0]` (mousedown, delta ms)
-   - Events[3..N-1]: type=1 drag moves. Generate 17–18 moves. dx values must: (a) sum to ≈xAnswer, (b) decelerate (large→small), (c) include small jitter. dy=randInt(-1,2). ts=randInt(30,84) delta ms.
-   - Event[N]: `[3, randInt(-2,1), randInt(0,1), randInt(141,153), 0, 0, 0, 0]` (mouseup, delta ms)
-3. Ensure the function still returns `Array<number[]>` (same shape)
+**Test file**: `tests/test-behavioral-events.js` (new file)
+**Test framework**: Node.js built-in `node:test` + `node:assert`
 
 ### Verification
-- [ ] `npm test` passes (all existing tests)
-- [ ] Output matches schema: correct type sequence `4,1,2,1,...,1,3`
-- [ ] Event[0] timestamp is absolute, events[1+] timestamps are small deltas (not epoch)
-- [ ] Sum of drag dx values ≈ xAnswer (within ±5)
-- [ ] 21–22 total events
+- [ ] `node --test tests/test-behavioral-events.js` passes
+- [ ] `npm test` passes (all tests including new ones)
 
 ### Suggested Agent
-general-purpose — targeted function rewrite
+general-purpose — test authoring
 
 ---
 
