@@ -533,7 +533,7 @@ class Scraper {
     // canonical 16 = timestampInit
     cdCanonical[16] = nowSec;
     // canonical 22 = pageUrl
-    cdCanonical[22] = sig.showUrl || cdCanonical[22];
+    cdCanonical[22] = 'https://t.captcha.qq.com/cap_union_new_show?rand=' + Math.floor(Math.random() * 1e16);
     // canonical 52 = timestampCollectionEnd
     cdCanonical[52] = nowSec + 2;
     // canonical 53 = timestampCollectionStart
@@ -752,7 +752,7 @@ class Scraper {
           // Legacy synthetic mode: build cd from profiles/default.json
           const nowSec = Math.round(Date.now() / 1000);
           const profileOverrides = Object.assign({}, this.profile, {
-            pageUrl: sig.showUrl || this.profile.pageUrl,
+            pageUrl: 'https://t.captcha.qq.com/cap_union_new_show?rand=' + Math.floor(Math.random() * 1e16),
             timestamp: nowSec,
             timestampCollectionStart: nowSec,
             timestampCollectionEnd: nowSec + 3,

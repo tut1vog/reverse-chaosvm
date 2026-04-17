@@ -77,7 +77,7 @@ Decrypted both collect tokens and ran semantic field matching across different t
 | ID | Task | Status |
 |----|------|--------|
 | 53.1 | Decrypt both collect tokens and diff cd field arrays | done |
-| 53.2 | Fix pageUrl in collect: scraper should capture only the short `?rand=...` URL, not the full show URL with all params. | pending |
+| 53.2 | Fix pageUrl in collect: scraper should capture only the short `?rand=...` URL, not the full show URL with all params. | done |
 | 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests. | pending |
 | 53.4 | Fix the slide-jy.js fetch: update the regex in scraper.js to match the live show page HTML. | pending |
 | 53.5 | Add human-like timing delays: randomized pause between show page load and verify POST (2-5s). | pending |
