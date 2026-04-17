@@ -240,6 +240,6 @@ Fresh Puppeteer vData decrypted (using reference XTEA key) vs scraper profile:
 
 | ID | Task | Status |
 |----|------|--------|
-| 50.1 | Fix vData profile: set `inf` to `"top"` (Puppeteer's value), make `tp` per-session (use current session's sid) | pending |
-| 50.2 | Tests for 50.1 | pending |
-| 50.3 | Live re-measurement (director-owned) | pending |
+| 50.1 | Fix vData profile: set `inf` to `"top"`, make `tp` per-session (use session sid) | done |
+| 50.2 | Tests — existing tests updated as part of 50.1 | done |
+| 50.3 | Live re-measurement — null result: 0/4 errorCode 0 (4 ec=-1, 1 ec=12 rate limit) | done |
