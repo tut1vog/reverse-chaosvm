@@ -123,11 +123,78 @@ Decrypted both collect tokens and ran semantic field matching across different t
 |----|------|--------|
 | 55.1 | Capture a Puppeteer verify POST body (raw bytes) and a scraper verify POST body side-by-side. Diff field-by-field: encoding differences, field order, content-type, body length. Write `scripts/verify-body-diff.js`. | done |
 | 55.2 | Fix sid in collect: identify which -1 slot contains sid (by matching the numeric string pattern), substitute `session.sid` at generation time instead of using the stale profile value. | done |
-| 55.3 | Re-run audit with both fixes and check errorCode. | in-progress |
+| 55.3 | Re-run audit with both fixes and check errorCode. | done |
+
+---
+
+## Phase 55.3 Results (2026-04-17)
+
+- Puppeteer: **errorCode 0** (success)
+- Scraper: **errorCode -1** (still failing)
+- **🔴 CRITICAL: POST body encoding mismatch discovered.** The real browser (`t_captcha_slide.js`) builds the verify POST body via **custom string concatenation** (`key + '=' + value` joined with `&`), NOT `$.param()` or `URLSearchParams`. Base64 characters (`+`, `/`, `=`) and delimiters (`,`, `;`) appear **raw** in the wire format. The scraper's `URLSearchParams` percent-encodes them (`%2B`, `%2F`, `%3D`, `%2C`, `%3B`), causing:
+  1. **`tlg` vs collect length mismatch**: `tlg` records pre-encoding length (~5100), but percent-encoded collect is ~6000 chars on the wire — server detects the discrepancy.
+  2. **`vData` computed over wrong body**: vData is the HMAC-like digest of the POST body. Scraper computes it over percent-encoded text; server expects it over the raw-concat text.
+  3. **`ans` encoding**: browser sends `495,35;` raw, scraper sends `516%2C158%3B`.
+- Sid fix working: live session sid now in POST body fields.
+- `subcapclass` differs: Puppeteer sends `""`, scraper sends `"15"` — minor, but worth matching.
+
+---
+
+### Phase 56: Fix POST body encoding to match browser's raw concatenation
+
+> **Root cause fix.** The real browser uses custom string concatenation (not $.param/URLSearchParams) to build the verify POST body. Base64 chars appear raw. The scraper must match this exactly. Additionally, vData must be computed over the same raw-format body.
+
+| ID | Task | Status |
+|----|------|--------|
+| 56.1 | Replace `serializePostFields()` (URLSearchParams) with a raw-concat serializer that matches the browser's format: `key=value` joined by `&`, NO percent-encoding of base64 chars. Also fix `vData` to be appended raw (not via `encodeURIComponent`). Fix `subcapclass` to match Puppeteer (empty string). | pending |
+| 56.2 | Re-run audit with the encoding fix and check errorCode. Run verify-body-diff to confirm encoding now matches. | pending |
 
 ---
 
 ## Current Task
+
+**ID**: 56.1
+**Title**: Replace POST body serializer with raw-concat format
+**Phase**: Phase 56 — Fix POST body encoding
+**Status**: pending
+
+### Goal
+Replace the scraper's `URLSearchParams`-based POST body serializer with a raw string concatenation format that matches what `t_captcha_slide.js` produces in the real browser. This is the most likely root cause of errorCode=-1.
+
+### Context
+
+**Current flow** (scraper):
+1. `serializePostFields(postFields)` at line 62 uses `URLSearchParams` — encodes `+` → `%2B`, `/` → `%2F`, `=` → `%3D`, `,` → `%2C`, `;` → `%3B`, spaces → `+`
+2. vData computed over this percent-encoded body
+3. `captcha-client.js` line 1047: `prebuiltBody + '&vData=' + encodeURIComponent(vData)` — vData also percent-encoded
+
+**Target flow** (real browser):
+1. Custom concatenation: `key=value&key=value` with NO encoding of any characters
+2. vData computed over this raw body
+3. vData appended as `&vData=<raw vData>` (no encoding)
+
+**Files to modify**:
+- `tools/scraper/scraper.js` — replace `serializePostFields()` body with raw concat
+- `tools/captcha-solver/captcha-client.js` — fix `prebuiltBody + '&vData='` path to append vData raw
+- `tools/scraper/scraper.js` line ~337 — set `subcapclass` to empty string (matching Puppeteer)
+
+### Implementation Steps
+1. In `serializePostFields()` (line 62), replace `URLSearchParams` with: `Object.keys(fields).map(k => k + '=' + (fields[k] == null ? '' : String(fields[k]))).join('&')`
+2. In `captcha-client.js` line 1047, change `encodeURIComponent(vData)` to just `vData` (raw append)
+3. In `tools/scraper/scraper.js`, find the `subcapclass` field in the POST fields object and ensure it's `''` not `'15'`
+4. Verify vData is computed over the raw-concat body (it should be, since `buildVDataForPost(serializedBody, ...)` uses the serialized body directly)
+
+### Verification
+- [ ] `npm test` passes
+- [ ] `serializePostFields('a+b', '=/=')` produces `a+b==/=` (no encoding)
+- [ ] Running verify-body-diff on captures shows encoding now matches browser format
+
+### Suggested Agent
+general-purpose — targeted serializer fix
+
+---
+
+## Old Current Task (archived)
 
 **ID**: 55.1
 **Title**: Verify POST body byte-level diff
