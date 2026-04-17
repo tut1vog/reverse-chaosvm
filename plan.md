@@ -205,8 +205,8 @@ general-purpose — targeted serializer fix
 
 | ID | Task | Status |
 |----|------|--------|
-| 57.1 | Capture multiple Puppeteer behavioral event arrays via collect-diff (3+ runs), document the exact schema: event type codes, timestamp format (absolute vs delta), coordinate semantics (absolute screen vs incremental drag), event sequence order, count ranges, dx/dy value ranges. Write `output/phase-57/behavioral-event-schema.json`. | pending |
-| 57.2 | Rewrite `generateBehavioralEvents()` in `tools/scraper/collect-generator.js` to match the documented schema: correct event sequence, delta timestamps, correct coordinate system. | pending |
+| 57.1 | Capture multiple Puppeteer behavioral event arrays via collect-diff (3+ runs), document the exact schema: event type codes, timestamp format (absolute vs delta), coordinate semantics (absolute screen vs incremental drag), event sequence order, count ranges, dx/dy value ranges. Write `output/phase-57/behavioral-event-schema.json`. | done |
+| 57.2 | Rewrite `generateBehavioralEvents()` in `tools/scraper/collect-generator.js` to match the documented schema: correct event sequence, delta timestamps, correct coordinate system. | in-progress |
 | 57.3 | Write tests for the new `generateBehavioralEvents()` that assert: correct event type sequence, timestamps are deltas (not absolute), first move uses screen coordinates, total drag dx ≈ xAnswer. | pending |
 | 57.4 | Re-run audit (Puppeteer + scraper + collect-diff) and check errorCode. | pending |
 
@@ -214,43 +214,54 @@ general-purpose — targeted serializer fix
 
 ## Current Task
 
-**ID**: 57.1
-**Title**: Capture and document behavioral event schema from real browser
+**ID**: 57.2
+**Title**: Rewrite generateBehavioralEvents() to match real browser schema
 **Phase**: Phase 57 — Fix behavioral event format
-**Status**: pending
+**Status**: in-progress
 
 ### Goal
-Capture 3+ Puppeteer behavioral event arrays from different CAPTCHA solves, analyze the exact format, and produce a definitive schema document. This is the research step before rewriting the scraper's event generator.
+Rewrite `generateBehavioralEvents()` in `tools/scraper/collect-generator.js` so the output matches the schema documented in `output/phase-57/behavioral-event-schema.json`.
 
 ### Context
-From the Phase 56 collect-diff, one Puppeteer capture shows:
-- 21 events, sequence: `4,1,2,1,1,...,1,3`
-- Event[0]: `[4,-1,-1,1776431245660,0,0,0,0]` — init, absolute epoch ms
-- Event[1]: `[1,159,811,1513,0,0,0,0]` — mousemove, large dx/dy, timestamp=1513 (delta ms)
-- Event[2]: `[2,0,0,167,0,0,0,0]` — mousedown, timestamp=167 (delta ms)
-- Events[3-19]: type=1 mousemove, dx=small increments, timestamps=deltas (20-70ms)
-- Event[20]: `[3,1,1,141,0,0,0,0]` — mouseup, timestamp=141 (delta ms)
+**Schema** (from 3 real Puppeteer captures, `output/phase-57/behavioral-event-schema.json`):
+- 8-element tuples: `[type, dx, dy, timestamp, 0, 0, 0, 0]`
+- Event[0] `type=4`: init, dx=-1, dy=-1, **absolute** epoch ms
+- Event[1] `type=1`: cursor-to-handle, dx=159, dy=811 (absolute screen coords), ts=delta ms (1222–1513)
+- Event[2] `type=2`: mousedown, dx=0, dy=0, ts=delta ms (167–201)
+- Events[3..N-1] `type=1`: drag moves, dx=incremental (decelerating, total≈xAnswer), dy=[-1,2] jitter, ts=delta ms (30–84)
+- Event[N] `type=3`: mouseup, dx=[-2,1], dy=[0,1], ts=delta ms (141–153)
+- Total events: 21–22 (17–18 drag moves)
+- Trailing fields [4-7] always zero
 
-Open questions to resolve with more captures:
-1. Is event[1] always a cursor-to-handle position move (absolute coords)?
-2. What are typical event counts (init=1, pre-drag moves=?, mousedown=1, drag moves=?, mouseup=1)?
-3. Is there always exactly one mousemove before mousedown?
-4. What are the ranges for dx/dy/dt values in the drag phase?
-5. Do the trailing 4 zeros in each tuple ever change?
+**Current bugs in the scraper's `generateBehavioralEvents()`** (line 228–278):
+1. ALL timestamps are absolute epoch ms — should be delta ms for events[1+]
+2. Sequence is init→drag→mousedown→jitter→mouseup — should be init→cursor→mousedown→drag→mouseup
+3. No cursor-position event (event[1] with absolute screen coords)
+4. No decelerating dx pattern (real data shows large dx early, small dx late)
+
+**File to modify**: `tools/scraper/collect-generator.js`, function `generateBehavioralEvents` at line 228.
+
+**Function signature**: `generateBehavioralEvents(xAnswer, slideY, timestamp)` — keep the same signature.
 
 ### Implementation Steps
-1. Run Puppeteer captcha-solver 3 times, each time saving the collect-diff output
-2. Extract and parse the behavioral event array from each decrypted collect
-3. Document the schema as JSON with ranges, sequences, and examples
-4. Write the schema to `output/phase-57/behavioral-event-schema.json`
+1. Read `output/phase-57/behavioral-event-schema.json` for exact ranges
+2. Rewrite the function body:
+   - Event[0]: `[4, -1, -1, timestamp, 0, 0, 0, 0]` (absolute epoch — already correct)
+   - Event[1]: `[1, 159, slideY || 811, randInt(1222,1513), 0, 0, 0, 0]` (cursor position, delta ms)
+   - Event[2]: `[2, 0, 0, randInt(167,201), 0, 0, 0, 0]` (mousedown, delta ms)
+   - Events[3..N-1]: type=1 drag moves. Generate 17–18 moves. dx values must: (a) sum to ≈xAnswer, (b) decelerate (large→small), (c) include small jitter. dy=randInt(-1,2). ts=randInt(30,84) delta ms.
+   - Event[N]: `[3, randInt(-2,1), randInt(0,1), randInt(141,153), 0, 0, 0, 0]` (mouseup, delta ms)
+3. Ensure the function still returns `Array<number[]>` (same shape)
 
 ### Verification
-- [ ] 3+ independent captures analyzed
-- [ ] Schema document covers all open questions above
-- [ ] Examples from each capture included
+- [ ] `npm test` passes (all existing tests)
+- [ ] Output matches schema: correct type sequence `4,1,2,1,...,1,3`
+- [ ] Event[0] timestamp is absolute, events[1+] timestamps are small deltas (not epoch)
+- [ ] Sum of drag dx values ≈ xAnswer (within ±5)
+- [ ] 21–22 total events
 
 ### Suggested Agent
-general-purpose — capture + analysis
+general-purpose — targeted function rewrite
 
 ---
 
