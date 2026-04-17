@@ -1,14 +1,309 @@
 {
-  "timestamp": "2026-04-17T12:10:35.570Z",
+  "timestamp": "2026-04-17T12:27:27.757Z",
   "puppeteerAuditPath": "/home/ubun/github.com/tut1vog/reverse-chaosvm/output/phase-52-audit/puppeteer-audit.json",
   "scraperAuditPath": "/home/ubun/github.com/tut1vog/reverse-chaosvm/output/phase-52-audit/scraper-audit.json",
-  "puppeteerKey": "template daf0c711ccb82124",
+  "puppeteerKey": "template 3429444f324c6110",
   "scraperKey": "template e2170903e201e018",
   "puppeteer": {
-    "tokenLength": 5196,
-    "plaintextLength": 3890,
+    "tokenLength": 5036,
+    "plaintextLength": 3771,
     "cdLength": 60,
     "cd": [
+      [
+        "en-US",
+        "en"
+      ],
+      1023,
+      1776428846,
+      "+08",
+      0.31599998474121094,
+      1,
+      "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
+      {
+        "_state": -2
+      },
+      "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
+      0,
+      0,
+      1,
+      "",
+      1,
+      "Intel Inc.",
+      "Linux x86_64",
+      0,
+      0,
+      0,
+      1508125014,
+      1776428844,
+      "top",
+      [
+        [
+          4,
+          -1,
+          -1,
+          1776428844132,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          159,
+          811,
+          1372,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0,
+          192,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          3,
+          0,
+          92,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          98,
+          0,
+          44,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          179,
+          0,
+          43,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          79,
+          0,
+          40,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          134,
+          -1,
+          46,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          61,
+          0,
+          38,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          54,
+          1,
+          31,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          87,
+          -1,
+          45,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          37,
+          0,
+          40,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          33,
+          1,
+          32,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          53,
+          -1,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          37,
+          1,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          28,
+          -2,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          14,
+          2,
+          67,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          7,
+          0,
+          49,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          2,
+          -2,
+          40,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          2,
+          1,
+          44,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          3,
+          -1,
+          0,
+          167,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "unknown",
+      [
+        1280,
+        1400
+      ],
+      null,
+      600,
+      298461210,
+      1776428844,
+      {
+        "nt_vc_output": {
+          "ac-baseLatency": 0.011609977324263039,
+          "ac-outputLatency": 0,
+          "ac-sampleRate": 44100,
+          "ac-maxChannelCount": 2,
+          "ac-numberOfInputs": 1,
+          "ac-numberOfOutputs": 0,
+          "ac-channelCount": 2,
+          "ac-channelCountMode": "explicit",
+          "ac-channelInterpretation": "speakers",
+          "an-fftSize": 2048,
+          "an-frequencyBinCount": 1024,
+          "an-minDecibels": -100,
+          "an-maxDecibels": -30,
+          "an-smoothingTimeConstant": 0.8,
+          "an-numberOfInputs": 1,
+          "an-numberOfOutputs": 1,
+          "an-channelCount": 2,
+          "an-channelCountMode": "max",
+          "an-channelInterpretation": "speakers"
+        },
+        "pxi_output": 11888.616780045351
+      },
+      "",
+      4,
+      2,
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+      800,
+      "1;0",
+      "UTF-8",
+      "800-600-600-24-*-*-|-*",
+      "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+      24,
+      [
+        {
+          "type": "application/pdf",
+          "suffixes": "pdf"
+        },
+        {
+          "type": "text/pdf",
+          "suffixes": "pdf"
+        }
+      ],
+      "windows",
+      0,
+      "srgb",
       [
         {
           "codec": "AAC",
@@ -47,28 +342,71 @@
           "support": "maybe"
         }
       ],
-      "800-600-600-24-*-*-|-*",
-      0,
-      600,
-      0,
-      "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
+      8,
+      "",
       {
-        "timeZone": "Asia/Shanghai",
-        "calendar": "gregory",
-        "numberingSystem": "latn",
-        "locale": "en-US"
+        "brands": [],
+        "mobile": false,
+        "platform": ""
       },
-      1,
-      4,
-      "top",
-      0,
-      1,
       {
         "_state": 0,
         "quota": 10737418240,
         "usage": null,
         "usageDetails": {}
       },
+      "7450882602784194560",
+      "",
+      {
+        "timeZone": "Asia/Shanghai",
+        "calendar": "gregory",
+        "numberingSystem": "latn",
+        "locale": "en-US"
+      },
+      0,
+      {
+        "_state": 0,
+        "architecture": "",
+        "bitness": "",
+        "brands": [],
+        "fullVersionList": [],
+        "mobile": false,
+        "model": "",
+        "platform": "",
+        "platformVersion": "",
+        "uaFullVersion": "",
+        "wow64": false
+      },
+      "Intel Iris OpenGL Engine",
+      "",
+      "98k",
+      [
+        {
+          "name": "PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Chrome PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Chromium PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "Microsoft Edge PDF Viewer",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        },
+        {
+          "name": "WebKit built-in PDF",
+          "description": "Portable Document Format",
+          "filename": "internal-pdf-viewer"
+        }
+      ],
       [
         {
           "codec": "H.264",
@@ -103,375 +441,7 @@
           "support": ""
         }
       ],
-      "unknown",
-      "",
-      0,
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-      539495552,
-      "windows",
-      "srgb",
-      {
-        "_state": 0,
-        "architecture": "",
-        "bitness": "",
-        "brands": [],
-        "fullVersionList": [],
-        "mobile": false,
-        "model": "",
-        "platform": "",
-        "platformVersion": "",
-        "uaFullVersion": "",
-        "wow64": false
-      },
-      "",
-      1776427769,
-      "Intel Iris OpenGL Engine",
-      "",
-      0,
-      0.2690000534057617,
-      800,
-      2,
-      "UTF-8",
-      0,
-      24,
-      "Intel Inc.",
-      [
-        1280,
-        1400
-      ],
-      0,
-      [
-        [
-          4,
-          -1,
-          -1,
-          1776427769138,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          159,
-          811,
-          1700,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          2,
-          0,
-          0,
-          187,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          3,
-          0,
-          59,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          138,
-          0,
-          52,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          120,
-          1,
-          42,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          106,
-          0,
-          44,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          47,
-          0,
-          40,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          83,
-          0,
-          67,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          73,
-          -1,
-          66,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          31,
-          0,
-          33,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          57,
-          1,
-          67,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          43,
-          -1,
-          67,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          18,
-          -1,
-          33,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          15,
-          0,
-          33,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          26,
-          1,
-          67,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          22,
-          1,
-          57,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          12,
-          -1,
-          60,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          7,
-          1,
-          49,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          7,
-          0,
-          50,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          1,
-          -1,
-          32,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          3,
-          0,
-          69,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          -2,
-          0,
-          48,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          3,
-          0,
-          0,
-          78,
-          0,
-          0,
-          0,
-          0
-        ]
-      ],
-      0,
-      null,
-      "+08",
-      1,
-      "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
-      8,
-      [
-        {
-          "name": "PDF Viewer",
-          "description": "Portable Document Format",
-          "filename": "internal-pdf-viewer"
-        },
-        {
-          "name": "Chrome PDF Viewer",
-          "description": "Portable Document Format",
-          "filename": "internal-pdf-viewer"
-        },
-        {
-          "name": "Chromium PDF Viewer",
-          "description": "Portable Document Format",
-          "filename": "internal-pdf-viewer"
-        },
-        {
-          "name": "Microsoft Edge PDF Viewer",
-          "description": "Portable Document Format",
-          "filename": "internal-pdf-viewer"
-        },
-        {
-          "name": "WebKit built-in PDF",
-          "description": "Portable Document Format",
-          "filename": "internal-pdf-viewer"
-        }
-      ],
-      1776427772,
-      "98k",
-      "",
-      "Linux x86_64",
-      1023,
-      [
-        "en-US",
-        "en"
-      ],
-      {
-        "nt_vc_output": {
-          "ac-baseLatency": 0.011609977324263039,
-          "ac-outputLatency": 0,
-          "ac-sampleRate": 44100,
-          "ac-maxChannelCount": 2,
-          "ac-numberOfInputs": 1,
-          "ac-numberOfOutputs": 0,
-          "ac-channelCount": 2,
-          "ac-channelCountMode": "explicit",
-          "ac-channelInterpretation": "speakers",
-          "an-fftSize": 2048,
-          "an-frequencyBinCount": 1024,
-          "an-minDecibels": -100,
-          "an-maxDecibels": -30,
-          "an-smoothingTimeConstant": 0.8,
-          "an-numberOfInputs": 1,
-          "an-numberOfOutputs": 1,
-          "an-channelCount": 2,
-          "an-channelCountMode": "max",
-          "an-channelInterpretation": "speakers"
-        },
-        "pxi_output": 11888.616780045351
-      },
-      {
-        "_state": -2
-      },
-      {
-        "brands": [],
-        "mobile": false,
-        "platform": ""
-      },
-      1117836576,
-      1776427769,
-      "7450878091809505280",
-      "",
-      [
-        {
-          "type": "application/pdf",
-          "suffixes": "pdf"
-        },
-        {
-          "type": "text/pdf",
-          "suffixes": "pdf"
-        }
-      ],
-      "1;0",
-      "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347"
+      0
     ],
     "sd": {
       "od": "C",
@@ -487,172 +457,137 @@
         [
           162,
           811,
-          58
+          92
         ],
         [
-          68,
-          2,
+          98,
+          0,
+          43
+        ],
+        [
+          94,
+          0,
           26
         ],
         [
-          70,
-          -2,
-          26
+          85,
+          0,
+          17
+        ],
+        [
+          79,
+          0,
+          40
+        ],
+        [
+          71,
+          0,
+          22
+        ],
+        [
+          63,
+          -1,
+          24
         ],
         [
           61,
           0,
-          19
+          38
         ],
         [
-          59,
+          54,
           1,
-          23
+          32
         ],
         [
-          55,
+          48,
           -1,
           21
         ],
         [
-          51,
-          1,
+          39,
+          0,
           23
         ],
         [
-          47,
+          37,
           0,
           40
         ],
         [
-          46,
-          -1,
-          26
-        ],
-        [
-          37,
-          1,
-          41
-        ],
-        [
-          40,
-          -1,
-          28
-        ],
-        [
           33,
+          1,
+          31
+        ],
+        [
+          29,
+          -1,
+          25
+        ],
+        [
+          24,
+          0,
+          43
+        ],
+        [
+          23,
+          1,
+          27
+        ],
+        [
+          14,
           0,
           39
         ],
         [
-          31,
-          0,
-          32
-        ],
-        [
-          31,
-          1,
-          28
-        ],
-        [
-          26,
-          0,
-          40
-        ],
-        [
-          20,
-          -1,
-          24
-        ],
-        [
-          23,
-          0,
-          42
-        ],
-        [
-          18,
-          -1,
-          33
-        ],
-        [
           15,
-          0,
-          33
+          -1,
+          22
         ],
         [
-          16,
-          0,
-          29
-        ],
-        [
-          10,
-          1,
-          38
-        ],
-        [
-          11,
-          0,
-          31
-        ],
-        [
-          11,
-          1,
-          26
-        ],
-        [
-          8,
-          -2,
-          24
-        ],
-        [
-          4,
-          1,
-          36
-        ],
-        [
-          5,
-          0,
-          26
-        ],
-        [
-          2,
-          1,
-          23
+          13,
+          -1,
+          44
         ],
         [
           6,
-          -1,
-          19
+          0,
+          25
         ],
         [
-          1,
-          1,
-          30
-        ],
-        [
-          1,
-          -1,
-          32
-        ],
-        [
+          8,
           2,
-          0,
-          29
+          42
         ],
         [
-          1,
+          4,
           0,
-          40
+          23
         ],
         [
-          -1,
-          -1,
+          3,
+          0,
           26
         ],
         [
-          -1,
           1,
+          -1,
+          18
+        ],
+        [
+          1,
+          -1,
           22
+        ],
+        [
+          2,
+          1,
+          44
+        ],
+        [
+          -1,
+          0,
+          20
         ],
         [
           0,
@@ -665,8 +600,8 @@
     }
   },
   "scraper": {
-    "tokenLength": 5664,
-    "plaintextLength": 4245,
+    "tokenLength": 5568,
+    "plaintextLength": 4170,
     "cdLength": 60,
     "cd": [
       "windows",
@@ -734,7 +669,57 @@
           4,
           -1,
           -1,
-          1776427778257,
+          1776428832363,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          29,
+          0,
+          1776428832463,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          26,
+          -1,
+          1776428832501,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          26,
+          -1,
+          1776428832562,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          24,
+          0,
+          1776428832600,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          24,
+          -1,
+          1776428832652,
           0,
           0,
           0,
@@ -744,17 +729,7 @@
           1,
           22,
           1,
-          1776427778372,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          22,
-          0,
-          1776427778435,
+          1776428832715,
           0,
           0,
           0,
@@ -763,8 +738,8 @@
         [
           1,
           21,
-          -1,
-          1776427778491,
+          0,
+          1776428832774,
           0,
           0,
           0,
@@ -774,7 +749,7 @@
           1,
           19,
           0,
-          1776427778560,
+          1776428832831,
           0,
           0,
           0,
@@ -783,18 +758,8 @@
         [
           1,
           18,
-          0,
-          1776427778631,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          19,
-          0,
-          1776427778679,
+          -1,
+          1776428832893,
           0,
           0,
           0,
@@ -803,8 +768,18 @@
         [
           1,
           17,
-          -1,
-          1776427778730,
+          0,
+          1776428832950,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          17,
+          0,
+          1776428832989,
           0,
           0,
           0,
@@ -813,8 +788,8 @@
         [
           1,
           16,
-          1,
-          1776427778804,
+          0,
+          1776428833038,
           0,
           0,
           0,
@@ -822,9 +797,9 @@
         ],
         [
           1,
-          17,
-          0,
-          1776427778856,
+          16,
+          -1,
+          1776428833095,
           0,
           0,
           0,
@@ -834,7 +809,37 @@
           1,
           15,
           0,
-          1776427778922,
+          1776428833156,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          15,
+          0,
+          1776428833222,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          13,
+          0,
+          1776428833285,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          13,
+          1,
+          1776428833347,
           0,
           0,
           0,
@@ -843,48 +848,8 @@
         [
           1,
           14,
-          -1,
-          1776427778971,
           0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          13,
-          0,
-          1776427779037,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          13,
-          -1,
-          1776427779087,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          13,
-          1,
-          1776427779134,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          13,
-          -1,
-          1776427779181,
+          1776428833410,
           0,
           0,
           0,
@@ -893,8 +858,8 @@
         [
           1,
           12,
-          -1,
-          1776427779254,
+          1,
+          1776428833471,
           0,
           0,
           0,
@@ -902,109 +867,9 @@
         ],
         [
           1,
-          12,
+          13,
           0,
-          1776427779309,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          12,
-          -1,
-          1776427779357,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          10,
-          0,
-          1776427779416,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          10,
-          1,
-          1776427779464,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          10,
-          0,
-          1776427779536,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          11,
-          1,
-          1776427779585,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          9,
-          0,
-          1776427779651,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          9,
-          0,
-          1776427779707,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          9,
-          1,
-          1776427779755,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          9,
-          -1,
-          1776427779819,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          10,
-          0,
-          1776427779876,
+          1776428833527,
           0,
           0,
           0,
@@ -1014,7 +879,37 @@
           1,
           11,
           -1,
-          1776427779940,
+          1776428833573,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          10,
+          0,
+          1776428833622,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          12,
+          0,
+          1776428833675,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          12,
+          0,
+          1776428833716,
           0,
           0,
           0,
@@ -1023,8 +918,8 @@
         [
           1,
           13,
-          1,
-          1776427780007,
+          0,
+          1776428833772,
           0,
           0,
           0,
@@ -1032,9 +927,19 @@
         ],
         [
           1,
-          53,
+          14,
+          0,
+          1776428833834,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
           1,
-          1776427780059,
+          59,
+          1,
+          1776428833882,
           0,
           0,
           0,
@@ -1044,7 +949,7 @@
           2,
           0,
           0,
-          1776427780108,
+          1776428833926,
           0,
           0,
           0,
@@ -1053,28 +958,8 @@
         [
           1,
           0,
-          -1,
-          1776427780159,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
           1,
-          0,
-          -1,
-          1776427780196,
-          0,
-          0,
-          0,
-          0
-        ],
-        [
-          1,
-          0,
-          -1,
-          1776427780239,
+          1776428833972,
           0,
           0,
           0,
@@ -1084,7 +969,7 @@
           3,
           0,
           0,
-          1776427780274,
+          1776428834025,
           0,
           0,
           0,
@@ -1112,10 +997,10 @@
         "wow64": false
       },
       "+08",
-      1776427778,
+      1776428832,
       0,
       0,
-      1776427778,
+      1776428832,
       {
         "_state": 0,
         "quota": 10737418240,
@@ -1147,9 +1032,9 @@
         },
         "pxi_output": 11888.616780045351
       },
+      "Intel Inc.",
       "",
-      "",
-      "",
+      "Intel Iris OpenGL Engine",
       [
         {
           "codec": "AAC",
@@ -1188,7 +1073,7 @@
           "support": "maybe"
         }
       ],
-      "",
+      "unknown",
       "",
       "800-600-600-24-*-*-|-*",
       1,
@@ -1237,14 +1122,14 @@
       4,
       0,
       1546386734,
-      1776427780,
+      1776428834,
       "srgb",
       [
         1280,
         1400
       ],
-      "https://t.captcha.qq.com/cap_union_new_show?rand=6508564538547765",
-      "",
+      "https://t.captcha.qq.com/cap_union_new_show?rand=2822576218508923",
+      "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
       {
         "timeZone": "Asia/Shanghai",
         "calendar": "gregory",
@@ -1265,49 +1150,74 @@
       "refreshcnt": 0,
       "slideValue": [
         [
-          22,
-          821,
-          66
+          29,
+          825,
+          64
+        ],
+        [
+          26,
+          -1,
+          38
+        ],
+        [
+          26,
+          -1,
+          61
+        ],
+        [
+          24,
+          0,
+          38
+        ],
+        [
+          24,
+          -1,
+          52
         ],
         [
           22,
-          0,
+          1,
           63
         ],
         [
           21,
-          -1,
-          56
+          0,
+          59
         ],
         [
           19,
           0,
-          69
+          57
         ],
         [
           18,
-          0,
-          71
-        ],
-        [
-          19,
-          0,
-          48
+          -1,
+          62
         ],
         [
           17,
-          -1,
-          51
+          0,
+          57
+        ],
+        [
+          17,
+          0,
+          39
         ],
         [
           16,
-          1,
-          74
+          0,
+          49
         ],
         [
-          17,
+          16,
+          -1,
+          57
+        ],
+        [
+          15,
           0,
-          52
+          61
         ],
         [
           15,
@@ -1315,119 +1225,69 @@
           66
         ],
         [
+          13,
+          0,
+          63
+        ],
+        [
+          13,
+          1,
+          62
+        ],
+        [
           14,
-          -1,
-          49
-        ],
-        [
-          13,
           0,
-          66
-        ],
-        [
-          13,
-          -1,
-          50
-        ],
-        [
-          13,
-          1,
-          47
-        ],
-        [
-          13,
-          -1,
-          47
+          63
         ],
         [
           12,
-          -1,
-          73
-        ],
-        [
-          12,
-          0,
-          55
-        ],
-        [
-          12,
-          -1,
-          48
-        ],
-        [
-          10,
-          0,
-          59
-        ],
-        [
-          10,
           1,
-          48
+          61
         ],
         [
-          10,
-          0,
-          72
-        ],
-        [
-          11,
-          1,
-          49
-        ],
-        [
-          9,
-          0,
-          66
-        ],
-        [
-          9,
+          13,
           0,
           56
         ],
         [
-          9,
-          1,
-          48
-        ],
-        [
-          9,
+          11,
           -1,
-          64
+          46
         ],
         [
           10,
           0,
-          57
+          49
         ],
         [
-          11,
-          -1,
-          64
+          12,
+          0,
+          53
+        ],
+        [
+          12,
+          0,
+          41
         ],
         [
           13,
+          0,
+          56
+        ],
+        [
+          14,
+          0,
+          62
+        ],
+        [
+          59,
           1,
-          67
+          48
         ],
         [
-          53,
+          0,
           1,
-          52
-        ],
-        [
-          0,
-          -1,
-          100
-        ],
-        [
-          0,
-          -1,
-          37
-        ],
-        [
-          0,
-          -1,
-          43
+          90
         ],
         [
           0,
@@ -1436,7 +1296,7 @@
         ]
       ],
       "dragobj": 1,
-      "ft": "K02TTrO88"
+      "ft": "_8DWcnJ7m"
     }
   },
   "diff": {
@@ -1463,7 +1323,9 @@
       "timezoneOffset",
       "userAgent",
       "userAgentData",
-      "videoCodecs"
+      "videoCodecs",
+      "webglImage",
+      "webglRenderer"
     ],
     "semanticDiffs": [
       "behavioralEvents",
@@ -1471,146 +1333,144 @@
     ],
     "puppeteerOnlyFields": [
       "detectedFonts",
-      "sid",
-      "webglImage",
-      "webglRenderer"
+      "sid"
     ],
     "scraperOnlyFields": [],
     "fieldMapping": {
-      "audioCodecs": {
+      "languages": {
         "puppeteerIndex": 0,
-        "scraperIndex": 38,
+        "scraperIndex": 10,
         "match": true
-      },
-      "screenComposite": {
-        "puppeteerIndex": 1,
-        "scraperIndex": 41,
-        "match": true
-      },
-      "webglImage": {
-        "puppeteerIndex": 5,
-        "scraperIndex": null,
-        "match": null
-      },
-      "intlOptions": {
-        "puppeteerIndex": 6,
-        "scraperIndex": 58,
-        "match": true
-      },
-      "frameStatus": {
-        "puppeteerIndex": 9,
-        "scraperIndex": 16,
-        "match": true
-      },
-      "storageEstimate": {
-        "puppeteerIndex": 12,
-        "scraperIndex": 32,
-        "match": true
-      },
-      "videoCodecs": {
-        "puppeteerIndex": 13,
-        "scraperIndex": 43,
-        "match": true
-      },
-      "userAgent": {
-        "puppeteerIndex": 17,
-        "scraperIndex": 49,
-        "match": true
-      },
-      "osPlatform": {
-        "puppeteerIndex": 19,
-        "scraperIndex": 0,
-        "match": true
-      },
-      "colorGamut": {
-        "puppeteerIndex": 20,
-        "scraperIndex": 54,
-        "match": true
-      },
-      "highEntropyValues": {
-        "puppeteerIndex": 21,
-        "scraperIndex": 26,
-        "match": true
-      },
-      "webglRenderer": {
-        "puppeteerIndex": 24,
-        "scraperIndex": null,
-        "match": null
-      },
-      "characterSet": {
-        "puppeteerIndex": 30,
-        "scraperIndex": 2,
-        "match": true
-      },
-      "screenResolution": {
-        "puppeteerIndex": 34,
-        "scraperIndex": 55,
-        "match": true
-      },
-      "behavioralEvents": {
-        "puppeteerIndex": 36,
-        "scraperIndex": 18,
-        "match": false
       },
       "timezoneOffset": {
-        "puppeteerIndex": 39,
+        "puppeteerIndex": 3,
         "scraperIndex": 27,
         "match": true
       },
       "detectedFonts": {
-        "puppeteerIndex": 41,
+        "puppeteerIndex": 6,
         "scraperIndex": null,
         "match": null
       },
-      "plugins": {
-        "puppeteerIndex": 43,
-        "scraperIndex": 8,
-        "match": true
-      },
-      "platform": {
-        "puppeteerIndex": 47,
-        "scraperIndex": 5,
-        "match": true
-      },
-      "languages": {
-        "puppeteerIndex": 49,
-        "scraperIndex": 10,
-        "match": true
-      },
-      "audioFingerprint": {
-        "puppeteerIndex": 50,
-        "scraperIndex": 34,
-        "match": true
-      },
       "permissionStatus": {
-        "puppeteerIndex": 51,
+        "puppeteerIndex": 7,
         "scraperIndex": 44,
         "match": true
       },
-      "userAgentData": {
-        "puppeteerIndex": 52,
-        "scraperIndex": 15,
+      "webglImage": {
+        "puppeteerIndex": 8,
+        "scraperIndex": 57,
         "match": true
       },
-      "sid": {
-        "puppeteerIndex": 55,
-        "scraperIndex": null,
-        "match": null
+      "platform": {
+        "puppeteerIndex": 15,
+        "scraperIndex": 5,
+        "match": true
       },
-      "mimeTypes": {
-        "puppeteerIndex": 57,
-        "scraperIndex": 9,
+      "frameStatus": {
+        "puppeteerIndex": 21,
+        "scraperIndex": 16,
+        "match": true
+      },
+      "behavioralEvents": {
+        "puppeteerIndex": 22,
+        "scraperIndex": 18,
+        "match": false
+      },
+      "screenResolution": {
+        "puppeteerIndex": 24,
+        "scraperIndex": 55,
+        "match": true
+      },
+      "audioFingerprint": {
+        "puppeteerIndex": 29,
+        "scraperIndex": 34,
+        "match": true
+      },
+      "userAgent": {
+        "puppeteerIndex": 33,
+        "scraperIndex": 49,
         "match": true
       },
       "screenPosition": {
-        "puppeteerIndex": 58,
+        "puppeteerIndex": 35,
         "scraperIndex": 13,
         "match": true
       },
+      "characterSet": {
+        "puppeteerIndex": 36,
+        "scraperIndex": 2,
+        "match": true
+      },
+      "screenComposite": {
+        "puppeteerIndex": 37,
+        "scraperIndex": 41,
+        "match": true
+      },
       "pageUrl": {
-        "puppeteerIndex": 59,
+        "puppeteerIndex": 38,
         "scraperIndex": 56,
         "match": false
+      },
+      "mimeTypes": {
+        "puppeteerIndex": 40,
+        "scraperIndex": 9,
+        "match": true
+      },
+      "osPlatform": {
+        "puppeteerIndex": 41,
+        "scraperIndex": 0,
+        "match": true
+      },
+      "colorGamut": {
+        "puppeteerIndex": 43,
+        "scraperIndex": 54,
+        "match": true
+      },
+      "audioCodecs": {
+        "puppeteerIndex": 44,
+        "scraperIndex": 38,
+        "match": true
+      },
+      "userAgentData": {
+        "puppeteerIndex": 47,
+        "scraperIndex": 15,
+        "match": true
+      },
+      "storageEstimate": {
+        "puppeteerIndex": 48,
+        "scraperIndex": 32,
+        "match": true
+      },
+      "sid": {
+        "puppeteerIndex": 49,
+        "scraperIndex": null,
+        "match": null
+      },
+      "intlOptions": {
+        "puppeteerIndex": 51,
+        "scraperIndex": 58,
+        "match": true
+      },
+      "highEntropyValues": {
+        "puppeteerIndex": 53,
+        "scraperIndex": 26,
+        "match": true
+      },
+      "webglRenderer": {
+        "puppeteerIndex": 54,
+        "scraperIndex": 37,
+        "match": true
+      },
+      "plugins": {
+        "puppeteerIndex": 57,
+        "scraperIndex": 8,
+        "match": true
+      },
+      "videoCodecs": {
+        "puppeteerIndex": 58,
+        "scraperIndex": 43,
+        "match": true
       }
     }
   }

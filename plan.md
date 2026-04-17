@@ -102,16 +102,15 @@ Decrypted both collect tokens and ran semantic field matching across different t
 |----|------|--------|
 | 54.1 | Fix `_generateCollectChrome` to preserve captured values for non-hashPosition -1 slots instead of emptying them. | done |
 | 54.2 | Re-run audit — errorCode still -1. 2 of 4 missing fields now present (webglRenderer, detectedFonts). webglImage and sid still missing due to template rotation: cp.cd[i] indexes by profile template order, not live template order. | done |
-| 54.3 | Store unmapped -1 values as pool; inject into live template's -1 slots. | in-progress |
+| 54.3 | Store unmapped -1 values as pool; inject into live template's -1 slots. | done |
 
 ---
 
 ## Current Task
 
-**ID**: 54.1
-**Title**: Fix -1 slot value preservation in _generateCollectChrome
+**ID**: *Phase 54 complete*
 **Phase**: Phase 54 — Fix dropped -1 slot values
-**Status**: pending
+**Status**: done
 
 ### Goal
 Fix `_generateCollectChrome` in `tools/scraper/scraper.js` so that non-hashPosition `-1` slots in the `cdFieldOrder` pass through the captured Chrome values from the profile's `cd` array, instead of being replaced with empty strings.
