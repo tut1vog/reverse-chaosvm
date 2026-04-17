@@ -109,6 +109,13 @@ async function main() {
                 );
                 console.error(`  Wrote verify-post.json (${Object.keys(ticket._capture.verifyPostBody).length} fields)`);
               }
+              if (ticket._capture.verifyRawBody) {
+                fs.writeFileSync(
+                  path.join(captureDir, 'verify-raw-body.txt'),
+                  ticket._capture.verifyRawBody
+                );
+                console.error(`  Wrote verify-raw-body.txt (${ticket._capture.verifyRawBody.length} chars)`);
+              }
             }
             if (ticket._raw) {
               fs.writeFileSync(

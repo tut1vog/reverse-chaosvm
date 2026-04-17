@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 53** — Collect token structural fix + audit-derived fixes
-Current task: **53.1** — Decrypt both collect tokens and diff cd field arrays
+Current phase: **Phase 55** — Verify POST body fidelity + collect sid binding
+Current task: **55.1** — Verify POST body byte-level diff
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -121,7 +121,7 @@ Decrypted both collect tokens and ran semantic field matching across different t
 
 | ID | Task | Status |
 |----|------|--------|
-| 55.1 | Capture a Puppeteer verify POST body (raw bytes) and a scraper verify POST body side-by-side. Diff field-by-field: encoding differences, field order, content-type, body length. Write `scripts/verify-body-diff.js`. | pending |
+| 55.1 | Capture a Puppeteer verify POST body (raw bytes) and a scraper verify POST body side-by-side. Diff field-by-field: encoding differences, field order, content-type, body length. Write `scripts/verify-body-diff.js`. | done |
 | 55.2 | Fix sid in collect: identify which -1 slot contains sid (by matching the numeric string pattern), substitute `session.sid` at generation time instead of using the stale profile value. | pending |
 | 55.3 | Re-run audit with both fixes and check errorCode. | pending |
 

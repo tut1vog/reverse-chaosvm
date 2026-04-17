@@ -1056,6 +1056,11 @@ class CaptchaClient {
         .join('&');
     }
 
+    // Phase 55: raw body capture callback for POST body diffing
+    if (typeof params._rawBodyCapture === 'function') {
+      params._rawBodyCapture(body);
+    }
+
     // Diagnostic (Task 10.5.3): log verify POST details
     if (typeof process !== 'undefined' && process.stderr) {
       process.stderr.write(`  [verify] using ${prebuiltBody ? 'jQuery prebuilt' : 'manual'} body, length: ${body.length}\n`);

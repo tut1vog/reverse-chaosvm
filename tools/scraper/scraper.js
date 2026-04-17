@@ -905,6 +905,7 @@ class Scraper {
 
         // (o) Submit verify
         this._log('Step 8: verify');
+        let scraperRawBody = null;
         const result = await client.verify({
           session,
           sig,
@@ -914,7 +915,16 @@ class Scraper {
           tlg: collectVal.length,
           vData,
           prebuiltBody: serializedBody,
+          _rawBodyCapture: (body) => { scraperRawBody = body; },
         });
+
+        // Phase 55: write raw verify body for diffing
+        if (scraperRawBody) {
+          const phase55Dir = path.join(PROJECT_ROOT, 'output', 'phase-55');
+          fs.mkdirSync(phase55Dir, { recursive: true });
+          fs.writeFileSync(path.join(phase55Dir, 'scraper-verify-body.txt'), scraperRawBody);
+          this._log(`  Wrote scraper-verify-body.txt (${scraperRawBody.length} chars)`);
+        }
 
         this._log(`  errorCode: ${result.errorCode}, ticket: ${result.ticket ? result.ticket.slice(0, 30) + '...' : 'none'}`);
 

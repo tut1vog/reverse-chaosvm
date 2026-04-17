@@ -259,6 +259,7 @@ class CaptchaPuppeteer {
       const interceptedImages = {}; // { 'bg': Buffer, 'slice': Buffer }
       let capturedTdcSource = null;
       let capturedVerifyPost = null;
+      let capturedVerifyRawBody = null;
       let verifyResolve;
       let verifyReject;
       const verifyPromise = new Promise((resolve, reject) => {
@@ -339,6 +340,8 @@ class CaptchaPuppeteer {
             const collect = params.get('collect') || '';
             log(`  [pptr] Verify request: POST body ${postData.length} chars`);
             log(`  [pptr] Verify request: collect field length = ${collect.length}`);
+            // Capture raw POST body string (before any parsing)
+            capturedVerifyRawBody = postData;
             // Capture full POST body as plain object
             // IMPORTANT: URLSearchParams converts '+' to spaces, corrupting
             // base64 fields (collect, eks). Parse raw postData to preserve them.
@@ -520,6 +523,7 @@ class CaptchaPuppeteer {
         _capture: {
           tdcSource: capturedTdcSource,
           verifyPostBody: capturedVerifyPost,
+          verifyRawBody: capturedVerifyRawBody,
         },
       };
     } finally {
