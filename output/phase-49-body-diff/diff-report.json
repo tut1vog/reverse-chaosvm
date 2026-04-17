@@ -1,5 +1,5 @@
 {
-  "_generated": "2026-04-17T06:00:12.304Z",
+  "_generated": "2026-04-17T06:09:24.424Z",
   "_description": "Phase 49.1: field-by-field diff of scraper (Chrome profile) vs Puppeteer verify POST body",
   "postFields": {
     "matching": [
@@ -241,69 +241,9 @@
     ]
   },
   "collectCd": {
-    "matching": 53,
-    "differing": 7,
+    "matching": 59,
+    "differing": 1,
     "diffs": [
-      {
-        "browserIndex": 21,
-        "schemaIndex": 14,
-        "fieldName": "maxTouchPoints",
-        "match": false,
-        "browserValue": 4,
-        "scraperValue": 0,
-        "scraperSource": "cdCanonical[14]",
-        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
-      },
-      {
-        "browserIndex": 30,
-        "schemaIndex": 15,
-        "fieldName": "canvasHash",
-        "match": false,
-        "browserValue": 1189887932,
-        "scraperValue": 37437602,
-        "scraperSource": "cdCanonical[15]",
-        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
-      },
-      {
-        "browserIndex": 32,
-        "schemaIndex": 54,
-        "fieldName": "performanceHash",
-        "match": false,
-        "browserValue": 681731712,
-        "scraperValue": 1283372547,
-        "scraperSource": "cdCanonical[54]",
-        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
-      },
-      {
-        "browserIndex": 40,
-        "schemaIndex": 4,
-        "fieldName": "detectedFonts",
-        "match": false,
-        "browserValue": "7448307515255877632",
-        "scraperValue": "",
-        "scraperSource": "cdCanonical[4]",
-        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
-      },
-      {
-        "browserIndex": 46,
-        "schemaIndex": 25,
-        "fieldName": "maxTouchPointsDup",
-        "match": false,
-        "browserValue": 0,
-        "scraperValue": 4,
-        "scraperSource": "cdCanonical[25]",
-        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
-      },
-      {
-        "browserIndex": 48,
-        "schemaIndex": 17,
-        "fieldName": "mathFingerprint",
-        "match": false,
-        "browserValue": 1.0739998817443848,
-        "scraperValue": 0.4289999008178711,
-        "scraperSource": "cdCanonical[17]",
-        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
-      },
       {
         "browserIndex": 55,
         "schemaIndex": -1,
@@ -992,6 +932,15 @@
         "scraperSource": "cdCanonical[47]"
       },
       {
+        "browserIndex": 21,
+        "schemaIndex": 14,
+        "fieldName": "maxTouchPoints",
+        "match": true,
+        "browserValue": 4,
+        "scraperValue": 4,
+        "scraperSource": "cdCanonical[14]"
+      },
+      {
         "browserIndex": 22,
         "schemaIndex": 31,
         "fieldName": "userAgent",
@@ -1098,6 +1047,15 @@
         "scraperSource": "cdCanonical[36]"
       },
       {
+        "browserIndex": 30,
+        "schemaIndex": 15,
+        "fieldName": "canvasHash",
+        "match": true,
+        "browserValue": 1189887932,
+        "scraperValue": 1189887932,
+        "scraperSource": "cdCanonical[15]"
+      },
+      {
         "browserIndex": 31,
         "schemaIndex": 52,
         "fieldName": "timestampCollectionEnd",
@@ -1105,6 +1063,15 @@
         "browserValue": 1775814894,
         "scraperValue": 1775814894,
         "scraperSource": "cdCanonical[52]"
+      },
+      {
+        "browserIndex": 32,
+        "schemaIndex": 54,
+        "fieldName": "performanceHash",
+        "match": true,
+        "browserValue": 681731712,
+        "scraperValue": 681731712,
+        "scraperSource": "cdCanonical[54]"
       },
       {
         "browserIndex": 33,
@@ -1176,6 +1143,15 @@
         "scraperSource": "cdCanonical[51]"
       },
       {
+        "browserIndex": 40,
+        "schemaIndex": 4,
+        "fieldName": "detectedFonts",
+        "match": true,
+        "browserValue": "7448307515255877632",
+        "scraperValue": "7448307515255877632",
+        "scraperSource": "cdCanonical[4]"
+      },
+      {
         "browserIndex": 41,
         "schemaIndex": 22,
         "fieldName": "pageUrl",
@@ -1227,6 +1203,15 @@
         "scraperSource": "cdCanonical[32]"
       },
       {
+        "browserIndex": 46,
+        "schemaIndex": 25,
+        "fieldName": "maxTouchPointsDup",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[25]"
+      },
+      {
         "browserIndex": 47,
         "schemaIndex": 7,
         "fieldName": "colorGamutLegacy",
@@ -1234,6 +1219,15 @@
         "browserValue": "",
         "scraperValue": "",
         "scraperSource": "cdCanonical[7]"
+      },
+      {
+        "browserIndex": 48,
+        "schemaIndex": 17,
+        "fieldName": "mathFingerprint",
+        "match": true,
+        "browserValue": 1.0739998817443848,
+        "scraperValue": 1.0739998817443848,
+        "scraperSource": "cdCanonical[17]"
       },
       {
         "browserIndex": 49,
@@ -1360,24 +1354,9 @@
     ]
   },
   "collectSd": {
-    "matching": 6,
-    "differing": 2,
+    "matching": 7,
+    "differing": 1,
     "diffs": [
-      {
-        "field": "coordinate",
-        "match": false,
-        "browserValue": [
-          10,
-          60,
-          1.8559
-        ],
-        "scraperValue": [
-          10,
-          60,
-          1
-        ],
-        "reason": "coordinate[2] ratio: browser=1.8559, scraper=1.0 (hardcoded default). This is the CSS layout geometry ratio and likely a server-side detector."
-      },
       {
         "field": "ft",
         "match": false,
@@ -1398,6 +1377,20 @@
         "match": true,
         "browserValue": "",
         "scraperValue": ""
+      },
+      {
+        "field": "coordinate",
+        "match": true,
+        "browserValue": [
+          10,
+          60,
+          1.8559
+        ],
+        "scraperValue": [
+          10,
+          60,
+          1.8559
+        ]
       },
       {
         "field": "trycnt",
@@ -1828,64 +1821,15 @@
   },
   "summary": {
     "totalCdFields": 60,
-    "cdMatching": 53,
-    "cdDiffering": 7,
+    "cdMatching": 59,
+    "cdDiffering": 1,
     "sdFields": 8,
-    "sdMatching": 6,
-    "sdDiffering": 2,
+    "sdMatching": 7,
+    "sdDiffering": 1,
     "postFieldsTotal": 39,
     "postFieldsMatching": 33,
     "postFieldsDiffering": 5,
     "criticalDifferences": [
-      {
-        "source": "cd",
-        "field": "maxTouchPoints",
-        "schemaIndex": 14,
-        "browserValue": "4",
-        "scraperValue": "0"
-      },
-      {
-        "source": "cd",
-        "field": "canvasHash",
-        "schemaIndex": 15,
-        "browserValue": "1189887932",
-        "scraperValue": "37437602"
-      },
-      {
-        "source": "cd",
-        "field": "performanceHash",
-        "schemaIndex": 54,
-        "browserValue": "681731712",
-        "scraperValue": "1283372547"
-      },
-      {
-        "source": "cd",
-        "field": "detectedFonts",
-        "schemaIndex": 4,
-        "browserValue": "\"7448307515255877632\"",
-        "scraperValue": "\"\""
-      },
-      {
-        "source": "cd",
-        "field": "maxTouchPointsDup",
-        "schemaIndex": 25,
-        "browserValue": "0",
-        "scraperValue": "4"
-      },
-      {
-        "source": "cd",
-        "field": "mathFingerprint",
-        "schemaIndex": 17,
-        "browserValue": "1.0739998817443848",
-        "scraperValue": "0.4289999008178711"
-      },
-      {
-        "source": "sd",
-        "field": "coordinate",
-        "browserValue": "[10,60,1.8559]",
-        "scraperValue": "[10,60,1]",
-        "reason": "coordinate[2] ratio: browser=1.8559, scraper=1.0 (hardcoded default). This is the CSS layout geometry ratio and likely a server-side detector."
-      },
       {
         "source": "sd",
         "field": "ft",

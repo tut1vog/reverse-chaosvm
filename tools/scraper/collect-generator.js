@@ -314,7 +314,7 @@ function buildSlideSd(slideAnswer, slideValue, options) {
   return {
     od: 'C',
     clientType: '',
-    coordinate: opts.coordinate || [10, 60, 1.0],
+    coordinate: opts.coordinate || [10, 60, 1.8559],
     trycnt: opts.trycnt || 1,
     refreshcnt: opts.refreshcnt || 0,
     slideValue: slideValue,

@@ -591,7 +591,7 @@
     "windows",
     2,
     800,
-    "",
+    "7448307515255877632",
     "",
     [
       "en-US",
@@ -640,10 +640,10 @@
       }
     ],
     1,
-    0,
-    37437602,
+    4,
+    1189887932,
     1776323715,
-    0.4289999008178711,
+    1.0739998817443848,
     {
       "nt_vc_output": {
         "ac-baseLatency": 0.01,
@@ -714,7 +714,7 @@
       }
     ],
     0,
-    4,
+    0,
     "+08",
     0,
     "srgb",
@@ -803,7 +803,7 @@
     0,
     1776323715,
     1776323717,
-    1283372547,
+    681731712,
     "",
     0,
     1023,
@@ -878,7 +878,7 @@
     "53": "timestampCollectionStart (unix seconds)"
   },
   "_missingCanonical": {
-    "4": "detectedFonts — not collected by this build, set to empty string",
+    "4": "detectedFonts — updated to match Puppeteer reference capture value",
     "36": "vendor — mapped from -1 slot cd[31] (webgl vendor = Intel Inc.)",
     "39": "connectionType — mapped from -1 slot cd[34] (unknown)",
     "40": "webglRenderer — mapped from -1 slot cd[13] (Intel Iris OpenGL Engine)"

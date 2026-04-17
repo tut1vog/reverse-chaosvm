@@ -153,7 +153,7 @@ for (const entry of fieldMapping) {
 const scraperSd = {
   od: 'C',
   clientType: '',
-  coordinate: [10, 60, 1.0],  // scraper default
+  coordinate: [10, 60, 1.8559],  // scraper default (updated in 49.2)
   trycnt: 1,
   refreshcnt: 0,
   slideValue: browserSd.slideValue,  // use same slideValue for comparison
