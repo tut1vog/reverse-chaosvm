@@ -540,25 +540,37 @@ class Scraper {
     cdCanonical[53] = nowSec;
 
     // Reorder from canonical to the live template's field order.
-    // Unlike reorderCdArray (which inserts behavioralEvents at every -1 slot),
-    // we only place events at the designated hashPosition and use empty values
-    // for other -1 slots. This matches real Chrome behavior and produces tokens
-    // of the correct ~5K size instead of bloated ~11K tokens.
+    // -1 slots: hashPosition gets behavioral events; other -1 slots get
+    // unmapped static values from the Chrome profile (webglVendor, webglRenderer,
+    // webglImage, sid, etc.). These are hardware/session constants captured from
+    // Chrome that the opcode mapper couldn't assign canonical indices to.
     const cdFieldOrder = cached.cdFieldOrder || null;
     let cdArray;
     if (cdFieldOrder) {
       const hashPos = cached.hashPosition;
+
+      // Build a pool of unmapped static values from the profile's cd array.
+      // These are non-behavioral -1 slots: same values across all templates
+      // for the same browser fingerprint, just at different positions.
+      const profileOrder = cp.chromeFieldOrder || [];
+      const unmappedPool = [];
+      for (let j = 0; j < profileOrder.length; j++) {
+        if (profileOrder[j] === -1 && cp.cd[j] !== undefined && !Array.isArray(cp.cd[j])) {
+          unmappedPool.push(cp.cd[j]);
+        }
+      }
+
       cdArray = [];
+      let poolIdx = 0;
       for (let i = 0; i < cdFieldOrder.length; i++) {
         const idx = cdFieldOrder[i];
         if (idx === -1) {
-          // Only the hashPosition -1 slot gets behavioral events.
-          // Other -1 slots are unmapped canonical fields — pass through
-          // the captured Chrome value from the profile's cd array.
           if (i === hashPos) {
             cdArray.push(behavioralEvents);
+          } else if (poolIdx < unmappedPool.length) {
+            cdArray.push(unmappedPool[poolIdx++]);
           } else {
-            cdArray.push(cp.cd[i] !== undefined ? cp.cd[i] : '');
+            cdArray.push('');
           }
         } else {
           cdArray.push(cdCanonical[idx]);
