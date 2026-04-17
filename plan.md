@@ -208,43 +208,27 @@ general-purpose — targeted serializer fix
 | 57.1 | Capture multiple Puppeteer behavioral event arrays via collect-diff (3+ runs), document the exact schema: event type codes, timestamp format (absolute vs delta), coordinate semantics (absolute screen vs incremental drag), event sequence order, count ranges, dx/dy value ranges. Write `output/phase-57/behavioral-event-schema.json`. | done |
 | 57.2 | Rewrite `generateBehavioralEvents()` in `tools/scraper/collect-generator.js` to match the documented schema: correct event sequence, delta timestamps, correct coordinate system. | done |
 | 57.3 | Write tests for the new `generateBehavioralEvents()` that assert: correct event type sequence, timestamps are deltas (not absolute), first move uses screen coordinates, total drag dx ≈ xAnswer. | done |
-| 57.4 | Re-run audit (Puppeteer + scraper + collect-diff) and check errorCode. | in-progress |
+| 57.4 | Re-run audit (Puppeteer + scraper + collect-diff) and check errorCode. | done |
+
+---
+
+## Phase 57.4 Results (2026-04-17)
+
+- Puppeteer: **errorCode 0** (success)
+- Scraper: **errorCode -1** (still failing)
+- Behavioral event format fix confirmed working: correct type sequence (4,1,2,1..1,3), delta timestamps, deceleration curve, dx sum = xAnswer
+- **New finding: aggressive template rotation** — scraper received 103-opcode template (not A=95, B=94, or C=100). Puppeteer also got an unknown template. collect-diff failed to decrypt either token.
+- POST body structure verified: all 39 fields match between Puppeteer and scraper (modulo session-specific values)
+
+**Eliminated hypotheses (Phases 47–57)**:
+- All prior Phase 47–56 eliminations still hold
+- Phase 57: behavioral event format (timestamp, sequence, coordinates) — now matches real browser, still errorCode -1
 
 ---
 
 ## Current Task
 
-**ID**: 57.3
-**Title**: Write tests for generateBehavioralEvents()
-**Phase**: Phase 57 — Fix behavioral event format
-**Status**: in-progress
-
-### Goal
-Write a test file that validates `generateBehavioralEvents()` output matches the real browser schema. Tests exercise the function as a consumer — asserting shape, sequence, timestamp format, coordinate semantics, and dx sum.
-
-### Context
-**Function**: `generateBehavioralEvents(xAnswer, slideY, timestamp)` in `tools/scraper/collect-generator.js`, exported at line 450.
-**Returns**: `Array<number[]>` — array of 8-element tuples.
-
-**Expected behavior** (from schema `output/phase-57/behavioral-event-schema.json`):
-- Event[0]: `[4, -1, -1, <abs_epoch>, 0,0,0,0]` — init
-- Event[1]: `[1, 159, slideY, <delta_1222-1513>, 0,0,0,0]` — cursor position
-- Event[2]: `[2, 0, 0, <delta_167-201>, 0,0,0,0]` — mousedown
-- Events[3..N-1]: `[1, dx, dy, <delta_30-84>, 0,0,0,0]` — drag moves (17-18 of them)
-- Event[N]: `[3, dx, dy, <delta_141-153>, 0,0,0,0]` — mouseup
-- Total events: 21-22
-- Sum of drag move dx = xAnswer exactly
-- Fields [4-7] always 0
-
-**Test file**: `tests/test-behavioral-events.js` (new file)
-**Test framework**: Node.js built-in `node:test` + `node:assert`
-
-### Verification
-- [ ] `node --test tests/test-behavioral-events.js` passes
-- [ ] `npm test` passes (all tests including new ones)
-
-### Suggested Agent
-general-purpose — test authoring
+*(Phase 57 complete. Awaiting user direction for next investigation.)*
 
 ---
 
