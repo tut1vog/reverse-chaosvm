@@ -122,8 +122,8 @@ Decrypted both collect tokens and ran semantic field matching across different t
 | ID | Task | Status |
 |----|------|--------|
 | 55.1 | Capture a Puppeteer verify POST body (raw bytes) and a scraper verify POST body side-by-side. Diff field-by-field: encoding differences, field order, content-type, body length. Write `scripts/verify-body-diff.js`. | done |
-| 55.2 | Fix sid in collect: identify which -1 slot contains sid (by matching the numeric string pattern), substitute `session.sid` at generation time instead of using the stale profile value. | pending |
-| 55.3 | Re-run audit with both fixes and check errorCode. | pending |
+| 55.2 | Fix sid in collect: identify which -1 slot contains sid (by matching the numeric string pattern), substitute `session.sid` at generation time instead of using the stale profile value. | done |
+| 55.3 | Re-run audit with both fixes and check errorCode. | in-progress |
 
 ---
 

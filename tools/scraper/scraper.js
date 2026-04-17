@@ -522,7 +522,7 @@ class Scraper {
    * @param {number} now - Current timestamp in ms
    * @returns {string} URL-encoded collect token
    */
-  _generateCollectChrome(xteaParams, cached, sig, slideSd, behavioralEvents, now) {
+  _generateCollectChrome(xteaParams, cached, sig, slideSd, behavioralEvents, now, session) {
     const cp = this._chromeProfileData;
     const nowSec = Math.round(now / 1000);
 
@@ -557,6 +557,18 @@ class Scraper {
       for (let j = 0; j < profileOrder.length; j++) {
         if (profileOrder[j] === -1 && cp.cd[j] !== undefined && !Array.isArray(cp.cd[j])) {
           unmappedPool.push(cp.cd[j]);
+        }
+      }
+
+      // Phase 55.2: substitute live session sid for stale profile sid.
+      // The sid is a 16-22 digit numeric string (e.g. "7450533642822729728").
+      const liveSid = (session && session.sid) || sig.sid || '';
+      if (liveSid) {
+        for (let k = 0; k < unmappedPool.length; k++) {
+          if (typeof unmappedPool[k] === 'string' && /^\d{16,}$/.test(unmappedPool[k])) {
+            unmappedPool[k] = liveSid;
+            break;
+          }
         }
       }
 
@@ -760,7 +772,7 @@ class Scraper {
           // order, substitute per-session fields, reorder for the live template,
           // and pass via cdArrayOverride.
           collectEncoded = this._generateCollectChrome(
-            xteaParams, cached, sig, slideSd, behavioralEvents, now
+            xteaParams, cached, sig, slideSd, behavioralEvents, now, session
           );
         } else {
           // Legacy synthetic mode: build cd from profiles/default.json
