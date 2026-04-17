@@ -858,6 +858,23 @@ class Scraper {
         }
         this._log(`  vData: ${vData.slice(0, 30)}...`);
 
+        // Audit: log token values for cross-flow diffing
+        auditLogger.logTokens({
+          collectLength: collectVal.length,
+          collectEncoded: collectVal,
+          eks: eks || '',
+          vData: vData,
+          ans: ans,
+          slideSd: slideSd,
+          behavioralEventsCount: behavioralEvents.length,
+          nonce: postFields.nonce || '',
+          vsig: postFields.vsig || '',
+          websig: postFields.websig || '',
+          sess: postFields.sess || '',
+          tlg: postFields.tlg || '',
+          sid: postFields.sid || '',
+        });
+
         // (n) Submit verify
         this._log('Step 8: verify');
         const result = await client.verify({

@@ -37,7 +37,7 @@ Current task: **52.1** — Instrument `httpRequest` and Puppeteer with request-l
 | ID | Task | Status |
 |----|------|--------|
 | 52.1 | Instrument `httpRequest` with request-level logging (URL, method, headers, timing, status, response size); instrument Puppeteer `captcha-solver.js` to capture the same data from Chrome DevTools Protocol. Both write to a common JSON schema under `output/phase-52-audit/`. | done |
-| 52.2 | Instrument token generation: scraper logs decrypted collect fields (full cd array, sd object), behavioral events array, vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the same audit JSON. | pending |
+| 52.2 | Instrument token generation: scraper logs decrypted collect fields (full cd array, sd object), behavioral events array, vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the same audit JSON. | done |
 | 52.3 | Build `scripts/audit-diff.js` that loads a Puppeteer audit log and a scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, timing diffs, header diffs, POST body field diffs, collect cd diffs, sd diffs, vData field diffs, behavioral event shape diffs. | pending |
 | 52.4 | Run both flows, produce the diff report, and analyze findings. | pending |
 
@@ -45,31 +45,28 @@ Current task: **52.1** — Instrument `httpRequest` and Puppeteer with request-l
 
 ## Current Task
 
-**ID**: 52.2
-**Title**: Instrument token generation for audit logging
+**ID**: 52.3
+**Title**: Build audit-diff.js — categorized comparison of two audit logs
 **Phase**: Phase 52 — Full-flow side-by-side audit
 **Status**: pending
 
 ### Goal
-Add token-level audit logging: scraper logs decrypted collect fields (cd array, sd object), behavioral events, and vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the audit JSON's `tokens` field.
+Build `scripts/audit-diff.js` that loads a Puppeteer and scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, header diffs, POST body field diffs, token field diffs, timing diffs. The output should narrow the root cause to 1–3 concrete items.
 
 ### Context
-52.1 is done — `AuditLogger` class exists at `tools/scraper/audit-logger.js`, both flows create an instance and call `auditLogger.logTokens()` (currently empty). The scraper already has all token values in scope during `solveCaptcha()` (collect, eks, vData, behavioral events, slideSd). The Puppeteer flow captures the raw verify POST body in `capturedVerifyPost` (a plain object of POST fields). To decode Puppeteer's collect token we need to decrypt+deserialize it using the token generator's decoder. For vData we need to decode the base64 + XTEA decrypt using the vdata-generator's decoder.
-
-**Key files**:
-- `tools/scraper/scraper.js` — `solveCaptcha()` has `collectEncoded`, `slideSd`, `behavioralEvents`, `vData` in scope
-- `tools/captcha-solver/captcha-solver.js` — `capturedVerifyPost` has raw POST fields including `collect`, `eks`, `vData`
-- `tools/token-generator/` — token encoder/decoder for collect
-- `tools/vdata-generator/` — vData encoder/decoder
+52.1 + 52.2 are done. Both flows write `output/phase-52-audit/{scraper,puppeteer}-audit.json` with identical schemas: `{ source, timestamp, requests[], tokens{}, result }`. Each request entry has: seq, step, method, url, requestHeaders, requestBodyDigest, responseStatus, responseHeaders, responseSize, startTime, duration, error. Token fields: collectLength, collectEncoded, eks, vData, ans, slideSd, behavioralEventsCount, nonce, vsig, websig, sess, tlg, sid.
 
 ### Implementation Steps
-1. In scraper's `solveCaptcha()`, after generating collect+vData, call `auditLogger.logTokens()` with the decoded values
-2. In Puppeteer's `solve()`, after capturing `capturedVerifyPost`, decode collect and vData from the POST fields and call `auditLogger.logTokens()`
-3. Both should log the same token field schema for diffability
+1. Read both JSON files
+2. Diff request chains (match by step label, compare URL patterns, methods, header sets, response statuses)
+3. Diff token fields (compare lengths, values where same-session tokens aren't expected to match but field presence/length/shape should)
+4. Diff POST field coverage (scraper logs all 38+ verify fields, Puppeteer captures from raw POST body)
+5. Report categorized diffs with severity
 
 ### Verification
-- [ ] `npm test` passes (530+ green)
-- [ ] Token schema matches between scraper and Puppeteer audit logs
+- [ ] `node scripts/audit-diff.js output/phase-52-audit/puppeteer-audit.json output/phase-52-audit/scraper-audit.json` runs without error on sample data
+- [ ] Output clearly categorizes differences
+- [ ] `npm test` still passes
 
 ### Suggested Agent
 general-purpose

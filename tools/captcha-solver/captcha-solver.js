@@ -493,6 +493,25 @@ class CaptchaPuppeteer {
         randstr: verifyData.randstr || '',
       });
 
+      // Audit: log token values for cross-flow diffing
+      if (capturedVerifyPost) {
+        auditLogger.logTokens({
+          collectLength: (capturedVerifyPost.collect || '').length,
+          collectEncoded: capturedVerifyPost.collect || '',
+          eks: capturedVerifyPost.eks || '',
+          vData: capturedVerifyPost.vData || '',
+          ans: capturedVerifyPost.ans || '',
+          slideSd: '', // not available in Puppeteer flow
+          behavioralEventsCount: 0, // not available in Puppeteer flow
+          nonce: capturedVerifyPost.nonce || '',
+          vsig: capturedVerifyPost.vsig || '',
+          websig: capturedVerifyPost.websig || '',
+          sess: capturedVerifyPost.sess || '',
+          tlg: capturedVerifyPost.tlg || '',
+          sid: capturedVerifyPost.sid || '',
+        });
+      }
+
       return {
         ticket: verifyData.ticket || '',
         randstr: verifyData.randstr || '',
