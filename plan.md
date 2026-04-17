@@ -46,46 +46,42 @@ Current task: **51.1** — Collect token round-trip test
 
 | ID | Task | Status |
 |----|------|--------|
-| 51.1 | Collect token XTEA round-trip — encrypt a known plaintext with auto-ported params, decrypt, verify identity. Also: capture a fresh Puppeteer collect token on the same template, decrypt with the same params, verify valid JSON. | pending |
-| 51.2 | vData XTEA key verification — run Puppeteer to capture vData, decrypt with the scraper's reference key (`2e430f8c15b7da96`), verify we get valid kv plaintext. If not: instrument vm-slide to extract the live key. | pending |
+| 51.1 | Collect token XTEA round-trip — encrypt a known plaintext with auto-ported params, decrypt, verify identity. Also: capture a fresh Puppeteer collect token on the same template, decrypt with the same params, verify valid JSON. | done |
+| 51.2 | vData XTEA key verification — decrypt the Puppeteer-captured vData with the scraper's reference key (`2e430f8c15b7da96`), verify we get valid kv plaintext. If not: instrument vm-slide to extract the live key. | pending |
 | 51.3 | Fix + re-test if either test reveals a mismatch | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 51.1
-**Title**: Collect token XTEA round-trip test
+**ID**: 51.2
+**Title**: vData XTEA key verification
 **Phase**: Phase 51 — XTEA encryption fidelity
 **Status**: pending
 
 ### Goal
-Verify that the scraper's auto-ported XTEA params (key + keyMods) for the live template produce correct encryption that the server can decrypt. Two sub-tests:
-
-**Test A — Self round-trip**: Take a known plaintext (e.g. `{"cd":[1,2,3],"sd":{"od":"C"}}`), encrypt it with the scraper's XTEA params for the current live template, decrypt it with the same params, verify the plaintext is recovered exactly.
-
-**Test B — Cross-validation**: Run a fresh Puppeteer capture (`tools/captcha-solver/cli.js`), capture the tdc-source.js, auto-port it to extract XTEA params, then decrypt the Puppeteer's collect token with those params. If the decrypted output is valid JSON with `cd` and `sd` keys, the params are correct.
+Verify the scraper's vData XTEA key matches the live vm-slide build by decrypting the Puppeteer-captured vData from `output/puppeteer-capture/verify-post.json` using the scraper's reference key (`2e430f8c15b7da96`). If decryption produces valid key=value plaintext, the key is correct. If not, instrument vm-slide to extract the live key.
 
 ### Context
-- Auto-porting: `tools/porting-pipeline/run.js <tdc-source> --skip-verify` → outputs XTEA params to `output/<stem>/xtea-params.json`
-- Key extractor: `tools/porting-pipeline/key-extractor.js` — Puppeteer-based dynamic tracer
-- The scraper's template cache (`tools/scraper/template-cache.js`) caches ported params per source hash
-- The scraper's collect generator encrypts with keyMods from the ported config
-- **Key concern**: the `keyModConstants` (per-index additions to the XTEA key schedule) are extracted by tracing the cipher rounds. If the tracer misidentifies the pattern (e.g. wrong indices), every block using that key index decrypts wrong on the server.
+- Puppeteer capture `output/puppeteer-capture/verify-post.json` has `vData` field: `"VueBKpkQNbhk8PJ_PeBGUrZa0SQPFx78UAhqWVgeezUpKA*ve*PQ6N3w9sDZZt1oEJ6cgPkA*6IszW6wXxShntDQwNwNrzCkpXo6ZdlScDNnPyVjyb*GScppLGfpD*256njvt-OW9r-jnadWhe91IGYY"`
+- vData pipeline: custom 65-char base64 decode → XTEA decrypt → un-ShiftRows → un-PKCS#7-pad → plaintext
+- Reference key: `2e430f8c15b7da96` (16 ASCII bytes → 4 LE uint32s)
+- Encoder/decoder in `tools/vdata-generator/encode.js`
+- Test fixtures in `tests/fixtures/vdata-{jsdom,har}-capture.json` round-trip with this key
 
 ### Implementation Steps
-1. Write `scripts/test-xtea-fidelity.js` that:
-   a. Runs `tools/captcha-solver/cli.js` once (or re-uses latest capture) to get tdc-source.js + verify-post.json
-   b. Auto-ports the tdc-source via the pipeline to get XTEA params
-   c. **Test A**: encrypt a test plaintext, decrypt, assert identity
-   d. **Test B**: decrypt the Puppeteer capture's collect token, assert valid JSON with cd/sd
-   e. Print PASS/FAIL for each sub-test
-2. Save output to `output/phase-51-xtea-fidelity/`
+1. Add a Test C to `scripts/test-xtea-fidelity.js` (or write a separate script) that:
+   a. Reads the `vData` field from verify-post.json
+   b. Decodes with the vData custom base64 alphabet
+   c. Decrypts with the reference XTEA key
+   d. Un-ShiftRows and un-pads
+   e. Checks if output looks like valid kv pairs (e.g. contains `key=` or `tp=` or `inf=`)
+   f. Prints PASS/FAIL
 
 ### Verification
-- [ ] `node scripts/test-xtea-fidelity.js` runs and reports PASS/FAIL for both sub-tests
-- [ ] If PASS: the XTEA params are correct, root cause is elsewhere
-- [ ] If FAIL: identifies which keyMod index is wrong
+- [ ] Script runs and reports PASS/FAIL for vData decryption
+- [ ] If PASS: vData key confirmed correct for live build
+- [ ] If FAIL: raw hex output shows garbled data, confirming key mismatch
 
 ### Suggested Agent
-general-purpose — needs to read porting pipeline code, run the pipeline, write test script
+general-purpose — needs vdata-generator encode.js, fixture format knowledge
