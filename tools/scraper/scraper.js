@@ -832,7 +832,10 @@ class Scraper {
         } else {
           this._log('Step 7: buildVDataForPost (standalone, browser profile)');
           serializedBody = serializePostFields(postFields);
-          vData = buildVDataForPost(serializedBody, { profile: this._vdataProfile });
+          vData = buildVDataForPost(serializedBody, {
+            profile: this._vdataProfile,
+            overrides: { tp: session.sid || sig.sid || '' },
+          });
         }
         this._log(`  vData: ${vData.slice(0, 30)}...`);
 

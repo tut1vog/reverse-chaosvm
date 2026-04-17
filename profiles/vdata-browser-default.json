@@ -5,6 +5,6 @@
   "env": "0",
   "version": "2",
   "cLod": "loadTDC",
-  "inf": "iframe",
+  "inf": "top",
   "ss": "11%2Ctdc%2Cslide%2Cvm"
 }

@@ -11,7 +11,7 @@
 //       default path and to `generateVData` on the legacy path, and
 //   (d) both code paths produce a 152-char / ALPHABET / `YY`-tail vData
 //       string whose decoded 8-field plaintext reflects the profile source
-//       (browser default -> `cLod=loadTDC,inf=iframe,env=0`; legacy jsdom
+//       (browser default -> `cLod=loadTDC,inf=top,env=0`; legacy jsdom
 //       harness -> `cLod=unloadTDC,inf=top,env=1`).
 //
 // The step-(m) branch is not exposed as its own method, so Groups C and D
@@ -172,8 +172,8 @@ test('Group B: bundled vData browser profile contents', async (t) => {
     assert.equal(profile.cLod, 'loadTDC');
   });
 
-  await t.test('inf is iframe (browser branch, vs jsdom top)', () => {
-    assert.equal(profile.inf, 'iframe');
+  await t.test('inf is top (top-level window, not iframe)', () => {
+    assert.equal(profile.inf, 'top');
   });
 
   await t.test('env is "0" (browser branch, vs jsdom "1")', () => {
@@ -217,8 +217,8 @@ test('Group C: default path library output (browser profile)', async (t) => {
     assert.equal(decoded.cLod, 'loadTDC');
   });
 
-  await t.test('decoded inf === "iframe" (browser branch signature)', () => {
-    assert.equal(decoded.inf, 'iframe');
+  await t.test('decoded inf === "top" (top-level window)', () => {
+    assert.equal(decoded.inf, 'top');
   });
 
   await t.test('decoded env === "0" (browser branch signature)', () => {
