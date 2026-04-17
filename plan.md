@@ -186,20 +186,60 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 
 ## Current Task
 
-**ID**: 49.6
-**Title**: Phase 49 conclusion
-**Phase**: Phase 49 — errorCode -1 root cause
-**Status**: done
+**ID**: 50.1
+**Title**: Fix vData profile: inf and tp fields
+**Phase**: Phase 50 — vData plaintext fix
+**Status**: pending
 
-### Conclusion
-Two rounds of profile fixes + live measurement confirmed: **errorCode -1 is NOT caused by the collect token's fingerprint values**. Even with a profile matching the live Puppeteer capture, the scraper still gets -1.
+### Goal
+Fix the two vData field mismatches found by decrypting the Puppeteer capture's vData.
 
-### What Phase 49 eliminated
-- Static fingerprint values in the collect cd array
-- sd.coordinate[2] CSS layout ratio  
-- Stale/mismatched Chrome profile values
+### Context
+Decrypting the Puppeteer verify POST body's vData field (using reference XTEA key `2e430f8c15b7da96`) revealed:
 
-### Remaining hypotheses (narrowed)
-1. **vData plaintext** — standalone generator vs real vm-slide. Fields `tp`, `ss`, `py` may differ.
-2. **Behavioral events / timing** — synthetic mouse trajectory or request timing
-3. **XTEA encryption fidelity** — keyMod constants may be wrong for live template
+| Field | Puppeteer (ec=0) | Scraper profile | Match? |
+|-------|------------------|-----------------|--------|
+| `tp` | `"7450533642822729728"` (session sid) | `"7446039806946242560"` (stale sid) | ❌ |
+| `inf` | `"top"` | `"iframe"` | ❌ |
+| `ss` | `"11%2Ctdc%2Cslide%2Cvm"` | `"11%2Ctdc%2Cslide%2Cvm"` | ✅ |
+| `py` | `"0"` | `"0"` | ✅ |
+| `env` | `"0"` | `"0"` | ✅ |
+| `version` | `"2"` | `"2"` | ✅ |
+| `cLod` | `"loadTDC"` | `"loadTDC"` | ✅ |
+| `key` | `"41yy"` (per-body) | `__COMPUTED__` (per-body) | ✅ (algorithm) |
+
+**`inf` fix**: Change from `"iframe"` to `"top"`. The Puppeteer solver navigates directly to the show page URL (top-level), not inside an iframe. The scraper also loads the show page directly. So `"top"` is correct for both.
+
+**`tp` fix**: The `tp` field is a captured JS runtime error string — it comes from `fn 22400` in vm-slide, which captures errors during page load. The value `"7450533642822729728"` is the session `sid` (matches `verify-post.json` field `sid`). The scraper profile has a different stale sid. Fix: make `tp` dynamic — use the session's `sid` from prehandle.
+
+### Files to modify
+- `profiles/vdata-browser-default.json` — change `inf` from `"iframe"` to `"top"`
+- `tools/scraper/scraper.js` — where `buildVDataForPost` is called, pass `overrides: { tp: session.sid }` to make `tp` per-session
+
+### Verification
+- [ ] `profiles/vdata-browser-default.json` has `inf: "top"`
+- [ ] Scraper passes `tp` override from session sid to buildVDataForPost
+- [ ] `npm test` passes
+
+### Remaining hypotheses (narrowed) → vData plaintext confirmed different
+Fresh Puppeteer vData decrypted (using reference XTEA key) vs scraper profile:
+- `tp`: Puppeteer=`"7450533642822729728"` (session sid), scraper=`"7446039806946242560"` (stale sid) — **mismatch**
+- `inf`: Puppeteer=`"top"`, scraper=`"iframe"` — **mismatch** (Puppeteer runs top-level, scraper hardcodes iframe)
+- `ss`, `py`, `env`, `version`, `cLod`: match
+- `key`: computed per-body, always differs but algorithm is correct
+
+---
+
+### Phase 50: vData plaintext fix
+
+> **Framing** — Decrypting the Puppeteer capture's vData revealed two field mismatches: `tp` is a per-session sid (not static), and `inf` is `"top"` in Puppeteer (not `"iframe"`). The scraper hardcodes stale values for both.
+
+**Goal**: fix the scraper's vData profile so `tp` and `inf` match what a real browser produces.
+
+**Success metric**: errorCode 0 on at least some verify responses.
+
+| ID | Task | Status |
+|----|------|--------|
+| 50.1 | Fix vData profile: set `inf` to `"top"` (Puppeteer's value), make `tp` per-session (use current session's sid) | pending |
+| 50.2 | Tests for 50.1 | pending |
+| 50.3 | Live re-measurement (director-owned) | pending |
