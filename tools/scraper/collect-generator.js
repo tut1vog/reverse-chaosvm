@@ -227,52 +227,73 @@ function buildSerializationOverrides(serializationDiffs) {
  */
 function generateBehavioralEvents(xAnswer, slideY, timestamp) {
   const events = [];
-  let t = timestamp;
 
-  // Init event
-  events.push([4, -1, -1, t, 0, 0, 0, 0]);
-  t += Math.floor(Math.random() * 50 + 30);
+  // Helper: random int in [min, max] inclusive
+  const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-  // Generate ~20-30 mousemove events simulating deceleration
-  const moveCount = Math.floor(Math.random() * 11 + 20); // 20-30
+  // Event 0: init — absolute epoch timestamp
+  events.push([4, -1, -1, timestamp, 0, 0, 0, 0]);
+
+  // Event 1: cursor-to-handle position — absolute screen coords, delta ms
+  events.push([1, 159, slideY || 811, randInt(1222, 1513), 0, 0, 0, 0]);
+
+  // Event 2: mousedown — delta ms
+  events.push([2, 0, 0, randInt(167, 201), 0, 0, 0, 0]);
+
+  // Events 3..N-1: drag moves — 17-18 moves with decelerating dx
+  // Real captures show: first drag dx near 0, then large values that taper off.
+  // Capture 0 (sum 837): 0,159,136,116,96,82,70,26,49,35,30,15,16,1,7,2,-3
+  // Capture 1 (sum 878): 1,185,161,70,119,98,41,36,30,29,24,35,14,16,14,5,0
+  // Capture 2 (sum 901): -1,99,172,76,129,61,52,89,69,55,37,29,17,7,3,3,0,4
+  const dragCount = randInt(17, 18);
   let remaining = xAnswer;
-  const totalTime = Math.floor(Math.random() * 1000 + 1000); // 1-2 seconds total
-  const avgDt = totalTime / moveCount;
 
-  for (let i = 0; i < moveCount; i++) {
-    // Deceleration: larger steps early, smaller steps late
-    const progress = i / moveCount;
-    const factor = 1 - progress * 0.8; // decelerating
-    const baseDx = (remaining / (moveCount - i)) * factor * 1.5;
-    const dx = Math.max(0, Math.round(baseDx + (Math.random() - 0.5) * 2));
-    remaining -= dx;
-    const dy = Math.round((Math.random() - 0.5) * 2);
-    const dt = Math.floor(avgDt + (Math.random() - 0.5) * 30);
-    t += Math.max(20, dt);
+  // First drag event: near-zero dx (range -1 to 1), longer dt (60-84)
+  const firstDx = randInt(-1, 1);
+  remaining -= firstDx;
+  events.push([1, firstDx, randInt(-1, 1), randInt(60, 84), 0, 0, 0, 0]);
 
-    events.push([1, dx, dy, t, 0, 0, 0, 0]);
+  // Remaining drag events: decelerating curve with natural jitter
+  // Generate raw weights using exponential decay, then scale to match xAnswer
+  const innerCount = dragCount - 1; // events after the first drag
+  const weights = [];
+  for (let i = 0; i < innerCount; i++) {
+    const progress = i / innerCount;
+    // Exponential decay with noise — models the real deceleration curve
+    const base = Math.pow(1 - progress, 1.8) * (0.8 + Math.random() * 0.4);
+    weights.push(base);
+  }
+  const weightSum = weights.reduce((a, b) => a + b, 0);
+
+  // Scale weights to distribute remaining across the drag events
+  const rawDx = weights.map(w => (w / weightSum) * remaining);
+
+  // Round to integers and track cumulative error for correction
+  let allocated = 0;
+  const dxValues = [];
+  for (let i = 0; i < innerCount; i++) {
+    let dx;
+    if (i === innerCount - 1) {
+      // Last drag event: consume whatever is left
+      dx = remaining - allocated;
+    } else {
+      dx = Math.round(rawDx[i] + (Math.random() - 0.5) * 3);
+      // Allow small negative values (observed: -3) but clamp floor
+      dx = Math.max(-3, dx);
+    }
+    dxValues.push(dx);
+    allocated += dx;
   }
 
-  // If there's remaining distance, add it to the last move
-  if (remaining > 0 && events.length > 1) {
-    const last = events[events.length - 1];
-    last[1] += remaining;
+  // Push drag events with appropriate dt and dy jitter
+  for (let i = 0; i < innerCount; i++) {
+    const dy = randInt(-1, 2);
+    const dt = randInt(30, 84);
+    events.push([1, dxValues[i], dy, dt, 0, 0, 0, 0]);
   }
 
-  // Mousedown event
-  t += Math.floor(Math.random() * 30 + 20);
-  events.push([2, 0, 0, t, 0, 0, 0, 0]);
-
-  // A few small jitter moves after mousedown
-  const jitterCount = Math.floor(Math.random() * 3 + 1);
-  for (let i = 0; i < jitterCount; i++) {
-    t += Math.floor(Math.random() * 40 + 20);
-    events.push([1, 0, Math.round((Math.random() - 0.5) * 2), t, 0, 0, 0, 0]);
-  }
-
-  // Mouseup event
-  t += Math.floor(Math.random() * 50 + 30);
-  events.push([3, 0, 0, t, 0, 0, 0, 0]);
+  // Event N: mouseup — small residual dx/dy, delta ms
+  events.push([3, randInt(-2, 1), randInt(0, 1), randInt(141, 153), 0, 0, 0, 0]);
 
   return events;
 }
