@@ -80,32 +80,32 @@ Decrypted both collect tokens and ran semantic field matching across different t
 | 53.2 | Fix pageUrl in collect: scraper should capture only the short `?rand=...` URL, not the full show URL with all params. | done |
 | 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests. | done |
 | 53.4 | Fix the slide-jy.js fetch: add fallback to canonical CDN URL when sig._html unavailable. | done |
-| 53.5 | Add human-like timing delays: randomized pause between show page load and verify POST (2-5s). | pending |
+| 53.5 | Add human-like timing delays: randomized pause between show page load and verify POST (2-5s). | done |
 | 53.6 | Re-run the full audit (Puppeteer + scraper + collect-diff) and verify that fixes narrow or eliminate errorCode -1. | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 53.5
-**Title**: Add human-like timing delays
+**ID**: 53.6
+**Title**: Re-run full audit and verify fixes
 **Phase**: Phase 53 — Audit-derived fixes
 **Status**: pending
 
 ### Goal
-Add a randomized delay (2-5 seconds) between the show page load and the verify POST to simulate human-like timing. The Phase 52 audit showed the scraper completes in 1.2s vs Puppeteer's 5.0s, with only 41ms between caplog-pre and verify vs Chrome's 3314ms.
-
-### Context
-The delay should be inserted in `tools/scraper/scraper.js` in the `solve()` method, between the caplog pre-verify beacon (step 7a) and the verify POST (step 8). This simulates the time a real user takes to drag the slider.
+Re-run the full Puppeteer + scraper audit flows and the collect-diff to verify that the Phase 53 fixes (pageUrl, Accept-Language, slide-jy.js, timing) improve the scraper's errorCode.
 
 ### Implementation Steps
-1. Find the verify POST section in scraper.js (search for "verify" or "Step 8")
-2. Add a `await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000))` before the verify POST
-3. Log the delay duration when verbose
+1. Run Puppeteer CAPTCHA solve with audit logging
+2. Run scraper CAPTCHA solve with audit logging
+3. Run `scripts/audit-diff.js` on the new captures
+4. Run `scripts/collect-diff.js` on the new captures
+5. Check if errorCode changes from -1
 
 ### Verification
-- [ ] `npm test` passes (530/530)
-- [ ] The delay is positioned between caplog-pre and the verify POST
+- [ ] Both audit runs complete successfully
+- [ ] Diff report shows reduced differences vs Phase 52 baseline
+- [ ] Document the new errorCode result
 
 ### Suggested Agent
-general-purpose — simple code insertion
+general-purpose — runs the tools and captures output

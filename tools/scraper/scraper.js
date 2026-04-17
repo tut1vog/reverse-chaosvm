@@ -882,7 +882,14 @@ class Scraper {
           sid: postFields.sid || '',
         });
 
-        // (n) Submit verify
+        // (n) Human-like delay before verify POST.
+        // Phase 52 audit: scraper submits in 41ms vs Chrome's 3314ms.
+        // Simulate the time a real user takes to drag the slider.
+        const humanDelay = 2000 + Math.floor(Math.random() * 3000);
+        this._log('Step 7b: human-like delay (' + humanDelay + 'ms)');
+        await new Promise(r => setTimeout(r, humanDelay));
+
+        // (o) Submit verify
         this._log('Step 8: verify');
         const result = await client.verify({
           session,
