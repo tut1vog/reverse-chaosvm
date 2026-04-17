@@ -179,24 +179,27 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | 49.2 | Fix scraper collect+sd to match Puppeteer: coordinate ratio, detectedFonts, per-session hash randomization, chrome profile refresh | done |
 | 49.3 | Tests for 49.2 — verify chrome profile values + coordinate ratio + diff script | done |
 | 49.4 | Live re-measurement (director-owned) — null result: 0/5 errorCode 0 | done |
-| 49.5 | Auto-refresh chrome-fingerprint.json from live Puppeteer capture | in-progress |
-| 49.6 | Live re-measurement #2 — verify with fresh profile | pending |
+| 49.5 | Auto-refresh chrome-fingerprint.json from live Puppeteer capture | done |
+| 49.6 | Live re-measurement #2 — null result: 0/3 errorCode 0 (3 ec=-1, 2 ec=12 rate limit) | done |
 
 ---
 
 ## Current Task
 
-**ID**: 49.5
-**Title**: Auto-refresh chrome-fingerprint.json from live Puppeteer capture
+**ID**: 49.6
+**Title**: Phase 49 conclusion
 **Phase**: Phase 49 — errorCode -1 root cause
-**Status**: in-progress
+**Status**: done
 
-### Goal
-The chrome-fingerprint.json is fundamentally stale — a fresh Puppeteer decrypt revealed 13 field diffs including format mismatches (font names vs hash, empty vs full webglImage, swapped maxTouchPoints). Write a script that runs Puppeteer, extracts the real Chrome cd array from TDC, and saves it as the canonical profile.
+### Conclusion
+Two rounds of profile fixes + live measurement confirmed: **errorCode -1 is NOT caused by the collect token's fingerprint values**. Even with a profile matching the live Puppeteer capture, the scraper still gets -1.
 
-### Key findings from fresh decrypt
-- `detectedFonts`: browser sends font NAMES string, profile has numeric HASH — format mismatch
-- `webglImage` (canonical 20): browser sends empty `""`, profile has base64 PNG
-- `audioFingerprint` (canonical 18): `baseLatency: 0.0116...` vs `0.01` — precision differs
-- `maxTouchPoints` / `maxTouchPointsDup`: STILL inconsistent with current machine
-- `availHeight`/`viewportWidth`: appear swapped (800/600 vs 600/800)
+### What Phase 49 eliminated
+- Static fingerprint values in the collect cd array
+- sd.coordinate[2] CSS layout ratio  
+- Stale/mismatched Chrome profile values
+
+### Remaining hypotheses (narrowed)
+1. **vData plaintext** — standalone generator vs real vm-slide. Fields `tp`, `ss`, `py` may differ.
+2. **Behavioral events / timing** — synthetic mouse trajectory or request timing
+3. **XTEA encryption fidelity** — keyMod constants may be wrong for live template
