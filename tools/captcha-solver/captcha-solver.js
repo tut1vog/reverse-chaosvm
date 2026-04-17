@@ -19,10 +19,12 @@
  * Exports: CaptchaPuppeteer
  */
 
+const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { solveSlider } = require('./slide-solver');
 const { CaptchaClient } = require('./captcha-client');
+const { AuditLogger, bodyDigest } = require('../scraper/audit-logger');
 
 // Register stealth plugin — patches headless detection vectors
 puppeteer.use(StealthPlugin());
@@ -237,6 +239,8 @@ class CaptchaPuppeteer {
     const browser = await this._ensureBrowser();
     const page = await browser.newPage();
     let verifyTimer;
+    const auditLogger = new AuditLogger('puppeteer');
+    const auditRequestMap = new Map(); // Map<CDPRequest, {url, method, headers, startTime}>
 
     try {
       // Set user agent
@@ -260,6 +264,69 @@ class CaptchaPuppeteer {
       const verifyPromise = new Promise((resolve, reject) => {
         verifyResolve = (data) => { clearTimeout(verifyTimer); resolve(data); };
         verifyReject = (err) => { clearTimeout(verifyTimer); reject(err); };
+      });
+
+      // ── Audit: comprehensive request listener ──
+      page.on('request', (request) => {
+        const url = request.url();
+        const method = request.method();
+        let reqHeaders = {};
+        try { reqHeaders = request.headers(); } catch (_) {}
+        const postData = request.postData() || null;
+        auditRequestMap.set(request, {
+          url,
+          method,
+          headers: reqHeaders,
+          bodyDigest: bodyDigest(postData),
+          startTime: Date.now(),
+        });
+      });
+
+      // ── Audit: comprehensive response listener ──
+      page.on('response', async (response) => {
+        const request = response.request();
+        const url = response.url();
+        const meta = auditRequestMap.get(request);
+        const startTime = meta ? meta.startTime : null;
+        const duration = startTime ? Date.now() - startTime : null;
+
+        // Determine step label from URL
+        let step = 'other';
+        if (url.includes('prehandle')) step = 'prehandle';
+        else if (url.includes('new_show')) step = 'show';
+        else if (url.includes('hycdn')) step = 'image';
+        else if (url.includes('tdc.js')) step = 'tdc';
+        else if (url.includes('tcaptcha-slide')) step = 'tcaptcha-slide';
+        else if (url.includes('slide-jy')) step = 'slide-jy';
+        else if (url.includes('vm-slide') || url.includes('vm_slide')) step = 'vm-slide';
+        else if (url.includes('caplog')) step = 'caplog';
+        else if (url.includes('new_verify')) step = 'verify';
+
+        let respHeaders = {};
+        try { respHeaders = response.headers(); } catch (_) {}
+        let bodySize = 0;
+        try {
+          const buf = await response.buffer();
+          bodySize = buf.length;
+        } catch (_) {
+          // response.buffer() can fail for redirects, data: URIs, etc.
+        }
+
+        auditLogger.logRequest({
+          step,
+          method: meta ? meta.method : request.method(),
+          url,
+          requestHeaders: meta ? meta.headers : {},
+          requestBodyDigest: meta ? meta.bodyDigest : null,
+          responseStatus: response.status(),
+          responseHeaders: respHeaders,
+          responseSize: bodySize,
+          startTime,
+          duration,
+          error: null,
+        });
+
+        auditRequestMap.delete(request);
       });
 
       // ── Capture verify request body (full POST fields) ──
@@ -420,6 +487,12 @@ class CaptchaPuppeteer {
       const errorCode = parseInt(verifyData.errorCode, 10);
       log(`  [pptr] Verify result: errorCode=${errorCode}`);
 
+      auditLogger.setResult({
+        errorCode: errorCode,
+        ticket: verifyData.ticket || '',
+        randstr: verifyData.randstr || '',
+      });
+
       return {
         ticket: verifyData.ticket || '',
         randstr: verifyData.randstr || '',
@@ -432,6 +505,12 @@ class CaptchaPuppeteer {
       };
     } finally {
       if (verifyTimer) clearTimeout(verifyTimer);
+      // Save audit log (always — even on error)
+      try {
+        auditLogger.save(path.join(__dirname, '..', '..', 'output', 'phase-52-audit', 'puppeteer-audit.json'));
+      } catch (_) {
+        // Don't let audit save failure mask the real error
+      }
       await page.close().catch(() => {});
     }
   }

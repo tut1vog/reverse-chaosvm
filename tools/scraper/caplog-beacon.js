@@ -158,6 +158,8 @@ function buildPostVerifyBeaconUrl(opts) {
  * @param {string} [opts.userAgent]
  * @param {number} [opts.timeoutMs=3000]
  * @param {string} [opts.referer] - Referer URL (defaults to t.captcha.qq.com)
+ * @param {Object} [opts.auditLogger] - AuditLogger instance for request-level logging
+ * @param {string} [opts.auditStep] - step label for audit log
  * @returns {Promise<void>}
  */
 async function fireBeacon(url, opts) {
@@ -181,7 +183,12 @@ async function fireBeacon(url, opts) {
     headers['User-Agent'] = o.userAgent;
   }
   try {
-    await httpRequest(url, { headers, timeout });
+    await httpRequest(url, {
+      headers,
+      timeout,
+      auditLogger: o.auditLogger || null,
+      auditStep: o.auditStep || null,
+    });
   } catch (_) {
     // Fire-and-forget: swallow network errors so callers never see a rejection.
   }

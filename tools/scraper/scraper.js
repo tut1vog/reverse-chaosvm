@@ -18,6 +18,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/captcha-client');
+const { AuditLogger } = require('./audit-logger');
 const { solveSlider } = require('../captcha-solver/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd, reorderCdArray } = require('./collect-generator');
 const { generateVData, parseVmSlideUrl } = require('./vdata-harness');
@@ -290,13 +291,17 @@ class Scraper {
 
   /**
    * Create a fresh CaptchaClient instance for a new session.
+   * @param {Object} [opts]
+   * @param {Object} [opts.auditLogger] — AuditLogger instance for request-level logging
    * @returns {CaptchaClient}
    */
-  _createClient() {
+  _createClient(opts) {
+    const o = opts || {};
     return new CaptchaClient({
       aid: this.aid,
       referer: this.referer,
       userAgent: this.userAgent,
+      auditLogger: o.auditLogger || null,
     });
   }
 
@@ -361,9 +366,12 @@ class Scraper {
    * Falls back to the cached sample/vm_slide.js.
    *
    * @param {Object} sig - From getSig() (may have _raw with script URLs)
+   * @param {Object} [opts]
+   * @param {Object} [opts.auditLogger] - AuditLogger instance
    * @returns {Promise<string>} vm-slide source code
    */
-  async _getVmSlideSource(sig) {
+  async _getVmSlideSource(sig, opts) {
+    const auditOpts = opts || {};
     // Strategy 1: Try to find vm-slide URL in sig._raw config fields
     if (sig._raw) {
       const candidates = ['vmSlide', 'vm_slide', 'vmSlideFileName'];
@@ -391,6 +399,8 @@ class Scraper {
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
               },
+              auditLogger: auditOpts.auditLogger || null,
+              auditStep: 'vm-slide',
             });
             if (resp.statusCode === 200 && resp.body.length > 100) {
               this._log(`  Got live vm-slide (${resp.body.length} chars)`);
@@ -429,6 +439,8 @@ class Scraper {
               'sec-ch-ua-mobile': '?0',
               'sec-ch-ua-platform': '"Windows"',
             },
+            auditLogger: auditOpts.auditLogger || null,
+            auditStep: 'vm-slide',
           });
           if (resp.statusCode === 200 && resp.body.length > 100) {
             this._log(`  Got live vm-slide (${resp.body.length} chars)`);
@@ -444,7 +456,7 @@ class Scraper {
     if (sig.showUrl) {
       try {
         this._log(`Fetching show page to find vm-slide URL: ${sig.showUrl.slice(0, 80)}...`);
-        const showResp = await httpRequest(sig.showUrl, { timeout: 10000 });
+        const showResp = await httpRequest(sig.showUrl, { timeout: 10000, auditLogger: auditOpts.auditLogger || null, auditStep: 'show-refetch' });
         if (showResp.statusCode === 200 && showResp.body.length > 100) {
           const vmSlideUrl = parseVmSlideUrl(showResp.body);
           if (vmSlideUrl) {
@@ -469,6 +481,8 @@ class Scraper {
                 'sec-ch-ua-mobile': '?0',
                 'sec-ch-ua-platform': '"Windows"',
               },
+              auditLogger: auditOpts.auditLogger || null,
+              auditStep: 'vm-slide',
             });
             if (vmResp.statusCode === 200 && vmResp.body.length > 100) {
               this._log(`  Got live vm-slide (${vmResp.body.length} chars)`);
@@ -578,7 +592,8 @@ class Scraper {
       throw new Error('Scraper not initialized — call init() first');
     }
 
-    const client = this._createClient();
+    const auditLogger = new AuditLogger('scraper');
+    const client = this._createClient({ auditLogger });
     this._client = client;
     let lastError = null;
 
@@ -631,6 +646,8 @@ class Scraper {
                   'sec-ch-ua-platform': '"Windows"',
                 },
                 timeout: 10000,
+                auditLogger: auditLogger,
+                auditStep: 'tcaptcha-slide',
               });
               this._log('  tcaptcha-slide.js fetched');
             } catch (err) {
@@ -773,7 +790,7 @@ class Scraper {
         // bot tell. The default path discards the fetched body and still uses the
         // committed sample/vm_slide.js cache for vData generation — only the
         // network observation matters here.
-        const vmSlideSource = await this._getVmSlideSource(sig);
+        const vmSlideSource = await this._getVmSlideSource(sig, { auditLogger });
 
         // (k1) Fetch slide-jy.js from CDN (HAR entry 8).
         // Real browser loads this via <script> tag in show page HTML.
@@ -796,6 +813,8 @@ class Scraper {
                   'sec-ch-ua-platform': '"Windows"',
                 },
                 timeout: 10000,
+                auditLogger: auditLogger,
+                auditStep: 'slide-jy',
               });
               this._log('  slide-jy.js fetched');
             } catch (err) {
@@ -810,7 +829,7 @@ class Scraper {
         if (!this.skipCaplog) {
           this._log('Step 7a: caplog pre-verify beacon');
           const preUrl = buildPreVerifyBeaconUrl({ t0 });
-          await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl });
+          await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl, auditLogger: auditLogger, auditStep: 'caplog-pre' });
         }
 
         // (l) Build the 38 verify POST fields
@@ -854,16 +873,24 @@ class Scraper {
 
         this._log(`  errorCode: ${result.errorCode}, ticket: ${result.ticket ? result.ticket.slice(0, 30) + '...' : 'none'}`);
 
+        // Record the verify result for the audit log
+        auditLogger.setResult({
+          errorCode: result.errorCode,
+          ticket: result.ticket || '',
+          randstr: result.randstr || '',
+        });
+
         // Phase 46.4: fire the post-verify /caplog telemetry beacon (HAR
         // entry 10). Must fire on both success and failure paths. Uses the
         // solved x-answer as the field-27 slide-dx proxy.
         if (!this.skipCaplog) {
           this._log('Step 9: caplog post-verify beacon');
           const postUrl = buildPostVerifyBeaconUrl({ ans: xAnswer });
-          await fireBeacon(postUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl });
+          await fireBeacon(postUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl, auditLogger: auditLogger, auditStep: 'caplog-post' });
         }
 
         if (result.errorCode === 0 || (result.errorCode === -1 && result.ticket)) {
+          auditLogger.save(path.join(PROJECT_ROOT, 'output', 'phase-52-audit', 'scraper-audit.json'));
           return {
             errorCode: result.errorCode,
             ticket: result.ticket,
@@ -883,6 +910,8 @@ class Scraper {
       }
     }
 
+    // Save audit log even on failure — captures all requests for debugging
+    auditLogger.save(path.join(PROJECT_ROOT, 'output', 'phase-52-audit', 'scraper-audit.json'));
     throw lastError || new Error('solveCaptcha: max retries exceeded');
   }
 

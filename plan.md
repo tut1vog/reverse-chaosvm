@@ -1,62 +1,75 @@
 # Plan
 
 ## Status
-Current phase: **Phase 51** — XTEA encryption fidelity
-Current task: **51.1** — Collect token round-trip test
+Current phase: **Phase 52** — Full-flow side-by-side audit (Puppeteer vs scraper)
+Current task: **52.1** — Instrument `httpRequest` and Puppeteer with request-level logging
 
-**Phases 38–50 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`. Single-line summaries below.
+**Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
 ---
 
 ## Phases
 
-### Phases 38–46 — DONE
-> Restructure, vm-slide reversal, captcha orchestrator, vData cipher+plaintext, scraper vData switchover, request-chain fidelity, TLS spike. All closed. See `history/`.
+### Phases 38–50 — DONE
+> Restructure, vm-slide reversal, captcha orchestrator, vData cipher+plaintext, scraper vData switchover, request-chain fidelity, TLS spike, Chrome-profile collect, session signals, errorCode -1 body content, vData plaintext fix. All closed.
 
-### Phase 47: Chrome-profile collect replay — DONE
-> Scraper uses real Chrome cd values. Null result: 0/30 t01/t02, but errorCode -1 identified as the real gap.
+### Phase 51: XTEA encryption fidelity — DONE
+> Both collect and vData XTEA encryption confirmed correct for the live template. Three round-trip tests pass. Encryption eliminated as root cause.
 
-### Phase 48: Session-level signal investigation — DONE
-> Request-chain completion, caplog beacons. errorCode 12 = IP rate limit. errorCode -1 = verify POST body content. Pivoted to body diff.
-
-### Phase 49: errorCode -1 root cause — collect token content — DONE
-> POST body diff script, Chrome profile refresh (auto-refresh from Puppeteer capture), coordinate ratio fix. Two live measurements: 0/8 errorCode 0. **Collect token fingerprint values eliminated as root cause.**
-
-### Phase 50: vData plaintext fix — DONE
-> Decrypted Puppeteer vData: found `inf="top"` (not "iframe") and `tp=session.sid` (not static). Fixed both. Null result: 0/4 errorCode 0. **vData plaintext field values eliminated as root cause.**
-
-### Eliminated hypotheses (Phases 47–50)
+### Eliminated hypotheses (Phases 47–51)
 - Collect cd fingerprint values (profile refresh, coordinate ratio, field mapping)
 - vData `inf`, `tp` field values
 - TLS fingerprint (JA3 matches Chrome)
 - Request chain completeness (all 12 HAR entries matched)
 - Header ordering, caplog beacons
+- XTEA encryption (collect + vData) — Phase 51
 
 ---
 
-### Phase 51: XTEA encryption fidelity
+### Phase 52: Full-flow side-by-side audit (Puppeteer vs scraper)
 
-> **Framing** — Phases 49–50 fixed all known plaintext differences between Puppeteer and scraper (collect cd values, sd coordinate, vData inf/tp). ErrorCode -1 persists. Since content fixes have no effect, the hypothesis shifts to the **encryption layer**: if the scraper's auto-ported XTEA keyMod constants are wrong for the live template, the server decrypts the collect token to garbled data — making all plaintext-level fixes irrelevant. Similarly, if the vData XTEA key doesn't match the live vm-slide build, the server can't decrypt vData at all.
->
-> **Two tests**: (1) Verify the scraper's collect token encryption round-trips correctly by encrypting a known plaintext, decrypting with the same params, and checking for identity. (2) Verify the vData XTEA key matches the live build by capturing Puppeteer's vData and decrypting it with the scraper's key.
+> **Framing** — Phases 47–51 eliminated every targeted hypothesis (fingerprint fields, vData fields, TLS, request chain, XTEA encryption). ErrorCode -1 persists. Instead of guessing the next hypothesis, we build **comprehensive instrumentation** to capture every observable difference between the two flows in a single run. The output is a structured JSON log for each flow, containing every HTTP request/response (URL, method, headers, timing, status, body digest) and every generated token field (collect cd/sd, vData fields, behavioral events). A diff script then highlights every divergence — the root cause should be visible in the diff.
 
-**Goal**: confirm or deny that the scraper's XTEA encryption (both collect and vData) is correct for the live template.
+**Goal**: produce a structured side-by-side comparison that reveals **every** difference between a successful Puppeteer solve and a failing scraper solve.
 
-**Success metric**: both round-trip tests pass (encryption is correct) or one fails (root cause found).
+**Success metric**: a diff report showing categorized differences (URLs, timing, headers, token fields, POST body fields) that narrows the root cause to 1–3 concrete items.
 
 | ID | Task | Status |
 |----|------|--------|
-| 51.1 | Collect token XTEA round-trip — encrypt a known plaintext with auto-ported params, decrypt, verify identity. Also: capture a fresh Puppeteer collect token on the same template, decrypt with the same params, verify valid JSON. | done |
-| 51.2 | vData XTEA key verification — decrypt the Puppeteer-captured vData with the scraper's reference key (`2e430f8c15b7da96`), verify we get valid kv plaintext. If not: instrument vm-slide to extract the live key. | done |
-| 51.3 | Fix + re-test if either test reveals a mismatch | done (n/a — both tests passed) |
+| 52.1 | Instrument `httpRequest` with request-level logging (URL, method, headers, timing, status, response size); instrument Puppeteer `captcha-solver.js` to capture the same data from Chrome DevTools Protocol. Both write to a common JSON schema under `output/phase-52-audit/`. | done |
+| 52.2 | Instrument token generation: scraper logs decrypted collect fields (full cd array, sd object), behavioral events array, vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the same audit JSON. | pending |
+| 52.3 | Build `scripts/audit-diff.js` that loads a Puppeteer audit log and a scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, timing diffs, header diffs, POST body field diffs, collect cd diffs, sd diffs, vData field diffs, behavioral event shape diffs. | pending |
+| 52.4 | Run both flows, produce the diff report, and analyze findings. | pending |
 
 ---
 
-## Phase 51 Complete
+## Current Task
 
-All three tests in `scripts/test-xtea-fidelity.js` pass:
-- **Test A** (self round-trip): collect XTEA encrypt/decrypt recovers plaintext exactly
-- **Test B** (cross-validation): Puppeteer collect decrypts to valid 60-field cd + 8-key sd JSON
-- **Test C** (vData key): Puppeteer vData decrypts to valid 98-char kv plaintext: `ss=11%2Ctdc%2Cslide%2Cvm&tp=...&inf=top&key=41yy&py=0&env=0&version=2&cLod=loadTDC`
+**ID**: 52.2
+**Title**: Instrument token generation for audit logging
+**Phase**: Phase 52 — Full-flow side-by-side audit
+**Status**: pending
 
-**Conclusion**: Both XTEA encryption layers (collect token and vData) are correct for the live template. XTEA encryption eliminated as root cause for errorCode -1. The server can decrypt both payloads — the rejection must be content-level or session-level.
+### Goal
+Add token-level audit logging: scraper logs decrypted collect fields (cd array, sd object), behavioral events, and vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the audit JSON's `tokens` field.
+
+### Context
+52.1 is done — `AuditLogger` class exists at `tools/scraper/audit-logger.js`, both flows create an instance and call `auditLogger.logTokens()` (currently empty). The scraper already has all token values in scope during `solveCaptcha()` (collect, eks, vData, behavioral events, slideSd). The Puppeteer flow captures the raw verify POST body in `capturedVerifyPost` (a plain object of POST fields). To decode Puppeteer's collect token we need to decrypt+deserialize it using the token generator's decoder. For vData we need to decode the base64 + XTEA decrypt using the vdata-generator's decoder.
+
+**Key files**:
+- `tools/scraper/scraper.js` — `solveCaptcha()` has `collectEncoded`, `slideSd`, `behavioralEvents`, `vData` in scope
+- `tools/captcha-solver/captcha-solver.js` — `capturedVerifyPost` has raw POST fields including `collect`, `eks`, `vData`
+- `tools/token-generator/` — token encoder/decoder for collect
+- `tools/vdata-generator/` — vData encoder/decoder
+
+### Implementation Steps
+1. In scraper's `solveCaptcha()`, after generating collect+vData, call `auditLogger.logTokens()` with the decoded values
+2. In Puppeteer's `solve()`, after capturing `capturedVerifyPost`, decode collect and vData from the POST fields and call `auditLogger.logTokens()`
+3. Both should log the same token field schema for diffability
+
+### Verification
+- [ ] `npm test` passes (530+ green)
+- [ ] Token schema matches between scraper and Puppeteer audit logs
+
+### Suggested Agent
+general-purpose

@@ -121,10 +121,16 @@ function parseJSONP(text) {
  * @param {number} [opts.timeout]
  * @param {CookieJar} [opts.cookieJar]
  * @param {boolean} [opts.binary=false] — if true, return body as Buffer
+ * @param {object} [opts.auditLogger] — AuditLogger instance for structured logging (opt-in)
+ * @param {string} [opts.auditStep] — step label for audit log (e.g. 'prehandle', 'verify')
  * @returns {Promise<{statusCode: number, headers: object, body: string|Buffer}>}
  */
 function httpRequest(urlStr, opts = {}) {
-  return new Promise((resolve, reject) => {
+  const auditLogger = opts.auditLogger || null;
+  const auditStep = opts.auditStep || null;
+  const startTime = auditLogger ? Date.now() : 0;
+
+  const promise = new Promise((resolve, reject) => {
     const parsed = new URL(urlStr);
     const transport = parsed.protocol === 'https:' ? https : http;
 
@@ -194,6 +200,54 @@ function httpRequest(urlStr, opts = {}) {
 
     req.end();
   });
+
+  // Wrap the promise to capture audit data on success or failure
+  if (!auditLogger) return promise;
+
+  return promise.then((resp) => {
+    const duration = Date.now() - startTime;
+    let bodyDigestVal = null;
+    if (opts.body) {
+      const crypto = require('crypto');
+      bodyDigestVal = crypto.createHash('sha256').update(opts.body).digest('hex');
+    }
+    const bodySize = typeof resp.body === 'string' ? Buffer.byteLength(resp.body) : resp.body.length;
+    auditLogger.logRequest({
+      step: auditStep,
+      method: opts.method || 'GET',
+      url: urlStr,
+      requestHeaders: Object.assign({}, opts.headers || {}),
+      requestBodyDigest: bodyDigestVal,
+      responseStatus: resp.statusCode,
+      responseHeaders: Object.assign({}, resp.headers),
+      responseSize: bodySize,
+      startTime: startTime,
+      duration: duration,
+      error: null,
+    });
+    return resp;
+  }).catch((err) => {
+    const duration = Date.now() - startTime;
+    let bodyDigestVal = null;
+    if (opts.body) {
+      const crypto = require('crypto');
+      bodyDigestVal = crypto.createHash('sha256').update(opts.body).digest('hex');
+    }
+    auditLogger.logRequest({
+      step: auditStep,
+      method: opts.method || 'GET',
+      url: urlStr,
+      requestHeaders: Object.assign({}, opts.headers || {}),
+      requestBodyDigest: bodyDigestVal,
+      responseStatus: null,
+      responseHeaders: {},
+      responseSize: 0,
+      startTime: startTime,
+      duration: duration,
+      error: err.message,
+    });
+    throw err;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -207,6 +261,7 @@ class CaptchaClient {
    * @param {string} [config.referer] — Referer header for requests
    * @param {number} [config.timeout=10000] — request timeout in ms
    * @param {string} [config.userAgent] — custom User-Agent
+   * @param {object} [config.auditLogger] — AuditLogger instance for structured request logging
    */
   constructor(config) {
     if (!config || !config.aid) {
@@ -217,6 +272,7 @@ class CaptchaClient {
     this.referer = config.referer || 'https://t.captcha.qq.com/';
     this.timeout = config.timeout || DEFAULT_TIMEOUT;
     this.userAgent = config.userAgent || DEFAULT_USER_AGENT;
+    this._auditLogger = config.auditLogger || null;
 
     /** @type {CookieJar} */
     this.cookieJar = new CookieJar();
@@ -324,6 +380,8 @@ class CaptchaClient {
       }),
       timeout: this.timeout,
       cookieJar: this.cookieJar,
+      auditLogger: this._auditLogger,
+      auditStep: 'prehandle',
     });
 
     if (resp.statusCode !== 200) {
@@ -412,6 +470,8 @@ class CaptchaClient {
       }),
       timeout: this.timeout,
       cookieJar: this.cookieJar,
+      auditLogger: this._auditLogger,
+      auditStep: 'getSig',
     });
 
     if (resp.statusCode !== 200) {
@@ -533,6 +593,8 @@ class CaptchaClient {
       }),
       timeout: this.timeout,
       cookieJar: this.cookieJar,
+      auditLogger: this._auditLogger,
+      auditStep: 'show',
     });
 
     if (resp.statusCode !== 200) {
@@ -705,6 +767,8 @@ class CaptchaClient {
       headers: this._headers(),
       timeout: this.timeout,
       cookieJar: this.cookieJar,
+      auditLogger: this._auditLogger,
+      auditStep: 'getCapBySig',
     });
 
     if (resp.statusCode !== 200) {
@@ -789,12 +853,16 @@ class CaptchaClient {
         timeout: this.timeout,
         cookieJar: this.cookieJar,
         binary: true,
+        auditLogger: this._auditLogger,
+        auditStep: 'image-bg',
       }),
       httpRequest(sliceUrl, {
         headers: imgHeaders,
         timeout: this.timeout,
         cookieJar: this.cookieJar,
         binary: true,
+        auditLogger: this._auditLogger,
+        auditStep: 'image-slice',
       }),
     ]);
 
@@ -846,6 +914,8 @@ class CaptchaClient {
       }),
       timeout: this.timeout,
       cookieJar: this.cookieJar,
+      auditLogger: this._auditLogger,
+      auditStep: 'tdc',
     });
 
     if (resp.statusCode !== 200) {
@@ -1016,6 +1086,8 @@ class CaptchaClient {
       body: body,
       timeout: this.timeout,
       cookieJar: this.cookieJar,
+      auditLogger: this._auditLogger,
+      auditStep: 'verify',
     });
 
     if (resp.statusCode !== 200) {
