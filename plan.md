@@ -106,11 +106,74 @@ Decrypted both collect tokens and ran semantic field matching across different t
 
 ---
 
+## Phase 54.3 Results (2026-04-17)
+
+- ErrorCode still -1 despite webglImage + webglRenderer now matching
+- Pool approach restored 2 more fields but sid and detectedFonts still Puppeteer-only (template rotation shuffles pool order)
+
+---
+
+### Phase 55: Verify POST body fidelity + collect sid session binding
+
+> Two parallel investigations:
+> (A) **Verify POST body fidelity**: compare the exact byte-level POST body encoding between the scraper's `URLSearchParams` serialization and the real jQuery `$.param()` encoding Chrome uses. Differences in encoding (e.g., `+` vs `%20` for spaces, `%3D` vs `=` in base64, field ordering) could cause server rejection.
+> (B) **Collect token sid binding**: the collect token's cd array contains a stale `sid` from the profile (`7450533642822729728`), while the verify POST's `sid` field is the live session's value. If the server cross-checks these, the mismatch triggers rejection. Fix by substituting the live session's sid into the correct -1 slot before collect generation.
+
+| ID | Task | Status |
+|----|------|--------|
+| 55.1 | Capture a Puppeteer verify POST body (raw bytes) and a scraper verify POST body side-by-side. Diff field-by-field: encoding differences, field order, content-type, body length. Write `scripts/verify-body-diff.js`. | pending |
+| 55.2 | Fix sid in collect: identify which -1 slot contains sid (by matching the numeric string pattern), substitute `session.sid` at generation time instead of using the stale profile value. | pending |
+| 55.3 | Re-run audit with both fixes and check errorCode. | pending |
+
+---
+
 ## Current Task
 
-**ID**: *Phase 54 complete*
-**Phase**: Phase 54 — Fix dropped -1 slot values
-**Status**: done
+**ID**: 55.1
+**Title**: Verify POST body byte-level diff
+**Phase**: Phase 55 — Verify POST body fidelity + collect sid binding
+**Status**: pending
+
+### Goal
+Capture the exact verify POST bodies from both Puppeteer and scraper, then diff them field-by-field at the byte level. Identify any encoding differences that could cause server rejection.
+
+### Context
+
+**Scraper encoding**: uses `URLSearchParams.toString()` (Node.js built-in). This encodes:
+- Spaces as `+`
+- Non-unreserved chars as `%XX`
+- Values via `encodeURIComponent()` internally
+
+**Chrome/jQuery encoding**: uses `jQuery.param()` which:
+- Encodes spaces as `+` (same)
+- Does NOT encode `*` (jQuery quirk)
+- May handle `=` in base64 differently
+
+**Key suspect**: The `collect` field value contains base64 with `+`, `/`, `=` characters. `URLSearchParams` encodes `=` as `%3D`, `+` as `%2B`, `/` as `%2F`. jQuery's `$.param()` may preserve some of these or encode differently.
+
+**Files**:
+- Scraper body: built by `serializePostFields()` in `tools/scraper/scraper.js:62-69`
+- Chrome body: built by `captcha-client.js` verify(), uses either jQuery prebuilt or manual `encodeURIComponent` fallback
+- Puppeteer capture: can intercept via Chrome DevTools Protocol `Network.requestWillBeSent`
+
+### Implementation Steps
+1. Instrument Puppeteer's captcha-solver to capture the raw verify POST body bytes and write to `output/phase-55/puppeteer-verify-body.txt`
+2. Instrument scraper to write its `serializedBody + '&vData=...'` to `output/phase-55/scraper-verify-body.txt`
+3. Write `scripts/verify-body-diff.js` that:
+   - Loads both body strings
+   - Splits by `&`, then by `=` to get field/value pairs
+   - Compares field order
+   - For each field, compares encoding byte-by-byte
+   - Highlights encoding differences (e.g., `%2B` vs `+`, `%3D` vs `=`)
+4. Run and analyze
+
+### Verification
+- [ ] Both body captures exist
+- [ ] Diff script produces clear field-by-field comparison
+- [ ] Any encoding differences are documented
+
+### Suggested Agent
+general-purpose — instrumentation + diff scripting
 
 ### Goal
 Fix `_generateCollectChrome` in `tools/scraper/scraper.js` so that non-hashPosition `-1` slots in the `cdFieldOrder` pass through the captured Chrome values from the profile's `cd` array, instead of being replaced with empty strings.
