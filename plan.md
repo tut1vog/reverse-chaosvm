@@ -39,33 +39,21 @@ Current task: **52.1** — Instrument `httpRequest` and Puppeteer with request-l
 | 52.1 | Instrument `httpRequest` with request-level logging (URL, method, headers, timing, status, response size); instrument Puppeteer `captcha-solver.js` to capture the same data from Chrome DevTools Protocol. Both write to a common JSON schema under `output/phase-52-audit/`. | done |
 | 52.2 | Instrument token generation: scraper logs decrypted collect fields (full cd array, sd object), behavioral events array, vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the same audit JSON. | done |
 | 52.3 | Build `scripts/audit-diff.js` that loads a Puppeteer audit log and a scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, timing diffs, header diffs, POST body field diffs, collect cd diffs, sd diffs, vData field diffs, behavioral event shape diffs. | done |
-| 52.4 | Run both flows, produce the diff report, and analyze findings. | pending |
+| 52.4 | Run both flows, produce the diff report, and analyze findings. | done |
 
 ---
 
 ## Current Task
 
-**ID**: 52.4
-**Title**: Run both flows, produce diff report, analyze findings
-**Phase**: Phase 52 — Full-flow side-by-side audit
-**Status**: pending
+Phase 52 complete. Findings documented below.
 
-### Goal
-Run the Puppeteer solver and scraper back-to-back, capture both audit logs, run the diff script, and analyze the output to identify the root cause(s) of errorCode -1.
+### Phase 52 Findings (2026-04-17)
 
-### Context
-52.1–52.3 are done. Both flows are instrumented. `scripts/audit-diff.js` produces categorized diffs. Now we need to actually run them and read the results.
+**Root cause of errorCode -1**: collect token structural mismatch.
 
-### Implementation Steps
-1. Run Puppeteer: `node tools/captcha-solver/cli.js`
-2. Run scraper: `node tools/scraper/cli.js --captcha-only --verbose`
-3. Run diff: `node scripts/audit-diff.js output/phase-52-audit/puppeteer-audit.json output/phase-52-audit/scraper-audit.json`
-4. Analyze output and document findings
+1. **Collect length: Puppeteer=5144, Scraper=6540** (+27%). The scraper generates 60 cd fields but Chrome's real TDC for the live template produces a shorter collect. This is the primary detection vector.
+2. **eks differs per session** (expected — server-baked).
+3. **Request chain is equivalent** (differences are step-label artifacts).
+4. **Header differences are CDP reporting gaps** (Chrome sends sec-fetch-* etc. but CDP page.on doesn't expose them).
 
-### Verification
-- [ ] Both audit JSON files exist with ≥8 request entries each
-- [ ] Diff report produced and analyzed
-- [ ] Root cause narrowed to 1–3 concrete items
-
-### Suggested Agent
-Director runs this manually (live network required)
+**Next steps**: Decrypt both collect tokens and compare cd field arrays to identify exactly which fields the scraper is adding that Chrome's TDC doesn't include. Then fix the scraper's collect generation to match the live template's field count/serialization.
