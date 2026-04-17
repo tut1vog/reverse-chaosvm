@@ -1,0 +1,1898 @@
+{
+  "_generated": "2026-04-17T06:00:12.304Z",
+  "_description": "Phase 49.1: field-by-field diff of scraper (Chrome profile) vs Puppeteer verify POST body",
+  "postFields": {
+    "matching": [
+      {
+        "field": "aid",
+        "match": true,
+        "browserValue": "2046626881",
+        "scraperValue": "2046626881"
+      },
+      {
+        "field": "protocol",
+        "match": true,
+        "browserValue": "https",
+        "scraperValue": "https"
+      },
+      {
+        "field": "accver",
+        "match": true,
+        "browserValue": "1",
+        "scraperValue": "1"
+      },
+      {
+        "field": "showtype",
+        "match": true,
+        "browserValue": "popup",
+        "scraperValue": "popup"
+      },
+      {
+        "field": "ua",
+        "match": true,
+        "browserValue": "TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE0Ni4wLjAuMCBTYWZhcmkvNTM3LjM2",
+        "scraperValue": "TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE0Ni4wLjAuMCBTYWZhcmkvNTM3LjM2"
+      },
+      {
+        "field": "noheader",
+        "match": true,
+        "browserValue": "1",
+        "scraperValue": "1"
+      },
+      {
+        "field": "fb",
+        "match": true,
+        "browserValue": "1",
+        "scraperValue": "1"
+      },
+      {
+        "field": "aged",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "enableAged",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "enableDarkMode",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "grayscale",
+        "match": true,
+        "browserValue": "1",
+        "scraperValue": "1"
+      },
+      {
+        "field": "dyeid",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "clientype",
+        "match": true,
+        "browserValue": "2",
+        "scraperValue": "2"
+      },
+      {
+        "field": "sess",
+        "match": true,
+        "browserValue": "s1ERy4XJbYawekpXuzY6ISoX7p_sMBFD-rt4PfmogLWuADYupKnWq8WJT81yxnrXnzLAUw_jUfi97IIZJLSfazd6ZgLO2Acv4RBMhXXe1Yf7X6ckIg69XEgA2z0CGm9KDB_NMqlIqi5Kbsy0JuJLXaNYhyIt30Khce8zKqO-k07UDg4nwtRxQoXdu-pEwEYlqjwhw88xW6C-dYVRwRh_qGwFZEvYMcyavoy2YeZ8me5PMdHSXsYwU3fauKVrMyZnfqfQMoF-Y8UcxBPAAIUew-twEK5zOWwzTjqGY_PmXdgBmh2L6qpQYk2Q_hb9_x8LnsHKe-qbm9H4k*",
+        "scraperValue": "s1ERy4XJbYawekpXuzY6ISoX7p_sMBFD-rt4PfmogLWuADYupKnWq8WJT81yxnrXnzLAUw_jUfi97IIZJLSfazd6ZgLO2Acv4RBMhXXe1Yf7X6ckIg69XEgA2z0CGm9KDB_NMqlIqi5Kbsy0JuJLXaNYhyIt30Khce8zKqO-k07UDg4nwtRxQoXdu-pEwEYlqjwhw88xW6C-dYVRwRh_qGwFZEvYMcyavoy2YeZ8me5PMdHSXsYwU3fauKVrMyZnfqfQMoF-Y8UcxBPAAIUew-twEK5zOWwzTjqGY_PmXdgBmh2L6qpQYk2Q_hb9_x8LnsHKe-qbm9H4k*"
+      },
+      {
+        "field": "fwidth",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "sid",
+        "match": true,
+        "browserValue": "7450533642822729728",
+        "scraperValue": "7450533642822729728"
+      },
+      {
+        "field": "wxLang",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "tcScale",
+        "match": true,
+        "browserValue": "1",
+        "scraperValue": "1"
+      },
+      {
+        "field": "uid",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "cap_cd",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "global",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "subsid",
+        "match": true,
+        "browserValue": "1",
+        "scraperValue": "1"
+      },
+      {
+        "field": "cdata",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "ans",
+        "match": true,
+        "browserValue": "462,69;",
+        "scraperValue": "462,69;"
+      },
+      {
+        "field": "vsig",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "websig",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "subcapclass",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "pow_answer",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "pow_calc_time",
+        "match": true,
+        "browserValue": "0",
+        "scraperValue": "0"
+      },
+      {
+        "field": "fpinfo",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "eks",
+        "match": true,
+        "browserValue": "bWwpGm3o9jBd5g6RRrv9FQS11bpvQVvrs/69wDrQjscQJ+MYnnNRHsiM4VZu8TdFfAwhqhiNxNB0QFxuF4CzFHKooKyFsIM7rRwa8FQ67EZtA3LuAV19303PsYwY2H9g4uiJ4QUFt5eT+uyJjln8qcuYp4D6cqriDNQDXmVCAvsDraKfHJ3D8VmBI86p9PqcubavVCwlUtlfWBlTew1WD70+UPpLr6DHstWTubBIX8gG1oeClcowFOM6bjLU96EIDVmxYEsMD6iO6Jou3IEh5VZBaxVgETMrK5+ZVtZGMjl2IgEVL5zAbQ==",
+        "scraperValue": "bWwpGm3o9jBd5g6RRrv9FQS11bpvQVvrs/69wDrQjscQJ+MYnnNRHsiM4VZu8TdFfAwhqhiNxNB0QFxuF4CzFHKooKyFsIM7rRwa8FQ67EZtA3LuAV19303PsYwY2H9g4uiJ4QUFt5eT+uyJjln8qcuYp4D6cqriDNQDXmVCAvsDraKfHJ3D8VmBI86p9PqcubavVCwlUtlfWBlTew1WD70+UPpLr6DHstWTubBIX8gG1oeClcowFOM6bjLU96EIDVmxYEsMD6iO6Jou3IEh5VZBaxVgETMrK5+ZVtZGMjl2IgEVL5zAbQ=="
+      },
+      {
+        "field": "nonce",
+        "match": true,
+        "browserValue": "eda1152f11f1daf0",
+        "scraperValue": "eda1152f11f1daf0"
+      },
+      {
+        "field": "vlg",
+        "match": true,
+        "browserValue": "0_0_1",
+        "scraperValue": "0_0_1"
+      }
+    ],
+    "differing": [
+      {
+        "field": "rnd",
+        "match": false,
+        "browserValue": "450489",
+        "scraperValue": "<random 0-999999>",
+        "reason": "Per-session random value — always differs but server likely ignores exact value"
+      },
+      {
+        "field": "prehandleLoadTime",
+        "match": false,
+        "browserValue": "114",
+        "scraperValue": "<random 100-299>",
+        "reason": "Per-session random value — always differs but server likely ignores exact value"
+      },
+      {
+        "field": "createIframeStart",
+        "match": false,
+        "browserValue": "1776345644612",
+        "scraperValue": "<random near Date.now()>",
+        "reason": "Per-session random value — always differs but server likely ignores exact value"
+      },
+      {
+        "field": "collect",
+        "match": false,
+        "browserValue": "<5144 chars>",
+        "scraperValue": "<generated — see cd/sd diff>",
+        "reason": "Collect token differs due to cd/sd differences (see collectCd and collectSd sections)"
+      },
+      {
+        "field": "tlg",
+        "match": false,
+        "browserValue": "5144",
+        "scraperValue": "<collect.length>",
+        "reason": "Token length: browser=5144, scraper=<depends on cd/sd>. Different cd/sd → different token length"
+      }
+    ]
+  },
+  "collectCd": {
+    "matching": 53,
+    "differing": 7,
+    "diffs": [
+      {
+        "browserIndex": 21,
+        "schemaIndex": 14,
+        "fieldName": "maxTouchPoints",
+        "match": false,
+        "browserValue": 4,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[14]",
+        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
+      },
+      {
+        "browserIndex": 30,
+        "schemaIndex": 15,
+        "fieldName": "canvasHash",
+        "match": false,
+        "browserValue": 1189887932,
+        "scraperValue": 37437602,
+        "scraperSource": "cdCanonical[15]",
+        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
+      },
+      {
+        "browserIndex": 32,
+        "schemaIndex": 54,
+        "fieldName": "performanceHash",
+        "match": false,
+        "browserValue": 681731712,
+        "scraperValue": 1283372547,
+        "scraperSource": "cdCanonical[54]",
+        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
+      },
+      {
+        "browserIndex": 40,
+        "schemaIndex": 4,
+        "fieldName": "detectedFonts",
+        "match": false,
+        "browserValue": "7448307515255877632",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[4]",
+        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
+      },
+      {
+        "browserIndex": 46,
+        "schemaIndex": 25,
+        "fieldName": "maxTouchPointsDup",
+        "match": false,
+        "browserValue": 0,
+        "scraperValue": 4,
+        "scraperSource": "cdCanonical[25]",
+        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
+      },
+      {
+        "browserIndex": 48,
+        "schemaIndex": 17,
+        "fieldName": "mathFingerprint",
+        "match": false,
+        "browserValue": 1.0739998817443848,
+        "scraperValue": 0.4289999008178711,
+        "scraperSource": "cdCanonical[17]",
+        "reason": "Static fingerprint field — differs between chrome-fingerprint.json and real browser capture"
+      },
+      {
+        "browserIndex": 55,
+        "schemaIndex": -1,
+        "fieldName": "behavioralEvents",
+        "match": false,
+        "browserValue": [
+          [
+            4,
+            -1,
+            -1,
+            1775814894970,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            159,
+            812,
+            1239,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            2,
+            0,
+            0,
+            167,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            99,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            153,
+            -1,
+            33,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            137,
+            2,
+            44,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            121,
+            0,
+            50,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            99,
+            -2,
+            68,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            88,
+            1,
+            67,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            74,
+            -1,
+            67,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            30,
+            1,
+            32,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            54,
+            0,
+            67,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            25,
+            -1,
+            50,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            20,
+            0,
+            50,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            36,
+            0,
+            48,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            12,
+            0,
+            36,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            22,
+            0,
+            66,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            16,
+            1,
+            67,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            8,
+            0,
+            44,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            7,
+            -1,
+            56,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            3,
+            0,
+            47,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            -2,
+            0,
+            36,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            -1,
+            41,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            0,
+            70,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "scraperSource": "N/A (behavioralEvents injected at hashPosition -1 slot)",
+        "reason": "behavioralEvents: scraper injects generated events at hashPosition; per-session, always differs"
+      }
+    ],
+    "matches": [
+      {
+        "browserIndex": 0,
+        "schemaIndex": 35,
+        "fieldName": "connectionInfo",
+        "match": true,
+        "browserValue": null,
+        "scraperValue": null,
+        "scraperSource": "cdCanonical[35]"
+      },
+      {
+        "browserIndex": 1,
+        "schemaIndex": 26,
+        "fieldName": "timezoneOffset",
+        "match": true,
+        "browserValue": "+08",
+        "scraperValue": "+08",
+        "scraperSource": "cdCanonical[26]"
+      },
+      {
+        "browserIndex": 2,
+        "schemaIndex": 23,
+        "fieldName": "plugins",
+        "match": true,
+        "browserValue": [
+          {
+            "name": "PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "Chrome PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "Chromium PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "Microsoft Edge PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "WebKit built-in PDF",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          }
+        ],
+        "scraperValue": [
+          {
+            "name": "PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "Chrome PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "Chromium PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "Microsoft Edge PDF Viewer",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          },
+          {
+            "name": "WebKit built-in PDF",
+            "description": "Portable Document Format",
+            "filename": "internal-pdf-viewer"
+          }
+        ],
+        "scraperSource": "cdCanonical[23]"
+      },
+      {
+        "browserIndex": 3,
+        "schemaIndex": 24,
+        "fieldName": "indexedDbAvail",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[24]"
+      },
+      {
+        "browserIndex": 4,
+        "schemaIndex": 5,
+        "fieldName": "flashFonts",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[5]"
+      },
+      {
+        "browserIndex": 5,
+        "schemaIndex": 18,
+        "fieldName": "audioFingerprint",
+        "match": true,
+        "browserValue": {
+          "nt_vc_output": {
+            "ac-baseLatency": 0.01,
+            "ac-outputLatency": 0,
+            "ac-sampleRate": 44100,
+            "ac-maxChannelCount": 2,
+            "ac-numberOfInputs": 1,
+            "ac-numberOfOutputs": 0,
+            "ac-channelCount": 2,
+            "ac-channelCountMode": "explicit",
+            "ac-channelInterpretation": "speakers",
+            "an-fftSize": 2048,
+            "an-frequencyBinCount": 1024,
+            "an-minDecibels": -100,
+            "an-maxDecibels": -30,
+            "an-smoothingTimeConstant": 0.8,
+            "an-numberOfInputs": 1,
+            "an-numberOfOutputs": 1,
+            "an-channelCount": 2,
+            "an-channelCountMode": "max",
+            "an-channelInterpretation": "speakers"
+          },
+          "pxi_output": 10240
+        },
+        "scraperValue": {
+          "nt_vc_output": {
+            "ac-baseLatency": 0.01,
+            "ac-outputLatency": 0,
+            "ac-sampleRate": 44100,
+            "ac-maxChannelCount": 2,
+            "ac-numberOfInputs": 1,
+            "ac-numberOfOutputs": 0,
+            "ac-channelCount": 2,
+            "ac-channelCountMode": "explicit",
+            "ac-channelInterpretation": "speakers",
+            "an-fftSize": 2048,
+            "an-frequencyBinCount": 1024,
+            "an-minDecibels": -100,
+            "an-maxDecibels": -30,
+            "an-smoothingTimeConstant": 0.8,
+            "an-numberOfInputs": 1,
+            "an-numberOfOutputs": 1,
+            "an-channelCount": 2,
+            "an-channelCountMode": "max",
+            "an-channelInterpretation": "speakers"
+          },
+          "pxi_output": 10240
+        },
+        "scraperSource": "cdCanonical[18]"
+      },
+      {
+        "browserIndex": 6,
+        "schemaIndex": 29,
+        "fieldName": "audioCodecs",
+        "match": true,
+        "browserValue": [
+          {
+            "codec": "AAC",
+            "support": "probably"
+          },
+          {
+            "codec": "MP3",
+            "support": "probably"
+          },
+          {
+            "codec": "Ogg Vorbis",
+            "support": "probably"
+          },
+          {
+            "codec": "Ogg Opus",
+            "support": "probably"
+          },
+          {
+            "codec": "WAV",
+            "support": "probably"
+          },
+          {
+            "codec": "FLAC",
+            "support": "probably"
+          },
+          {
+            "codec": "WebM Vorbis",
+            "support": "probably"
+          },
+          {
+            "codec": "WebM Opus",
+            "support": "probably"
+          },
+          {
+            "codec": "M4A",
+            "support": "maybe"
+          }
+        ],
+        "scraperValue": [
+          {
+            "codec": "AAC",
+            "support": "probably"
+          },
+          {
+            "codec": "MP3",
+            "support": "probably"
+          },
+          {
+            "codec": "Ogg Vorbis",
+            "support": "probably"
+          },
+          {
+            "codec": "Ogg Opus",
+            "support": "probably"
+          },
+          {
+            "codec": "WAV",
+            "support": "probably"
+          },
+          {
+            "codec": "FLAC",
+            "support": "probably"
+          },
+          {
+            "codec": "WebM Vorbis",
+            "support": "probably"
+          },
+          {
+            "codec": "WebM Opus",
+            "support": "probably"
+          },
+          {
+            "codec": "M4A",
+            "support": "maybe"
+          }
+        ],
+        "scraperSource": "cdCanonical[29]"
+      },
+      {
+        "browserIndex": 7,
+        "schemaIndex": 2,
+        "fieldName": "touchSupport",
+        "match": true,
+        "browserValue": 2,
+        "scraperValue": 2,
+        "scraperSource": "cdCanonical[2]"
+      },
+      {
+        "browserIndex": 8,
+        "schemaIndex": 40,
+        "fieldName": "webglRenderer",
+        "match": true,
+        "browserValue": "Intel Iris OpenGL Engine",
+        "scraperValue": "Intel Iris OpenGL Engine",
+        "scraperSource": "cdCanonical[40]"
+      },
+      {
+        "browserIndex": 9,
+        "schemaIndex": 44,
+        "fieldName": "availHeight",
+        "match": true,
+        "browserValue": 600,
+        "scraperValue": 600,
+        "scraperSource": "cdCanonical[44]"
+      },
+      {
+        "browserIndex": 10,
+        "schemaIndex": 41,
+        "fieldName": "frameStatus",
+        "match": true,
+        "browserValue": "top",
+        "scraperValue": "top",
+        "scraperSource": "cdCanonical[41]"
+      },
+      {
+        "browserIndex": 11,
+        "schemaIndex": 45,
+        "fieldName": "headlessFlag",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[45]"
+      },
+      {
+        "browserIndex": 12,
+        "schemaIndex": 55,
+        "fieldName": "cssOverflowResult",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[55]"
+      },
+      {
+        "browserIndex": 13,
+        "schemaIndex": 28,
+        "fieldName": "colorGamut",
+        "match": true,
+        "browserValue": "srgb",
+        "scraperValue": "srgb",
+        "scraperSource": "cdCanonical[28]"
+      },
+      {
+        "browserIndex": 14,
+        "schemaIndex": 16,
+        "fieldName": "timestampInit",
+        "match": true,
+        "browserValue": 1775814897,
+        "scraperValue": 1775814897,
+        "scraperSource": "cdCanonical[16]"
+      },
+      {
+        "browserIndex": 15,
+        "schemaIndex": 46,
+        "fieldName": "userAgentData",
+        "match": true,
+        "browserValue": {
+          "brands": [],
+          "mobile": false,
+          "platform": ""
+        },
+        "scraperValue": {
+          "brands": [],
+          "mobile": false,
+          "platform": ""
+        },
+        "scraperSource": "cdCanonical[46]"
+      },
+      {
+        "browserIndex": 16,
+        "schemaIndex": 20,
+        "fieldName": "webglImage",
+        "match": true,
+        "browserValue": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+        "scraperValue": "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+        "scraperSource": "cdCanonical[20]"
+      },
+      {
+        "browserIndex": 17,
+        "schemaIndex": 8,
+        "fieldName": "hardwareConcurrency",
+        "match": true,
+        "browserValue": 8,
+        "scraperValue": 8,
+        "scraperSource": "cdCanonical[8]"
+      },
+      {
+        "browserIndex": 18,
+        "schemaIndex": 12,
+        "fieldName": "videoCodecs",
+        "match": true,
+        "browserValue": [
+          {
+            "codec": "H.264",
+            "support": "probably"
+          },
+          {
+            "codec": "H.264 High",
+            "support": "probably"
+          },
+          {
+            "codec": "H.265/HEVC",
+            "support": ""
+          },
+          {
+            "codec": "VP8",
+            "support": "probably"
+          },
+          {
+            "codec": "VP9",
+            "support": "probably"
+          },
+          {
+            "codec": "AV1",
+            "support": "probably"
+          },
+          {
+            "codec": "Theora",
+            "support": ""
+          },
+          {
+            "codec": "MPEG-4",
+            "support": ""
+          }
+        ],
+        "scraperValue": [
+          {
+            "codec": "H.264",
+            "support": "probably"
+          },
+          {
+            "codec": "H.264 High",
+            "support": "probably"
+          },
+          {
+            "codec": "H.265/HEVC",
+            "support": ""
+          },
+          {
+            "codec": "VP8",
+            "support": "probably"
+          },
+          {
+            "codec": "VP9",
+            "support": "probably"
+          },
+          {
+            "codec": "AV1",
+            "support": "probably"
+          },
+          {
+            "codec": "Theora",
+            "support": ""
+          },
+          {
+            "codec": "MPEG-4",
+            "support": ""
+          }
+        ],
+        "scraperSource": "cdCanonical[12]"
+      },
+      {
+        "browserIndex": 19,
+        "schemaIndex": 58,
+        "fieldName": "errorLog",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[58]"
+      },
+      {
+        "browserIndex": 20,
+        "schemaIndex": 47,
+        "fieldName": "screenComposite",
+        "match": true,
+        "browserValue": "800-600-600-24-*-*-|-*",
+        "scraperValue": "800-600-600-24-*-*-|-*",
+        "scraperSource": "cdCanonical[47]"
+      },
+      {
+        "browserIndex": 22,
+        "schemaIndex": 31,
+        "fieldName": "userAgent",
+        "match": true,
+        "browserValue": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        "scraperValue": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+        "scraperSource": "cdCanonical[31]"
+      },
+      {
+        "browserIndex": 23,
+        "schemaIndex": 37,
+        "fieldName": "highEntropyValues",
+        "match": true,
+        "browserValue": {
+          "_state": 0,
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "model": "",
+          "platform": "",
+          "platformVersion": "",
+          "uaFullVersion": "",
+          "wow64": false
+        },
+        "scraperValue": {
+          "_state": 0,
+          "architecture": "",
+          "bitness": "",
+          "brands": [],
+          "fullVersionList": [],
+          "mobile": false,
+          "model": "",
+          "platform": "",
+          "platformVersion": "",
+          "uaFullVersion": "",
+          "wow64": false
+        },
+        "scraperSource": "cdCanonical[37]"
+      },
+      {
+        "browserIndex": 24,
+        "schemaIndex": 27,
+        "fieldName": "adBlockDetected",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[27]"
+      },
+      {
+        "browserIndex": 25,
+        "schemaIndex": 21,
+        "fieldName": "storageEstimate",
+        "match": true,
+        "browserValue": {
+          "_state": 0,
+          "quota": 10737418240,
+          "usage": null,
+          "usageDetails": {}
+        },
+        "scraperValue": {
+          "_state": 0,
+          "quota": 10737418240,
+          "usage": null,
+          "usageDetails": {}
+        },
+        "scraperSource": "cdCanonical[21]"
+      },
+      {
+        "browserIndex": 26,
+        "schemaIndex": 3,
+        "fieldName": "viewportWidth",
+        "match": true,
+        "browserValue": 800,
+        "scraperValue": 800,
+        "scraperSource": "cdCanonical[3]"
+      },
+      {
+        "browserIndex": 27,
+        "schemaIndex": 50,
+        "fieldName": "doNotTrack",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[50]"
+      },
+      {
+        "browserIndex": 28,
+        "schemaIndex": 57,
+        "fieldName": "featureBitmask",
+        "match": true,
+        "browserValue": 1023,
+        "scraperValue": 1023,
+        "scraperSource": "cdCanonical[57]"
+      },
+      {
+        "browserIndex": 29,
+        "schemaIndex": 36,
+        "fieldName": "vendor",
+        "match": true,
+        "browserValue": "Intel Inc.",
+        "scraperValue": "Intel Inc.",
+        "scraperSource": "cdCanonical[36]"
+      },
+      {
+        "browserIndex": 31,
+        "schemaIndex": 52,
+        "fieldName": "timestampCollectionEnd",
+        "match": true,
+        "browserValue": 1775814894,
+        "scraperValue": 1775814894,
+        "scraperSource": "cdCanonical[52]"
+      },
+      {
+        "browserIndex": 33,
+        "schemaIndex": 9,
+        "fieldName": "screenResolution",
+        "match": true,
+        "browserValue": [
+          1280,
+          1400
+        ],
+        "scraperValue": [
+          1280,
+          1400
+        ],
+        "scraperSource": "cdCanonical[9]"
+      },
+      {
+        "browserIndex": 34,
+        "schemaIndex": 33,
+        "fieldName": "screenPosition",
+        "match": true,
+        "browserValue": "1;0",
+        "scraperValue": "1;0",
+        "scraperSource": "cdCanonical[33]"
+      },
+      {
+        "browserIndex": 35,
+        "schemaIndex": 56,
+        "fieldName": "canvasBlocked",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[56]"
+      },
+      {
+        "browserIndex": 36,
+        "schemaIndex": 11,
+        "fieldName": "sessionStorageAvail",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[11]"
+      },
+      {
+        "browserIndex": 37,
+        "schemaIndex": 13,
+        "fieldName": "localStorageAvail",
+        "match": true,
+        "browserValue": 1,
+        "scraperValue": 1,
+        "scraperSource": "cdCanonical[13]"
+      },
+      {
+        "browserIndex": 38,
+        "schemaIndex": 30,
+        "fieldName": "webdriverFlag",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[30]"
+      },
+      {
+        "browserIndex": 39,
+        "schemaIndex": 51,
+        "fieldName": "cookiesEnabled",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0,
+        "scraperSource": "cdCanonical[51]"
+      },
+      {
+        "browserIndex": 41,
+        "schemaIndex": 22,
+        "fieldName": "pageUrl",
+        "match": true,
+        "browserValue": "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+        "scraperValue": "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+        "scraperSource": "cdCanonical[22]"
+      },
+      {
+        "browserIndex": 42,
+        "schemaIndex": 38,
+        "fieldName": "internalToken",
+        "match": true,
+        "browserValue": "98k",
+        "scraperValue": "98k",
+        "scraperSource": "cdCanonical[38]"
+      },
+      {
+        "browserIndex": 43,
+        "schemaIndex": 0,
+        "fieldName": "callCounter",
+        "match": true,
+        "browserValue": 1,
+        "scraperValue": 1,
+        "scraperSource": "cdCanonical[0]"
+      },
+      {
+        "browserIndex": 44,
+        "schemaIndex": 6,
+        "fieldName": "languages",
+        "match": true,
+        "browserValue": [
+          "en-US",
+          "en"
+        ],
+        "scraperValue": [
+          "en-US",
+          "en"
+        ],
+        "scraperSource": "cdCanonical[6]"
+      },
+      {
+        "browserIndex": 45,
+        "schemaIndex": 32,
+        "fieldName": "characterSet",
+        "match": true,
+        "browserValue": "UTF-8",
+        "scraperValue": "UTF-8",
+        "scraperSource": "cdCanonical[32]"
+      },
+      {
+        "browserIndex": 47,
+        "schemaIndex": 7,
+        "fieldName": "colorGamutLegacy",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[7]"
+      },
+      {
+        "browserIndex": 49,
+        "schemaIndex": 34,
+        "fieldName": "intlOptions",
+        "match": true,
+        "browserValue": {
+          "timeZone": "Asia/Shanghai",
+          "calendar": "gregory",
+          "numberingSystem": "latn",
+          "locale": "en-US"
+        },
+        "scraperValue": {
+          "timeZone": "Asia/Shanghai",
+          "calendar": "gregory",
+          "numberingSystem": "latn",
+          "locale": "en-US"
+        },
+        "scraperSource": "cdCanonical[34]"
+      },
+      {
+        "browserIndex": 50,
+        "schemaIndex": 19,
+        "fieldName": "mimeTypes",
+        "match": true,
+        "browserValue": [
+          {
+            "type": "application/pdf",
+            "suffixes": "pdf"
+          },
+          {
+            "type": "text/pdf",
+            "suffixes": "pdf"
+          }
+        ],
+        "scraperValue": [
+          {
+            "type": "application/pdf",
+            "suffixes": "pdf"
+          },
+          {
+            "type": "text/pdf",
+            "suffixes": "pdf"
+          }
+        ],
+        "scraperSource": "cdCanonical[19]"
+      },
+      {
+        "browserIndex": 51,
+        "schemaIndex": 39,
+        "fieldName": "connectionType",
+        "match": true,
+        "browserValue": "unknown",
+        "scraperValue": "unknown",
+        "scraperSource": "cdCanonical[39]"
+      },
+      {
+        "browserIndex": 52,
+        "schemaIndex": 53,
+        "fieldName": "timestampCollectionStart",
+        "match": true,
+        "browserValue": 1775814894,
+        "scraperValue": 1775814894,
+        "scraperSource": "cdCanonical[53]"
+      },
+      {
+        "browserIndex": 53,
+        "schemaIndex": 10,
+        "fieldName": "devicePixelRatio",
+        "match": true,
+        "browserValue": 1,
+        "scraperValue": 1,
+        "scraperSource": "cdCanonical[10]"
+      },
+      {
+        "browserIndex": 54,
+        "schemaIndex": 1,
+        "fieldName": "osPlatform",
+        "match": true,
+        "browserValue": "windows",
+        "scraperValue": "windows",
+        "scraperSource": "cdCanonical[1]"
+      },
+      {
+        "browserIndex": 56,
+        "schemaIndex": 42,
+        "fieldName": "permissionStatus",
+        "match": true,
+        "browserValue": {
+          "_state": -2
+        },
+        "scraperValue": {
+          "_state": -2
+        },
+        "scraperSource": "cdCanonical[42]"
+      },
+      {
+        "browserIndex": 57,
+        "schemaIndex": 48,
+        "fieldName": "platform",
+        "match": true,
+        "browserValue": "Linux x86_64",
+        "scraperValue": "Linux x86_64",
+        "scraperSource": "cdCanonical[48]"
+      },
+      {
+        "browserIndex": 58,
+        "schemaIndex": 43,
+        "fieldName": "webrtcIp",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": "",
+        "scraperSource": "cdCanonical[43]"
+      },
+      {
+        "browserIndex": 59,
+        "schemaIndex": 49,
+        "fieldName": "colorDepth",
+        "match": true,
+        "browserValue": 24,
+        "scraperValue": 24,
+        "scraperSource": "cdCanonical[49]"
+      }
+    ]
+  },
+  "collectSd": {
+    "matching": 6,
+    "differing": 2,
+    "diffs": [
+      {
+        "field": "coordinate",
+        "match": false,
+        "browserValue": [
+          10,
+          60,
+          1.8559
+        ],
+        "scraperValue": [
+          10,
+          60,
+          1
+        ],
+        "reason": "coordinate[2] ratio: browser=1.8559, scraper=1.0 (hardcoded default). This is the CSS layout geometry ratio and likely a server-side detector."
+      },
+      {
+        "field": "ft",
+        "match": false,
+        "browserValue": "6f_7Pfn_H",
+        "scraperValue": "<random 9-char>",
+        "reason": "Browser ft=\"6f_7Pfn_H\" (possibly deterministic). Scraper generates random 9-char string each time."
+      }
+    ],
+    "matches": [
+      {
+        "field": "od",
+        "match": true,
+        "browserValue": "C",
+        "scraperValue": "C"
+      },
+      {
+        "field": "clientType",
+        "match": true,
+        "browserValue": "",
+        "scraperValue": ""
+      },
+      {
+        "field": "trycnt",
+        "match": true,
+        "browserValue": 1,
+        "scraperValue": 1
+      },
+      {
+        "field": "refreshcnt",
+        "match": true,
+        "browserValue": 0,
+        "scraperValue": 0
+      },
+      {
+        "field": "slideValue",
+        "match": true,
+        "browserValue": [
+          [
+            159,
+            812,
+            99
+          ],
+          [
+            80,
+            0,
+            16
+          ],
+          [
+            73,
+            -1,
+            17
+          ],
+          [
+            74,
+            1,
+            20
+          ],
+          [
+            63,
+            1,
+            23
+          ],
+          [
+            63,
+            0,
+            27
+          ],
+          [
+            58,
+            0,
+            23
+          ],
+          [
+            53,
+            0,
+            23
+          ],
+          [
+            46,
+            -2,
+            45
+          ],
+          [
+            46,
+            0,
+            29
+          ],
+          [
+            42,
+            1,
+            38
+          ],
+          [
+            39,
+            -1,
+            30
+          ],
+          [
+            35,
+            0,
+            37
+          ],
+          [
+            30,
+            1,
+            32
+          ],
+          [
+            31,
+            0,
+            26
+          ],
+          [
+            23,
+            0,
+            41
+          ],
+          [
+            25,
+            -1,
+            49
+          ],
+          [
+            20,
+            0,
+            49
+          ],
+          [
+            18,
+            0,
+            24
+          ],
+          [
+            18,
+            0,
+            23
+          ],
+          [
+            12,
+            0,
+            36
+          ],
+          [
+            13,
+            1,
+            24
+          ],
+          [
+            9,
+            -1,
+            42
+          ],
+          [
+            7,
+            0,
+            21
+          ],
+          [
+            9,
+            1,
+            46
+          ],
+          [
+            5,
+            -1,
+            21
+          ],
+          [
+            3,
+            1,
+            23
+          ],
+          [
+            3,
+            -2,
+            21
+          ],
+          [
+            4,
+            1,
+            35
+          ],
+          [
+            -1,
+            1,
+            29
+          ],
+          [
+            4,
+            -1,
+            19
+          ],
+          [
+            -2,
+            0,
+            35
+          ],
+          [
+            2,
+            -1,
+            20
+          ],
+          [
+            -2,
+            0,
+            21
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "scraperValue": [
+          [
+            159,
+            812,
+            99
+          ],
+          [
+            80,
+            0,
+            16
+          ],
+          [
+            73,
+            -1,
+            17
+          ],
+          [
+            74,
+            1,
+            20
+          ],
+          [
+            63,
+            1,
+            23
+          ],
+          [
+            63,
+            0,
+            27
+          ],
+          [
+            58,
+            0,
+            23
+          ],
+          [
+            53,
+            0,
+            23
+          ],
+          [
+            46,
+            -2,
+            45
+          ],
+          [
+            46,
+            0,
+            29
+          ],
+          [
+            42,
+            1,
+            38
+          ],
+          [
+            39,
+            -1,
+            30
+          ],
+          [
+            35,
+            0,
+            37
+          ],
+          [
+            30,
+            1,
+            32
+          ],
+          [
+            31,
+            0,
+            26
+          ],
+          [
+            23,
+            0,
+            41
+          ],
+          [
+            25,
+            -1,
+            49
+          ],
+          [
+            20,
+            0,
+            49
+          ],
+          [
+            18,
+            0,
+            24
+          ],
+          [
+            18,
+            0,
+            23
+          ],
+          [
+            12,
+            0,
+            36
+          ],
+          [
+            13,
+            1,
+            24
+          ],
+          [
+            9,
+            -1,
+            42
+          ],
+          [
+            7,
+            0,
+            21
+          ],
+          [
+            9,
+            1,
+            46
+          ],
+          [
+            5,
+            -1,
+            21
+          ],
+          [
+            3,
+            1,
+            23
+          ],
+          [
+            3,
+            -2,
+            21
+          ],
+          [
+            4,
+            1,
+            35
+          ],
+          [
+            -1,
+            1,
+            29
+          ],
+          [
+            4,
+            -1,
+            19
+          ],
+          [
+            -2,
+            0,
+            35
+          ],
+          [
+            2,
+            -1,
+            20
+          ],
+          [
+            -2,
+            0,
+            21
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "reason": "Using Puppeteer slideValue for like-for-like comparison"
+      },
+      {
+        "field": "dragobj",
+        "match": true,
+        "browserValue": 1,
+        "scraperValue": 1
+      }
+    ]
+  },
+  "vData": {
+    "browserLength": 152,
+    "scraperExpectedLength": 152,
+    "lengthMatch": true,
+    "browserEndsWithPadding": true,
+    "scraperProfile": {
+      "tp": "7446039806946242560",
+      "key": "__COMPUTED__",
+      "py": "0",
+      "env": "0",
+      "version": "2",
+      "cLod": "loadTDC",
+      "inf": "iframe",
+      "ss": "11%2Ctdc%2Cslide%2Cvm"
+    },
+    "notes": [
+      "vData is 152 chars (14x8-byte XTEA blocks → custom base64 with 65-char alphabet)",
+      "Browser vData cannot be decrypted without the build-specific XTEA key",
+      "Scraper computes key field from POST body via computeKeyField (char-lookup digest)",
+      "Scraper profile: tp=\"7446039806946242560\", py=\"0\", env=\"0\", version=\"2\", cLod=\"loadTDC\", inf=\"iframe\", ss=\"11%2Ctdc%2Cslide%2Cvm\""
+    ],
+    "potentialDifferences": [
+      {
+        "field": "key",
+        "reason": "key is a char-lookup digest of the POST body. Since collect token differs (different cd/sd), the serialized POST body differs, so key differs. This is expected and correct behavior."
+      },
+      {
+        "field": "tp",
+        "reason": "tp is a captured JS runtime error string. Scraper uses static \"7446039806946242560\" from profile. Browser value is unknown (encrypted in vData). If browser has a different tp, server could detect this."
+      },
+      {
+        "field": "ss",
+        "reason": "ss is \"11%2Ctdc%2Cslide%2Cvm\" in scraper profile. Browser value unknown. This encodes TDC lifecycle state and may differ if browser initialization differs."
+      },
+      {
+        "field": "inf",
+        "reason": "inf is \"iframe\" in scraper (window !== window.top in CAPTCHA iframe). Browser should also be \"iframe\" but verify via dynamic trace."
+      },
+      {
+        "field": "cLod",
+        "reason": "cLod is \"loadTDC\" in scraper. Browser value depends on TDC lifecycle. Should match."
+      },
+      {
+        "field": "py",
+        "reason": "py comes from arguments[1].py in getCaptchaData. Scraper uses \"0\". Browser value depends on orchestrator — may differ."
+      }
+    ]
+  },
+  "summary": {
+    "totalCdFields": 60,
+    "cdMatching": 53,
+    "cdDiffering": 7,
+    "sdFields": 8,
+    "sdMatching": 6,
+    "sdDiffering": 2,
+    "postFieldsTotal": 39,
+    "postFieldsMatching": 33,
+    "postFieldsDiffering": 5,
+    "criticalDifferences": [
+      {
+        "source": "cd",
+        "field": "maxTouchPoints",
+        "schemaIndex": 14,
+        "browserValue": "4",
+        "scraperValue": "0"
+      },
+      {
+        "source": "cd",
+        "field": "canvasHash",
+        "schemaIndex": 15,
+        "browserValue": "1189887932",
+        "scraperValue": "37437602"
+      },
+      {
+        "source": "cd",
+        "field": "performanceHash",
+        "schemaIndex": 54,
+        "browserValue": "681731712",
+        "scraperValue": "1283372547"
+      },
+      {
+        "source": "cd",
+        "field": "detectedFonts",
+        "schemaIndex": 4,
+        "browserValue": "\"7448307515255877632\"",
+        "scraperValue": "\"\""
+      },
+      {
+        "source": "cd",
+        "field": "maxTouchPointsDup",
+        "schemaIndex": 25,
+        "browserValue": "0",
+        "scraperValue": "4"
+      },
+      {
+        "source": "cd",
+        "field": "mathFingerprint",
+        "schemaIndex": 17,
+        "browserValue": "1.0739998817443848",
+        "scraperValue": "0.4289999008178711"
+      },
+      {
+        "source": "sd",
+        "field": "coordinate",
+        "browserValue": "[10,60,1.8559]",
+        "scraperValue": "[10,60,1]",
+        "reason": "coordinate[2] ratio: browser=1.8559, scraper=1.0 (hardcoded default). This is the CSS layout geometry ratio and likely a server-side detector."
+      },
+      {
+        "source": "sd",
+        "field": "ft",
+        "browserValue": "\"6f_7Pfn_H\"",
+        "scraperValue": "\"<random 9-char>\"",
+        "reason": "Browser ft=\"6f_7Pfn_H\" (possibly deterministic). Scraper generates random 9-char string each time."
+      }
+    ]
+  }
+}
