@@ -552,11 +552,13 @@ class Scraper {
       for (let i = 0; i < cdFieldOrder.length; i++) {
         const idx = cdFieldOrder[i];
         if (idx === -1) {
-          // Only the hashPosition -1 slot gets behavioral events
+          // Only the hashPosition -1 slot gets behavioral events.
+          // Other -1 slots are unmapped canonical fields — pass through
+          // the captured Chrome value from the profile's cd array.
           if (i === hashPos) {
             cdArray.push(behavioralEvents);
           } else {
-            cdArray.push('');
+            cdArray.push(cp.cd[i] !== undefined ? cp.cd[i] : '');
           }
         } else {
           cdArray.push(cdCanonical[idx]);

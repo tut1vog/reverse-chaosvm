@@ -100,8 +100,8 @@ Decrypted both collect tokens and ran semantic field matching across different t
 
 | ID | Task | Status |
 |----|------|--------|
-| 54.1 | Fix `_generateCollectChrome` to preserve captured values for non-hashPosition -1 slots instead of emptying them. | pending |
-| 54.2 | Re-run audit and verify collect-diff shows the 4 missing fields now present, check errorCode. | pending |
+| 54.1 | Fix `_generateCollectChrome` to preserve captured values for non-hashPosition -1 slots instead of emptying them. | done |
+| 54.2 | Re-run audit and verify collect-diff shows the missing fields now present, check errorCode. | in-progress |
 
 ---
 
