@@ -81,31 +81,23 @@ Decrypted both collect tokens and ran semantic field matching across different t
 | 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests. | done |
 | 53.4 | Fix the slide-jy.js fetch: add fallback to canonical CDN URL when sig._html unavailable. | done |
 | 53.5 | Add human-like timing delays: randomized pause between show page load and verify POST (2-5s). | done |
-| 53.6 | Re-run the full audit (Puppeteer + scraper + collect-diff) and verify that fixes narrow or eliminate errorCode -1. | pending |
+| 53.6 | Re-run the full audit (Puppeteer + scraper + collect-diff) and verify that fixes narrow or eliminate errorCode -1. | done |
+
+---
+
+## Phase 53.6 Results (2026-04-17)
+
+- Puppeteer: **errorCode 0** (success)
+- Scraper: **errorCode -1** (failure — unchanged)
+- Collect size gap narrowed from 1396 chars (27%) to 468 chars (9%) — pageUrl fix working
+- All 4 fixes confirmed working: pageUrl short, Accept-Language matches, slide-jy.js fetched, 2.2s delay applied
+- **Remaining suspects**:
+  1. 4 missing browser-API fields: `detectedFonts`, `sid`, `webglImage`, `webglRenderer` (empty in scraper)
+  2. 33+ unidentified fields may contain bot-detectable values
+  3. Collect token size is still ~9% larger — may itself be a signal
 
 ---
 
 ## Current Task
 
-**ID**: 53.6
-**Title**: Re-run full audit and verify fixes
-**Phase**: Phase 53 — Audit-derived fixes
-**Status**: pending
-
-### Goal
-Re-run the full Puppeteer + scraper audit flows and the collect-diff to verify that the Phase 53 fixes (pageUrl, Accept-Language, slide-jy.js, timing) improve the scraper's errorCode.
-
-### Implementation Steps
-1. Run Puppeteer CAPTCHA solve with audit logging
-2. Run scraper CAPTCHA solve with audit logging
-3. Run `scripts/audit-diff.js` on the new captures
-4. Run `scripts/collect-diff.js` on the new captures
-5. Check if errorCode changes from -1
-
-### Verification
-- [ ] Both audit runs complete successfully
-- [ ] Diff report shows reduced differences vs Phase 52 baseline
-- [ ] Document the new errorCode result
-
-### Suggested Agent
-general-purpose — runs the tools and captures output
+*Phase 53 complete. All 6 tasks done. Awaiting direction.*
