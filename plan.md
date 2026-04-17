@@ -179,24 +179,24 @@ Current task: **47.1** — Wire `profiles/chrome-fingerprint.json` into the scra
 | 49.2 | Fix scraper collect+sd to match Puppeteer: coordinate ratio, detectedFonts, per-session hash randomization, chrome profile refresh | done |
 | 49.3 | Tests for 49.2 — verify chrome profile values + coordinate ratio + diff script | done |
 | 49.4 | Live re-measurement (director-owned) — null result: 0/5 errorCode 0 | done |
+| 49.5 | Auto-refresh chrome-fingerprint.json from live Puppeteer capture | in-progress |
+| 49.6 | Live re-measurement #2 — verify with fresh profile | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 49.4
-**Title**: Live re-measurement — null result
+**ID**: 49.5
+**Title**: Auto-refresh chrome-fingerprint.json from live Puppeteer capture
 **Phase**: Phase 49 — errorCode -1 root cause
-**Status**: done
+**Status**: in-progress
 
-### Result
-5/5 errorCode -1 (plus 1 errorCode 12 rate-limit). Profile + coordinate fixes did NOT change the errorCode. The root cause is NOT in the collect token's static fingerprint values or sd.coordinate ratio.
+### Goal
+The chrome-fingerprint.json is fundamentally stale — a fresh Puppeteer decrypt revealed 13 field diffs including format mismatches (font names vs hash, empty vs full webglImage, swapped maxTouchPoints). Write a script that runs Puppeteer, extracts the real Chrome cd array from TDC, and saves it as the canonical profile.
 
-### Remaining hypotheses (priority order)
-1. **vData content mismatch** — the standalone vData generator builds from a static profile; the real vm-slide computes live values. Fields like `tp` (JS runtime error string), `ss` (TDC lifecycle state), `py` (orchestrator argument) may differ.
-2. **Behavioral events quality** — synthetic mouse trajectories may be statistically distinguishable from real ones.
-3. **Collect token encryption keyMods** — the live Template C build (`gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR`, 100 opcodes) may use different keyMod constants than what the auto-porting pipeline extracts.
-4. **Session-level server decision** — the server may decide errorCode at prehandle time based on IP/history, making the verify body content irrelevant.
-
-### Decision gate
-Profile/coordinate fixes are preserved (they're correct regardless). Phase 49 closes as a **partial result** — 49.2 fixes were valid improvements, but errorCode -1 persists. Need user input on next direction.
+### Key findings from fresh decrypt
+- `detectedFonts`: browser sends font NAMES string, profile has numeric HASH — format mismatch
+- `webglImage` (canonical 20): browser sends empty `""`, profile has base64 PNG
+- `audioFingerprint` (canonical 18): `baseLatency: 0.0116...` vs `0.01` — precision differs
+- `maxTouchPoints` / `maxTouchPointsDup`: STILL inconsistent with current machine
+- `availHeight`/`viewportWidth`: appear swapped (800/600 vs 600/800)

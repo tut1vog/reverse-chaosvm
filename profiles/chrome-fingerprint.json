@@ -1,17 +1,405 @@
 {
-  "_source": "Captured from headless Puppeteer/Chrome 146 on 2026-04-16",
+  "_source": "Auto-refreshed from Puppeteer/Chrome capture on 2026-04-17",
   "_template": "C",
-  "_tdcName": "gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR",
+  "_tdcName": "auto-detected",
   "_notes": "cd array is in Template C field order (post-shuffle). PER-SESSION indices must be substituted at generation time.",
   "perSessionIndices": {
-    "17": "sessionId (sid from prehandle)",
-    "25": "timestampInit (unix seconds)",
-    "29": "eventLog (mouse/touch/key events)",
-    "36": "pageUrl (show page URL with rand param)",
-    "51": "timestampCollectionEnd (unix seconds)",
-    "56": "timestampCollectionStart (unix seconds)"
+    "14": "pageUrl (show page URL with rand param)",
+    "55": "timestampInit (unix seconds)",
+    "56": "timestampCollectionStart (unix seconds)",
+    "57": "timestampCollectionEnd (unix seconds)"
   },
   "cd": [
+    "800-600-600-24-*-*-|-*",
+    "windows",
+    [
+      1280,
+      1400
+    ],
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "",
+    null,
+    "",
+    "Intel Inc.",
+    2,
+    "top",
+    "",
+    "",
+    {
+      "timeZone": "Asia/Shanghai",
+      "calendar": "gregory",
+      "numberingSystem": "latn",
+      "locale": "en-US"
+    },
+    0.8489999771118164,
+    "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
+    1,
+    "98k",
+    0,
+    0,
+    "Intel Iris OpenGL Engine",
+    8,
+    {
+      "nt_vc_output": {
+        "ac-baseLatency": 0.011609977324263039,
+        "ac-outputLatency": 0,
+        "ac-sampleRate": 44100,
+        "ac-maxChannelCount": 2,
+        "ac-numberOfInputs": 1,
+        "ac-numberOfOutputs": 0,
+        "ac-channelCount": 2,
+        "ac-channelCountMode": "explicit",
+        "ac-channelInterpretation": "speakers",
+        "an-fftSize": 2048,
+        "an-frequencyBinCount": 1024,
+        "an-minDecibels": -100,
+        "an-maxDecibels": -30,
+        "an-smoothingTimeConstant": 0.8,
+        "an-numberOfInputs": 1,
+        "an-numberOfOutputs": 1,
+        "an-channelCount": 2,
+        "an-channelCountMode": "max",
+        "an-channelInterpretation": "speakers"
+      },
+      "pxi_output": 11888.616780045351
+    },
+    1023,
+    4,
+    [
+      {
+        "type": "application/pdf",
+        "suffixes": "pdf"
+      },
+      {
+        "type": "text/pdf",
+        "suffixes": "pdf"
+      }
+    ],
+    572524160,
+    [
+      {
+        "codec": "H.264",
+        "support": "probably"
+      },
+      {
+        "codec": "H.264 High",
+        "support": "probably"
+      },
+      {
+        "codec": "H.265/HEVC",
+        "support": ""
+      },
+      {
+        "codec": "VP8",
+        "support": "probably"
+      },
+      {
+        "codec": "VP9",
+        "support": "probably"
+      },
+      {
+        "codec": "AV1",
+        "support": "probably"
+      },
+      {
+        "codec": "Theora",
+        "support": ""
+      },
+      {
+        "codec": "MPEG-4",
+        "support": ""
+      }
+    ],
+    "srgb",
+    [
+      [
+        4,
+        -1,
+        -1,
+        1776345645715,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        159,
+        811,
+        1510,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        150,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        0,
+        68,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        157,
+        0,
+        37,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        134,
+        1,
+        60,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        59,
+        1,
+        32,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        107,
+        -1,
+        68,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        89,
+        0,
+        67,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        76,
+        0,
+        66,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        60,
+        0,
+        67,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        48,
+        -1,
+        68,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        18,
+        1,
+        49,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        18,
+        0,
+        50,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        29,
+        1,
+        66,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        7,
+        -1,
+        50,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        10,
+        0,
+        31,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        6,
+        0,
+        35,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        6,
+        1,
+        33,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        3,
+        -1,
+        31,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        3,
+        0,
+        36,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        2,
+        0,
+        41,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        2,
+        0,
+        60,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        -1,
+        -1,
+        146,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    {
+      "_state": -2
+    },
+    [
+      {
+        "name": "PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Chrome PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Chromium PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "Microsoft Edge PDF Viewer",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      },
+      {
+        "name": "WebKit built-in PDF",
+        "description": "Portable Document Format",
+        "filename": "internal-pdf-viewer"
+      }
+    ],
+    0,
+    {
+      "brands": [],
+      "mobile": false,
+      "platform": ""
+    },
+    1,
+    "unknown",
+    0,
+    "GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJoAJv/ilf7GhGwAAAABJRU5ErkJggg==",
+    "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
+    0,
+    0,
+    [
+      "en-US",
+      "en"
+    ],
     {
       "_state": 0,
       "architecture": "",
@@ -25,22 +413,22 @@
       "uaFullVersion": "",
       "wow64": false
     },
-    {
-      "_state": -2
-    },
-    "UTF-8",
-    600,
-    "1;0",
-    "+08",
-    0,
-    1,
-    0,
+    800,
     "",
+    "UTF-8",
+    "1;0",
     {
-      "brands": [],
-      "mobile": false,
-      "platform": ""
+      "_state": 0,
+      "quota": 10737418240,
+      "usage": null,
+      "usageDetails": {}
     },
+    0,
+    "+08",
+    "7450533642822729728",
+    "Linux x86_64",
+    1,
+    600,
     [
       {
         "codec": "AAC",
@@ -79,352 +467,12 @@
         "support": "maybe"
       }
     ],
-    "",
-    "Intel Iris OpenGL Engine",
-    "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
-    0.4289999008178711,
-    "srgb",
-    "7450441658890645504",
-    0,
-    {
-      "_state": 0,
-      "quota": 10737418240,
-      "usage": null,
-      "usageDetails": {}
-    },
-    0,
-    0,
-    "windows",
-    "",
-    "",
-    1776323715,
-    "Linux x86_64",
-    0,
-    0,
-    [
-      [
-        4,
-        -1,
-        -1,
-        1776323715323,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        159,
-        812,
-        1286,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        2,
-        0,
-        0,
-        182,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        1,
-        1,
-        54,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        249,
-        0,
-        44,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        137,
-        -2,
-        59,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        118,
-        1,
-        41,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        97,
-        0,
-        59,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        78,
-        -1,
-        47,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        36,
-        0,
-        37,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        56,
-        1,
-        66,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        43,
-        -1,
-        67,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        32,
-        1,
-        66,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        20,
-        0,
-        67,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        15,
-        -1,
-        49,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        9,
-        0,
-        68,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        2,
-        1,
-        67,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        1,
-        1,
-        -1,
-        41,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        3,
-        0,
-        0,
-        141,
-        0,
-        0,
-        0,
-        0
-      ]
-    ],
-    "",
-    "Intel Inc.",
-    [
-      {
-        "codec": "H.264",
-        "support": "probably"
-      },
-      {
-        "codec": "H.264 High",
-        "support": "probably"
-      },
-      {
-        "codec": "H.265/HEVC",
-        "support": ""
-      },
-      {
-        "codec": "VP8",
-        "support": "probably"
-      },
-      {
-        "codec": "VP9",
-        "support": "probably"
-      },
-      {
-        "codec": "AV1",
-        "support": "probably"
-      },
-      {
-        "codec": "Theora",
-        "support": ""
-      },
-      {
-        "codec": "MPEG-4",
-        "support": ""
-      }
-    ],
-    "top",
-    "unknown",
-    "800-600-600-24-*-*-|-*",
-    "https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347",
-    1023,
-    "",
-    [
-      "en-US",
-      "en"
-    ],
-    [
-      {
-        "name": "PDF Viewer",
-        "description": "Portable Document Format",
-        "filename": "internal-pdf-viewer"
-      },
-      {
-        "name": "Chrome PDF Viewer",
-        "description": "Portable Document Format",
-        "filename": "internal-pdf-viewer"
-      },
-      {
-        "name": "Chromium PDF Viewer",
-        "description": "Portable Document Format",
-        "filename": "internal-pdf-viewer"
-      },
-      {
-        "name": "Microsoft Edge PDF Viewer",
-        "description": "Portable Document Format",
-        "filename": "internal-pdf-viewer"
-      },
-      {
-        "name": "WebKit built-in PDF",
-        "description": "Portable Document Format",
-        "filename": "internal-pdf-viewer"
-      }
-    ],
-    null,
-    2,
-    [
-      1280,
-      1400
-    ],
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
-    [
-      {
-        "type": "application/pdf",
-        "suffixes": "pdf"
-      },
-      {
-        "type": "text/pdf",
-        "suffixes": "pdf"
-      }
-    ],
-    1,
-    37437602,
-    4,
-    {
-      "nt_vc_output": {
-        "ac-baseLatency": 0.01,
-        "ac-outputLatency": 0,
-        "ac-sampleRate": 44100,
-        "ac-maxChannelCount": 2,
-        "ac-numberOfInputs": 1,
-        "ac-numberOfOutputs": 0,
-        "ac-channelCount": 2,
-        "ac-channelCountMode": "explicit",
-        "ac-channelInterpretation": "speakers",
-        "an-fftSize": 2048,
-        "an-frequencyBinCount": 1024,
-        "an-minDecibels": -100,
-        "an-maxDecibels": -30,
-        "an-smoothingTimeConstant": 0.8,
-        "an-numberOfInputs": 1,
-        "an-numberOfOutputs": 1,
-        "an-channelCount": 2,
-        "an-channelCountMode": "max",
-        "an-channelInterpretation": "speakers"
-      },
-      "pxi_output": 10240
-    },
-    1,
-    1776323717,
-    0,
-    "98k",
-    800,
-    1283372547,
-    1776323715,
-    {
-      "timeZone": "Asia/Shanghai",
-      "calendar": "gregory",
-      "numberingSystem": "latn",
-      "locale": "en-US"
-    },
+    1546386734,
+    1776345645,
+    1776345645,
+    1776345648,
     24,
-    8
+    0
   ],
   "sd": {
     "od": "C",
@@ -439,143 +487,153 @@
     "slideValue": [
       [
         160,
-        813,
-        53
+        811,
+        67
       ],
       [
-        88,
-        0,
-        15
-      ],
-      [
-        86,
-        -1,
-        15
-      ],
-      [
-        75,
-        1,
-        15
-      ],
-      [
-        72,
-        -1,
-        17
-      ],
-      [
-        65,
-        -1,
-        42
-      ],
-      [
-        63,
-        1,
-        20
-      ],
-      [
-        55,
-        0,
-        20
-      ],
-      [
-        51,
+        80,
         1,
         21
       ],
       [
-        46,
+        77,
         -1,
-        38
+        16
       ],
       [
-        41,
-        -1,
-        20
-      ],
-      [
-        37,
-        0,
-        26
-      ],
-      [
-        36,
-        0,
-        37
-      ],
-      [
-        30,
+        68,
         1,
-        26
+        19
       ],
       [
-        26,
+        66,
         0,
         40
       ],
       [
-        21,
-        0,
+        59,
+        1,
+        33
+      ],
+      [
+        55,
+        -2,
+        25
+      ],
+      [
+        52,
+        1,
+        42
+      ],
+      [
+        48,
+        1,
         26
       ],
       [
-        22,
+        41,
         -1,
         41
       ],
       [
-        16,
-        1,
-        24
-      ],
-      [
-        16,
-        0,
-        43
-      ],
-      [
-        13,
+        41,
         0,
         24
       ],
       [
-        7,
+        35,
         0,
         42
       ],
       [
-        9,
+        30,
         0,
-        22
+        27
       ],
       [
-        6,
+        30,
+        0,
+        40
+      ],
+      [
+        27,
+        0,
+        29
+      ],
+      [
+        21,
+        -1,
+        39
+      ],
+      [
+        18,
+        1,
+        48
+      ],
+      [
+        18,
+        0,
+        50
+      ],
+      [
+        15,
         -1,
         27
       ],
       [
-        4,
+        14,
+        2,
+        38
+      ],
+      [
+        7,
+        -1,
+        50
+      ],
+      [
+        10,
+        0,
+        31
+      ],
+      [
+        6,
+        0,
+        36
+      ],
+      [
+        6,
+        1,
+        32
+      ],
+      [
+        3,
+        -1,
+        32
+      ],
+      [
+        3,
+        0,
+        36
+      ],
+      [
+        2,
         0,
         21
       ],
       [
-        5,
-        0,
-        47
+        1,
+        -1,
+        17
       ],
       [
         1,
         1,
-        24
-      ],
-      [
-        1,
-        0,
         43
       ],
       [
-        1,
         -1,
-        23
+        -1,
+        20
       ],
       [
         0,
@@ -590,8 +648,8 @@
     1,
     "windows",
     2,
-    800,
-    "7448307515255877632",
+    600,
+    "Arial,Courier New,Times New Roman,Helvetica,Ubuntu,WenQuanYi Zen Hei",
     "",
     [
       "en-US",
@@ -640,13 +698,13 @@
       }
     ],
     1,
-    4,
-    1189887932,
+    0,
+    572524160,
     1776323715,
-    1.0739998817443848,
+    0.8489999771118164,
     {
       "nt_vc_output": {
-        "ac-baseLatency": 0.01,
+        "ac-baseLatency": 0.011609977324263039,
         "ac-outputLatency": 0,
         "ac-sampleRate": 44100,
         "ac-maxChannelCount": 2,
@@ -666,7 +724,7 @@
         "an-channelCountMode": "max",
         "an-channelInterpretation": "speakers"
       },
-      "pxi_output": 10240
+      "pxi_output": 11888.616780045351
     },
     [
       {
@@ -678,7 +736,7 @@
         "suffixes": "pdf"
       }
     ],
-    "GgoAAAANSUhEUgAAASwAAACWCAYAAA5PuFFW0sP/M9169FjkvtP/vvDn78+4MA/JAitOx/SzQAAAAASUVORK5CYII=",
+    "",
     {
       "_state": 0,
       "quota": 10737418240,
@@ -714,7 +772,7 @@
       }
     ],
     0,
-    0,
+    4,
     "+08",
     0,
     "srgb",
@@ -789,7 +847,7 @@
       "_state": -2
     },
     "",
-    600,
+    800,
     0,
     {
       "brands": [],
@@ -803,73 +861,73 @@
     0,
     1776323715,
     1776323717,
-    681731712,
+    1546386734,
     "",
     0,
     1023,
     ""
   ],
   "chromeFieldOrder": [
-    37,
-    42,
-    32,
-    44,
-    33,
-    26,
-    11,
-    0,
-    24,
-    5,
-    46,
-    29,
-    7,
-    -1,
-    20,
-    17,
-    28,
-    -1,
-    27,
-    21,
-    30,
-    45,
-    1,
-    43,
-    50,
-    16,
-    48,
-    51,
-    56,
-    -1,
-    55,
-    -1,
-    12,
-    41,
-    -1,
     47,
-    22,
-    57,
-    58,
-    6,
-    23,
-    35,
-    2,
+    1,
     9,
     31,
-    19,
-    10,
-    15,
-    25,
-    18,
-    13,
-    53,
-    14,
-    38,
-    3,
-    54,
-    52,
+    5,
+    35,
+    7,
+    -1,
+    2,
+    41,
+    20,
+    43,
     34,
+    17,
+    22,
+    0,
+    38,
+    11,
+    24,
+    -1,
+    8,
+    18,
+    57,
+    25,
+    19,
+    15,
+    12,
+    28,
+    -1,
+    42,
+    23,
+    27,
+    46,
+    10,
+    -1,
+    30,
+    -1,
+    4,
+    45,
+    51,
+    6,
+    37,
+    44,
+    50,
+    32,
+    33,
+    21,
+    56,
+    26,
+    -1,
+    48,
+    13,
+    3,
+    29,
+    54,
+    16,
+    53,
+    52,
     49,
-    8
+    14
   ],
   "perSessionCanonical": {
     "16": "timestampInit (unix seconds)",
@@ -877,17 +935,12 @@
     "52": "timestampCollectionEnd (unix seconds)",
     "53": "timestampCollectionStart (unix seconds)"
   },
-  "_missingCanonical": {
-    "4": "detectedFonts — updated to match Puppeteer reference capture value",
-    "36": "vendor — mapped from -1 slot cd[31] (webgl vendor = Intel Inc.)",
-    "39": "connectionType — mapped from -1 slot cd[34] (unknown)",
-    "40": "webglRenderer — mapped from -1 slot cd[13] (Intel Iris OpenGL Engine)"
-  },
   "_behavioralSlots": {
-    "13": "webglRenderer value (Intel Iris OpenGL Engine) — also fills canonical[40]",
-    "17": "sessionId (sid from prehandle) — NOT a canonical field, injected into -1 slot",
-    "29": "eventLog (mouse/touch/key events) — NOT a canonical field, injected into -1 slot",
-    "31": "vendor value (Intel Inc.) — also fills canonical[36]",
-    "34": "connectionType value (unknown) — also fills canonical[39]"
+    "7": "hash/behavioral slot (value: Intel Inc.)",
+    "19": "hash/behavioral slot (value: Intel Iris OpenGL Engine)",
+    "28": "hash/behavioral slot (value: [[4,-1,-1,1776345645715,0,0,0,0],[1,159,811,1510,0,0,0,0],[2)",
+    "34": "hash/behavioral slot (value: unknown)",
+    "36": "hash/behavioral slot (value: GgoAAAANSUhEUgAAASwAAACWCAYAAA5NaTBbpWkt+U1bjlI58vrFvnpybnJo)",
+    "49": "hash/behavioral slot (value: 7450533642822729728)"
   }
 }
