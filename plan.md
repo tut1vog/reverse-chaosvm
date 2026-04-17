@@ -38,35 +38,34 @@ Current task: **52.1** — Instrument `httpRequest` and Puppeteer with request-l
 |----|------|--------|
 | 52.1 | Instrument `httpRequest` with request-level logging (URL, method, headers, timing, status, response size); instrument Puppeteer `captcha-solver.js` to capture the same data from Chrome DevTools Protocol. Both write to a common JSON schema under `output/phase-52-audit/`. | done |
 | 52.2 | Instrument token generation: scraper logs decrypted collect fields (full cd array, sd object), behavioral events array, vData plaintext fields. Puppeteer captures the same from the intercepted verify POST body (decrypt collect, decode vData). Both append to the same audit JSON. | done |
-| 52.3 | Build `scripts/audit-diff.js` that loads a Puppeteer audit log and a scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, timing diffs, header diffs, POST body field diffs, collect cd diffs, sd diffs, vData field diffs, behavioral event shape diffs. | pending |
+| 52.3 | Build `scripts/audit-diff.js` that loads a Puppeteer audit log and a scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, timing diffs, header diffs, POST body field diffs, collect cd diffs, sd diffs, vData field diffs, behavioral event shape diffs. | done |
 | 52.4 | Run both flows, produce the diff report, and analyze findings. | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 52.3
-**Title**: Build audit-diff.js — categorized comparison of two audit logs
+**ID**: 52.4
+**Title**: Run both flows, produce diff report, analyze findings
 **Phase**: Phase 52 — Full-flow side-by-side audit
 **Status**: pending
 
 ### Goal
-Build `scripts/audit-diff.js` that loads a Puppeteer and scraper audit log, diffs them field-by-field, and prints a categorized report: request-chain diffs, header diffs, POST body field diffs, token field diffs, timing diffs. The output should narrow the root cause to 1–3 concrete items.
+Run the Puppeteer solver and scraper back-to-back, capture both audit logs, run the diff script, and analyze the output to identify the root cause(s) of errorCode -1.
 
 ### Context
-52.1 + 52.2 are done. Both flows write `output/phase-52-audit/{scraper,puppeteer}-audit.json` with identical schemas: `{ source, timestamp, requests[], tokens{}, result }`. Each request entry has: seq, step, method, url, requestHeaders, requestBodyDigest, responseStatus, responseHeaders, responseSize, startTime, duration, error. Token fields: collectLength, collectEncoded, eks, vData, ans, slideSd, behavioralEventsCount, nonce, vsig, websig, sess, tlg, sid.
+52.1–52.3 are done. Both flows are instrumented. `scripts/audit-diff.js` produces categorized diffs. Now we need to actually run them and read the results.
 
 ### Implementation Steps
-1. Read both JSON files
-2. Diff request chains (match by step label, compare URL patterns, methods, header sets, response statuses)
-3. Diff token fields (compare lengths, values where same-session tokens aren't expected to match but field presence/length/shape should)
-4. Diff POST field coverage (scraper logs all 38+ verify fields, Puppeteer captures from raw POST body)
-5. Report categorized diffs with severity
+1. Run Puppeteer: `node tools/captcha-solver/cli.js`
+2. Run scraper: `node tools/scraper/cli.js --captcha-only --verbose`
+3. Run diff: `node scripts/audit-diff.js output/phase-52-audit/puppeteer-audit.json output/phase-52-audit/scraper-audit.json`
+4. Analyze output and document findings
 
 ### Verification
-- [ ] `node scripts/audit-diff.js output/phase-52-audit/puppeteer-audit.json output/phase-52-audit/scraper-audit.json` runs without error on sample data
-- [ ] Output clearly categorizes differences
-- [ ] `npm test` still passes
+- [ ] Both audit JSON files exist with ≥8 request entries each
+- [ ] Diff report produced and analyzed
+- [ ] Root cause narrowed to 1–3 concrete items
 
 ### Suggested Agent
-general-purpose
+Director runs this manually (live network required)
