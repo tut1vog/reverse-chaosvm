@@ -299,7 +299,7 @@ class CaptchaClient {
     const h = {
       'User-Agent': this.userAgent,
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+      'Accept-Language': 'en-US,en;q=0.9',
       'Accept-Encoding': 'gzip, deflate, br, zstd',
       // Chrome client hints — HAR shows these on ALL requests (Category 3+4)
       'Cache-Control': 'no-cache',

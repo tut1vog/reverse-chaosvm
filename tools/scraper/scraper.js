@@ -387,7 +387,7 @@ class Scraper {
               headers: {
                 'User-Agent': this.userAgent,
                 'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Accept-Language': 'en-US,en;q=0.9',
                 'Accept-Encoding': 'gzip, deflate, br, zstd',
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache',
@@ -427,7 +427,7 @@ class Scraper {
             headers: {
               'User-Agent': this.userAgent,
               'Accept': '*/*',
-              'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+              'Accept-Language': 'en-US,en;q=0.9',
               'Accept-Encoding': 'gzip, deflate, br, zstd',
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',
@@ -469,7 +469,7 @@ class Scraper {
               headers: {
                 'User-Agent': this.userAgent,
                 'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Accept-Language': 'en-US,en;q=0.9',
                 'Accept-Encoding': 'gzip, deflate, br, zstd',
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache',
@@ -638,7 +638,7 @@ class Scraper {
                 headers: {
                   'User-Agent': this.userAgent,
                   'Accept': '*/*',
-                  'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                  'Accept-Language': 'en-US,en;q=0.9',
                   'Accept-Encoding': 'gzip, deflate, br, zstd',
                   'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
                   'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
@@ -793,33 +793,40 @@ class Scraper {
         const vmSlideSource = await this._getVmSlideSource(sig, { auditLogger });
 
         // (k1) Fetch slide-jy.js from CDN (HAR entry 8).
-        // Real browser loads this via <script> tag in show page HTML.
-        // We don't use the response — only the network request matters.
-        if (sig._html) {
-          const jyScriptMatch = sig._html.match(/src="(https?:\/\/captcha\.gtimg\.com\/[^"]*slide-jy[^"]*)"/);
-          if (jyScriptMatch) {
-            const jyScriptUrl = jyScriptMatch[1];
-            this._log('Step 6b: fetch slide-jy.js (HAR entry 8)');
-            try {
-              await httpRequest(jyScriptUrl, {
-                headers: {
-                  'User-Agent': this.userAgent,
-                  'Accept': '*/*',
-                  'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-                  'Accept-Encoding': 'gzip, deflate, br, zstd',
-                  'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
-                  'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-                  'sec-ch-ua-mobile': '?0',
-                  'sec-ch-ua-platform': '"Windows"',
-                },
-                timeout: 10000,
-                auditLogger: auditLogger,
-                auditStep: 'slide-jy',
-              });
-              this._log('  slide-jy.js fetched');
-            } catch (err) {
-              this._log('  slide-jy.js fetch failed (non-fatal): ' + err.message);
+        // tcaptcha-slide.js loads this dynamically. sig._html may contain
+        // an htdocsPath config, but it's often unavailable. Fall back to the
+        // canonical CDN URL observed in Chrome captures.
+        {
+          let jyScriptUrl = null;
+          if (sig._html) {
+            const htdocsMatch = sig._html.match(/htdocsPath\s*:\s*"(https?:\/\/[^"]*)"/);
+            if (htdocsMatch) {
+              jyScriptUrl = htdocsMatch[1].replace(/\/+$/, '') + '/slide-jy.js';
             }
+          }
+          if (!jyScriptUrl) {
+            jyScriptUrl = 'https://captcha.gtimg.com/1/slide-jy.js';
+          }
+          this._log('Step 6b: fetch slide-jy.js (HAR entry 8)');
+          try {
+            await httpRequest(jyScriptUrl, {
+              headers: {
+                'User-Agent': this.userAgent,
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br, zstd',
+                'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
+                'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"Windows"',
+              },
+              timeout: 10000,
+              auditLogger: auditLogger,
+              auditStep: 'slide-jy',
+            });
+            this._log('  slide-jy.js fetched');
+          } catch (err) {
+            this._log('  slide-jy.js fetch failed (non-fatal): ' + err.message);
           }
         }
 

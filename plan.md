@@ -78,8 +78,8 @@ Decrypted both collect tokens and ran semantic field matching across different t
 |----|------|--------|
 | 53.1 | Decrypt both collect tokens and diff cd field arrays | done |
 | 53.2 | Fix pageUrl in collect: scraper should capture only the short `?rand=...` URL, not the full show URL with all params. | done |
-| 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests. | pending |
-| 53.4 | Fix the slide-jy.js fetch: update the regex in scraper.js to match the live show page HTML. | pending |
+| 53.3 | Fix Accept-Language to `en-US,en;q=0.9` across all scraper HTTP requests. | done |
+| 53.4 | Fix the slide-jy.js fetch: add fallback to canonical CDN URL when sig._html unavailable. | done |
 | 53.5 | Add human-like timing delays: randomized pause between show page load and verify POST (2-5s). | pending |
 | 53.6 | Re-run the full audit (Puppeteer + scraper + collect-diff) and verify that fixes narrow or eliminate errorCode -1. | pending |
 
@@ -87,31 +87,25 @@ Decrypted both collect tokens and ran semantic field matching across different t
 
 ## Current Task
 
-**ID**: 53.2
-**Title**: Fix pageUrl in collect token
+**ID**: 53.5
+**Title**: Add human-like timing delays
 **Phase**: Phase 53 — Audit-derived fixes
 **Status**: pending
 
 ### Goal
-Fix the scraper's collect generator so that the `pageUrl` cd field contains a short `?rand=...` URL (matching Chrome's real TDC behavior) instead of the full `cap_union_new_show?aid=...&protocol=...` URL which leaks captcha context.
+Add a randomized delay (2-5 seconds) between the show page load and the verify POST to simulate human-like timing. The Phase 52 audit showed the scraper completes in 1.2s vs Puppeteer's 5.0s, with only 41ms between caplog-pre and verify vs Chrome's 3314ms.
 
 ### Context
-
-The collect-diff (53.1) showed Puppeteer's pageUrl is `"https://t.captcha.qq.com/cap_union_new_show?rand=1519713624347"` while the scraper sends the full show URL with all query parameters (779 chars). The real TDC.js running in Chrome's iframe only sees `location.href` which is the short rand-only URL after the redirect — the full URL with all params is the initial navigation URL, not what the iframe sees.
-
-**Files to investigate**:
-- `tools/scraper/collect-generator.js` — where `pageUrl` is set in the cd array
-- `profiles/default.json` — may contain a `pageUrl` field
-- The scraper's template cdFieldOrder to find which index `pageUrl` maps to
+The delay should be inserted in `tools/scraper/scraper.js` in the `solve()` method, between the caplog pre-verify beacon (step 7a) and the verify POST (step 8). This simulates the time a real user takes to drag the slider.
 
 ### Implementation Steps
-1. Find where `pageUrl` is populated in `tools/scraper/collect-generator.js`
-2. Change it to generate a short `https://t.captcha.qq.com/cap_union_new_show?rand=<timestamp>` URL
-3. Verify the change doesn't break test suite
+1. Find the verify POST section in scraper.js (search for "verify" or "Step 8")
+2. Add a `await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000))` before the verify POST
+3. Log the delay duration when verbose
 
 ### Verification
-- [ ] `npm test` passes (296/296)
-- [ ] Running `node scripts/collect-diff.js` shows pageUrl now matches the short format
+- [ ] `npm test` passes (530/530)
+- [ ] The delay is positioned between caplog-pre and the verify POST
 
 ### Suggested Agent
-general-purpose — simple code change in the collect generator
+general-purpose — simple code insertion

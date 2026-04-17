@@ -167,7 +167,7 @@ async function fireBeacon(url, opts) {
   const timeout = typeof o.timeoutMs === 'number' ? o.timeoutMs : 3000;
   const headers = {
     'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+    'Accept-Language': 'en-US,en;q=0.9',
     'Accept-Encoding': 'gzip, deflate, br, zstd',
     'Cache-Control': 'no-cache',
     'Pragma': 'no-cache',
