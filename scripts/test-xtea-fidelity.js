@@ -238,6 +238,106 @@ if (!collectStr) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// Test C — vData XTEA key verification (Puppeteer-captured vData)
+// ═══════════════════════════════════════════════════════════════════════
+
+console.log('=== Test C: vData XTEA key verification (Puppeteer-captured vData) ===');
+
+const { customBase64Decode } = require(path.join(projectRoot, 'tools', 'vdata-generator', 'custom-base64.js'));
+const { xteaDecryptLE, keyFromHex } = require(path.join(projectRoot, 'tools', 'vdata-generator', 'xtea.js'));
+const { PERM } = require(path.join(projectRoot, 'tools', 'vdata-generator', 'build-plaintext.js'));
+
+const PAD_ALPHABET = '0abcdefghijklmnop';
+
+// Build inverse permutation: INV_PERM[PERM[k]] = k
+const INV_PERM = new Array(16);
+for (let k = 0; k < 16; k++) INV_PERM[PERM[k]] = k;
+
+let testCPass = false;
+let testCPlaintext = null;
+let testCError = null;
+
+const vDataStr = verifyPost.vData;
+if (!vDataStr) {
+  console.log('  SKIP: No vData field in verify-post.json');
+} else {
+  console.log('  vData string length:', vDataStr.length, 'chars');
+  console.log('  vData:', vDataStr);
+
+  try {
+    // Step 1: Custom base64 decode
+    const cipherBuf = customBase64Decode(vDataStr);
+    console.log('  Base64-decoded ciphertext:', cipherBuf.length, 'bytes');
+
+    // Step 2: XTEA decrypt with the vData key
+    // Key hex is the hex encoding of ASCII '2e430f8c15b7da96'
+    const VDATA_KEY_HEX = '32653433306638633135623764613936';
+    const vdataKey = keyFromHex(VDATA_KEY_HEX);
+    console.log('  XTEA key (BE uint32):', vdataKey.map(k => '0x' + (k >>> 0).toString(16)));
+
+    const decryptedBuf = xteaDecryptLE(cipherBuf, vdataKey);
+    console.log('  Decrypted buffer:', decryptedBuf.length, 'bytes');
+
+    // Step 3: Inverse ShiftRows — undo the 16-byte block permutation
+    const unpermuted = Buffer.alloc(decryptedBuf.length);
+    for (let i = 0; i < decryptedBuf.length; i += 16) {
+      for (let k = 0; k < 16; k++) {
+        unpermuted[i + k] = decryptedBuf[i + INV_PERM[k]];
+      }
+    }
+
+    // Step 4: Strip PKCS#7-style padding
+    // Last byte's index in PAD_ALPHABET gives padLen
+    const lastByte = unpermuted[unpermuted.length - 1];
+    const lastChar = String.fromCharCode(lastByte);
+    const padIdx = PAD_ALPHABET.indexOf(lastChar);
+
+    let strippedBuf;
+    if (padIdx > 0 && padIdx <= 16) {
+      // Verify all pad bytes match
+      let padValid = true;
+      for (let j = unpermuted.length - padIdx; j < unpermuted.length; j++) {
+        if (unpermuted[j] !== lastByte) {
+          padValid = false;
+          break;
+        }
+      }
+      if (padValid) {
+        strippedBuf = unpermuted.slice(0, unpermuted.length - padIdx);
+        console.log('  Padding char:', JSON.stringify(lastChar), '(padLen=' + padIdx + ')');
+      } else {
+        strippedBuf = unpermuted;
+        console.log('  WARNING: Padding bytes inconsistent, keeping full buffer');
+      }
+    } else {
+      strippedBuf = unpermuted;
+      console.log('  WARNING: Last byte not in pad alphabet, keeping full buffer');
+    }
+
+    testCPlaintext = strippedBuf.toString('utf8');
+    console.log('  Plaintext length:', testCPlaintext.length, 'chars');
+    console.log('  Plaintext:', testCPlaintext);
+
+    // Step 5: Validate — should contain &-delimited key=value pairs with known field names
+    const hasKnownField = /\b(inf|tp|key|version|env|cLod|ss|py)=/.test(testCPlaintext);
+    const hasAmpersand = testCPlaintext.includes('&');
+    const hasEquals = testCPlaintext.includes('=');
+
+    console.log('  Contains known vData field:', hasKnownField);
+    console.log('  Contains & delimiter:', hasAmpersand);
+    console.log('  Contains = separator:', hasEquals);
+
+    testCPass = hasKnownField && hasAmpersand && hasEquals;
+  } catch (e) {
+    testCError = e.message;
+    console.log('  ERROR:', e.message);
+  }
+
+  console.log('  Result:', testCPass ? 'PASS' : 'FAIL');
+}
+console.log();
+
+// ═══════════════════════════════════════════════════════════════════════
 // Save summary
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -278,6 +378,13 @@ const summary = {
       }
     })() : null,
   },
+  testC: {
+    name: 'vData XTEA key verification (Puppeteer-captured vData)',
+    vDataLength: verifyPost.vData ? verifyPost.vData.length : null,
+    pass: testCPass,
+    plaintext: testCPlaintext,
+    error: testCError,
+  },
 };
 
 const outPath = path.join(projectRoot, 'output', 'phase-51-xtea-fidelity', 'round-trip-result.json');
@@ -285,5 +392,7 @@ fs.writeFileSync(outPath, JSON.stringify(summary, null, 2), 'utf8');
 console.log('\nSummary saved to', outPath);
 
 // Exit code
-const allPass = summary.testA.pass && (summary.testB.pass === true || summary.testB.pass === null);
+const allPass = summary.testA.pass
+  && (summary.testB.pass === true || summary.testB.pass === null)
+  && (summary.testC.pass === true || summary.testC.pass === null);
 process.exit(allPass ? 0 : 1);

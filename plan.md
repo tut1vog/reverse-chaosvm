@@ -47,41 +47,16 @@ Current task: **51.1** — Collect token round-trip test
 | ID | Task | Status |
 |----|------|--------|
 | 51.1 | Collect token XTEA round-trip — encrypt a known plaintext with auto-ported params, decrypt, verify identity. Also: capture a fresh Puppeteer collect token on the same template, decrypt with the same params, verify valid JSON. | done |
-| 51.2 | vData XTEA key verification — decrypt the Puppeteer-captured vData with the scraper's reference key (`2e430f8c15b7da96`), verify we get valid kv plaintext. If not: instrument vm-slide to extract the live key. | pending |
-| 51.3 | Fix + re-test if either test reveals a mismatch | pending |
+| 51.2 | vData XTEA key verification — decrypt the Puppeteer-captured vData with the scraper's reference key (`2e430f8c15b7da96`), verify we get valid kv plaintext. If not: instrument vm-slide to extract the live key. | done |
+| 51.3 | Fix + re-test if either test reveals a mismatch | done (n/a — both tests passed) |
 
 ---
 
-## Current Task
+## Phase 51 Complete
 
-**ID**: 51.2
-**Title**: vData XTEA key verification
-**Phase**: Phase 51 — XTEA encryption fidelity
-**Status**: pending
+All three tests in `scripts/test-xtea-fidelity.js` pass:
+- **Test A** (self round-trip): collect XTEA encrypt/decrypt recovers plaintext exactly
+- **Test B** (cross-validation): Puppeteer collect decrypts to valid 60-field cd + 8-key sd JSON
+- **Test C** (vData key): Puppeteer vData decrypts to valid 98-char kv plaintext: `ss=11%2Ctdc%2Cslide%2Cvm&tp=...&inf=top&key=41yy&py=0&env=0&version=2&cLod=loadTDC`
 
-### Goal
-Verify the scraper's vData XTEA key matches the live vm-slide build by decrypting the Puppeteer-captured vData from `output/puppeteer-capture/verify-post.json` using the scraper's reference key (`2e430f8c15b7da96`). If decryption produces valid key=value plaintext, the key is correct. If not, instrument vm-slide to extract the live key.
-
-### Context
-- Puppeteer capture `output/puppeteer-capture/verify-post.json` has `vData` field: `"VueBKpkQNbhk8PJ_PeBGUrZa0SQPFx78UAhqWVgeezUpKA*ve*PQ6N3w9sDZZt1oEJ6cgPkA*6IszW6wXxShntDQwNwNrzCkpXo6ZdlScDNnPyVjyb*GScppLGfpD*256njvt-OW9r-jnadWhe91IGYY"`
-- vData pipeline: custom 65-char base64 decode → XTEA decrypt → un-ShiftRows → un-PKCS#7-pad → plaintext
-- Reference key: `2e430f8c15b7da96` (16 ASCII bytes → 4 LE uint32s)
-- Encoder/decoder in `tools/vdata-generator/encode.js`
-- Test fixtures in `tests/fixtures/vdata-{jsdom,har}-capture.json` round-trip with this key
-
-### Implementation Steps
-1. Add a Test C to `scripts/test-xtea-fidelity.js` (or write a separate script) that:
-   a. Reads the `vData` field from verify-post.json
-   b. Decodes with the vData custom base64 alphabet
-   c. Decrypts with the reference XTEA key
-   d. Un-ShiftRows and un-pads
-   e. Checks if output looks like valid kv pairs (e.g. contains `key=` or `tp=` or `inf=`)
-   f. Prints PASS/FAIL
-
-### Verification
-- [ ] Script runs and reports PASS/FAIL for vData decryption
-- [ ] If PASS: vData key confirmed correct for live build
-- [ ] If FAIL: raw hex output shows garbled data, confirming key mismatch
-
-### Suggested Agent
-general-purpose — needs vdata-generator encode.js, fixture format knowledge
+**Conclusion**: Both XTEA encryption layers (collect token and vData) are correct for the live template. XTEA encryption eliminated as root cause for errorCode -1. The server can decrypt both payloads — the rejection must be content-level or session-level.
