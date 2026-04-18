@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 60** — Inject TDC_itoken cookie into scraper
-Current task: **60.2** — Run scraper and check errorCode
+Current phase: **Phase 61** — TLS fingerprint test via curl-impersonate
+Current task: **61.1** — Build TLS experiment script
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -321,9 +321,124 @@ general-purpose — targeted serializer fix
 
 ---
 
+### Phase 61: TLS fingerprint test via curl-impersonate
+
+> **Hypothesis**: The verify endpoint fingerprints the TLS ClientHello (JA3/JA4). Node.js uses OpenSSL with different cipher suites, extensions, and ordering vs Chrome's BoringSSL. This is the last remaining transport-layer difference — the HTTP headers are essentially identical between scraper and Puppeteer.
+>
+> **Test design**: Run the scraper's normal flow for everything *except* the final verify POST. Instead of sending via Node.js `https.request()` (OpenSSL), dump the complete request (headers + body) and replay it via `curl-impersonate-chrome` (BoringSSL, Chrome TLS fingerprint). If errorCode changes from -1 to 0, TLS fingerprint is the root cause.
+>
+> **Tool**: `curl-impersonate-chrome` is installed at `/usr/local/bin/curl-impersonate-chrome` — uses BoringSSL (same as Chrome), supports HTTP/2, and mimics Chrome's exact TLS ClientHello.
+
+| ID | Task | Status |
+|----|------|--------|
+| 61.1 | Build `scripts/tls-experiment.js` — runs scraper flow through vData generation, then sends verify POST via `curl-impersonate-chrome` subprocess instead of Node.js https. Records errorCode. Also runs a control: same body via Node.js `https` (normal scraper path) for comparison. | pending |
+| 61.2 | Run the experiment, analyze results. | pending |
+
+---
+
 ## Current Task
 
-*(Phase 60 complete. Awaiting user direction for next investigation.)*
+**ID**: 61.1
+**Title**: Build TLS experiment script
+**Phase**: Phase 61 — TLS fingerprint test
+**Status**: pending
+
+### Goal
+Build a script that runs the scraper's CAPTCHA flow but sends the final verify POST via `curl-impersonate-chrome` instead of Node.js `https`. Compare errorCode with the normal Node.js path. This isolates TLS fingerprint as the only variable.
+
+### Context
+
+**Why this test is definitive**: Phase 58 proved the scraper's collect token is accepted when sent through Chrome. Phase 60 proved the missing cookie wasn't the cause. The HTTP request headers are now essentially identical (verified by user's Chrome capture vs scraper's `_headers()`). The only remaining difference is the TLS layer: Node.js OpenSSL vs Chrome BoringSSL.
+
+**`curl-impersonate-chrome`** at `/usr/local/bin/curl-impersonate-chrome`:
+- Uses BoringSSL (same TLS library as Chrome)
+- Mimics Chrome's exact TLS ClientHello: cipher suites, extensions, ALPN, signature algorithms
+- Supports HTTP/2 with Chrome-like settings
+- Version: curl 8.1.1 with BoringSSL
+
+**Scraper's verify path** (captcha-client.js):
+- `httpRequest()` (line 128) uses Node.js `https.request()` → OpenSSL
+- Verify headers built by `_headers()` (line 298) + verify-specific overrides (line 1072)
+- Cookie jar injected at line 140-144
+- Body is the raw-concat serialized POST body + `&vData=...`
+
+### Implementation design
+
+The script runs **2 test cases** per session:
+1. **Test A (curl-impersonate)**: Full scraper flow → capture the exact URL, headers, body → send via `curl-impersonate-chrome` subprocess
+2. **Test B (Node.js https)**: Same flow, same everything, but send via normal `https.request()` (scraper's default path)
+
+Both tests need **separate sessions** (each verify consumes the session). For test A, the script must:
+1. Run the normal scraper flow (prehandle → show → solve → collect → vData)
+2. Build the exact verify request (URL, headers object, body string)
+3. Instead of calling `httpRequest()`, spawn `curl-impersonate-chrome` as a child process:
+   ```bash
+   curl-impersonate-chrome \
+     -X POST \
+     -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" \
+     -H "Accept: application/json, text/javascript, */*; q=0.01" \
+     -H "User-Agent: Mozilla/5.0 ..." \
+     -H "Origin: https://t.captcha.qq.com" \
+     -H "Referer: https://t.captcha.qq.com/cap_union_new_show?..." \
+     -H "X-Requested-With: XMLHttpRequest" \
+     -H "Sec-Fetch-Dest: empty" \
+     -H "Sec-Fetch-Mode: cors" \
+     -H "Sec-Fetch-Site: same-origin" \
+     -H "Cache-Control: no-cache" \
+     -H "Pragma: no-cache" \
+     -H "sec-ch-ua: ..." \
+     -H "sec-ch-ua-mobile: ?0" \
+     -H "sec-ch-ua-platform: \"Windows\"" \
+     -H "Cookie: TDC_itoken=<value>" \
+     -H "Accept-Language: en-US,en;q=0.9" \
+     -H "Accept-Encoding: gzip, deflate, br, zstd" \
+     -d @<body-file> \
+     "https://t.captcha.qq.com/cap_union_new_verify"
+   ```
+4. Parse the curl response for errorCode
+
+**Key implementation detail**: The scraper currently does everything inside `CaptchaClient.verify()`. For test A, we need to intercept *after* the body is built but *before* it's sent. Options:
+- (a) Use `_rawBodyCapture` callback (already exists at line 1060) to capture the body, then send via curl separately
+- (b) Fork the flow: run the scraper up to `_buildPostFields` + `serializePostFields` + `buildVDataForPost`, capture the final body, then choose transport
+
+Option (b) is cleaner — import the scraper's modules directly and build the request manually.
+
+### Verification
+- [ ] Script runs without crashing
+- [ ] Output `output/phase-61/tls-experiment.json` has results for both tests
+- [ ] Test B (Node.js) returns errorCode -1 (confirms the scraper's normal behavior)
+- [ ] Test A (curl-impersonate) returns a different errorCode (ideally 0)
+
+### Suggested Agent
+general-purpose — child process spawning + scraper flow reuse
+
+### Output format
+```json
+{
+  "timestamp": "...",
+  "results": [
+    {
+      "testId": "A",
+      "testName": "curl-impersonate-chrome",
+      "transport": "curl-impersonate-chrome (BoringSSL)",
+      "errorCode": ...,
+      "httpStatus": ...,
+      "ticket": "...",
+      "template": "...",
+      "tdcName": "...",
+      "timestamp": "..."
+    },
+    {
+      "testId": "B",
+      "testName": "node-https",
+      "transport": "Node.js https (OpenSSL)",
+      "errorCode": -1,
+      "httpStatus": 200,
+      ...
+    }
+  ]
+}
+```
 
 ---
 
