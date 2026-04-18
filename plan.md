@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 64** — Cleanup pass
-Current task: **64.6** — Drop `decompile` script from `package.json`
+Current task: **64.7** — Doc path sweep
 
 > Phases 38–63 closed (errorCode -1 → 0 investigation). Detail in `git log`.
 
@@ -23,7 +23,7 @@ Current task: **64.6** — Drop `decompile` script from `package.json`
 | 64.3 | Remove 5 dead research tracks (`research/errorcode-12/`, `research/scraper-tls-impersonation/`, `research/collector-fields/`, `research/eks-payload/`, `research/key-mod/`), `docs/ERRORCODE_12_INVESTIGATION.md`, and orphan `tests/test-token-isolation.js` (imports just-deleted module) | done |
 | 64.4 | Remove `scripts/`, `history/`, `docs/PROGRESS.md`, `docs/WORKFLOW.md`, `docs/CONVENTIONS.md` | done |
 | 64.5 | Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md` | done |
-| 64.6 | Remove `decompile` script from `package.json` | pending |
+| 64.6 | Remove `decompile` script from `package.json` | done |
 | 64.7 | Doc path sweep — scrub `targets/tdc*.js` and `sample/*` citations across `docs/` (excluding `HAR_ANALYSIS.md`), `README.md`, and `.claude/` (agents, commands, skills) | pending |
 | 64.8 | Rewrite `docs/HAR_ANALYSIS.md` — abstract description of the captured flow, cross-references to current docs, protocol analysis preserved | pending |
 | 64.9 | Dependency usage audit — report remaining references to `puppeteer`, `puppeteer-extra`, `puppeteer-extra-plugin-stealth`, `canvas` after earlier cleanup tasks land (report only — do not remove) | pending |
@@ -87,37 +87,113 @@ Groups A, C, D, E, G do not depend on `sample/` and should survive. The durable 
 
 ## Current Task
 
-**ID**: 64.6
-**Title**: Drop `decompile` script from `package.json`
+**ID**: 64.7
+**Title**: Doc path sweep — scrub `targets/tdc*.js`, `sample/*`, and other deleted-path citations across `docs/` (excluding HAR_ANALYSIS.md), `README.md`, and `.claude/`
 **Phase**: Phase 64 — Cleanup pass
 **Status**: in-progress
 
 ### Goal
-Remove the `decompile` npm script from `package.json`. Its command line was `node research/tdc-register-vm/run.js --input targets/tdc.js --output output/tdc`, which references two paths that were deleted in 64.1 (`output/tdc`) and 64.2 (`targets/tdc.js`). The target script (`research/tdc-register-vm/run.js`) still exists and accepts `--input <path>` / `--output <dir>` flags directly — the npm alias is the dead thing, not the tool.
+Replace every stale reference to a deleted path (from 64.1–64.6) with an abstract description. Preserve technical content. Leave `docs/HAR_ANALYSIS.md` alone — 64.8 rewrites it wholesale. No test code touches this, but `npm test` must stay green.
 
-### Context
-- Current `package.json` scripts: `decompile`, `token:standalone`, `solve:puppeteer`, `test`. Remove `decompile`; keep the other three.
-- Do NOT touch `dependencies`, `name`, `description`, `private`, or anything else.
-- `CLAUDE.md` documents the decompile invocation as `node research/tdc-register-vm/run.js --input <path> --output output/<stem>` (without the npm alias) — no doc edit needed here.
-- Cross-reference check: `grep -rn 'npm run decompile\|"decompile"' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` — flag for 64.7 if needed.
+### Transformation rules
 
-**Protected**: everything else.
+**`targets/tdc*.js` citations**:
+- `targets/tdc.js` → "the Template A reference build" (or phrase as appropriate to context — it's the reference build in every repo citation).
+- `targets/tdc-v2.js` / `tdc-v3.js` / `tdc-v4.js` / `tdc-v5.js` / `tdc-live.js` → the specific template (B, C, or other) by name, OR a generic "a known tdc.js build" when the specific template isn't the point.
+- `targets/tdc*.js` / `across targets/` → "across known templates A / B / C" or "across the register-machine tdc.js builds observed to date".
+- "in `targets/`" / "read-only `targets/`" language → remove or rephrase as "the caller-supplied target path" (the tools now take a path argument).
+
+**`sample/*` citations**:
+- `sample/vm_slide.js` → "the vm-slide build the research scripts were run against".
+- `sample/t_captcha_slide.js` → "the `t_captcha_slide.js` build the research scripts were run against".
+- `sample/captcha-har.har` → "the captured CAPTCHA HAR the research scripts were run against" (or rephrase to a protocol-level description when possible).
+- `sample/slide-jy.js` → "the jQuery-style bundle fetched during the slide flow".
+- `sample/bot.py`, `sample/payload.txt`, `sample/cap_union_prehandle` — unlikely to be cited; if they are, abstract them similarly.
+
+**Known handoffs from 64.3 / 64.4 / 64.6 (must all be fixed)**:
+- `docs/VM_SLIDE_ARCHITECTURE.md` — 4 refs to `research/eks-payload/`, 2 refs to `research/key-mod/` (both dead tracks). Replace with abstract descriptions of what was in those tracks, or cut if the surrounding paragraph is about the dead track itself.
+- `docs/CAPTCHA_ORCHESTRATOR.md` — 3 refs to `docs/ERRORCODE_12_INVESTIGATION.md` (deleted doc). Remove or rewrite the sentences.
+- `docs/VERSION_DIFFERENCES.md:373` — "See `scripts/tdc-survey.js` for survey methodology" — scripts/ is gone. Either describe the methodology in-line or remove the pointer.
+- `README.md:220-223` — table rows for `WORKFLOW.md`, `CONVENTIONS.md`, `PROGRESS.md` (deleted docs). Remove those rows.
+- `README.md:251` — `npm run decompile` reference. Replace with the direct-invocation form documented in `CLAUDE.md`: `node research/tdc-register-vm/run.js --input <path> --output output/<stem>`, or cut if the surrounding prose is otherwise broken.
+- `tests/test-tdc-diagnose.js:4` and `tests/test-tdc-survey.js:4` — stale header comments pointing at `scripts/tdc-diagnose.js` / `scripts/tdc-survey.js`. These are code comments, not doc citations. The brief's scope for 64.7 is docs + README + `.claude/`. **Skip these two test-file comments** — note in the report that they exist but are out of this task's scope (they can be handled in a follow-up pass if the user wants).
+
+**Brief's explicit doc sweep list** (scrub all of these):
+- `docs/CHAOSVM_VARIANTS.md`, `docs/VM_SLIDE_ARCHITECTURE.md`, `docs/VM_SLIDE_OPCODES.md`, `docs/CAPTCHA_ORCHESTRATOR.md`, `docs/VDATA_FORMAT.md`, `docs/TOKEN_FORMAT.md`, `docs/TOKEN_DECRYPTION.md`, `docs/COLLECTOR_SCHEMA.md`, `docs/COLLECT_FINGERPRINT_ANALYSIS.md`, `docs/CRYPTO_ANALYSIS.md`, `docs/EKS_FORMAT.md`, `docs/OPCODE_REFERENCE.md`, `docs/VM_ARCHITECTURE.md`, `docs/VERSION_DIFFERENCES.md`.
+- `README.md` — sweep same stale paths; cut any phase-narrative prose (e.g. "Phase 47 proved X" or "Phase 63 slim scraper" prose in the README should be cut or abstracted). Match the style of the refreshed `CLAUDE.md` — concise, no phase narrative. Keep the usage sections. Don't change the project description at the top unless the paths in it are stale.
+- `.claude/agents/key-extractor.md`, `.claude/agents/opcode-mapper.md`, `.claude/agents/token-verifier.md` — replace "`targets/*.js` (READ ONLY)" / "never modify `targets/`" language with "the caller-supplied target path". The agents are always invoked with a path argument.
+- `.claude/commands/port-version.md` — update argument description and example so it no longer implies `targets/tdc-v*.js`. The command still takes a path; make the example a fresh-fetch path (e.g. `./output/puppeteer-capture/tdc-source.js` or a temp path).
+- `.claude/commands/scrape.md` — sweep for `targets/`/`sample/` references (likely none, verify).
+- `.claude/skills/port-opcodes.md` — path sweep.
+
+**Do not modify**:
+- `docs/HAR_ANALYSIS.md` — 64.8 rewrites it.
+- Any file under `tools/`, `tests/`, `research/`, `profiles/`.
+- `CLAUDE.md` — already refreshed in the scaffold.
+- `package.json`, `plan.md`, `project-brief.md`, `.gitignore`.
+- `.claude/rules/*.md` — all four surviving rules (coding-style, output-versioning, research-artifacts, verify-dont-assume) are already refreshed in the scaffold; the patterns above shouldn't touch them.
+
+**Preserve technical content**. This is pure reference scrubbing. Do not delete or rewrite protocol analysis, field tables, opcode tables, XTEA parameter discussions, fingerprint schemas, or algorithmic descriptions. If a paragraph's entire purpose is "this is the specific file the research script was run against" and that sentence is the only point, the abstracted version is fine; but keep everything else.
+
+### Before-edit discovery
+Before editing, run the following and save the output as your starting checklist — the specific line numbers/files are the scope:
+
+```bash
+# 1. Stale sample/ and targets/ citations across the doc sweep set
+grep -rnE '(sample/|targets/)[a-zA-Z0-9_.-]+' \
+  docs/ README.md .claude/agents/ .claude/commands/ .claude/skills/ \
+  2>/dev/null | grep -v 'docs/HAR_ANALYSIS\.md'
+
+# 2. "targets/" READ ONLY / never-modify patterns
+grep -rnE '(READ ONLY|never modify).{0,40}targets/' \
+  docs/ README.md .claude/ 2>/dev/null | grep -v 'docs/HAR_ANALYSIS\.md'
+
+# 3. Deleted-doc / deleted-track name references
+grep -rnE '(ERRORCODE_12_INVESTIGATION|PROGRESS\.md|WORKFLOW\.md|CONVENTIONS\.md|eks-payload|key-mod|errorcode-12|scraper-tls-impersonation|collector-fields)' \
+  docs/ README.md .claude/ 2>/dev/null | grep -v 'docs/HAR_ANALYSIS\.md'
+
+# 4. Deleted scripts references
+grep -rnE 'scripts/[a-zA-Z0-9_.-]+\.(js|py)' \
+  docs/ README.md .claude/ 2>/dev/null | grep -v 'docs/HAR_ANALYSIS\.md'
+
+# 5. npm run decompile
+grep -rnE 'npm run decompile' docs/ README.md .claude/ 2>/dev/null
+```
 
 ### Implementation Steps
-1. Read `package.json`.
-2. Remove the `decompile` key from the `scripts` object. Preserve JSON formatting.
-3. Run `npm test` — must stay green.
-4. Capture Verification output.
+1. Run the 5 grep queries and save their combined output as the work queue. Every hit outside `docs/HAR_ANALYSIS.md` must be addressed.
+2. For each file that has hits, read it, apply the transformation rules above, then verify the file re-reads cleanly (no broken Markdown tables, no orphan sentences). Preserve file-level anchors, section headers, and technical content.
+3. For `README.md` specifically: also cut phase-narrative prose (e.g. "Phase 47 eliminated X", "Phase 63 slim scraper", etc.). Match the compact reference-style of the refreshed `CLAUDE.md`. Keep the usage commands, directory layout, and stack section.
+4. For `.claude/agents/*.md` (3 files) and `.claude/commands/port-version.md`: rewrite the "target path" convention language to reflect that the caller always supplies a path argument.
+5. Run `npm test` — must stay green.
+6. Re-run the 5 grep queries — all 5 should now return empty output (or only lines in `docs/HAR_ANALYSIS.md`, which is out of scope).
 
 ### Verification — capture exact output
-- `node --input-type=commonjs -e "const p=require('./package.json'); console.log(Object.keys(p.scripts).sort().join(','));"` → `solve:puppeteer,test,token:standalone`.
-- `node --input-type=commonjs -e "const p=require('./package.json'); console.log('decompile' in p.scripts ? 'PRESENT' : 'GONE');"` → `GONE`.
-- `git diff --cached --name-only` → only `package.json`.
+- Re-run each of the 5 grep queries. All 5 should be empty when restricted to the sweep surface (exclude HAR_ANALYSIS.md).
 - `npm test 2>&1 | tail -8` → `# fail 0`.
-- Cross-reference grep results.
+- `git diff --cached --name-only | sort` → only files within the sweep set (docs/<various>.md, README.md, .claude/agents/<3 files>.md, .claude/commands/<maybe 2>.md, .claude/skills/port-opcodes.md). No files under `tools/`, `tests/`, `research/`, `profiles/`. No changes to `CLAUDE.md`, `package.json`, `plan.md`, `project-brief.md`.
+- For each modified agent file (`key-extractor.md`, `opcode-mapper.md`, `token-verifier.md`): `grep -iE 'targets/\*\.js|READ ONLY|never modify.*targets/' <file>` → `0` matches.
+- For `README.md`: `grep -nE 'npm run decompile|WORKFLOW\.md|CONVENTIONS\.md|PROGRESS\.md|targets/tdc|sample/' README.md` → `0` matches (the `targets/` in grep is specifically the deleted directory, not arbitrary uses of the word "targets" in prose).
+
+### Report back
+Under 500 words:
+1. The Before-edit grep findings (count per file).
+2. Per-file summary of what you changed and why.
+3. The After-edit grep findings (should be empty per query).
+4. `npm test` summary.
+5. Any files with hits in the Before scan that you intentionally didn't change, with justification.
+6. Any surprises.
+
+### Constraints
+- **Do not make any git commits.** The director handles the final commit after verification.
+- **Do not modify** `docs/HAR_ANALYSIS.md`, any file under `tools/`/`tests/`/`research/`/`profiles/`, `CLAUDE.md`, `package.json`, `plan.md`, `project-brief.md`, `.claude/rules/*.md`, `.claude/settings.local.json` (if present), or `.gitignore`.
+- **Do not add or remove files** — this is an edit-only pass.
+- **Preserve technical accuracy**. If you're uncertain whether a change preserves meaning, leave the text as-is and flag it in the report for director review.
+- **Do not invent facts**. When replacing "in `targets/tdc.js`" with "in the Template A reference build", the original sentence's subject must actually be about the Template A reference build. If the context is ambiguous, use a generic phrasing ("in one of the known register-machine tdc.js builds") rather than asserting template identity.
+- **If the task becomes too large or ambiguous**, stop partway and report — do not press on with uncertain edits.
 
 ### Suggested Agent
-general-purpose — trivial JSON edit + test.
+general-purpose — large-surface reference scrub with mechanical transformation rules; benefits from careful reading of surrounding context before each edit.
 
 ### Goal
 Land the Option A remediation: on top of the already-done 64.2 work (still unstaged in the working tree), delete the 12 decompiler-snapshot test files and trim Groups B/F from `tests/test-vdata-for-post.js`. Update `package.json`'s `test` script to drop the 12 additional entries. `npm test` must be fully green before commit.
