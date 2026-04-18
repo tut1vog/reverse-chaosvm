@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 64** — Cleanup pass
-Current task: **64.9** — Dependency usage audit (report-only)
+Current task: **64.10** — Final: delete `plan.md` and `project-brief.md`
 
 > Phases 38–63 closed (errorCode -1 → 0 investigation). Detail in `git log`.
 
@@ -26,7 +26,7 @@ Current task: **64.9** — Dependency usage audit (report-only)
 | 64.6 | Remove `decompile` script from `package.json` | done |
 | 64.7 | Doc path sweep — scrub `targets/tdc*.js` and `sample/*` citations across `docs/` (excluding `HAR_ANALYSIS.md`), `README.md`, and `.claude/` (agents, commands, skills) | done |
 | 64.8 | Rewrite `docs/HAR_ANALYSIS.md` — abstract description of the captured flow, cross-references to current docs, protocol analysis preserved | done |
-| 64.9 | Dependency usage audit — report remaining references to `puppeteer`, `puppeteer-extra`, `puppeteer-extra-plugin-stealth`, `canvas` after earlier cleanup tasks land (report only — do not remove) | pending |
+| 64.9 | Dependency usage audit — report remaining references to `puppeteer`, `puppeteer-extra`, `puppeteer-extra-plugin-stealth`, `canvas` after earlier cleanup tasks land (report only — do not remove) | done |
 | 64.10 | Final: delete `plan.md` and `project-brief.md` | pending |
 
 ---
@@ -87,10 +87,33 @@ Groups A, C, D, E, G do not depend on `sample/` and should survive. The durable 
 
 ## Current Task
 
-**ID**: 64.9
-**Title**: Dependency usage audit (report-only)
+**ID**: 64.10
+**Title**: Final — delete `plan.md` and `project-brief.md`
 **Phase**: Phase 64 — Cleanup pass
 **Status**: in-progress
+
+### Goal
+Delete the two tracking documents that carried this cleanup pass:
+- `project-brief.md` (root) — the planning input; brief's own final instruction is to delete this file.
+- `plan.md` (root) — the director's working memory; `CLAUDE.md`'s Planning Context section states "The repo has no long-running planning artifact; each short-lived project pass writes a brief at the start and deletes it when the pass is done."
+
+After this commit the repo's end-state is reached for Phase 64. `git log` is the durable record of the cleanup pass.
+
+### Steps (director handles directly — no subagent needed)
+1. `git rm plan.md project-brief.md`.
+2. Confirm `npm test` still green (no test depends on either file, but sanity-check).
+3. `git status --short` — expect exactly 2 staged deletions and no working-tree residue.
+4. Commit as the passed-task record for 64.10 with the full cleanup pass summary in the body.
+
+### Verification
+- `test ! -e plan.md && echo GONE || echo PRESENT` → `GONE`.
+- `test ! -e project-brief.md && echo GONE || echo PRESENT` → `GONE`.
+- `git status --short` → empty after commit.
+- `git log --oneline e38b7f6..HEAD` — the full Phase 64 commit chain readable in one glance.
+- `npm test` → `# fail 0`.
+
+### Notes
+This is the only task in this pass where the director executes the work directly rather than dispatching — the operation is pure bookkeeping (git rm + commit) with no application code involved. The commit subject/body serves as the Phase 64 wrap-up journal entry in `git log`.
 
 ### Goal
 Per the brief's explicit scope: "`puppeteer`, `puppeteer-extra`, `puppeteer-extra-plugin-stealth`, `canvas` — flag if usage is ambiguous after cleanup; confirm with user before removing." Produce an evidence-based usage report for each of these 4 dependencies. Do NOT modify `package.json`.
