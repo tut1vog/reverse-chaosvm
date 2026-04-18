@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 58** — Controlled collect corruption experiment
-Current task: **58.1** — Build the experiment script
+Current task: **58.2** — Analyze results (complete)
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -232,22 +232,51 @@ general-purpose — targeted serializer fix
 
 | ID | Task | Status |
 |----|------|--------|
-| 58.1 | Build `scripts/collect-experiment.js` — a Puppeteer script that runs 5 CAPTCHA solves, each with a different collect token variant, records errorCode for each. | in-progress |
-| 58.2 | Run the experiment, analyze results, document findings in `output/phase-58/`. | pending |
+| 58.1 | Build `scripts/collect-experiment.js` — a Puppeteer script that runs 5 CAPTCHA solves, each with a different collect token variant, records errorCode for each. | done |
+| 58.2 | Run the experiment, analyze results, document findings in `output/phase-58/`. | done |
+
+---
+
+## Phase 58 Results (2026-04-18)
+
+### Error code mapping discovered:
+
+| Test | Collect | errorCode | Interpretation |
+|------|---------|-----------|---------------|
+| A (baseline) | Chrome's real TDC collect | **0** | ✅ Control passes — flow works |
+| B (garbled) | Random base64 | *crashed* | Template rotation (96 opcodes) — key extraction returned null, not a script bug |
+| C (empty) | `""` | **12** | Server requires non-empty collect |
+| D (scraper-collect) | Our `generateCollect()` | **0** | 🔴 **Our collect generator is NOT the cause of errorCode -1** |
+| E (poisoned) | Valid structure, Bot/1.0 + all zeros | **12** | Server decrypts and scores individual cd field values |
+
+### Key findings:
+
+1. **errorCode 12 = fingerprint/content rejection** — the server decrypts the collect token and inspects individual cd field values. Both empty collect (C) and poisoned fields (E) produce errorCode 12.
+2. **🔴 CRITICAL: Test D got errorCode 0** — our standalone `generateCollect()` with live XTEA params + Chrome profile, sent through the real Puppeteer browser flow, produces a valid ticket. This proves **the scraper's collect token is accepted when the surrounding context is a real browser**. The errorCode -1 in the headless scraper is NOT caused by the collect token itself.
+3. **errorCode -1 ≠ errorCode 12** — the scraper gets -1, not 12. This means the server can decrypt and validate the scraper's collect fine (otherwise it would return 12). The -1 is from something else entirely — likely the request context (TLS, headers, request chain, timing, IP reputation) rather than token content.
+4. **Template rotation is aggressive** — hit templates with 94, 96, and 98 opcodes across 5 runs. Test B's 96-opcode template isn't in the known set (A=95, B=94, C=100).
+
+### Implications for root cause:
+- Collect token content is **eliminated** as the errorCode -1 root cause.
+- errorCode 12 is the fingerprint scoring error code; -1 is something different.
+- Next investigation should focus on what differs between Puppeteer's fetch() and the scraper's HTTP client at the transport/session level.
 
 ---
 
 ## Current Task
 
+*(Phase 58 complete. Awaiting user direction for next investigation.)*
+
+---
+
+## Archived Current Task (Phase 58.1)
+
 **ID**: 58.1
 **Title**: Build the collect corruption experiment script
 **Phase**: Phase 58 — Controlled collect corruption experiment
-**Status**: in-progress
+**Status**: done
 
-### Goal
-Create a Puppeteer experiment script that runs 5 controlled test cases through the full CAPTCHA solve flow, varying ONLY the collect token in the verify POST body. Each test case uses its own fresh session (separate CAPTCHA solve). This isolates collect as the single variable while keeping TLS, headers, vData, and all other POST fields identical to a real browser.
-
-### Context
+### Context (archived)
 
 **Base flow to reuse**: `tools/captcha-solver/live-submit.js` already implements the full Puppeteer CAPTCHA flow:
 1. Launch browser (steps 1–3: prehandle → show page → solve slider)

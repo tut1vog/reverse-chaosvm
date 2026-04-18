@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-04-18T04:05:36.725Z",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+  "results": [
+    {
+      "testId": "A",
+      "testName": "baseline",
+      "description": "Chrome's real TDC-generated collect",
+      "collectLength": 3980,
+      "tlg": "3980",
+      "errorCode": 0,
+      "httpStatus": 200,
+      "ticket": "t03tservertHJmzlqms5lYKP25YPhAeK6c5s8uIzWoHo5ZjNHXz08A-Z-Jx8PuRFvV4aF_FjMAMyAmECFq1t9Oxp-xZQtiR68uciYU-zqOMKoU71WLyPwBcfn6Fejn4w**",
+      "template": "B",
+      "tdcName": "FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF",
+      "caseCount": 94,
+      "timestamp": "2026-04-18T04:04:52.978Z",
+      "error": null
+    },
+    {
+      "testId": "B",
+      "testName": "garbled",
+      "description": "Random base64 string, same length as baseline",
+      "collectLength": null,
+      "tlg": null,
+      "errorCode": null,
+      "httpStatus": null,
+      "ticket": null,
+      "template": null,
+      "tdcName": null,
+      "caseCount": null,
+      "timestamp": "2026-04-18T04:05:03.619Z",
+      "error": "Cannot read properties of null (reading 'map')"
+    },
+    {
+      "testId": "C",
+      "testName": "empty",
+      "description": "Empty string collect",
+      "collectLength": 0,
+      "tlg": "0",
+      "errorCode": 12,
+      "httpStatus": 200,
+      "ticket": null,
+      "template": "unknown-98",
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "caseCount": 98,
+      "timestamp": "2026-04-18T04:05:13.754Z",
+      "error": null
+    },
+    {
+      "testId": "D",
+      "testName": "scraper-collect",
+      "description": "Our generateCollect() with Chrome profile + live XTEA params",
+      "collectLength": 7564,
+      "tlg": "7564",
+      "errorCode": 0,
+      "httpStatus": 200,
+      "ticket": "t03tserverCRQE-zsrPeekBSBHapPO1WdKDg2-F5icMVR1re0FzbJzpo8-9pkPahqfeKb9TI2R9i4ahg7VwCoC5Idj-gWLbfzYAYFkOG9Xw4UJGkePsl3MJ4KtEXTlzA**",
+      "template": "unknown-98",
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "caseCount": 98,
+      "timestamp": "2026-04-18T04:05:24.936Z",
+      "error": null
+    },
+    {
+      "testId": "E",
+      "testName": "poisoned",
+      "description": "Valid collect structure with poisoned cd fields (Bot/1.0, all zeros)",
+      "collectLength": 2072,
+      "tlg": "2072",
+      "errorCode": 12,
+      "httpStatus": 200,
+      "ticket": null,
+      "template": "B",
+      "tdcName": "FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF",
+      "caseCount": 94,
+      "timestamp": "2026-04-18T04:05:36.634Z",
+      "error": null
+    }
+  ]
+}
