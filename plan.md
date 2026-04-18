@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 64** — Cleanup pass
-Current task: **64.8** — Rewrite `docs/HAR_ANALYSIS.md`
+Current task: **64.9** — Dependency usage audit (report-only)
 
 > Phases 38–63 closed (errorCode -1 → 0 investigation). Detail in `git log`.
 
@@ -25,7 +25,7 @@ Current task: **64.8** — Rewrite `docs/HAR_ANALYSIS.md`
 | 64.5 | Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md` | done |
 | 64.6 | Remove `decompile` script from `package.json` | done |
 | 64.7 | Doc path sweep — scrub `targets/tdc*.js` and `sample/*` citations across `docs/` (excluding `HAR_ANALYSIS.md`), `README.md`, and `.claude/` (agents, commands, skills) | done |
-| 64.8 | Rewrite `docs/HAR_ANALYSIS.md` — abstract description of the captured flow, cross-references to current docs, protocol analysis preserved | pending |
+| 64.8 | Rewrite `docs/HAR_ANALYSIS.md` — abstract description of the captured flow, cross-references to current docs, protocol analysis preserved | done |
 | 64.9 | Dependency usage audit — report remaining references to `puppeteer`, `puppeteer-extra`, `puppeteer-extra-plugin-stealth`, `canvas` after earlier cleanup tasks land (report only — do not remove) | pending |
 | 64.10 | Final: delete `plan.md` and `project-brief.md` | pending |
 
@@ -87,10 +87,55 @@ Groups A, C, D, E, G do not depend on `sample/` and should survive. The durable 
 
 ## Current Task
 
-**ID**: 64.8
-**Title**: Rewrite `docs/HAR_ANALYSIS.md` — abstract description of the captured flow, cross-references to current docs, protocol analysis preserved
+**ID**: 64.9
+**Title**: Dependency usage audit (report-only)
 **Phase**: Phase 64 — Cleanup pass
 **Status**: in-progress
+
+### Goal
+Per the brief's explicit scope: "`puppeteer`, `puppeteer-extra`, `puppeteer-extra-plugin-stealth`, `canvas` — flag if usage is ambiguous after cleanup; confirm with user before removing." Produce an evidence-based usage report for each of these 4 dependencies. Do NOT modify `package.json`.
+
+### What to produce
+A compact report (printed in the director chat when 64.9 reports back) listing, for each of the 4 deps:
+- Every `require()` site in the current codebase (file + line).
+- Whether each site is in live, production-path code (tools/, research/) versus already-deleted research tracks (none should remain — 64.3 removed them).
+- A verdict: **keep** / **flag for removal** / **unused**.
+
+**Known live usages** (from an earlier director survey, for sanity-check):
+- `puppeteer`: `tools/captcha-solver/captcha-solver.js`, `tools/captcha-solver/fingerprint-harvester.js`, `tools/captcha-solver/live-submit.js`, `tools/dynamic-tracers/*.js` (harness, payload-tracer, comparison-harness, crypto-tracer-v3, encoding-tracer), `tools/porting-pipeline/key-extractor.js`, `tools/porting-pipeline/structure-extractor.js`, `tools/porting-pipeline/token-verifier.js`, `research/template-pool/live-comparison.js`, `tests/test-slide-solver.js`.
+- `puppeteer-extra`, `puppeteer-extra-plugin-stealth`: whoever wraps puppeteer with stealth.
+- `canvas`: used inside jsdom for DOM rendering (headless scraper).
+
+### Implementation Steps
+1. `cd /home/ubun/github.com/tut1vog/reverse-chaosvm`.
+2. For each of the 4 package names, run:
+   ```bash
+   grep -rn "require(['\"]<pkg>['\"])" tools/ research/ tests/ profiles/ 2>/dev/null
+   ```
+   (Exclude `node_modules/`, `scripts/` (deleted), and `.git/`.)
+3. Also catch ESM imports: `grep -rn "from ['\"]<pkg>['\"]" tools/ research/ tests/` (project is CJS-only, but catch any stray ESM).
+4. For `puppeteer-extra` and `puppeteer-extra-plugin-stealth`, look for `require('puppeteer-extra')` and `.use(StealthPlugin())` patterns — the plugin is usually registered once via `puppeteer.use(stealth())`.
+5. For `canvas`, it is typically consumed transitively by `jsdom` (peer dep); check for direct `require('canvas')` — may be zero if only jsdom consumes it.
+6. Categorize each site: production path (tools/ or live research track), test path (tests/), or orphan.
+7. Emit a verdict per dep. Keep: used in any surviving production path. Flag for removal: unused anywhere. Ambiguous: used only in dynamic-tracers/research that may be pruned in a future pass — flag with a note.
+
+### Verification
+- `git status --short` should remain clean or show only `M plan.md` (director may have touched it). No file changes from this task.
+- The report is the deliverable. It's printed in the agent's response; the director records it in the 64.9 commit body (against an empty commit since there are no file changes — use `git commit --allow-empty` per the Git Strategy).
+
+### Constraints
+- **Read-only task**. Do not modify any file.
+- **Do not stage or commit anything.** The director handles bookkeeping.
+- Stick to `require()`/`import from` call sites. Don't interpret string literals elsewhere as "usage."
+
+### Report back (this IS the deliverable)
+Under 400 words:
+1. For each of the 4 deps, list the full set of call sites (file:line, one per line). If zero, say "no call sites".
+2. For each dep, verdict: keep / flag for removal / ambiguous.
+3. Any surprises (e.g. a dep used in an unexpected place).
+
+### Suggested Agent
+general-purpose — pure read-only grep analysis.
 
 ### Goal
 Produce a replacement `docs/HAR_ANALYSIS.md` that documents the CAPTCHA protocol (endpoint sequence, headers, body formats) as durable reference material, without any references to the deleted `sample/captcha-har.har` file or the "Task 10.5 — our bot vs real browser" phase-narrative framing. Cross-reference the three surviving docs that own the collect / vData / orchestrator findings.
