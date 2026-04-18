@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 64** — Cleanup pass
-Current task: **64.2** — BLOCKED — brief undercounted test dependencies on `output/*` and `sample/captcha-har.har`. Awaiting user scope decision (see Blocker section below).
+Current task: **64.3** — Remove 5 dead research tracks + `docs/ERRORCODE_12_INVESTIGATION.md`
 
 > Phases 38–63 closed (errorCode -1 → 0 investigation). Detail in `git log`.
 
@@ -19,7 +19,7 @@ Current task: **64.2** — BLOCKED — brief undercounted test dependencies on `
 | ID | Task | Status |
 |----|------|--------|
 | 64.1 | Remove `output/` (252 tracked files + all untracked content) | done |
-| 64.2 | Remove `targets/`, `sample/`, `results.json`, the 9 broken-by-implication test files; update `package.json`'s `test` script; leave `TODO(follow-up)` in `tools/captcha-solver/live-submit.js` above the `sample/` reads | blocked |
+| 64.2 | Remove `targets/`, `sample/`, `results.json`, **21 broken-by-implication test files** (9 originally listed + 12 decompiler snapshots exposed by 64.1); update `package.json`'s `test` script; trim Groups B/F from `tests/test-vdata-for-post.js`; leave `TODO(follow-up)` in `tools/captcha-solver/live-submit.js` above the `sample/` reads | done |
 | 64.3 | Remove 5 dead research tracks (`research/errorcode-12/`, `research/scraper-tls-impersonation/`, `research/collector-fields/`, `research/eks-payload/`, `research/key-mod/`) and `docs/ERRORCODE_12_INVESTIGATION.md` | pending |
 | 64.4 | Remove `scripts/`, `history/`, `docs/PROGRESS.md`, `docs/WORKFLOW.md`, `docs/CONVENTIONS.md` | pending |
 | 64.5 | Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md` | pending |
@@ -31,7 +31,10 @@ Current task: **64.2** — BLOCKED — brief undercounted test dependencies on `
 
 ---
 
-## Blocker — 64.2 verification failed
+## Blocker resolution — Option A selected (2026-04-18)
+User confirmed Option A: expand 64.2's deletion scope to also include the 12 register-VM decompiler snapshot test files plus Groups B/F inside `tests/test-vdata-for-post.js`. The diagnosis that follows is preserved as the audit trail for the scope decision.
+
+## Blocker — 64.2 verification failed (resolved by Option A above)
 
 ### What happened
 - Subagent completed all 64.2 deletions and edits correctly (targets/, sample/, results.json, 9 test files gone; package.json test script trimmed to 22 entries; TODO block inserted at `tools/captcha-solver/live-submit.js:495-509` above the `sample/` reads).
@@ -84,10 +87,126 @@ Groups A, C, D, E, G do not depend on `sample/` and should survive. The durable 
 
 ## Current Task
 
-**ID**: 64.2
-**Title**: (BLOCKED) Remove `targets/`, `sample/`, `results.json`, broken test files; update `package.json` test script; TODO comment in `live-submit.js`
+**ID**: 64.3
+**Title**: Remove 5 dead research tracks + `docs/ERRORCODE_12_INVESTIGATION.md`
 **Phase**: Phase 64 — Cleanup pass
-**Status**: blocked — awaiting user decision on Option A / B / C above
+**Status**: in-progress
+
+### Goal
+Delete five research track directories that hold debug tracks or README-only stubs, plus the docs file that depends on one of them. Keep `research/tdc-register-vm/`, `research/vm-slide-stack-vm/`, `research/captcha-orchestrator/`, and `research/template-pool/` untouched — those remain part of the provenance for the surviving docs and tools. `npm test` must stay green.
+
+### Context
+
+**Tracks to delete** (entire directory each):
+- `research/errorcode-12/` — debug track for a hypothesis that's been eliminated. Contains scripts (`chrome-cd-inject.js`, `token-isolation-test.js`) that import `puppeteer`; these are research scripts, not production code.
+- `research/scraper-tls-impersonation/` — debug track for the TLS-fingerprint hypothesis, eliminated in Phase 61. Contains `capture-puppeteer-ja3.js`, `test-fetch-headers.js`, `test-fetch-same-origin.js`.
+- `research/collector-fields/` — debug track for cd-field discovery; folded into the production porting pipeline. Contains `discover-field-order.js`.
+- `research/eks-payload/` — README-only stub.
+- `research/key-mod/` — README-only stub.
+
+**Docs file to delete**:
+- `docs/ERRORCODE_12_INVESTIGATION.md` — depends on the now-dead `research/errorcode-12/` track.
+
+**Protected — do not modify**:
+- `research/tdc-register-vm/`, `research/vm-slide-stack-vm/`, `research/captcha-orchestrator/`, `research/template-pool/`
+- All of `tools/`, `tests/` (other surviving tests), `docs/` (other than ERRORCODE_12_INVESTIGATION.md), `.claude/`, `profiles/`, `CLAUDE.md`, `README.md`, `package.json`, `plan.md`, `project-brief.md`
+- The already-done-but-staged 64.2 changes — do not restage or re-edit those files
+
+**Cross-reference check**: before deletion, `grep -rln 'errorcode-12\|scraper-tls-impersonation\|collector-fields\|eks-payload\|key-mod\|ERRORCODE_12_INVESTIGATION' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` should yield only expected references. If surviving docs or tools cite these tracks, flag them — follow-on 64.7 doc sweep will handle path scrubbing, but the flag matters here for context.
+
+### Implementation Steps
+1. Check for cross-references (grep as above). Note any hits that are in files outside the delete set — those are not this task's problem (they feed 64.7) but should be reported.
+2. `git rm -r research/errorcode-12/ research/scraper-tls-impersonation/ research/collector-fields/ research/eks-payload/ research/key-mod/ docs/ERRORCODE_12_INVESTIGATION.md` — stages all deletions.
+3. `ls research/` to confirm only the 4 protected tracks remain.
+4. Run `npm test`. Must exit 0 with `# fail 0` — the suite shouldn't depend on any of these research tracks.
+5. Capture Verification output.
+
+### Verification
+- `ls research/ | sort` → exactly: `captcha-orchestrator`, `tdc-register-vm`, `template-pool`, `vm-slide-stack-vm` (4 entries).
+- `test ! -e docs/ERRORCODE_12_INVESTIGATION.md && echo GONE || echo PRESENT` → `GONE`.
+- For each of the 5 research tracks: `test ! -e research/<name>/ && echo GONE || echo PRESENT` → `GONE`.
+- `npm test 2>&1 | tail -6` → `# fail 0`.
+- `grep -rln 'errorcode-12\|scraper-tls-impersonation\|collector-fields\|eks-payload\|key-mod\|ERRORCODE_12_INVESTIGATION' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` → list any hits (these are handoffs to 64.7, not failures in this task).
+- `git status --short | grep '^D  ' | grep -v '^D  \(research/\|docs/ERRORCODE_12\)' | wc -l` → `0` (this task staged only the expected deletions — the working-tree 64.2 entries remain unstaged and untouched).
+
+### Suggested Agent
+general-purpose — directory deletion + cross-reference audit + test verification.
+
+### Goal
+Land the Option A remediation: on top of the already-done 64.2 work (still unstaged in the working tree), delete the 12 decompiler-snapshot test files and trim Groups B/F from `tests/test-vdata-for-post.js`. Update `package.json`'s `test` script to drop the 12 additional entries. `npm test` must be fully green before commit.
+
+### Context
+
+**Already done in working tree (preserve)**:
+- Deletions: `targets/` (6 files), `sample/` (7 files), `results.json`, 9 test files (`test-decoder`, `test-deobfuscator`, `test-key-extractor`, `test-opcode-mapper`, `test-vm-parser`, `test-pipeline-integration`, `test-request-chain-fidelity`, `test-scraper-foundation`, `test-vdata-generator`).
+- `package.json` test script already trimmed to 22 entries (the 8 of the 9 referenced).
+- TODO block at `tools/captcha-solver/live-submit.js:495-509` above the `sample/` reads.
+
+**New deletions to land in this pass (12 additional test files)**:
+1. `tests/test-disasm.js`
+2. `tests/test-strings.js`
+3. `tests/test-cfg.js`
+4. `tests/test-patterns.js`
+5. `tests/test-semantics.js`
+6. `tests/test-fold.js`
+7. `tests/test-reconstruct.js`
+8. `tests/test-emit.js`
+9. `tests/test-collector-schema.js`
+10. `tests/outer-pipeline.test.js`
+11. `tests/test-vm-slide-decoder.js`
+12. `tests/test-vm-slide-walker.js`
+
+All 12 appear in the current `package.json` `test` script and must be removed from that line in the same change. After this pass, the test script should list exactly 10 files:
+- `tests/test-vdata-generator-encoder.js`
+- `tests/test-vdata-builder.js`
+- `tests/test-vdata-for-post.js`
+- `tests/test-scraper.js`
+- `tests/test-structure-extractor.js`
+- `tests/test-outer-pipeline.js`
+- `tests/test-tdc-survey.js`
+- `tests/test-tdc-diagnose.js`
+- `tests/test-auto-port.js`
+- `tests/test-phase49-profile-fixes.js`
+
+**Trim in `tests/test-vdata-for-post.js`**:
+- Remove Group B (test block at lines 133-140) and Group F (test block at lines 198-235). Remove the supporting helper `loadHarVerifyBody` (lines 67-78), the constants `HAR_SAMPLE_PATH` (line 47), `HAR_OBJ` (lines 53-62), `HAR_ORDER` (line 63), and the `buildVDataFromObj` import (lines 23-25) if they become dead code after the two groups are gone. Keep Groups A/C/D/E/G, plus `FIXTURES_DIR`, `HAR_FIXTURE_PATH`, and anything else they still need. Preserve comment headers for the surviving groups.
+
+### Implementation Steps
+1. `cd /home/ubun/github.com/tut1vog/reverse-chaosvm`. Confirm working tree contains the pre-existing 64.2 work (the 23 deletions, `package.json` mod, `live-submit.js` mod — none staged).
+2. `git rm tests/test-disasm.js tests/test-strings.js tests/test-cfg.js tests/test-patterns.js tests/test-semantics.js tests/test-fold.js tests/test-reconstruct.js tests/test-emit.js tests/test-collector-schema.js tests/outer-pipeline.test.js tests/test-vm-slide-decoder.js tests/test-vm-slide-walker.js` — stages 12 deletions.
+3. Read `package.json` and edit the `test` script to remove the 12 additional `tests/<name>.js` tokens. The final line should list only the 10 test files above. Preserve single-space separation. Do not reformat any other part of the file.
+4. Read `tests/test-vdata-for-post.js` and remove Group B (lines 133-140) and Group F (lines 198-235), plus the now-dead imports / constants / helpers (`HAR_SAMPLE_PATH`, `HAR_OBJ`, `HAR_ORDER`, `loadHarVerifyBody`, `buildVDataFromObj` import). Verify the file still parses and that surviving groups A, C, D, E, G are untouched. Keep comment headers and empty separator lines between surviving groups.
+5. Run `npm test`. It must exit 0 with `# fail 0`.
+6. Stage the remaining 64.2 work that wasn't previously staged: `git add package.json tools/captcha-solver/live-submit.js tests/test-vdata-for-post.js` and confirm `git status --short` shows only the expected paths staged.
+
+### Verification — capture exact output
+- For each of the 12 newly deleted test files: `test ! -e tests/<name>.js && echo GONE || echo PRESENT` → `GONE` (report the summary).
+- `node --input-type=commonjs -e "const p=require('./package.json'); const t=p.scripts.test.match(/tests\\/[^ ]+\\.js/g) || []; console.log('count:', t.length); console.log(t.sort().join('\\n'));"` → `count: 10` and the exact 10 expected filenames sorted.
+- `grep -c 'Group B\|Group F\|loadHarVerifyBody\|HAR_SAMPLE_PATH\|HAR_OBJ\|HAR_ORDER\|buildVDataFromObj' tests/test-vdata-for-post.js` → `0` (no lingering references to the deleted pieces).
+- `node --check tests/test-vdata-for-post.js` → exits 0 (file parses).
+- `npm test 2>&1 | tail -10` → capture the TAP summary (`# tests`, `# pass`, `# fail 0`, `# skipped`, `# duration_ms`). `# fail` must be `0`.
+- `git status --short` → full output. Expect: deletions for `targets/` (6), `sample/` (7), `results.json`, 21 tests (9 prior + 12 new), `D` entries totaling 35; `M` entries for `package.json`, `tools/captcha-solver/live-submit.js`, `tests/test-vdata-for-post.js`. No entries outside these sets (other than `M plan.md` which the director owns and you should leave alone).
+
+### Constraints
+- **Do not make any git commits.** The director handles the final commit after verification.
+- **Do not modify any file not listed above.** No docs, no other tests, no `tools/` changes beyond what's already done, no `.claude/`, no `CLAUDE.md`, no `README.md`, no `plan.md`, no `project-brief.md`, no `.gitignore`, no `profiles/`, no `research/`, no `node_modules/`, no `package-lock.json`.
+- **Preserve the existing TODO block** at `tools/captcha-solver/live-submit.js:495-509`. Do not re-edit that file unless you accidentally reverted the prior work, in which case reapply it verbatim (check with `grep -c 'TODO(follow-up): live-submit.js disk reads' tools/captcha-solver/live-submit.js` — should already be `1`).
+- **If `npm test` fails** after your edits, stop. Do not patch tests or add mocks. Report the failing tests with exact error output.
+- **If the task is too difficult or impossible**, stop immediately and report back with what you attempted and what went wrong.
+
+### Warnings
+Prior attempt (same task ID, pre-remediation) completed the file operations but `npm test` reported 51 failures because 64.1's deletion of `output/` had already broken 12 decompiler-snapshot tests that read `output/*.json` and `output/*.txt` as inputs. The original 64.2 prompt listed only 9 test deletions — the brief undercounted test dependencies. The expanded scope above is the remediation. Don't re-run the original 9-test deletion plan; build on the existing working-tree state.
+
+### Report back
+Return a concise report (under 300 words):
+1. Literal output of each Verification command.
+2. The final `test` script line from `package.json` (exact).
+3. The line range you removed from `tests/test-vdata-for-post.js` (before / after line counts).
+4. The `npm test` summary lines (`# tests X`, `# pass X`, `# fail 0`, `# duration_ms`).
+5. Any surprises or deviations.
+
+### Suggested Agent
+general-purpose — precision deletion + small in-file edit + test-suite verification.
 
 ### Goal
 Collapse five tightly coupled deletions into one coherent commit so the test suite never goes through an intermediate broken state:

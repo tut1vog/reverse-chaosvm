@@ -10,8 +10,6 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 
 const {
   lookupFormField,
@@ -20,9 +18,6 @@ const {
 const {
   buildVDataForPost,
 } = require('../tools/vdata-generator/for-post.js');
-const {
-  buildVDataFromObj,
-} = require('../tools/vdata-generator/build-from-obj.js');
 
 // Phase 43 constants — the 65-char custom base64 alphabet; index 64 ('Y') is
 // the padding char. See docs/VDATA_FORMAT.md §3 and tests/test-vdata-builder.js.
@@ -42,40 +37,7 @@ const BROWSER_PROFILE = {
   ss: '11%2Ctdc%2Cslide%2Cvm',
 };
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
-const HAR_FIXTURE_PATH = path.join(FIXTURES_DIR, 'vdata-har-capture.json');
-const HAR_SAMPLE_PATH = path.join(__dirname, '..', 'sample', 'captcha-har.har');
-
-// HAR fixture ground truth (8-field obj + explicit order) copied verbatim from
-// tests/test-vdata-builder.js — the committed HAR fixture json stores the
-// vData string but not the (obj, order) pair itself, so the README's "Replay
-// mode" worked example is the documented oracle.
-const HAR_OBJ = {
-  inf: 'iframe',
-  env: '0',
-  tp: '7446039806946242560',
-  cLod: 'loadTDC',
-  version: '2',
-  key: '21L2',
-  ss: '11%2Ctdc%2Cslide%2Cvm',
-  py: '0',
-};
-const HAR_ORDER = ['inf', 'env', 'tp', 'cLod', 'version', 'key', 'ss', 'py'];
-
 // ---- Helpers --------------------------------------------------------------
-
-function loadHarVerifyBody() {
-  const har = JSON.parse(fs.readFileSync(HAR_SAMPLE_PATH, 'utf8'));
-  for (const entry of har.log.entries) {
-    if (entry.request.url.indexOf('cap_union_new_verify') !== -1) {
-      const text = (entry.request.postData && entry.request.postData.text) || '';
-      // The `&vData=...` tail is appended by the XHR monkey-patch AFTER `key`
-      // is computed, so strip it to reproduce what module 18 saw live.
-      return text.replace(/&vData=[^&]*$/, '');
-    }
-  }
-  throw new Error('cap_union_new_verify entry not found in HAR');
-}
 
 function assertValidVDataShape(s, label) {
   const tag = label ? ` (${label})` : '';
@@ -127,15 +89,6 @@ test('Group A — lookupFormField unit', async (t) => {
 
   await t.test('A9: URL-encoded value preserved (no decoding)', () => {
     assert.equal(lookupFormField('tag=a%26b', 'tag'), 'a%26b');
-  });
-});
-
-// ---- Group B — computeKeyField HAR oracle ---------------------------------
-
-test('Group B — computeKeyField HAR oracle (load-bearing)', async (t) => {
-  await t.test('B1: HAR verify POST body → key === "21L2"', () => {
-    const body = loadHarVerifyBody();
-    assert.equal(computeKeyField(body), '21L2');
   });
 });
 
@@ -192,45 +145,6 @@ test('Group E — buildVDataForPost shape (nondeterministic)', async (t) => {
   await t.test('E2: second call returns a valid 152-char vData', () => {
     const out = buildVDataForPost(body, { profile: BROWSER_PROFILE });
     assertValidVDataShape(out, 'shape call 2');
-  });
-});
-
-// ---- Group F — buildVDataForPost HAR byte-identity ------------------------
-
-test('Group F — buildVDataForPost HAR byte-identity (end-to-end)', async (t) => {
-  await t.test('F1: HAR body + HAR profile + HAR order → fixture vdata', () => {
-    const fixture = JSON.parse(fs.readFileSync(HAR_FIXTURE_PATH, 'utf8'));
-    const harVdata = fixture.har_vdata_string;
-    assert.equal(typeof harVdata, 'string');
-    assert.equal(harVdata.length, VDATA_LENGTH);
-
-    const body = loadHarVerifyBody();
-
-    // Build a profile from the HAR_OBJ oracle, stripping `key` so
-    // buildVDataForPost computes it per-body from `body` itself.
-    const profile = Object.assign({}, HAR_OBJ);
-    delete profile.key;
-
-    const out = buildVDataForPost(body, { profile, order: HAR_ORDER });
-
-    // Debug harness: if this ever fails, check in order:
-    //   (a) computeKeyField(body) vs HAR_OBJ.key   — Group B covers this
-    //   (b) buildVDataFromObj({obj:HAR_OBJ, order:HAR_ORDER}) vs harVdata
-    //   (c) Phase 43 cipher drift (test-vdata-builder.js covers this)
-    if (out !== harVdata) {
-      const computedKey = computeKeyField(body);
-      const builderDirect = buildVDataFromObj({ obj: HAR_OBJ, order: HAR_ORDER });
-      // eslint-disable-next-line no-console
-      console.error('F1 divergence:', {
-        computedKey,
-        expectedKey: HAR_OBJ.key,
-        builderDirectMatches: builderDirect === harVdata,
-        outFirst20: out.slice(0, 20),
-        expectFirst20: harVdata.slice(0, 20),
-      });
-    }
-
-    assert.equal(out, harVdata);
   });
 });
 

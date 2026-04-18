@@ -492,6 +492,21 @@ async function solve(opts) {
   const profile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
   log('Default profile loaded');
 
+  /*
+   * TODO(follow-up): live-submit.js disk reads
+   *
+   * The `sample/slide-jy.js` and `sample/vm_slide.js` files no longer exist
+   * after the 64.2 cleanup pass — the entire `sample/` directory was removed
+   * because it held stale, committed copies of resources that are served
+   * live by Tencent's CAPTCHA infrastructure.
+   *
+   * Fix: replace the `fs.readFileSync` calls below with HTTP fetches,
+   * mirroring the pattern the scraper already uses for pulling `tdc.js`
+   * live from `urlsec.qq.com` at runtime (see `tools/scraper/`).
+   *
+   * Until this is addressed, any code path that calls this function will
+   * throw `ENOENT` at runtime on the first `fs.existsSync` guard below.
+   */
   // Load jQuery source
   const jqueryPath = path.join(PROJECT_ROOT, 'sample', 'slide-jy.js');
   if (!fs.existsSync(jqueryPath)) {
