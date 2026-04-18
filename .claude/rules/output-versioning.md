@@ -4,35 +4,33 @@
 
 ## Rules
 
-- **Every pipeline or tracer run writes to `output/<target-stem>/`.** The target stem is the basename of the input file with the extension dropped: `targets/tdc-v2.js` → `output/tdc-v2/`. Never write artifacts to the project root, a bare `output/` directory, or a `tmp/` directory.
-- **Research-track artifacts go under `output/<track>/` or `output/<track>-<target-stem>/`.** A research survey that runs against many inputs may use a subdirectory per input: `output/tdc-survey/<hash>.js` + `output/tdc-survey-<hash>/...` for per-input pipeline output. Whatever scheme you pick, keep it consistent across the track.
-- **Artifact filenames are stable across runs.** The same pipeline run against the same input must overwrite the same filenames, not produce a timestamped new set. This is what lets `git diff output/` show what changed between runs.
-- **Never commit large binary blobs.** The full decompiled JS, disassembly listings, and JSON artifacts are fine (they diff well). Raw HAR captures, screenshots, video, and multi-megabyte traces go under `output/` but should stay untracked unless they are needed as test fixtures.
-- **Never write inside `research/<track>/` during a run.** Research directories are source-only (see `.claude/rules/research-artifacts.md`). If a script under `research/` produces output, that output goes under `output/`, not next to the script.
-- **Respect `targets/` and `sample/`.** These are read-only. A pipeline that writes back to its input directory is a bug.
+- **Every run writes to `output/<stem>/`.** The stem is the logical name of the input (for a `tdc.js` build, the source hash or a caller-supplied label). Never write artifacts to the project root, to a bare `output/` directory, or to a `tmp/` directory.
+- **Research-track scripts write to `output/<track>/`** or `output/<track>-<label>/` for per-input subdirs. Pick one scheme per track and stick to it so `git diff output/` between runs is meaningful.
+- **Artifact filenames are stable across runs.** The same script against the same input must overwrite the same filenames — not emit a new timestamped set. Stability is what lets `git diff` show what changed between runs. If you need per-run history, commit between runs instead of versioning the filenames.
+- **Never commit large binary blobs.** JSON artifacts, disassembly, decompiled source, and structured traces diff well and may be committed as needed. Raw HAR captures, screenshots, video, multi-megabyte traces, and browser profile data stay under `output/` and remain untracked unless one is specifically promoted to `tests/fixtures/` as a regression input.
+- **Never write inside `research/<track>/` during a run.** Research directories are source-only (see `.claude/rules/research-artifacts.md`). If a script under `research/` produces output, that output goes to `output/<track>/`, never next to the script.
 
 ## Examples
 
-**Good**:
+Good:
+
 ```bash
-node tools/porting-pipeline/run.js targets/tdc-v2.js
-# writes to output/tdc-v2/{opcode-table.json, xtea-params.json, ...}
+node tools/porting-pipeline/run.js /path/to/fresh-tdc.js
+# writes to output/<sourcehash>/{opcode-table.json, xtea-params.json, pipeline-config.json, ...}
 
-node research/vm-slide-stack-vm/decode.js sample/vm_slide.js
-# writes to output/vm-slide/{bytecode.json, disasm.txt, ...}
-
-node research/template-pool/survey.js
-# writes to output/tdc-survey/<hash>.js and output/tdc-survey-<hash>/...
+node research/vm-slide-stack-vm/decoder.js /path/to/vm-slide.js
+# writes to output/vm-slide/{bytecode.json, disassembly.txt, ...}
 ```
 
-**Bad**:
+Bad:
+
 ```bash
-node tools/porting-pipeline/run.js targets/tdc-v2.js > opcode-table.json
-# writes to project root — wrong
+# writes to project root
+node tools/porting-pipeline/run.js /path/to/tdc.js > opcode-table.json
 
-node research/vm-slide-stack-vm/decode.js > research/vm-slide-stack-vm/bytecode.json
-# writes inside a research directory — wrong, pollutes source tree
+# writes inside a research directory — pollutes the source tree
+node research/vm-slide-stack-vm/decoder.js > research/vm-slide-stack-vm/bytecode.json
 
-node tools/porting-pipeline/run.js targets/tdc-v2.js --output output/run-2026-04-12-1453/
-# timestamped directory — wrong, breaks git-based diffing of runs
+# timestamped directory breaks git-based diffing of consecutive runs
+node tools/porting-pipeline/run.js /path/to/tdc.js --output output/run-2026-04-18-1453/
 ```
