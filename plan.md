@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 64** — Cleanup pass
-Current task: **64.5** — Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md`
+Current task: **64.6** — Drop `decompile` script from `package.json`
 
 > Phases 38–63 closed (errorCode -1 → 0 investigation). Detail in `git log`.
 
@@ -22,7 +22,7 @@ Current task: **64.5** — Remove `.claude/commands/fetch-latest.md` and `.claud
 | 64.2 | Remove `targets/`, `sample/`, `results.json`, **21 broken-by-implication test files** (9 originally listed + 12 decompiler snapshots exposed by 64.1); update `package.json`'s `test` script; trim Groups B/F from `tests/test-vdata-for-post.js`; leave `TODO(follow-up)` in `tools/captcha-solver/live-submit.js` above the `sample/` reads | done |
 | 64.3 | Remove 5 dead research tracks (`research/errorcode-12/`, `research/scraper-tls-impersonation/`, `research/collector-fields/`, `research/eks-payload/`, `research/key-mod/`), `docs/ERRORCODE_12_INVESTIGATION.md`, and orphan `tests/test-token-isolation.js` (imports just-deleted module) | done |
 | 64.4 | Remove `scripts/`, `history/`, `docs/PROGRESS.md`, `docs/WORKFLOW.md`, `docs/CONVENTIONS.md` | done |
-| 64.5 | Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md` | pending |
+| 64.5 | Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md` | done |
 | 64.6 | Remove `decompile` script from `package.json` | pending |
 | 64.7 | Doc path sweep — scrub `targets/tdc*.js` and `sample/*` citations across `docs/` (excluding `HAR_ANALYSIS.md`), `README.md`, and `.claude/` (agents, commands, skills) | pending |
 | 64.8 | Rewrite `docs/HAR_ANALYSIS.md` — abstract description of the captured flow, cross-references to current docs, protocol analysis preserved | pending |
@@ -87,43 +87,37 @@ Groups A, C, D, E, G do not depend on `sample/` and should survive. The durable 
 
 ## Current Task
 
-**ID**: 64.5
-**Title**: Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md`
+**ID**: 64.6
+**Title**: Drop `decompile` script from `package.json`
 **Phase**: Phase 64 — Cleanup pass
 **Status**: in-progress
 
 ### Goal
-Delete two `.claude/` files that no longer have a referent:
-- `.claude/commands/fetch-latest.md` — the command's purpose was "fetch latest tdc.js build → save to `targets/`", and `targets/` was removed in 64.2.
-- `.claude/rules/targets-readonly.md` — rule documenting that `targets/` is read-only; no referent after 64.2.
-
-`npm test` must stay green (no tests depend on `.claude/*`, but confirm).
+Remove the `decompile` npm script from `package.json`. Its command line was `node research/tdc-register-vm/run.js --input targets/tdc.js --output output/tdc`, which references two paths that were deleted in 64.1 (`output/tdc`) and 64.2 (`targets/tdc.js`). The target script (`research/tdc-register-vm/run.js`) still exists and accepts `--input <path>` / `--output <dir>` flags directly — the npm alias is the dead thing, not the tool.
 
 ### Context
-- `.claude/settings.json` was already removed in the scaffold commit; don't touch that.
-- `.claude/commands/port-version.md` and `.claude/commands/scrape.md` are protected (surviving commands; path sweep lands in 64.7).
-- `.claude/rules/*.md` other than `targets-readonly.md` are protected (surviving rules).
-- Cross-reference check: `grep -rln 'fetch-latest\|targets-readonly' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null`. Flag hits outside the delete set for 64.7.
+- Current `package.json` scripts: `decompile`, `token:standalone`, `solve:puppeteer`, `test`. Remove `decompile`; keep the other three.
+- Do NOT touch `dependencies`, `name`, `description`, `private`, or anything else.
+- `CLAUDE.md` documents the decompile invocation as `node research/tdc-register-vm/run.js --input <path> --output output/<stem>` (without the npm alias) — no doc edit needed here.
+- Cross-reference check: `grep -rn 'npm run decompile\|"decompile"' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` — flag for 64.7 if needed.
 
-**Protected**: everything else under `.claude/`, all docs, all tools, all surviving tests, all of `research/`, `profiles/`, `CLAUDE.md`, `README.md`, `package.json`, `plan.md`, `project-brief.md`.
+**Protected**: everything else.
 
 ### Implementation Steps
-1. `cd /home/ubun/github.com/tut1vog/reverse-chaosvm`.
-2. Cross-reference grep as above.
-3. `git rm .claude/commands/fetch-latest.md .claude/rules/targets-readonly.md`.
-4. Run `npm test`. Must exit 0 with `# fail 0`.
+1. Read `package.json`.
+2. Remove the `decompile` key from the `scripts` object. Preserve JSON formatting.
+3. Run `npm test` — must stay green.
+4. Capture Verification output.
 
 ### Verification — capture exact output
-- `test ! -e .claude/commands/fetch-latest.md && echo GONE || echo PRESENT` → `GONE`.
-- `test ! -e .claude/rules/targets-readonly.md && echo GONE || echo PRESENT` → `GONE`.
-- `ls .claude/commands/ | sort` → surviving commands only (expected: `port-version.md`, `scrape.md`).
-- `ls .claude/rules/ | sort` → surviving rules only (expected: `coding-style.md`, `output-versioning.md`, `research-artifacts.md`, `verify-dont-assume.md`).
-- `git diff --cached --name-only` → exactly 2 entries, both `.claude/...` paths.
+- `node --input-type=commonjs -e "const p=require('./package.json'); console.log(Object.keys(p.scripts).sort().join(','));"` → `solve:puppeteer,test,token:standalone`.
+- `node --input-type=commonjs -e "const p=require('./package.json'); console.log('decompile' in p.scripts ? 'PRESENT' : 'GONE');"` → `GONE`.
+- `git diff --cached --name-only` → only `package.json`.
 - `npm test 2>&1 | tail -8` → `# fail 0`.
-- Cross-reference grep — list hits for 64.7.
+- Cross-reference grep results.
 
 ### Suggested Agent
-general-purpose — trivial deletion + cross-reference audit.
+general-purpose — trivial JSON edit + test.
 
 ### Goal
 Land the Option A remediation: on top of the already-done 64.2 work (still unstaged in the working tree), delete the 12 decompiler-snapshot test files and trim Groups B/F from `tests/test-vdata-for-post.js`. Update `package.json`'s `test` script to drop the 12 additional entries. `npm test` must be fully green before commit.
