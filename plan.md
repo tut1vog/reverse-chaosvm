@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 63** — Slim scraper: standalone-proven flow
-Current task: **63.2** — Smoke-test the slim scraper
+Current task: **Phase 63 complete** — slim scraper gets errorCode 0
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -426,26 +426,19 @@ The scraper's persistent errorCode -1 (from before this investigation) is likely
 | ID | Task | Status |
 |----|------|--------|
 | 63.1 | Rewrite `solveCaptcha()` to use standalone's minimal flow: drop sub-resource fetches, send verify via `httpRequest()` directly. Remove legacy vdata, caplog, vm-slide fetch. Delete 3 obsolete test files. | done |
-| 63.2 | Tests: ensure `npm test` still passes; run `--captcha-only --verbose` and confirm errorCode. | pending |
+| 63.2 | Tests: ensure `npm test` still passes; run `--captcha-only --verbose` and confirm errorCode. | done |
 
 ---
 
-## Current Task
+## Phase 63 Results (2026-04-18)
 
-**ID**: 63.2
-**Title**: Smoke-test the slim scraper
-**Phase**: Phase 63 — Slim scraper
-**Status**: pending
+### 🟢 errorCode 0 — CAPTCHA solved on first attempt!
 
-### Goal
-Run the slim scraper and confirm it executes the minimal flow without crashing.
+The slim scraper works end-to-end. The root cause of the persistent errorCode -1 (Phases 47–62) was the orchestration overhead in `solveCaptcha()` — extra sub-resource fetches and/or the `client.verify()` path. The proven minimal flow (prehandle → getSig → images → tdc → collect → vData → direct httpRequest verify) succeeds.
 
-### Verification
-- [ ] `node tools/scraper/cli.js --captcha-only --verbose` runs without crash
-- [ ] Logs show the slim flow (no tcaptcha-slide/vm-slide/slide-jy/caplog steps)
-
-### Suggested Agent
-manual — user runs this
+| Run | errorCode | Ticket | Template |
+|-----|-----------|--------|----------|
+| 1 | **0** | `t03tserverwO2F...` | 96 opcodes (auto-ported) |
 
 ---
 
