@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-04-18T06:04:05.569Z",
+  "attempt": 1,
+  "template": "unknown-96",
+  "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
+  "steps": {
+    "after_prehandle": {
+      "captchaClientCookies": {},
+      "chromeCookies": {
+        "label": "after_prehandle",
+        "timestamp": "2026-04-18T06:03:58.605Z",
+        "count": 0,
+        "cookies": []
+      }
+    },
+    "after_show_page": {
+      "chromeCookies": {
+        "label": "after_show_page",
+        "timestamp": "2026-04-18T06:03:59.893Z",
+        "count": 1,
+        "cookies": [
+          {
+            "name": "TDC_itoken",
+            "value": "552728512%3A1776492239",
+            "domain": "t.captcha.qq.com",
+            "path": "/",
+            "httpOnly": false,
+            "secure": false,
+            "expires": 1811052239.013609,
+            "size": 32
+          }
+        ]
+      }
+    },
+    "after_tdc_ready": {
+      "chromeCookies": {
+        "label": "after_tdc_ready",
+        "timestamp": "2026-04-18T06:04:00.150Z",
+        "count": 1,
+        "cookies": [
+          {
+            "name": "TDC_itoken",
+            "value": "552728512%3A1776492239",
+            "domain": "t.captcha.qq.com",
+            "path": "/",
+            "httpOnly": false,
+            "secure": false,
+            "expires": 1811052239.013609,
+            "size": 32
+          }
+        ]
+      }
+    },
+    "after_verify": {
+      "chromeCookies": {
+        "label": "after_verify",
+        "timestamp": "2026-04-18T06:04:05.568Z",
+        "count": 1,
+        "cookies": [
+          {
+            "name": "TDC_itoken",
+            "value": "552728512%3A1776492239",
+            "domain": "t.captcha.qq.com",
+            "path": "/",
+            "httpOnly": false,
+            "secure": false,
+            "expires": 1811052239.013609,
+            "size": 32
+          }
+        ]
+      }
+    }
+  },
+  "setCookieLog": [],
+  "verifyResult": {
+    "errorCode": 0,
+    "httpStatus": 200,
+    "ticket": "t03tservermCTNFM8r3Px8gyQOPZYJ4PwW4vSidAe-fk5WD34jzmEVEt5Fy6NZ2BKxUfr70V6RRaANYtkXUuX1aCWhBgwuGIYuz86ku1qz6COxY0UxGrwxyLGyCL-mvg**",
+    "randstr": "@baW"
+  }
+}
