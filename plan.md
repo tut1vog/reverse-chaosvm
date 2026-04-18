@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 58** — Controlled collect corruption experiment
-Current task: **58.2** — Analyze results (complete)
+Current phase: **Phase 59** — Cookie inspection: Puppeteer vs scraper
+Current task: **59.1** — Capture Puppeteer cookie state at each flow step
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -263,9 +263,97 @@ general-purpose — targeted serializer fix
 
 ---
 
+### Phase 59: Cookie inspection — Puppeteer vs scraper
+
+> **Hypothesis**: Chrome accumulates cookies during the CAPTCHA flow (prehandle → show page → TDC load → verify) that the scraper's `CookieJar` may miss or handle differently. The verify endpoint may check for these cookies.
+>
+> **Key observation**: In the Puppeteer flow, prehandle is done via Node.js `CaptchaClient` (its own cookie jar), but the show page is loaded in Chrome (Chrome's native cookie jar). Cookies from prehandle are **not transferred** to Chrome — yet it works. This means the critical cookies come from the show page and its sub-resources, not prehandle.
+>
+> **Approach**: Instrument both flows to dump every cookie at each step, then diff.
+
+| ID | Task | Status |
+|----|------|--------|
+| 59.1 | Build `scripts/cookie-inspector.js` — Puppeteer script that runs a full CAPTCHA solve and dumps Chrome's cookie jar at each step: after prehandle, after show page load, after TDC loads, after verify POST. Also dump `Set-Cookie` headers from every response. Write to `output/phase-59/puppeteer-cookies.json`. | in-progress |
+| 59.2 | Instrument the scraper's `CaptchaClient` to log every `Set-Cookie` header received and every `Cookie` header sent, at each flow step. Run the scraper and dump to `output/phase-59/scraper-cookies.json`. | pending |
+| 59.3 | Diff the two cookie logs: which cookies does Chrome have that the scraper doesn't? Are there cookies set by JavaScript (not `Set-Cookie` headers) that the scraper can't capture? Analyze and report findings. | pending |
+
+---
+
 ## Current Task
 
-*(Phase 58 complete. Awaiting user direction for next investigation.)*
+**ID**: 59.1
+**Title**: Capture Puppeteer cookie state at each flow step
+**Phase**: Phase 59 — Cookie inspection
+**Status**: in-progress
+
+### Goal
+Build a Puppeteer script that runs a real CAPTCHA solve and captures Chrome's full cookie state at each step of the flow. This reveals which cookies the verify endpoint expects and where they come from.
+
+### Context
+
+**Puppeteer flow** (from `tools/captcha-solver/live-submit.js`):
+1. Prehandle via Node.js `CaptchaClient` (line 536) — gets `sess`, `sid`. CaptchaClient has its own `CookieJar` that captures `Set-Cookie` from prehandle response.
+2. Navigate Chrome to show page URL (line ~580) — Chrome loads the show page, TDC JS, CAPTCHA images. Chrome's native cookie jar handles all `Set-Cookie` headers from these responses.
+3. TDC runs in Chrome, calls `TDC.getData()` — may set additional cookies via JS.
+4. Verify POST via Chrome `fetch()` (line 1316) — Chrome automatically includes all cookies for `t.captcha.qq.com`.
+
+**Critical gap**: Prehandle cookies (from Node.js CaptchaClient) are NEVER transferred to Chrome. Yet the flow works. This means either:
+- Prehandle doesn't set important cookies, OR
+- The show page re-establishes all needed cookies, OR
+- The verify endpoint doesn't check cookies at all (and cookies are a red herring)
+
+**Scraper flow** (from `tools/scraper/scraper.js`):
+- Uses `CaptchaClient` for all requests — single `CookieJar` across prehandle → show → verify.
+- `CookieJar` class (captcha-client.js lines 37-78) only captures `Set-Cookie` HTTP headers — it CANNOT capture cookies set by JavaScript (`document.cookie`).
+- The scraper never runs JavaScript in a real DOM (uses jsdom for TDC, but jsdom's cookie handling may differ).
+
+**What to capture at each step**:
+1. Chrome CDP: `Network.getAllCookies()` returns all cookies for all domains
+2. Chrome CDP: `Network.responseReceived` + `Network.responseReceivedExtraInfo` for `Set-Cookie` headers
+3. Also capture cookies from the Node.js CaptchaClient's cookie jar (for prehandle)
+
+### Implementation Steps
+1. Create `scripts/cookie-inspector.js` based on the flow from `scripts/collect-experiment.js`
+2. Use Chrome DevTools Protocol (CDP) to capture cookies:
+   - `const cdp = await page.createCDPSession()` (or `page.target().createCDPSession()`)
+   - `await cdp.send('Network.enable')` to get response headers
+   - `await cdp.send('Network.getAllCookies')` at each step to dump all cookies
+   - Listen for `Network.responseReceivedExtraInfo` events to capture `Set-Cookie` headers per-response
+3. At each step (after prehandle, after show page load, after TDC ready, after verify), snapshot:
+   - All Chrome cookies (`Network.getAllCookies`)
+   - The CaptchaClient cookie jar state (for prehandle step only)
+4. Also log every `Set-Cookie` header received during the flow, tagged with the URL that set it
+5. Run a full CAPTCHA solve (submit with Chrome's real collect for baseline)
+6. Write structured output to `output/phase-59/puppeteer-cookies.json`
+
+### Output format
+```json
+{
+  "timestamp": "...",
+  "steps": {
+    "after_prehandle": {
+      "captchaClientCookies": {"name": "value", ...},
+      "chromeCookies": [{"name": "...", "value": "...", "domain": "...", "path": "...", "httpOnly": bool, "secure": bool}]
+    },
+    "after_show_page": { "chromeCookies": [...] },
+    "after_tdc_ready": { "chromeCookies": [...] },
+    "after_verify": { "chromeCookies": [...] }
+  },
+  "setCookieLog": [
+    {"url": "...", "header": "...", "step": "show_page"}
+  ],
+  "verifyResult": { "errorCode": 0, "ticket": "..." }
+}
+```
+
+### Verification
+- [ ] Script runs without crashing and produces `output/phase-59/puppeteer-cookies.json`
+- [ ] Cookie snapshots are present for all 4 steps
+- [ ] `setCookieLog` captures at least 1 `Set-Cookie` header (verifies CDP instrumentation works)
+- [ ] Verify POST returns errorCode 0 (confirms the flow is valid)
+
+### Suggested Agent
+general-purpose — CDP instrumentation + Puppeteer scripting
 
 ---
 

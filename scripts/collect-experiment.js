@@ -78,11 +78,15 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+const MAX_RETRIES = 5;
+
 function parseArgs() {
   const args = process.argv.slice(2);
-  const opts = { headless: true };
+  const opts = { headless: true, only: null, maxRetries: MAX_RETRIES };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--headful') opts.headless = false;
+    if (args[i] === '--only' && args[i + 1]) opts.only = args[++i].toUpperCase();
+    if (args[i] === '--retries' && args[i + 1]) opts.maxRetries = parseInt(args[++i], 10);
   }
   return opts;
 }
@@ -893,24 +897,58 @@ async function main() {
     },
   ];
 
+  // Filter test cases if --only specified
+  const filteredTestCases = opts.only
+    ? testCases.filter(tc => tc.testId === opts.only)
+    : testCases;
+
+  if (filteredTestCases.length === 0) {
+    throw new Error(`No test case matching --only ${opts.only}. Valid IDs: A, B, C, D, E`);
+  }
+
+  if (opts.only) {
+    log(`Running only test case ${opts.only} (with up to ${opts.maxRetries} retries on template failure)`);
+  }
+
   const results = [];
 
-  for (let i = 0; i < testCases.length; i++) {
-    const tc = testCases[i];
+  for (let i = 0; i < filteredTestCases.length; i++) {
+    const tc = filteredTestCases[i];
+    let result = null;
 
-    const result = await runTestCase(
-      browser,
-      tc.testId,
-      tc.testName,
-      tc.description,
-      tc.collectBuilder,
-      sharedResources
-    );
+    for (let attempt = 1; attempt <= opts.maxRetries; attempt++) {
+      if (attempt > 1) {
+        log(`\n  Retry ${attempt}/${opts.maxRetries} for test ${tc.testId} (previous attempt hit unportable template)...`);
+        await sleep(INTER_TEST_DELAY);
+      }
+
+      result = await runTestCase(
+        browser,
+        tc.testId,
+        tc.testName,
+        tc.description,
+        tc.collectBuilder,
+        sharedResources
+      );
+
+      // Retry if the error looks like a template/key extraction failure
+      if (result.error && attempt < opts.maxRetries) {
+        const isTemplateFailure = result.error.includes('null') ||
+          result.error.includes('key') ||
+          result.error.includes('extract') ||
+          result.error.includes('map');
+        if (isTemplateFailure) {
+          log(`    Template extraction failed (attempt ${attempt}), will retry...`);
+          continue;
+        }
+      }
+      break; // Success or non-retryable error
+    }
 
     results.push(result);
 
     // Rate limiting delay between test cases (skip after last)
-    if (i < testCases.length - 1) {
+    if (i < filteredTestCases.length - 1) {
       log(`\nWaiting ${INTER_TEST_DELAY / 1000}s before next test case...`);
       await sleep(INTER_TEST_DELAY);
     }
