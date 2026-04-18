@@ -867,6 +867,14 @@ class Scraper {
           await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl, auditLogger: auditLogger, auditStep: 'caplog-pre' });
         }
 
+        // (l0) Phase 60: inject TDC_itoken cookie. In real Chrome, tdc.js sets
+        // this via document.cookie (not Set-Cookie). Format: <uint32>%3A<unix_ts>.
+        // The scraper's CookieJar only captures HTTP Set-Cookie headers, so this
+        // cookie is never set naturally. Inject it before the verify POST.
+        const itokenValue = Math.floor(Math.random() * 0xFFFFFFFF) + '%3A' + Math.floor(Date.now() / 1000);
+        client.cookieJar.cookies.set('TDC_itoken', itokenValue);
+        this._log('  TDC_itoken injected: ' + itokenValue);
+
         // (l) Build the 38 verify POST fields
         const postFields = this._buildPostFields(client, session, sig, ans, collectVal, eks);
 

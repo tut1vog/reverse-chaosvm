@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 59** — Cookie inspection: Puppeteer vs scraper
-Current task: **59.2** — Instrument scraper cookie logging
+Current phase: **Phase 60** — Inject TDC_itoken cookie into scraper
+Current task: **60.2** — Run scraper and check errorCode
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -275,75 +275,37 @@ general-purpose — targeted serializer fix
 |----|------|--------|
 | 59.1 | Build `scripts/cookie-inspector.js` — Puppeteer script that runs a full CAPTCHA solve and dumps Chrome's cookie jar at each step: after prehandle, after show page load, after TDC loads, after verify POST. Also dump `Set-Cookie` headers from every response. Write to `output/phase-59/puppeteer-cookies.json`. | done |
 | 59.2 | Instrument the scraper to log every `Set-Cookie` header received and every `Cookie` header sent, at each flow step. Run the scraper and dump to `output/phase-59/scraper-cookies.json`. Confirm `TDC_itoken` is absent. | done |
-| 59.3 | Diff the two cookie logs: which cookies does Chrome have that the scraper doesn't? Are there cookies set by JavaScript (not `Set-Cookie` headers) that the scraper can't capture? Analyze and report findings. | pending |
+| 59.3 | Diff the two cookie logs. | done (superseded — diff obvious from 59.1+59.2: Chrome has TDC_itoken, scraper has nothing) |
 
 ---
 
-## Phase 59.1 Results (2026-04-18)
+## Phase 59 Results (2026-04-18)
 
-- **Only 1 cookie across the entire CAPTCHA flow: `TDC_itoken`**
-- Format: `<uint32>%3A<unix_timestamp>` (e.g., `552728512%3A1776492239`)
-- Set by **client-side JavaScript** inside `tdc.js` via `document.cookie` — NOT by any `Set-Cookie` HTTP header
-- Zero `Set-Cookie` headers observed across the entire flow (setCookieLog empty)
-- Prehandle response sets zero cookies
-- `TDC_itoken` appears after show page load and persists unchanged through verify
-- Decompiled tdc.js reads AND writes `TDC_itoken` (decompiled-polished.js:6885,6934)
-- **The scraper's `CookieJar` only captures HTTP `Set-Cookie` — it misses `TDC_itoken` entirely**
+**59.1**: Chrome has exactly 1 cookie: `TDC_itoken` (format `<uint32>%3A<unix_timestamp>`), set by `tdc.js` via `document.cookie` — NOT by any `Set-Cookie` header. Zero server-set cookies across the entire flow.
+
+**59.2**: Scraper cookie jar is empty throughout. No `Set-Cookie` headers received, no `Cookie` header sent on verify. jsdom DOES capture `TDC_itoken` when tdc.js runs, but the scraper never reads it.
+
+**Diff**: Chrome sends `Cookie: TDC_itoken=...` on verify POST. Scraper sends no `Cookie` header at all.
+
+---
+
+### Phase 60: Inject TDC_itoken cookie into scraper verify POST
+
+> **Root cause fix.** Phase 59 proved Chrome sends `TDC_itoken` on the verify POST (set by tdc.js via `document.cookie`). The scraper sends no cookies. The cookie format is `<uint32>%3A<unix_timestamp>`. Fix: generate and inject into cookie jar before verify.
+
+| ID | Task | Status |
+|----|------|--------|
+| 60.1 | Add TDC_itoken generation to scraper.js: inject into `client.cookieJar` before verify POST. | done |
+| 60.2 | Run the scraper and check errorCode. | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 59.2
-**Title**: Instrument scraper cookie logging
-**Phase**: Phase 59 — Cookie inspection
+**ID**: 60.2
+**Title**: Run the scraper and check errorCode
+**Phase**: Phase 60 — Inject TDC_itoken
 **Status**: in-progress
-
-### Goal
-Confirm that the scraper never sends `TDC_itoken` (or any cookie) on the verify POST, by instrumenting the scraper's `CaptchaClient` to log every `Set-Cookie` header received and every `Cookie` header sent at each flow step. This provides the scraper-side evidence to pair with the Puppeteer cookie capture from 59.1.
-
-### Context
-
-**59.1 finding**: Chrome has exactly one cookie (`TDC_itoken`) set by `tdc.js` via `document.cookie`. No HTTP `Set-Cookie` headers are sent by the server at any point. The scraper's `CookieJar` (captcha-client.js lines 37-78) only captures HTTP `Set-Cookie` — it cannot capture JS-set cookies.
-
-**Scraper flow** (`tools/scraper/scraper.js`):
-- Creates `CaptchaClient` at line 302
-- `CaptchaClient.prehandle()` — first HTTP request
-- `CaptchaClient.show()` or direct `httpRequest()` for show page
-- Various sub-resource fetches (tdc.js, images, slide-jy.js, vm-slide.enc.js)
-- `CaptchaClient.verify()` or direct `httpRequest()` for verify POST
-
-**`CookieJar` class** (captcha-client.js lines 37-78):
-- `capture(setCookieHeaders)` — parses `Set-Cookie` headers from HTTP responses
-- `toString()` — builds `Cookie` header value
-- Used by `httpRequest()` (line 139-159): injects `Cookie` header if jar non-empty, captures `Set-Cookie` from responses
-
-**What we expect to find**: The scraper's cookie jar is empty throughout the entire flow because no server responses include `Set-Cookie` headers. Therefore no `Cookie` header is sent on the verify POST.
-
-### Implementation Steps
-1. Create `scripts/scraper-cookie-inspector.js` that:
-   - Imports the scraper's `CaptchaClient` and `httpRequest`
-   - Runs the scraper's CAPTCHA flow (prehandle → show → verify) once
-   - After each step, dumps `client.cookieJar.cookies` (the Map contents)
-   - Monkey-patches `httpRequest` or the `CookieJar` to log every `Set-Cookie` captured and every `Cookie` header sent
-   - Writes results to `output/phase-59/scraper-cookies.json`
-2. Alternatively, if easier: temporarily add logging to `CaptchaClient` and run the normal scraper with `--verbose`, then extract from logs.
-
-The simplest approach: create a small script that:
-- Creates a `CaptchaClient`
-- Calls `prehandle()`, logs cookies
-- Calls the show page fetch, logs cookies
-- Does the verify flow, logs the `Cookie` header that would be sent
-- Writes JSON output
-
-### Verification
-- [ ] Script runs and produces `output/phase-59/scraper-cookies.json`
-- [ ] Output confirms cookie jar is empty at every step (no `Set-Cookie` headers received)
-- [ ] Output confirms no `Cookie` header is sent on the verify POST
-- [ ] `npm test` still passes
-
-### Suggested Agent
-general-purpose — scraper instrumentation
 
 ---
 

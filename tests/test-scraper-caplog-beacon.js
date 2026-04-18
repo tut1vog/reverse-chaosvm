@@ -120,6 +120,7 @@ function makeFakeClient({ verifyResult, onVerify }) {
 
   return {
     _showSubsid: '10',
+    cookieJar: { cookies: new Map() },
     async prehandle() {
       return {
         sess: 'sess_abcdef',
