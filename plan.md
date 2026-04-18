@@ -331,20 +331,20 @@ general-purpose — targeted serializer fix
 
 | ID | Task | Status |
 |----|------|--------|
-| 61.1 | Build `scripts/tls-experiment.js` — runs scraper flow through vData generation, then sends verify POST via `curl-impersonate-chrome` subprocess instead of Node.js https. Records errorCode. Also runs a control: same body via Node.js `https` (normal scraper path) for comparison. | pending |
+| 61.1 | Build `scripts/tls-experiment.js` — runs scraper flow through vData generation, then sends verify POST via `curl-impersonate-chrome` subprocess instead of Node.js https. Records errorCode. Also runs a control: same body via Node.js `https` (normal scraper path) for comparison. | done |
 | 61.2 | Run the experiment, analyze results. | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 61.1
-**Title**: Build TLS experiment script
+**ID**: 61.2
+**Title**: Run the TLS experiment and analyze results
 **Phase**: Phase 61 — TLS fingerprint test
 **Status**: pending
 
 ### Goal
-Build a script that runs the scraper's CAPTCHA flow but sends the final verify POST via `curl-impersonate-chrome` instead of Node.js `https`. Compare errorCode with the normal Node.js path. This isolates TLS fingerprint as the only variable.
+Run `scripts/tls-experiment.js` and analyze the results. If curl-impersonate gets errorCode 0 while Node.js gets -1, TLS fingerprint is confirmed as the root cause. If both get -1, TLS is eliminated.
 
 ### Context
 
