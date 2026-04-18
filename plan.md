@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 64** — Cleanup pass
-Current task: **64.3** — Remove 5 dead research tracks + `docs/ERRORCODE_12_INVESTIGATION.md`
+Current task: **64.4** — Remove `scripts/`, `history/`, and three dev-residue docs
 
 > Phases 38–63 closed (errorCode -1 → 0 investigation). Detail in `git log`.
 
@@ -20,7 +20,7 @@ Current task: **64.3** — Remove 5 dead research tracks + `docs/ERRORCODE_12_IN
 |----|------|--------|
 | 64.1 | Remove `output/` (252 tracked files + all untracked content) | done |
 | 64.2 | Remove `targets/`, `sample/`, `results.json`, **21 broken-by-implication test files** (9 originally listed + 12 decompiler snapshots exposed by 64.1); update `package.json`'s `test` script; trim Groups B/F from `tests/test-vdata-for-post.js`; leave `TODO(follow-up)` in `tools/captcha-solver/live-submit.js` above the `sample/` reads | done |
-| 64.3 | Remove 5 dead research tracks (`research/errorcode-12/`, `research/scraper-tls-impersonation/`, `research/collector-fields/`, `research/eks-payload/`, `research/key-mod/`) and `docs/ERRORCODE_12_INVESTIGATION.md` | pending |
+| 64.3 | Remove 5 dead research tracks (`research/errorcode-12/`, `research/scraper-tls-impersonation/`, `research/collector-fields/`, `research/eks-payload/`, `research/key-mod/`), `docs/ERRORCODE_12_INVESTIGATION.md`, and orphan `tests/test-token-isolation.js` (imports just-deleted module) | done |
 | 64.4 | Remove `scripts/`, `history/`, `docs/PROGRESS.md`, `docs/WORKFLOW.md`, `docs/CONVENTIONS.md` | pending |
 | 64.5 | Remove `.claude/commands/fetch-latest.md` and `.claude/rules/targets-readonly.md` | pending |
 | 64.6 | Remove `decompile` script from `package.json` | pending |
@@ -87,47 +87,55 @@ Groups A, C, D, E, G do not depend on `sample/` and should survive. The durable 
 
 ## Current Task
 
-**ID**: 64.3
-**Title**: Remove 5 dead research tracks + `docs/ERRORCODE_12_INVESTIGATION.md`
+**ID**: 64.4
+**Title**: Remove `scripts/`, `history/`, `docs/PROGRESS.md`, `docs/WORKFLOW.md`, `docs/CONVENTIONS.md`
 **Phase**: Phase 64 — Cleanup pass
 **Status**: in-progress
 
 ### Goal
-Delete five research track directories that hold debug tracks or README-only stubs, plus the docs file that depends on one of them. Keep `research/tdc-register-vm/`, `research/vm-slide-stack-vm/`, `research/captcha-orchestrator/`, and `research/template-pool/` untouched — those remain part of the provenance for the surviving docs and tools. `npm test` must stay green.
+Delete the dev-residue toplevel directories `scripts/` (14 phase-numbered debugging scripts) and `history/` (5 per-day journal files), plus three docs that document the old dev process: `docs/PROGRESS.md`, `docs/WORKFLOW.md`, `docs/CONVENTIONS.md`. `npm test` must stay green.
 
 ### Context
 
-**Tracks to delete** (entire directory each):
-- `research/errorcode-12/` — debug track for a hypothesis that's been eliminated. Contains scripts (`chrome-cd-inject.js`, `token-isolation-test.js`) that import `puppeteer`; these are research scripts, not production code.
-- `research/scraper-tls-impersonation/` — debug track for the TLS-fingerprint hypothesis, eliminated in Phase 61. Contains `capture-puppeteer-ja3.js`, `test-fetch-headers.js`, `test-fetch-same-origin.js`.
-- `research/collector-fields/` — debug track for cd-field discovery; folded into the production porting pipeline. Contains `discover-field-order.js`.
-- `research/eks-payload/` — README-only stub.
-- `research/key-mod/` — README-only stub.
+**`scripts/` contents to delete** (entire directory — 14 files currently):
+- `audit-diff.js`, `bypass-verify-test.js`, `collect-diff.js`, `collect-experiment.js`, `cookie-inspector.js`, `diff-verify-bodies.js`, `refresh-chrome-profile.js`, `scraper-cookie-inspector.js`, `scraper-single-attempt.js`, `subreq-isolation.js`, `test-xtea-fidelity.js`, `tls-experiment.js`, `verify-body-diff.js`, `verify-request-diff.js`.
+- None are referenced from `tools/`, `tests/`, or `package.json`'s `scripts` block.
+- Several import `puppeteer` — informational only, not a blocker here.
 
-**Docs file to delete**:
-- `docs/ERRORCODE_12_INVESTIGATION.md` — depends on the now-dead `research/errorcode-12/` track.
+**`history/` contents to delete** (entire directory — 5 files):
+- `20260410.md`, `20260411.md`, `20260412.md`, `20260413.md`, `20260415.md` — per-day journals of the phase investigation.
+- Grep already confirmed no surviving code references these files. `tests/test-token-isolation.js` mentioned `history/202604{11,12}.md` but it was deleted in 64.3.
+
+**Docs to delete**:
+- `docs/PROGRESS.md` — dev-task checklist, documents the early decompiler task list.
+- `docs/WORKFLOW.md` — dev workflow doc.
+- `docs/CONVENTIONS.md` — superseded by `.claude/rules/coding-style.md`.
+
+**Cross-reference check before deletion**: surviving files may still cite these paths. `grep -rln 'scripts/\|history/\|docs/PROGRESS\.md\|docs/WORKFLOW\.md\|docs/CONVENTIONS\.md' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` — flag any hits outside the delete set. These are handoffs to 64.7 (doc path sweep), not failures here.
 
 **Protected — do not modify**:
-- `research/tdc-register-vm/`, `research/vm-slide-stack-vm/`, `research/captcha-orchestrator/`, `research/template-pool/`
-- All of `tools/`, `tests/` (other surviving tests), `docs/` (other than ERRORCODE_12_INVESTIGATION.md), `.claude/`, `profiles/`, `CLAUDE.md`, `README.md`, `package.json`, `plan.md`, `project-brief.md`
-- The already-done-but-staged 64.2 changes — do not restage or re-edit those files
-
-**Cross-reference check**: before deletion, `grep -rln 'errorcode-12\|scraper-tls-impersonation\|collector-fields\|eks-payload\|key-mod\|ERRORCODE_12_INVESTIGATION' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` should yield only expected references. If surviving docs or tools cite these tracks, flag them — follow-on 64.7 doc sweep will handle path scrubbing, but the flag matters here for context.
+- All of `tools/`, `tests/` (surviving), `research/` (surviving 4 tracks), `profiles/`, `.claude/`, `docs/` (all files other than the 3 being deleted).
+- `CLAUDE.md`, `README.md`, `package.json`, `plan.md`, `project-brief.md`, `.gitignore`.
+- `node_modules/`, `package-lock.json`.
 
 ### Implementation Steps
-1. Check for cross-references (grep as above). Note any hits that are in files outside the delete set — those are not this task's problem (they feed 64.7) but should be reported.
-2. `git rm -r research/errorcode-12/ research/scraper-tls-impersonation/ research/collector-fields/ research/eks-payload/ research/key-mod/ docs/ERRORCODE_12_INVESTIGATION.md` — stages all deletions.
-3. `ls research/` to confirm only the 4 protected tracks remain.
-4. Run `npm test`. Must exit 0 with `# fail 0` — the suite shouldn't depend on any of these research tracks.
-5. Capture Verification output.
+1. `cd /home/ubun/github.com/tut1vog/reverse-chaosvm`.
+2. Run the cross-reference grep listed above and capture the output.
+3. `git rm -r scripts/ history/` — stages 19 deletions (14 + 5).
+4. `git rm docs/PROGRESS.md docs/WORKFLOW.md docs/CONVENTIONS.md` — stages 3 deletions.
+5. Verify via `ls` that `scripts/` and `history/` no longer exist and the 3 docs are gone.
+6. Run `npm test`. Must exit 0 with `# fail 0`.
+7. Capture Verification output.
 
-### Verification
-- `ls research/ | sort` → exactly: `captcha-orchestrator`, `tdc-register-vm`, `template-pool`, `vm-slide-stack-vm` (4 entries).
-- `test ! -e docs/ERRORCODE_12_INVESTIGATION.md && echo GONE || echo PRESENT` → `GONE`.
-- For each of the 5 research tracks: `test ! -e research/<name>/ && echo GONE || echo PRESENT` → `GONE`.
-- `npm test 2>&1 | tail -6` → `# fail 0`.
-- `grep -rln 'errorcode-12\|scraper-tls-impersonation\|collector-fields\|eks-payload\|key-mod\|ERRORCODE_12_INVESTIGATION' docs/ README.md CLAUDE.md tools/ tests/ .claude/ 2>/dev/null` → list any hits (these are handoffs to 64.7, not failures in this task).
-- `git status --short | grep '^D  ' | grep -v '^D  \(research/\|docs/ERRORCODE_12\)' | wc -l` → `0` (this task staged only the expected deletions — the working-tree 64.2 entries remain unstaged and untouched).
+### Verification — capture exact output
+- `test ! -e scripts/ && echo GONE || echo PRESENT` → `GONE`.
+- `test ! -e history/ && echo GONE || echo PRESENT` → `GONE`.
+- For each of the 3 docs: `test ! -e docs/<name>.md && echo GONE || echo PRESENT` → `GONE`.
+- `ls docs/ | grep -E '^(PROGRESS|WORKFLOW|CONVENTIONS)\.md$' | wc -l` → `0`.
+- `git status --short | grep '^D ' | wc -l` → `22` (14 `scripts/` + 5 `history/` + 3 docs).
+- `git diff --cached --name-only | grep -vE '^(scripts/|history/|docs/(PROGRESS|WORKFLOW|CONVENTIONS)\.md)$' | wc -l` → `0` (only expected paths staged).
+- `npm test 2>&1 | tail -8` → `# fail 0`.
+- Cross-reference grep from step 2 — list every hit outside the delete set. These feed 64.7.
 
 ### Suggested Agent
 general-purpose — directory deletion + cross-reference audit + test verification.
