@@ -460,6 +460,12 @@ async function sendViaCurl(url, headers, body) {
 // ---------------------------------------------------------------------------
 
 async function sendViaNode(url, headers, body) {
+  // Phase 62: dump full body for field-by-field diffing
+  const dumpDir = path.join(PROJECT_ROOT, 'output', 'phase-62');
+  fs.mkdirSync(dumpDir, { recursive: true });
+  fs.writeFileSync(path.join(dumpDir, 'standalone-verify-body.txt'), body, 'utf8');
+  log('Wrote standalone-verify-body.txt (' + body.length + ' chars)');
+
   const resp = await httpRequest(url, {
     method: 'POST',
     headers: headers,
