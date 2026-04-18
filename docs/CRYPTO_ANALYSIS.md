@@ -39,7 +39,7 @@ r9[0] = v0; r9[1] = v1;
 | r90[0] | func_140 | word→byte serializer (LE) | 35472 |
 | r20[0] | (btoa) | base64 encoder | N/A |
 
-**Reimplementation**: `token/crypto-core.js` — standalone Node.js module, verified against all 802 iterations
+**Reimplementation**: `tools/token-generator/crypto-core.js` — standalone Node.js module, verified against all 802 iterations
 
 ## Architecture (Corrected — Task 7.3)
 
@@ -295,7 +295,7 @@ With the frozen environment (Date.now, Math.random, crypto.getRandomValues all d
 
 ## Reimplementation (COMPLETED — Task 7.4)
 
-**File**: `token/crypto-core.js`
+**File**: `tools/token-generator/crypto-core.js`
 
 All four functions have been reimplemented and verified:
 
@@ -328,20 +328,20 @@ Key design decisions:
 
 ## Trace Data Reference
 
-- **Tracer v2**: `dynamic/crypto-tracer-v2.js` → `output/dynamic/crypto-trace-v2.json`
+- **Tracer v2**: `tools/dynamic-tracers/crypto-tracer-v2.js`
   - Region hit counts: region1=8, region2=810, region3=802, exit=8 (across 2 getData() calls)
   - Inner loop: 401 iterations per getData(), processing 3,208 bytes total
   - Self-mod: Y[40178]: 37→87 (first pass), then 87→87 (idempotent)
   - Loop mechanism: CJMP (opcode 87), F.length=0 (no exception handling involved)
 
-- **Tracer v3 (Task 7.4)**: `dynamic/crypto-tracer-v3.js` → `output/dynamic/crypto-trace-v3.json`
+- **Tracer v3 (Task 7.4)**: `tools/dynamic-tracers/crypto-tracer-v3.js`
   - Deep arithmetic traces for 3 cipher round calls (1491 ops each)
   - Func identification: func_204 (cipher), func_136 (converter), func_140 (serializer)
   - Key finding: cipher is modified XTEA with key-index modifications
   - Loop termination: sum == 32 * DELTA (84,941,944,608) — compared without 32-bit truncation
 
-- **Reimplementation**: `token/crypto-core.js`
+- **Reimplementation**: `tools/token-generator/crypto-core.js`
   - Verified against all 802 cipher round I/O pairs (100% match)
   - Verified against all 1,604 converter calls (100% match)
   - Verified against all 1,604 serializer calls (100% match)
-  - All 4 btoa segments match crypto-trace-v2.json ground truth byte-for-byte
+  - All 4 btoa segments match the v2 tracer's ground truth byte-for-byte

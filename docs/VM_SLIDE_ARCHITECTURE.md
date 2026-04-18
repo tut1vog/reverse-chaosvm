@@ -2,13 +2,13 @@
 
 ## Overview
 
-`sample/vm_slide.js` is a stack-based ChaosVM variant (the `__TENCENT_CHAOS_STACK` global) used by Tencent's slide CAPTCHA. It is a **different VM** from the register-based `tdc.js` ChaosVM documented in `docs/VM_ARCHITECTURE.md`: instead of a switch-dispatched register machine, it is a table-dispatched stack machine with an explicit operand stack, a small dispatch table (69 slots), and an exception-history stack.
+The vm-slide build the research scripts were run against is a stack-based ChaosVM variant (the `__TENCENT_CHAOS_STACK` global) used by Tencent's slide CAPTCHA. It is a **different VM** from the register-based `tdc.js` ChaosVM documented in `docs/VM_ARCHITECTURE.md`: instead of a switch-dispatched register machine, it is a table-dispatched stack machine with an explicit operand stack, a small dispatch table (69 slots), and an exception-history stack.
 
-This document reflects Phase 39+40 analysis of `sample/vm_slide.js`. First-pass source classification (Phase 39.3) of all 53 non-null handler source strings in `output/vm-slide/dispatch-table.json` has been validated by a control-flow-aware walker (Phase 40.1, `research/vm-slide-stack-vm/walker.js`) that decodes **14,134 instructions across 101 distinct function entries** with zero unreached bytecode bytes — the visited range `[0, 24273)` is fully covered, with 58.2% of bytes being instruction starts and the remainder being operand bytes of visited instructions. A cross-track investigation (Phase 40.6, `research/vm-slide-stack-vm/xtea-hunt.js`) confirmed the presence of **classical XTEA encrypt and decrypt closures** inside the bytecode at entry PCs `15241` and `15416`, both instantiated by an outer factory at entry PC `15220`. The Phase 39.1 linear disassembler's pc=512 halt is now understood to have been caused entirely by `FUNC_CREATE` mis-parse, not by reaching a legitimate dispatch-table hole.
+This document reflects analysis of that vm-slide build. First-pass source classification of all 53 non-null handler source strings has been validated by a control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) that decodes **14,134 instructions across 101 distinct function entries** with zero unreached bytecode bytes — the visited range `[0, 24273)` is fully covered, with 58.2% of bytes being instruction starts and the remainder being operand bytes of visited instructions. A cross-track investigation (`research/vm-slide-stack-vm/xtea-hunt.js`) confirmed the presence of **classical XTEA encrypt and decrypt closures** inside the bytecode at entry PCs `15241` and `15416`, both instantiated by an outer factory at entry PC `15220`. The earlier linear disassembler's pc=512 halt is now understood to have been caused entirely by `FUNC_CREATE` mis-parse, not by reaching a legitimate dispatch-table hole.
 
 ## File layout
 
-`sample/vm_slide.js` is a 43,688-byte single-line script. The top-level structure, verified by inspecting the file prefix and suffix, is:
+The vm-slide source is a 43,688-byte single-line script. The top-level structure, verified by inspecting the file prefix and suffix, is:
 
 ```js
 var __TENCENT_CHAOS_STACK = function () {
@@ -37,7 +37,7 @@ __TENCENT_CHAOS_STACK.g = function () { return __TENCENT_CHAOS_STACK.shift()[0] 
 Key anchors:
 
 - **Dispatch table `Q`**: 69 slots, 53 non-null handlers, 16 sparse-array holes. Each non-null entry is a zero-argument function that reads operands via `m[g++]` and manipulates the operand stack `n`.
-- **Inline bytecode**: the 2nd argument to the outer `__TENCENT_CHAOS_VM` invocation is a literal number array. The Phase 39.1 decoder (`research/vm-slide-stack-vm/decoder.js`) extracts 24,273 elements from this literal.
+- **Inline bytecode**: the 2nd argument to the outer `__TENCENT_CHAOS_VM` invocation is a literal number array. The decoder (`research/vm-slide-stack-vm/decoder.js`) extracts 24,273 elements from this literal.
 - **Outer invocation**: `__TENCENT_CHAOS_VM(0, [...bytecode...], window)` — pc starts at 0, constant pool is `window`, and all other arguments default inside the function.
 - **Result helper**: `__TENCENT_CHAOS_STACK.g = function(){ return __TENCENT_CHAOS_STACK.shift()[0] }`. The VM invocation returns an array-like; callers pull one result at a time by shifting and unwrapping the single-cell pair.
 
@@ -82,7 +82,7 @@ Handler bodies never touch `n[i]` for `i < 2` directly except via the reference-
 
 ## Dispatch loop
 
-The outer dispatch loop, quoted verbatim from `sample/vm_slide.js`:
+The outer dispatch loop, quoted verbatim from the vm-slide source:
 
 ```js
 for (0; ;)
@@ -176,18 +176,18 @@ This is a noticeably different contract from the register-based `tdc.js` VM (see
 
 ## Bytecode format
 
-The bytecode is a flat JavaScript number array embedded as the 2nd argument of the outermost `__TENCENT_CHAOS_VM(0, [...], window)` call. Phase 39.1's decoder extracts **24,273 elements** (verified by `tests/test-vm-slide-decoder.js` and committed to `output/vm-slide/bytecode.json`), substantially larger than the register-based `tdc.js` VM's ~7K `Y[]` array.
+The bytecode is a flat JavaScript number array embedded as the 2nd argument of the outermost `__TENCENT_CHAOS_VM(0, [...], window)` call. The decoder extracts **24,273 elements** (verified by `tests/test-vm-slide-decoder.js` against the committed bytecode fixture), substantially larger than the register-based `tdc.js` VM's ~7K `Y[]` array.
 
 Format properties:
 
 - **PC-indexed**: the pc `g` is an integer index into the array. Opcode 6 (`g = m[g++]`) writes pc absolutely, so jumps are absolute positions into this same array.
 - **Inline operands**: every handler reads its operands via additional `m[g++]` after the initial opcode read. Operand counts are `{0: 37 handlers, 1: 14 handlers, 2: 1 handler (TRY_PUSH), 6: 1 handler (FUNC_CREATE, variable)}`.
-- **Non-integer operands allowed**: the bytecode contains exactly one `0.5` element (verified by inspecting `output/vm-slide/bytecode.json` near the tail). No handler in the 53-entry table coerces operands to integers, so non-integer constants are legal and are passed through verbatim by `PUSH_K` / `PUSH_CHAR` / similar.
+- **Non-integer operands allowed**: the bytecode contains exactly one `0.5` element (verified by inspecting the decoded bytecode near the tail). No handler in the 53-entry table coerces operands to integers, so non-integer constants are legal and are passed through verbatim by `PUSH_K` / `PUSH_CHAR` / similar.
 - **No stored opcode shuffle**: unlike `tdc.js` templates, where opcode numbering rotates between builds (see `docs/VERSION_DIFFERENCES.md`), the vm-slide dispatch table is a fixed literal inside the VM source. Porting across vm-slide builds would require re-parsing the dispatch-table literal, not an opcode-shuffle map.
 
 ## Observed coverage and limitations
 
-**Behavioral coverage is now effectively complete for this vm-slide build.** The Phase 40.1 control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) decodes **14,134 instructions across 101 distinct function entries** — a 45.3× increase over the Phase 39.1 linear disassembler's 312 instructions. Walker outputs are committed to `output/vm-slide/disassembly-full.txt` (14,486 lines).
+**Behavioral coverage is now effectively complete for this vm-slide build.** The control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) decodes **14,134 instructions across 101 distinct function entries** — a 45.3× increase over the earlier linear disassembler's 312 instructions. Walker output is 14,486 lines of disassembly.
 
 Key coverage facts:
 
@@ -197,7 +197,7 @@ Key coverage facts:
 - **Zero dispatch-hole hits** across the whole walk. The 16 dispatch holes at slots `[9, 14, 18, 19, 22, 26, 27, 29, 30, 34, 43, 44, 48, 53, 57, 65]` are confirmed unreached in this vm-slide build. The Phase 39.1 pc=512 halt was caused entirely by `FUNC_CREATE` variable-width mis-parse, not by the linear walker legitimately reaching hole 65.
 - **Opcode classifications validated**: every non-null handler has been observed firing at least once across the 14,134-instruction walk, so Phase 39.3's source-only classifications are now behaviorally grounded.
 
-The honest remaining limitation is **module-export indirection**: static analysis cannot identify which real-world values are supplied as arguments to the XTEA factory (see "XTEA factory and closures" below), because the closures are stored into module exports and invoked indirectly through Tencent's CommonJS-style module system. Pinning the real-world callers requires runtime instrumentation or coordinated analysis with the `captcha-orchestrator` / `eks-payload` research tracks.
+The honest remaining limitation is **module-export indirection**: static analysis cannot identify which real-world values are supplied as arguments to the XTEA factory (see "XTEA factory and closures" below), because the closures are stored into module exports and invoked indirectly through Tencent's CommonJS-style module system. Pinning the real-world callers requires runtime instrumentation or coordinated analysis with the `captcha-orchestrator` research track plus follow-up work on `eks` derivation.
 
 ## XTEA factory and closures
 
@@ -207,9 +207,9 @@ The Phase 40.6 cross-track investigation (`research/vm-slide-stack-vm/xtea-hunt.
 - **Encrypt closure — entry PC `15241`.** Created by `FUNC_CREATE` at PC `15404` inside the factory body. Loop head at PC `15284`; 32-round loop bound is the `PUSH_K 84941944608` at PC `15284` (decimal `84941944608 = 32·0x9E3779B9`). Uses `ADD` for `sum += delta` and `v += ...`. Backward `JUMP 15284` at PC `15377` closes the loop. The delta `0x9E3779B9` (decimal `2654435769`) appears as the `PUSH_K` operand at bytecode index `15353`.
 - **Decrypt closure — entry PC `15416`.** Created by `FUNC_CREATE` at PC `15579` inside the factory body. Loop head at PC `15459`; same `PUSH_K 84941944608` loop bound. Uses `SUB` for `sum -= delta` — the classical XTEA decrypt inverse. Backward `JUMP 15459` at PC `15552` closes the loop. The delta appears as the `PUSH_K` operand at bytecode index `15531`.
 
-Both closures implement the **vanilla XTEA round** from Needham & Wheeler — shifts by 4 and 5, bitwise XOR, `sum & 3` and `(sum >>> 11) & 3` key indices, 32 iterations. The cipher is **classical XTEA, not the register-VM's modified variant**: see the "Differences from the register-based `tdc.js` VM" section below and `docs/CRYPTO_ANALYSIS.md`. The key is an argument to the factory rather than derived from a per-template STATE_A, so the `key-mod/` research track's cross-template findings do not apply to vm-slide.
+Both closures implement the **vanilla XTEA round** from Needham & Wheeler — shifts by 4 and 5, bitwise XOR, `sum & 3` and `(sum >>> 11) & 3` key indices, 32 iterations. The cipher is **classical XTEA, not the register-VM's modified variant**: see the "Differences from the register-based `tdc.js` VM" section below and `docs/CRYPTO_ANALYSIS.md`. The key is an argument to the factory rather than derived from a per-template STATE_A, so the register VM's cross-template key-modification findings do not apply to vm-slide.
 
-The presence of both encrypt and decrypt strongly suggests vm-slide handles a round-trip cipher — the most likely use is `eks`-payload decryption on incoming data and verify-body encryption on outbound, but the module-export indirection described above prevents static pinning of the real-world callers. This is a natural handoff to the `captcha-orchestrator` and `eks-payload` research tracks.
+The presence of both encrypt and decrypt strongly suggests vm-slide handles a round-trip cipher — the most likely use is `eks`-payload decryption on incoming data and verify-body encryption on outbound, but the module-export indirection described above prevents static pinning of the real-world callers. This is a natural handoff to the `captcha-orchestrator` research track and to future work on `eks` derivation.
 
 See `research/vm-slide-stack-vm/xtea-hunt.js` for the reproducible analysis and the semantic disassembly windows around both closures.
 
@@ -222,7 +222,7 @@ See `research/vm-slide-stack-vm/xtea-hunt.js` for the reproducible analysis and 
 
 ### Still open
 
-- **Real-world XTEA caller arguments.** The outer factory takes 3 arguments, and the closures it creates are stored into module exports. The actual inputs supplied by the real-world caller — key material, plaintext/ciphertext blocks, invocation order — cannot be resolved statically because of CommonJS-style module-export indirection through Tencent's loader. Pinning callers requires runtime instrumentation, or coordinated analysis with the `captcha-orchestrator` and `eks-payload` research tracks.
+- **Real-world XTEA caller arguments.** The outer factory takes 3 arguments, and the closures it creates are stored into module exports. The actual inputs supplied by the real-world caller — key material, plaintext/ciphertext blocks, invocation order — cannot be resolved statically because of CommonJS-style module-export indirection through Tencent's loader. Pinning callers requires runtime instrumentation, or coordinated analysis with the `captcha-orchestrator` research track plus follow-up work on `eks` derivation.
 - **Shared compiler backend across register VM and stack VM.** Whether `tdc.js` (register) and `vm-slide` (stack) share a common upstream bytecode compiler or are independent codegens remains an open question with no active task.
 - **One bytecode element is `0.5`.** Located near the tail of the literal. No handler integer-coerces operands, so this is legal, but why the VM would push a half remains unexplained. Candidates include a Math argument, a coordinate, or a slide-puzzle interpolation constant. No active task.
 - **Whether the 16 dispatch holes become reachable in any other vm-slide build.** Confirmed unreached in this build by the Phase 40.1 walker, but Tencent can ship a different vm-slide build that populates (or references) those slots.
@@ -246,6 +246,6 @@ A side-by-side comparison will live in the future `docs/CHAOSVM_VARIANTS.md` (Ph
 | XTEA variant | Modified XTEA with per-template STATE_A key derivation via `keyModConstants` | **Classical XTEA** (Needham & Wheeler), key passed in as a factory argument |
 | Cipher direction(s) present | Encrypt only (token generation) | **Both encrypt and decrypt** — `eks` round-trip hypothesis, see "XTEA factory and closures" |
 
-The classical-vs-modified XTEA distinction is important for future porting work: the register VM's `keyModConstants` story and the `key-mod/` research track findings do **not** apply to vm-slide. vm-slide's key is whatever the factory caller supplies.
+The classical-vs-modified XTEA distinction is important for future porting work: the register VM's `keyModConstants` story does **not** apply to vm-slide. vm-slide's key is whatever the factory caller supplies.
 
 See `docs/VM_ARCHITECTURE.md` for the register VM and `docs/VM_SLIDE_OPCODES.md` for the vm-slide opcode table.

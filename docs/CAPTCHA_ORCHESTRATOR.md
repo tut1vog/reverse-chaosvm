@@ -7,8 +7,8 @@ for Phase 41; it transcribes the findings recorded in
 `research/captcha-orchestrator/SURVEY.md` (structural baseline). Every claim
 below cites either a module id with a short role anchor or a FLOW.md section.
 
-**Source reference**: `sample/t_captcha_slide.js` (213,162 bytes), webpack 4
-IIFE, entry module 64. HAR evidence comes from `sample/captcha-har.har` (one
+**Source reference**: the `t_captcha_slide.js` orchestrator bundle the research scripts were run against (213,162 bytes), webpack 4
+IIFE, entry module 64. HAR evidence comes from the captured CAPTCHA HAR the research scripts were run against (one
 successful desktop verification: prehandle → show → tdc.js → bundle →
 vm-slide.enc.js → verify).
 
@@ -19,18 +19,15 @@ vm-slide.enc.js → verify).
 - `docs/EKS_FORMAT.md` — how the `eks` field served by the orchestrator is
   server-baked into `tdc.js`.
 - `docs/HAR_ANALYSIS.md` — network-level flow view of the CAPTCHA protocol.
-- `docs/ERRORCODE_12_INVESTIGATION.md` — verify `errorCode 12` handling.
 - `research/captcha-orchestrator/FLOW.md` — research-side narrative, 9 sections.
 - `research/captcha-orchestrator/SURVEY.md` — structural baseline (bundle
   shape, module count, graph shape).
-- `output/captcha-orchestrator/verify-body-origination.json` — 39-field
-  origination table in machine-readable form.
 
 ---
 
 ## 1. Overview
 
-`sample/t_captcha_slide.js` is the webpack 4 orchestrator bundle that drives
+The `t_captcha_slide.js` orchestrator bundle is the webpack 4 bundle that drives
 Tencent's slide-CAPTCHA iframe. It is a standard webpack 4 IIFE with a flat
 module array. The runtime wrapper walks every module via
 `e[r].call(i.exports, i, i.exports, n)`, so every module wrapper has the
@@ -39,8 +36,7 @@ positional parameter of every wrapper is the `require` function. The entry
 module is module 64, declared by `n(n.s = 64)` in the wrapper (SURVEY.md
 "Bundle shape").
 
-Bundle-level facts (reproducible from `output/captcha-orchestrator/modules.json`
-and `module-graph.json`):
+Bundle-level facts (reproducible from the structural survey — module map and require graph):
 
 - **Total array slots**: 110.
 - **Non-empty modules**: 50.
@@ -67,8 +63,7 @@ open questions. Section 9 reconciles with the pre-existing docs.
 
 ## 2. End-to-end flow
 
-Transcribed from FLOW.md §6. HAR entry numbers refer to
-`sample/captcha-har.har`.
+Transcribed from FLOW.md §6. HAR entry numbers refer to the captured CAPTCHA HAR the research scripts were run against.
 
 1. **Prehandle** (HAR 1). Parent page calls
    `GET /cap_union_prehandle?aid=...&ua=...` as JSONP. Response
@@ -93,7 +88,7 @@ Transcribed from FLOW.md §6. HAR entry numbers refer to
        with `getData`, `setData`, `clearTc`, `getInfo`.
    (b) `<script src="https://captcha.gtimg.com/1/tcaptcha-slide.29a33140.js"
        crossorigin="anonymous">` (HAR 4) — this orchestrator bundle;
-       byte-identical (sha256) to `sample/t_captcha_slide.js`.
+       byte-identical (sha256) to the `t_captcha_slide.js` build the research scripts were run against.
    (c) `<script src="/vm-slide.e201876f.enc.js">` (HAR 5) — the stack VM
        (`research/vm-slide-stack-vm/`). **Hardcoded directly in the show-page
        HTML**, NOT loaded by the orchestrator bundle. FLOW.md §3 traces
@@ -349,7 +344,7 @@ The full per-field origination table is in §5.
 
 ## 5. Verify POST origination table
 
-Source: `output/captcha-orchestrator/verify-body-origination.json` — 39 rows,
+Source: the machine-readable verify-body origination table produced by the `captcha-orchestrator` research track — 39 rows,
 zero leftover HAR fields. Each row records `{name, sample_value_prefix,
 sample_value_length, origin_module, origin_lines, assembly_method,
 provenance}`. Sample values are truncated to roughly 60 characters with `…`;
@@ -516,7 +511,7 @@ vm-slide, outside the `getVData` function body. **Phase 43 closed-form result**:
 **Why `window.getVData` is the only `window.*` property vm-slide installs**.
 Task 42.2 ran a full-bytecode enumeration of `[window, <key>] + FUNC_CREATE
 + OP_24` property-set patterns (`research/vm-slide-stack-vm/vdata-provenance.js`
-→ `output/vm-slide/window-installs.json`). Exactly one entry: `getVData`.
+→ committed `window.*` install list). Exactly one entry: `getVData`.
 vm-slide does not expose a second global for the crypto — the XHR proxy
 keeps everything inside a closure.
 
@@ -545,7 +540,7 @@ vm-slide internal orchestrator (fn 19604, INSIDE vm-slide — not in this bundle
       final body: 9504 = 9345 + 7 ("&vData=") + 152
 ```
 
-The important mental-model correction: **`getCaptchaData` is defined and bound inside vm-slide itself, not in `t_captcha_slide.js`**. `sample/t_captcha_slide.js` contains zero references to `getCaptchaData`, `CaptchaData`, `TENCENT_CHAOS`, etc. (confirmed by `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`). The orchestrator bundle's only vData-related code is the `if (a.isLowIE())` IIFE at bytes 162929..163108 that calls `window.getVData` on the IE9 fallback path — on modern browsers this is a no-op, and the Chrome path is entirely driven by vm-slide's internal `fn 19604 → init → proxyXHR(fn 22317) → fn 20539 XHR.send patch → fn 22317 kv build + encrypt` chain described above.
+The important mental-model correction: **`getCaptchaData` is defined and bound inside vm-slide itself, not in `t_captcha_slide.js`**. The orchestrator bundle contains zero references to `getCaptchaData`, `CaptchaData`, `TENCENT_CHAOS`, etc. (confirmed by `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`). The orchestrator bundle's only vData-related code is the `if (a.isLowIE())` IIFE at bytes 162929..163108 that calls `window.getVData` on the IE9 fallback path — on modern browsers this is a no-op, and the Chrome path is entirely driven by vm-slide's internal `fn 19604 → init → proxyXHR(fn 22317) → fn 20539 XHR.send patch → fn 22317 kv build + encrypt` chain described above.
 
 **Historical correction note.** An earlier draft of this section (pre-Phase 44) stated that the 112-byte plaintext is "a canonical reduction of the caller-supplied verify body (`arguments[0]`)". That was incorrect. `arguments[0]` is read by fn 22317 only as an input to the `key` digest helper (fn 22730 → `require(18)(body,'tlg')`); the other 7 fields are independent runtime-state probes with no dependence on the POST body at all. The `tp` field is a JS runtime error string captured at page load, not a field derived from the body. The `&vData=` literal at bytecode pcs 24211..24223 lives inside **fn 22317**, not inside a separate "send replacement" function at pc 24210. See `research/vm-slide-stack-vm/FN-20539-SLOT8-HOP.md` for the pc-level reconciliation of this misreading.
 
@@ -609,8 +604,8 @@ Module 56 distinguishes the following non-zero error codes (FLOW.md §4.6):
 
 - **9** — wrong answer: show `puzzle8` cover, shake, call `q()` (refresh /
   getsig loop, §3.5).
-- **12** — soft fail: show `puzzle9` cover with refresh hook `q`. Consistent
-  with `docs/ERRORCODE_12_INVESTIGATION.md`.
+- **12** — soft fail: show `puzzle9` cover with refresh hook `q`. Distinct
+  from plain IP rate limiting.
 - **16 / 20 / 21** — session expired: `s.sessionTimeout()` (postMessage
   type 12 to parent).
 - **30 / 51** — hybrid verify handoff: `s.hybridVerify(e.sess, h.get())`
@@ -657,13 +652,12 @@ every response regardless of outcome.
   exports `u` with `u.init`, `u.get`, `u.initWxLang`, `u.rightToLeft`.
   Module 56 reads captions through `var i = n(41); i.c11; i.puzzle6;
   i.get('aged')`. Not on the critical path for the verify flow; parked.
-- **Module 76 is Zepto, `sample/slide-jy.js` is jQuery 1.11.3** — different
-  libraries, not the same codebase minified differently. Evidence is in
-  `output/captcha-orchestrator/slide-jy-diff.md`: slide-jy.js has an explicit
-  `"1.11.3"` version literal, a `noConflict` UMD footer, ~47 `extend`
-  occurrences, and no `Zepto` / `ajaxJSONP` tokens; module 76 has a `Zepto`
-  literal, exports `ajaxJSONP` (a Zepto-only method), no `noConflict`, no
-  `jQuery.fn.init`, no `Sizzle`, and only ~3 `extend` occurrences. Module
+- **Module 76 is Zepto, the jQuery-style bundle fetched during the slide flow is jQuery 1.11.3** — different
+  libraries, not the same codebase minified differently. The captured slide-jy
+  bundle has an explicit `"1.11.3"` version literal, a `noConflict` UMD footer,
+  ~47 `extend` occurrences, and no `Zepto` / `ajaxJSONP` tokens; module 76 has
+  a `Zepto` literal, exports `ajaxJSONP` (a Zepto-only method), no `noConflict`,
+  no `jQuery.fn.init`, no `Sizzle`, and only ~3 `extend` occurrences. Module
   64 picks between them at load time — mobile user agents use
   `window.$ = n(76)` (inline Zepto), desktop user agents fetch
   `/slide-jy.js` via `getScript` and poll for `window.$`.
@@ -716,9 +710,9 @@ documentation. **No contradictions were found.** Each bullet below records a
   `vm-slide.e201876f.enc.js` (GET, JS), `cap_union_new_verify` (POST,
   url-encoded, 39 fields, JSON response), and the retry loop via
   `cap_union_new_getsig`.
-- **`docs/ERRORCODE_12_INVESTIGATION.md`** — consistent. Module 56 treats
+- **`errorCode 12` handling** — Module 56 treats
   `errorCode 12` as a soft-retryable failure via `case 12:
   m.showCoverError("puzzle9", null, q, a.queryParam("sid"))`, with no
   special cleanup beyond the `e.sess && w(e.sess)` that runs
-  unconditionally before the switch. This matches the investigation's
-  finding that 12 is not plain IP rate limiting.
+  unconditionally before the switch. Consistent with the separately-recorded
+  finding that `errorCode 12` is not plain IP rate limiting.

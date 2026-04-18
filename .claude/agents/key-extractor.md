@@ -113,7 +113,7 @@ Write extracted parameters to a JSON file at the location specified in the dispa
 ## Important Constraints
 
 - NEVER hardcode PC addresses or opcode numbers from Template A — always derive them from the provided opcode table.
-- NEVER modify any file in `targets/`.
+- NEVER modify the caller-supplied target path — it is a read-only analysis input.
 - The tracer must work with ANY tdc.js build given the correct opcode table.
 - Clean up the local HTTP server and Puppeteer browser after tracing completes.
 - If tracing fails, report what went wrong with enough detail to diagnose the issue.

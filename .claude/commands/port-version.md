@@ -1,13 +1,13 @@
 ---
 description: "Port a new tdc.js build through the full porting pipeline: decode, map opcodes, extract XTEA key, verify token."
-argument: "Path to the target tdc.js file (e.g., targets/tdc-v4.js)"
+argument: "Path to the target tdc.js file (e.g., ./output/puppeteer-capture/tdc-source.js or any caller-supplied path to a fetched tdc.js)"
 ---
 
 # Port New TDC Version
 
 Port the target tdc.js build at `$ARGUMENTS` through the full multi-stage porting pipeline.
 
-Determine the target stem from the filename (e.g., `targets/tdc-v4.js` -> `tdc-v4`). Create the output directory `output/<target-stem>/` if it does not exist.
+Determine the target stem from the filename (e.g., `./output/puppeteer-capture/tdc-source.js` -> `tdc-source`). Create the output directory `output/<target-stem>/` if it does not exist.
 
 Report progress at each stage. If any stage fails, halt immediately and report diagnostics (error message, partial output, what to investigate).
 
@@ -109,7 +109,7 @@ Summarize the full porting result:
 
 1. **Target**: filename and path
 2. **Opcode count**: number of mapped opcodes (e.g., 95 or 94)
-3. **Template match**: A (95 ops, matches tdc.js), B (94 ops, matches tdc-v2.js), or new template
+3. **Template match**: A (95 ops), B (94 ops), C (100 ops), or a new template
 4. **XTEA key**: the 4 x uint32 key values (hex) — note if identical to Template A or different
 5. **Verification result**: byte-identical (yes/no), which segments match, which diverge
 6. **Action items**: anything that still needs manual attention

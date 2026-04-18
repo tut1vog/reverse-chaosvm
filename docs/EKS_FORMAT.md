@@ -106,11 +106,11 @@ eks is a free ticket included with every `tdc.js` fetch. The correct flow is:
 2. Extract eks from the response text:
      const eks = tdcJs.match(/window\.[A-Za-z0-9_]{20,}\s*=\s*'([^']+)'/)[1];
    (or use TDC.getInfo().info after loading the script)
-3. Run collect reimplementation (token/ directory)
+3. Run collect reimplementation (`tools/token-generator/`)
 4. POST /verify with both collect and eks
 ```
 
-`puppeteer/collect-generator.js` already does this correctly — it loads tdc.js and
+The Puppeteer-based collect generator in the CAPTCHA solver tool already does this correctly — it loads tdc.js and
 calls `TDC.getInfo().info` to retrieve the pre-baked eks value.
 
 ## Related Documents

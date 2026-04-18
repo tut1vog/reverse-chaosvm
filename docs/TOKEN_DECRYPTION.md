@@ -21,7 +21,7 @@ console.log(result.cdParsed);   // Array of 60 fingerprint entries
 console.log(result.sdParsed);   // Session data (slide trajectory, etc.)
 ```
 
-> **Key compatibility:** The XTEA key is hardcoded in `token/crypto-core.js` (extracted from `tdc.js`). This key is shared across `tdc.js`, `tdc-v3.js`, and `tdc-v4.js`. If a different TDC build uses a different key, `decryptionOk` will be `true` but `parseOk` will be `false` — the JSON will be garbage.
+> **Key compatibility:** The XTEA key is hardcoded in `tools/token-generator/crypto-core.js` as the Template A key. Template A builds share this key; Templates B and C have distinct keys extracted by `tools/porting-pipeline/key-extractor.js`. If the target build uses a different template's key, `decryptionOk` will be `true` but `parseOk` will be `false` — the JSON will be garbage.
 
 ---
 

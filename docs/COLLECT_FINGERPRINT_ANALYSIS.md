@@ -147,11 +147,11 @@ The new approach:
 
 ## 6. Artifacts
 
-| File | Contents |
-|------|----------|
-| `output/puppeteer-capture/verify-post.json` | Raw POST body from Chrome (39 fields) |
-| `output/puppeteer-capture/collect-plaintext.json` | Decrypted `{cd, sd}` JSON |
-| `output/puppeteer-capture/cd-fields.json` | Just the 60-element cd array |
-| `output/puppeteer-capture/sd-fields.json` | Just the sd object |
-| `output/tdc-pptr-capture/pipeline-config.json` | Auto-ported template config (key, field order, structure) |
-| `output/tdc-pptr-capture/xtea-params.json` | XTEA key + keyMods for this build |
+| Artifact | Contents |
+|----------|----------|
+| Puppeteer verify-POST capture | Raw POST body from Chrome (39 fields) |
+| Decrypted collect plaintext | Decrypted `{cd, sd}` JSON |
+| `cd` array snapshot | Just the 60-element cd array |
+| `sd` object snapshot | Just the sd object |
+| Porting-pipeline template config | Auto-ported template config (key, field order, structure) |
+| Porting-pipeline XTEA params | XTEA key + keyMods for this build |

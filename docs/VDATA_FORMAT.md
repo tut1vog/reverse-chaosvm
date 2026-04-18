@@ -63,7 +63,7 @@ vm-slide internal orchestrator (fn 19604)
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-**Verified.** The standalone reimplementation (`tools/vdata-generator/`) produces byte-identical output against two committed fixtures: `tests/fixtures/vdata-jsdom-capture.json` (synthetic via jsdom) and `tests/fixtures/vdata-har-capture.json` (a real Chrome 146 HAR capture from `sample/captcha-har.har`). Both directions (encode + decode + XTEA encrypt + XTEA decrypt) round-trip in `tests/test-vdata-generator-encoder.js` (Phase 43.4) and in the standalone `tests/fixtures/verify-vdata-fixtures.js` (Phase 43.2).
+**Verified.** The standalone reimplementation (`tools/vdata-generator/`) produces byte-identical output against two committed fixtures: `tests/fixtures/vdata-jsdom-capture.json` (synthetic via jsdom) and `tests/fixtures/vdata-har-capture.json` (a real Chrome 146 HAR capture). Both directions (encode + decode + XTEA encrypt + XTEA decrypt) round-trip in `tests/test-vdata-generator-encoder.js` (Phase 43.4) and in the standalone `tests/fixtures/verify-vdata-fixtures.js` (Phase 43.2).
 
 ## 2. Pipeline
 
@@ -118,9 +118,9 @@ The key is **constant across runs and across sessions**, identical between the j
 > **Key reconciliation across builds (Phase 44.0.1, updated Phase 44.2.7)**. Two hex strings have been observed in vm-slide traces, and they correspond to two different builds (or two different sampling points):
 >
 > - `2e430f8c15b7da96` — the key observed in the encrypt closure's local 4 when Phase 43 instrumented `research/vm-slide-stack-vm/vdata-dynamic-trace.js`. Both committed fixtures (`tests/fixtures/vdata-{jsdom,har}-capture.json`) round-trip byte-identically with this key, so it is the canonical key for the `tools/vdata-generator/` reference implementation and for all `tests/fixtures/verify-vdata-fixtures.js` assertions.
-> - `34e2c8f07b5169ad` — the 16-byte bytecode literal pushed into fn 13860 at pcs 13931 and 15149 inside `sample/vm_slide.js`. This is ALSO the value observed live as fn 15918's second argument by the 44.2.7 tracer `research/vm-slide-stack-vm/trace-fn20539-entry.js`, which means `sample/vm_slide.js` encrypts with the bytecode literal directly (no seed→key transform on that build).
+> - `34e2c8f07b5169ad` — the 16-byte bytecode literal pushed into fn 13860 at pcs 13931 and 15149 inside the vm-slide build the research scripts were run against. This is ALSO the value observed live as fn 15918's second argument by the 44.2.7 tracer `research/vm-slide-stack-vm/trace-fn20539-entry.js`, which means that vm-slide build encrypts with the bytecode literal directly (no seed→key transform on that build).
 >
-> The 44.0.1 reconciliation originally hypothesized a seed→key prologue transform inside fn 13860 on `sample/vm_slide.js`. The 44.2.7 runtime capture shows no such transform on that build — the literal IS the runtime key. The remaining contradiction (the fixtures' canonical key `2e43...` vs sample/vm_slide.js's runtime key `34e2...`) therefore reduces to "the committed fixtures were generated against a different vm-slide build than the one checked into `sample/`." This does not affect the fixture reproducibility contract or any Phase 43/44 deliverable — reconfirming which live build `tests/fixtures/` was captured from is an optional Phase 45 follow-up. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`.
+> The 44.0.1 reconciliation originally hypothesized a seed→key prologue transform inside fn 13860 on that vm-slide build. The 44.2.7 runtime capture shows no such transform — the literal IS the runtime key. The remaining contradiction (the fixtures' canonical key `2e43...` vs the vm-slide build's runtime key `34e2...`) therefore reduces to "the committed fixtures were generated against a different vm-slide build than the one the research scripts were run against." This does not affect the fixture reproducibility contract or any Phase 43/44 deliverable — reconfirming which live build `tests/fixtures/` was captured from is an optional follow-up. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`.
 
 ### Encoding alphabet
 
@@ -242,7 +242,7 @@ Every claim in this doc is grounded in either bytecode reading, a dynamic trace,
 
 | Claim | Source |
 |---|---|
-| Cipher is classical XTEA, not modified | Phase 40 walker output `output/vm-slide/disassembly-full.txt` at pcs 15241 (encrypt entry) and 15416 (decrypt entry); cross-checked by Phase 43.1 dynamic decrypt of HAR ciphertext with the recovered key |
+| Cipher is classical XTEA, not modified | Phase 40 walker disassembly at pcs 15241 (encrypt entry) and 15416 (decrypt entry); cross-checked by Phase 43.1 dynamic decrypt of HAR ciphertext with the recovered key |
 | XTEA delta `0x9E3779B9`, 32 rounds | `OP_08` immediates at bytecode indices 15352 / 15530 (encrypt and decrypt round constants) |
 | LE uint32 packing at the cipher boundary | Phase 43.1 dynamic trace `research/vm-slide-stack-vm/vdata-dynamic-trace.js` — the captured pre-XTEA buffer matches the 112-byte plaintext only under LE packing |
 | 16-byte XTEA key | Live capture of the encrypt closure call in Phase 43.1; confirmed identical between jsdom and HAR via decrypt round-trip |
@@ -303,7 +303,7 @@ function cmp(a, b) {
 }
 ```
 
-This is the classic "random shuffle via a nondeterministic comparator" footgun — it does not produce a uniform permutation, but it DOES scramble the order nondeterministically on every call. This is why the two committed fixtures ship different orders (`[inf,env,tp,key,py,ss,cLod,version]` for jsdom vs `[inf,env,tp,cLod,version,key,ss,py]` for HAR) despite having the same schema. Runtime cross-check: `output/vm-slide/fn-20539-entry-trace.json` shows `all_entry_counts[23898] = 15` per send, consistent with Node's TimSort comparing an 8-element array 15 times.
+This is the classic "random shuffle via a nondeterministic comparator" footgun — it does not produce a uniform permutation, but it DOES scramble the order nondeterministically on every call. This is why the two committed fixtures ship different orders (`[inf,env,tp,key,py,ss,cLod,version]` for jsdom vs `[inf,env,tp,cLod,version,key,ss,py]` for HAR) despite having the same schema. Runtime cross-check: the fn-20539 entry trace shows `all_entry_counts[23898] = 15` per send, consistent with Node's TimSort comparing an 8-element array 15 times.
 
 **Determinism implications for reproducers**:
 - To byte-identically reproduce a captured fixture, you must supply the observed `order` explicitly (the `--order` / `{obj, order}` path in `tools/vdata-generator/`). This is portable across Node versions.

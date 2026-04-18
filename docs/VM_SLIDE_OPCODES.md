@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the opcode table for the `__TENCENT_CHAOS_STACK` stack-based ChaosVM variant implemented in `sample/vm_slide.js`. Every row below is classified by reading the handler source string committed in `output/vm-slide/dispatch-table.json` — Phase 39.1's decoder extracted all 53 non-null handlers and their literal `operandCount` from the dispatch-table array literal. Source classifications have now been validated against the Phase 40.1 walker's full-coverage disassembly (`output/vm-slide/disassembly-full.txt`, 14,134 instructions across 101 function entries): every non-null handler has been observed firing at least once in real bytecode, so the table below is both semantically and behaviorally grounded.
+This is the opcode table for the `__TENCENT_CHAOS_STACK` stack-based ChaosVM variant implemented in the vm-slide build the research scripts were run against. Every row below is classified by reading the handler source string extracted by the decoder — Phase 39.1's decoder extracted all 53 non-null handlers and their literal `operandCount` from the dispatch-table array literal. Source classifications have now been validated against the Phase 40.1 walker's full-coverage disassembly (14,134 instructions across 101 function entries): every non-null handler has been observed firing at least once in real bytecode, so the table below is both semantically and behaviorally grounded.
 
 For VM internals (register file, dispatch loop, exception handling, return protocol), see `docs/VM_SLIDE_ARCHITECTURE.md`.
 
@@ -21,7 +21,7 @@ The 40.1 walker did not contradict any Phase 39.3 source-only classification. Wh
 - **Name** — descriptive uppercase mnemonic inferred from the handler body.
 - **Operands** — number of bytes the handler reads from `m[g++]` after the opcode. `var` marks handlers whose width depends on already-read operand values.
 - **Stack before → after** — the operand stack `n` shape around the handler invocation. `[..., x]` means "some prefix then x on top"; `pair` means a 2-element array `[obj, key]` or a local-slot ref; `ref` means a 1-element array `[slot]`.
-- **Effect** — one-line summary of what the handler does. Cross-reference `output/vm-slide/dispatch-table.json` for the exact source.
+- **Effect** — one-line summary of what the handler does. Cross-reference the decoder-extracted dispatch table for the exact source.
 
 All handlers are zero-argument JavaScript functions; "returns true" / "returns false" below refers to the boolean the outer dispatch loop reads to decide whether to break out (see `docs/VM_SLIDE_ARCHITECTURE.md` / "Dispatch loop").
 
@@ -83,13 +83,13 @@ All handlers are zero-argument JavaScript functions; "returns true" / "returns f
 | 67 | MUL | 0 | `[..., a, b]` → `[..., a * b]` | Multiplication. |
 | 68 | USHR | 0 | `[..., a, b]` → `[..., a >>> b]` | Unsigned right-shift. |
 
-53 rows, matching the 53 non-null entries in `output/vm-slide/dispatch-table.json` (verified by counting non-null elements of the committed JSON fixture).
+53 rows, matching the 53 non-null entries in the decoder-extracted dispatch table (verified by counting non-null elements).
 
 ## Dispatch holes
 
 The dispatch table `Q` is a 69-element sparse-array literal with 16 holes. These are not explicit `null` values in the source — they are gaps in the `[..., , func, , , func, ...]` literal that `JSON.stringify` and the Phase 39.1 decoder normalize to `null`. The Phase 40.1 walker's full-coverage walk confirmed that **none of the 16 holes are hit by any reachable code path in this vm-slide build** — they are confirmed unreached, not merely unobserved.
 
-The 16 hole indices (verified against `output/vm-slide/dispatch-table.json`):
+The 16 hole indices (verified against the decoder-extracted dispatch table):
 
 - Slot 9: null — no handler in the source array literal
 - Slot 14: null — no handler in the source array literal
@@ -134,8 +134,4 @@ Notably absent from the round body: `SHR`, `MUL`, `DIV`, `MOD`, `OR` — classic
 - `docs/OPCODE_REFERENCE.md` — opcode table for the register-based `tdc.js` ChaosVM (the different-variant counterpart to this doc).
 - `docs/VM_ARCHITECTURE.md` — architecture reference for the register-based `tdc.js` ChaosVM.
 - `docs/CRYPTO_ANALYSIS.md` — XTEA round constants and key-derivation details for the register-based `tdc.js` (modified XTEA). Note that vm-slide uses classical XTEA with a key passed in as a factory argument, not the register VM's STATE_A-derived key, so the `keyModConstants` story does not apply here.
-- `research/vm-slide-stack-vm/` — source artifacts for Phase 39 (decoder, disassembler, tests).
-- `output/vm-slide/dispatch-table.json` — raw handler source for all 69 dispatch slots (the primary input for this document).
-- `output/vm-slide/bytecode.json` — 24,273-element bytecode array extracted from `sample/vm_slide.js`.
-- `output/vm-slide/disassembly.txt` — Phase 39.1 linear disassembly (312 instructions, pinned by tests as a regression baseline).
-- `output/vm-slide/disassembly-full.txt` — Phase 40.1 control-flow-aware disassembly (14,134 instructions across 101 function entries, full-coverage).
+- `research/vm-slide-stack-vm/` — source artifacts for Phase 39 (decoder, disassembler, tests). The decoder produces the 69-slot dispatch table (the primary input for this document), the 24,273-element bytecode array, the linear disassembly (312 instructions, pinned by tests as a regression baseline), and the control-flow-aware full-coverage disassembly (14,134 instructions across 101 function entries).

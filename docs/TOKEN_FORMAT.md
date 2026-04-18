@@ -26,7 +26,7 @@ The TDC token is a **URL-encoded string (~4,500–5,000 characters)** containing
 
 **Purpose:** Transmit an encrypted device fingerprint from the browser to Tencent's verification servers. The fingerprint includes hardware specs, browser APIs, canvas/audio/WebGL hashes, timing data, and session metadata — 59 collector fields total.
 
-**Verified:** The standalone reimplementation (`token/generate-token.js`) produces **byte-identical** tokens to the live `tdc.js` VM when given the same inputs, confirmed across multiple runs (Task 8.1).
+**Verified:** The standalone reimplementation (`tools/token-generator/generate-token.js`) produces **byte-identical** tokens to the live `tdc.js` VM when given the same inputs, confirmed across multiple runs (Task 8.1).
 
 ---
 
@@ -550,15 +550,15 @@ Key `tdc.js` functions and their roles in the token pipeline:
 
 | tdc.js Function | Standalone Module | Standalone Function |
 |-----------------|-------------------|---------------------|
-| `func_276` | `token/outer-pipeline.js` | `buildCdString()` |
-| `func_212` (sd part) | `token/outer-pipeline.js` | `buildSdString()` |
-| `func_212` (assembly) | `token/outer-pipeline.js` | `assembleToken()` |
-| `func_177` | `token/outer-pipeline.js` | `urlEncode()` |
-| `func_271` (cipher) | `token/crypto-core.js` | `encrypt()`, `cipherRound()` |
-| `func_136` | `token/crypto-core.js` | `convertBytesToWord()` |
-| `func_140` | `token/crypto-core.js` | `convertWordToBytes()` |
-| Full pipeline | `token/generate-token.js` | `generateToken()` |
-| Collector schema | `token/collector-schema.js` | `COLLECTOR_SCHEMA`, `buildDefaultCdArray()` |
+| `func_276` | `tools/token-generator/outer-pipeline.js` | `buildCdString()` |
+| `func_212` (sd part) | `tools/token-generator/outer-pipeline.js` | `buildSdString()` |
+| `func_212` (assembly) | `tools/token-generator/outer-pipeline.js` | `assembleToken()` |
+| `func_177` | `tools/token-generator/outer-pipeline.js` | `urlEncode()` |
+| `func_271` (cipher) | `tools/token-generator/crypto-core.js` | `encrypt()`, `cipherRound()` |
+| `func_136` | `tools/token-generator/crypto-core.js` | `convertBytesToWord()` |
+| `func_140` | `tools/token-generator/crypto-core.js` | `convertWordToBytes()` |
+| Full pipeline | `tools/token-generator/generate-token.js` | `generateToken()` |
+| Collector schema | `tools/token-generator/collector-schema.js` | `COLLECTOR_SCHEMA`, `buildDefaultCdArray()` |
 
 ---
 
@@ -568,16 +568,16 @@ Key `tdc.js` functions and their roles in the token pipeline:
 
 ```bash
 # Generate with default Chrome/Linux profile
-node token/cli.js
+node tools/token-generator/cli.js
 
 # Generate with a specific profile
-node token/cli.js --profile headless-chrome
+node tools/token-generator/cli.js --profile headless-chrome
 
 # Generate with custom session data
-node token/cli.js --appid 2090803262 --nonce 0.12345678 --token my_token
+node tools/token-generator/cli.js --appid 2090803262 --nonce 0.12345678 --token my_token
 
 # Generate with frozen timestamp (for reproducibility)
-node token/cli.js --timestamp 1700000000000
+node tools/token-generator/cli.js --timestamp 1700000000000
 ```
 
 ### Programmatic Usage

@@ -94,13 +94,13 @@ Consult these files during analysis — read them before starting:
 - `docs/OPCODE_REFERENCE.md` — all 95 known semantic operations with handler patterns (your ground truth)
 - `docs/VERSION_DIFFERENCES.md` — what changes between builds and porting strategy
 - `research/tdc-register-vm/disassembler.js` lines 27-123 — reference opcode table for Template A (the known-good mapping)
-- The target tdc file itself (READ ONLY — never modify targets/)
+- The caller-supplied target path (read-only analysis input)
 
 ---
 
 ## Important Constraints
 
-- NEVER modify any file in `targets/` — they are read-only analysis targets.
+- NEVER modify the caller-supplied target path — it is a read-only analysis input.
 - Be methodical: map every single case handler. Do not skip any.
 - When in doubt, show the raw handler code in the notes file rather than guessing.
 - The output opcode table must use the exact mnemonic names from `docs/OPCODE_REFERENCE.md`.
