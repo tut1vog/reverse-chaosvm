@@ -332,19 +332,93 @@ general-purpose — targeted serializer fix
 | ID | Task | Status |
 |----|------|--------|
 | 61.1 | Build `scripts/tls-experiment.js` — runs scraper flow through vData generation, then sends verify POST via `curl-impersonate-chrome` subprocess instead of Node.js https. Records errorCode. Also runs a control: same body via Node.js `https` (normal scraper path) for comparison. | done |
-| 61.2 | Run the experiment, analyze results. | pending |
+| 61.2 | Run the experiment, analyze results. | done |
+
+---
+
+## Phase 61 Results (2026-04-18)
+
+### 🔴 BREAKTHROUGH: Both transports succeed — errorCode 0!
+
+| Run | Test A (curl-impersonate) | Test B (Node.js https) |
+|-----|---------------------------|------------------------|
+| Run 1 | errorCode 0, valid ticket | errorCode 0, valid ticket |
+| Run 2 | auto-port failed (template rotation) | errorCode 0, valid ticket |
+| Run 3 | errorCode 0, valid ticket | errorCode 0, valid ticket |
+
+**Key findings**:
+1. **TLS fingerprint is definitively NOT the issue** — Node.js OpenSSL works fine (errorCode 0).
+2. **The scraper's modules work correctly** — this script uses the same `generateCollect()`, `buildVDataForPost()`, `serializePostFields()`, `httpRequest()` and gets success.
+3. **The bug is in the scraper's integration/orchestration** — the script reconstructs the flow from imported modules and succeeds; the actual `TencentCaptchaScraper` class fails with -1.
+4. **Template rotation is aggressive** — hit templates with 91 and 103 opcodes. 91-opcode template auto-ports successfully and works.
+
+**Eliminated hypotheses (Phases 47–61)**:
+- All prior Phase 47–60 eliminations still hold
+- Phase 61: TLS fingerprint (OpenSSL and BoringSSL both succeed)
+- Phase 61 BONUS: the entire token generation pipeline (collect, vData, behavioral events, XTEA) works — errorCode 0 via Node.js
+
+**Root cause is narrowed to**: something the `TencentCaptchaScraper` class does differently from `tls-experiment.js` during the CAPTCHA flow. The difference is NOT in:
+- Token generation (same modules, same output)
+- TLS/transport layer (same `httpRequest()`)
+- Headers (script copies the same header set)
+- POST body encoding (same `serializePostFields()`)
+
+**Likely suspects**:
+1. **Request chain**: the scraper may make different/extra HTTP requests, or skip some, leaving a different server-side session state
+2. **Timing/ordering**: the scraper may do requests in a different order or with different timing
+3. **Cookie state**: the script hardcodes `Cookie: TDC_itoken=...` in headers; the scraper injects via `cookieJar`
+4. **Session params**: the script may use different `prehandle`/`getSig` params than the scraper
+
+---
+
+### Phase 62: Diff the scraper vs tls-experiment flow
+
+> **Root cause narrowed**: The standalone `tls-experiment.js` uses the same modules as the scraper but gets errorCode 0, while the scraper gets -1. The difference must be in **how** the scraper orchestrates the flow — different request chain, different parameters, different session state. This phase does a surgical diff of every HTTP request and every parameter between the two flows.
+
+| ID | Task | Status |
+|----|------|--------|
+| 62.1 | Build `scripts/flow-diff.js` — run both the full scraper flow AND the tls-experiment flow (fresh sessions each), capturing every HTTP request (URL, headers, body snippet) and every parameter passed to module functions. Print a side-by-side diff showing exactly what diverges. | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 61.2
-**Title**: Run the TLS experiment and analyze results
-**Phase**: Phase 61 — TLS fingerprint test
+**ID**: 62.1
+**Title**: Build flow-diff script to find scraper vs standalone divergence
+**Phase**: Phase 62 — Diff the scraper vs tls-experiment flow
 **Status**: pending
 
 ### Goal
-Run `scripts/tls-experiment.js` and analyze the results. If curl-impersonate gets errorCode 0 while Node.js gets -1, TLS fingerprint is confirmed as the root cause. If both get -1, TLS is eliminated.
+Find exactly what the `TencentCaptchaScraper` class does differently from `tls-experiment.js` that causes errorCode -1 vs 0. Build a diagnostic script that runs both flows and captures every observable difference.
+
+### Context
+
+The tls-experiment.js script (645 lines) succeeds with errorCode 0 using Node.js https. It:
+- Creates `CaptchaClient` with `{aid, referer, userAgent}`
+- Calls `client.prehandle()` → `client.getSig(session)` → `client.downloadImages(sig)` → `client.downloadTdc(sig)`
+- Extracts template info, solves slider, generates behavioral events + slideSd
+- Generates collect with `generateCollect()` using Chrome profile + live XTEA params
+- Serializes POST fields with `serializePostFields()` (raw concat)
+- Computes vData with `buildVDataForPost()`
+- Builds verify headers manually
+- Sends via `httpRequest()` directly (not through `client.verify()`)
+
+The scraper's `_captchaOnlySolve()` (in `tools/scraper/scraper.js`) also succeeds at each individual step but gets errorCode -1 on verify. The scraper:
+- Goes through `_captchaOnlySolve()` which orchestrates everything
+- Uses `client.verify()` which goes through `httpRequest()` with `cookieJar`
+- May construct POST fields with different values
+- May make additional/different HTTP requests
+
+**Key differences to check**:
+1. POST fields object: every field's value in scraper vs script
+2. Headers: exact header set and values in scraper's `verify()` vs script's manual build
+3. Cookie injection: `cookieJar.toString()` vs hardcoded `Cookie` header
+4. Request chain before verify: does the scraper make extra HTTP requests?
+5. URL construction: does `verify()` add query params?
+6. CaptchaClient constructor options: does the scraper pass different options?
+
+### Suggested Agent
+general-purpose — diagnostic instrumentation
 
 ### Context
 

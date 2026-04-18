@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-04-18T07:17:37.234Z",
+  "curlVersion": "curl 8.1.1 (x86_64-pc-linux-gnu) libcurl/8.1.1 BoringSSL zlib/1.3 brotli/1.0.9 nghttp2/1.56.0",
+  "nodeVersion": "v22.17.0",
+  "results": [
+    {
+      "testId": "A",
+      "testName": "curl-impersonate-chrome",
+      "transport": "curl-impersonate-chrome (BoringSSL, HTTP/2)",
+      "errorCode": 0,
+      "ticket": "t03tserverHEBGgTcAxhZ0OO1B2a--RNPVVDVJYzuDI0ntIjp5DFpodyaFwVHU5w2NGsXkDo4xTbN2CeU12CRiEcGQl1RSeHpw-x26Ed1fsapt_C2opLKlF7Kcyrk5-w**",
+      "templateOpcodes": 91,
+      "templateName": "unknown",
+      "bodyLength": 6143,
+      "rawResponse": "{\"errorCode\":\"0\",\"randstr\":\"@20s\",\"ticket\":\"t03tserverHEBGgTcAxhZ0OO1B2a--RNPVVDVJYzuDI0ntIjp5DFpodyaFwVHU5w2NGsXkDo4xTbN2CeU12CRiEcGQl1RSeHpw-x26Ed1fsapt_C2opLKlF7Kcyrk5-w**\",\"errMessage\":\"\",\"sess\":\"\"}",
+      "timestamp": "2026-04-18T07:17:32.718Z"
+    },
+    {
+      "testId": "B",
+      "testName": "node-https",
+      "transport": "Node.js https (OpenSSL, HTTP/1.1)",
+      "errorCode": 0,
+      "ticket": "t03tserverT0UaHfkaueie71peuu99LTlhGrlsAy6MaC_y4Cw2xWMuTRl1tQE1j7fLXbvpXqS4eRQYMUlhMkYEug8NRNEGeEVLYFcQnikpOozksqok-RgpKgCNzCncfw**",
+      "templateOpcodes": 91,
+      "templateName": "unknown",
+      "bodyLength": 6111,
+      "rawResponse": "{\"errorCode\":\"0\",\"randstr\":\"@zcA\",\"ticket\":\"t03tserverT0UaHfkaueie71peuu99LTlhGrlsAy6MaC_y4Cw2xWMuTRl1tQE1j7fLXbvpXqS4eRQYMUlhMkYEug8NRNEGeEVLYFcQnikpOozksqok-RgpKgCNzCncfw**\",\"errMessage\":\"\",\"sess\":\"\"}",
+      "timestamp": "2026-04-18T07:17:37.234Z"
+    }
+  ]
+}

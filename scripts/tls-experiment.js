@@ -445,7 +445,7 @@ async function sendViaCurl(url, headers, body) {
     return {
       errorCode: typeof data.errorCode === 'number'
         ? data.errorCode
-        : parseInt(data.errorCode, 10) || -999,
+        : (isNaN(parseInt(data.errorCode, 10)) ? -999 : parseInt(data.errorCode, 10)),
       ticket: data.ticket || '',
       randstr: data.randstr || '',
       rawResponse: result.stdout.slice(0, 500),
@@ -478,7 +478,7 @@ async function sendViaNode(url, headers, body) {
   return {
     errorCode: typeof data.errorCode === 'number'
       ? data.errorCode
-      : parseInt(data.errorCode, 10) || -999,
+      : (isNaN(parseInt(data.errorCode, 10)) ? -999 : parseInt(data.errorCode, 10)),
     ticket: data.ticket || '',
     randstr: data.randstr || '',
     rawResponse: resp.body.slice(0, 500),
