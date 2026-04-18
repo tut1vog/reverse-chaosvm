@@ -1,8 +1,8 @@
 # Plan
 
 ## Status
-Current phase: **Phase 55** — Verify POST body fidelity + collect sid binding
-Current task: **55.1** — Verify POST body byte-level diff
+Current phase: **Phase 58** — Controlled collect corruption experiment
+Current task: **58.1** — Build the experiment script
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -226,97 +226,81 @@ general-purpose — targeted serializer fix
 
 ---
 
-## Current Task
+### Phase 58: Controlled collect corruption experiment
 
-*(Phase 57 complete. Awaiting user direction for next investigation.)*
+> **Research question**: Does the verify endpoint validate collect token *contents*, and what error codes map to what failure modes? By running 5 test cases through the real Puppeteer browser (identical TLS, headers, vData, session) and varying ONLY the collect token, we isolate collect as the single variable.
+
+| ID | Task | Status |
+|----|------|--------|
+| 58.1 | Build `scripts/collect-experiment.js` — a Puppeteer script that runs 5 CAPTCHA solves, each with a different collect token variant, records errorCode for each. | in-progress |
+| 58.2 | Run the experiment, analyze results, document findings in `output/phase-58/`. | pending |
 
 ---
 
-## Old Current Task (archived)
+## Current Task
 
-**ID**: 55.1
-**Title**: Verify POST body byte-level diff
-**Phase**: Phase 55 — Verify POST body fidelity + collect sid binding
-**Status**: pending
+**ID**: 58.1
+**Title**: Build the collect corruption experiment script
+**Phase**: Phase 58 — Controlled collect corruption experiment
+**Status**: in-progress
 
 ### Goal
-Capture the exact verify POST bodies from both Puppeteer and scraper, then diff them field-by-field at the byte level. Identify any encoding differences that could cause server rejection.
+Create a Puppeteer experiment script that runs 5 controlled test cases through the full CAPTCHA solve flow, varying ONLY the collect token in the verify POST body. Each test case uses its own fresh session (separate CAPTCHA solve). This isolates collect as the single variable while keeping TLS, headers, vData, and all other POST fields identical to a real browser.
 
 ### Context
 
-**Scraper encoding**: uses `URLSearchParams.toString()` (Node.js built-in). This encodes:
-- Spaces as `+`
-- Non-unreserved chars as `%XX`
-- Values via `encodeURIComponent()` internally
+**Base flow to reuse**: `tools/captcha-solver/live-submit.js` already implements the full Puppeteer CAPTCHA flow:
+1. Launch browser (steps 1–3: prehandle → show page → solve slider)
+2. Extract XTEA params from live TDC (step 4–6: parse VM → map opcodes → extract key)
+3. Capture Chrome's real collect token (step 7: TDC.getData)
+4. Generate standalone collect (step 8: `generateCollect()`)
+5. Build POST fields → run jQuery.ajax in Chrome for vData → capture body (step 9)
+6. Submit via Chrome fetch() (step 10)
+7. Parse errorCode (step 11)
 
-**Chrome/jQuery encoding**: uses `jQuery.param()` which:
-- Encodes spaces as `+` (same)
-- Does NOT encode `*` (jQuery quirk)
-- May handle `=` in base64 differently
+**The experiment modifies step 8 only** — instead of always using `generateCollect()`, each test case substitutes a different collect value into the `postFields.collect` field before step 9.
 
-**Key suspect**: The `collect` field value contains base64 with `+`, `/`, `=` characters. `URLSearchParams` encodes `=` as `%3D`, `+` as `%2B`, `/` as `%2F`. jQuery's `$.param()` may preserve some of these or encode differently.
+**Five test cases**:
+| ID | Name | Collect value | What it tests |
+|----|------|--------------|---------------|
+| A | baseline | Chrome's real TDC-generated collect (from step 7) | Control — expect errorCode 0 |
+| B | garbled | Random base64 string, same length as A's collect | Does server parse collect structure at all? |
+| C | empty | Empty string `""` | Is collect required? |
+| D | scraper-collect | Our `generateCollect()` output using Chrome profile + live XTEA params | Is our collect generator the -1 cause? Isolates collect from all other scraper diffs |
+| E | poisoned | Valid collect structure via `generateCollect()` but with poisoned cd fields: `userAgent="Bot/1.0"`, all coordinate fields `"0"`, all timestamp fields `"0"` | Does server score individual field values? |
 
-**Files**:
-- Scraper body: built by `serializePostFields()` in `tools/scraper/scraper.js:62-69`
-- Chrome body: built by `captcha-client.js` verify(), uses either jQuery prebuilt or manual `encodeURIComponent` fallback
-- Puppeteer capture: can intercept via Chrome DevTools Protocol `Network.requestWillBeSent`
+**Each test case needs a fresh session** because each verify call consumes the session. The script runs 5 sequential full CAPTCHA solves (prehandle → show → solve → verify). This means 5 separate browser pages, but they can share the same browser instance.
 
-### Implementation Steps
-1. Instrument Puppeteer's captcha-solver to capture the raw verify POST body bytes and write to `output/phase-55/puppeteer-verify-body.txt`
-2. Instrument scraper to write its `serializedBody + '&vData=...'` to `output/phase-55/scraper-verify-body.txt`
-3. Write `scripts/verify-body-diff.js` that:
-   - Loads both body strings
-   - Splits by `&`, then by `=` to get field/value pairs
-   - Compares field order
-   - For each field, compares encoding byte-by-byte
-   - Highlights encoding differences (e.g., `%2B` vs `+`, `%3D` vs `=`)
-4. Run and analyze
+**Key files to reference**:
+- `tools/captcha-solver/live-submit.js` — the full flow to fork from (lines 1–1490)
+- `tools/scraper/collect-generator.js` — `generateCollect()`, `buildDefaultCdArray()`, `generateBehavioralEvents()`
+- `tools/token-generator/outer-pipeline.js` — `buildSdString()`, `buildCdString()`
+- `tools/captcha-solver/captcha-client.js` — `CaptchaClient` class for prehandle/show
+- `tools/captcha-solver/slide-solver.js` — `solveSlider()`
+- `profiles/default.json` — Chrome fingerprint profile
 
-### Verification
-- [ ] Both body captures exist
-- [ ] Diff script produces clear field-by-field comparison
-- [ ] Any encoding differences are documented
-
-### Suggested Agent
-general-purpose — instrumentation + diff scripting
-
-### Goal
-Fix `_generateCollectChrome` in `tools/scraper/scraper.js` so that non-hashPosition `-1` slots in the `cdFieldOrder` pass through the captured Chrome values from the profile's `cd` array, instead of being replaced with empty strings.
-
-### Context
-
-**The bug** is at lines 554-559 of `tools/scraper/scraper.js`:
-```js
-if (idx === -1) {
-  if (i === hashPos) {
-    cdArray.push(behavioralEvents);
-  } else {
-    cdArray.push('');  // ← BUG: should push cp.cd[i] instead
-  }
-}
-```
-
-The profile's `cd` array (template-ordered, 60 entries) has the real captured Chrome values at these positions. The fix is: `cdArray.push(cp.cd[i])` instead of `cdArray.push('')`.
-
-**Affected fields** (5 of 6 `-1` slots):
-- cd[7] = `"Intel Inc."` (webglVendor)
-- cd[19] = `"Intel Iris OpenGL Engine"` (webglRenderer)
-- cd[34] = `"unknown"` (unidentified field)
-- cd[36] = WebGL canvas fingerprint (base64, ~1KB)
-- cd[49] = `"7450533642822729728"` (session ID)
-
-Only cd[28] is the real behavioral events slot (correctly handled by hashPosition logic).
-
-**Note on `sid`**: cd[49] is a session-specific value. It should NOT be the stale captured value — it should be the current session's `sid` from `sig.sid` or `session.sid`. Consider substituting it per-session like timestamps are.
+**Important implementation details**:
+- The `tlg` field must match the collect length (it's a length check): `tlg: String(collectVal.length)`
+- vData is computed over the serialized POST body including collect — so each test case's vData will differ (correct behavior — vData is session-specific)
+- For test E (poisoned), override specific cd array fields before passing to `generateCollect()` via profile overrides
+- For test B (garbled), generate random base64: `crypto.randomBytes(N).toString('base64')` where N produces the same base64 length as the real collect
+- Write results to `output/phase-58/collect-experiment.json` with per-test-case entries
 
 ### Implementation Steps
-1. Change `cdArray.push('')` to `cdArray.push(cp.cd[i])` for non-hashPosition -1 slots
-2. Add per-session substitution for sid (cd[49]) using the live session's sid value
-3. Run `npm test` to verify
+1. Create `scripts/collect-experiment.js` that:
+   - Imports the same dependencies as `live-submit.js`
+   - Defines 5 test case generators (functions that produce collect values given Chrome's collect and XTEA params)
+   - For each test case, runs the full flow: launch page → navigate to captcha → solve slider → extract XTEA → generate the test-specific collect → build POST fields → vData via Chrome → submit via fetch → record result
+   - Handles failures gracefully (template rotation may prevent some test cases from running — record the failure and continue)
+   - Writes structured results to `output/phase-58/collect-experiment.json`
+2. The result JSON should include for each test case: `{testId, testName, collectDescription, collectLength, errorCode, httpStatus, ticket, template, tdcName, timestamp, error?}`
+3. Add `--headful` flag support for debugging
 
 ### Verification
-- [ ] `npm test` passes (530/530)
-- [ ] Running collect-diff shows webglImage, webglRenderer, webglVendor, sid now present in scraper token
+- [ ] `node scripts/collect-experiment.js --headful` runs without crashing (may run only 1-2 test cases successfully due to rate limiting)
+- [ ] Output file `output/phase-58/collect-experiment.json` exists and contains structured per-test-case results
+- [ ] Test A (baseline with Chrome's real collect) returns errorCode 0 at least once
+- [ ] Each test case's `tlg` field matches its collect length
 
 ### Suggested Agent
-general-purpose — targeted fix in _generateCollectChrome
+general-purpose — Puppeteer scripting, forking from live-submit.js
