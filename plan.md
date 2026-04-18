@@ -296,16 +296,34 @@ general-purpose — targeted serializer fix
 | ID | Task | Status |
 |----|------|--------|
 | 60.1 | Add TDC_itoken generation to scraper.js: inject into `client.cookieJar` before verify POST. | done |
-| 60.2 | Run the scraper and check errorCode. | in-progress |
+| 60.2 | Run the scraper and check errorCode. | done |
+
+---
+
+## Phase 60.2 Results (2026-04-18)
+
+- Scraper: **errorCode -1** (still failing)
+- `TDC_itoken` confirmed injected in logs: `3573759151%3A1776494487`
+- Ran 3 times, consistently -1
+- **TDC_itoken cookie alone is NOT the root cause** (or not the only factor)
+- Notably: server returned a ticket even with errorCode -1 (`t03tserver9x25...`)
+
+**Eliminated hypotheses (Phases 47–60)**:
+- All prior Phase 47–57 eliminations still hold
+- Phase 58: collect token content (accepted when sent via Puppeteer)
+- Phase 60: TDC_itoken cookie (injected, still -1)
+
+**Remaining transport-layer suspects**:
+1. TLS fingerprint (Node.js vs Chrome BoringSSL — JA3 checked in Phase 48 but may need re-examination)
+2. HTTP/2 vs HTTP/1.1 (Chrome uses H2, Node.js https uses H1.1)
+3. TCP/IP stack fingerprint
+4. Connection reuse pattern (Chrome reuses one TLS connection; scraper may open fresh per request)
 
 ---
 
 ## Current Task
 
-**ID**: 60.2
-**Title**: Run the scraper and check errorCode
-**Phase**: Phase 60 — Inject TDC_itoken
-**Status**: in-progress
+*(Phase 60 complete. Awaiting user direction for next investigation.)*
 
 ---
 
