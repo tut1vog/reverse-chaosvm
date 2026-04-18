@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-04-18T06:15:52.599Z",
+  "cookieJarSnapshots": {
+    "after_prehandle": {
+      "size": 0,
+      "cookies": {}
+    },
+    "after_show_page": {
+      "size": 0,
+      "cookies": {}
+    },
+    "after_tdc_fetch": {
+      "size": 0,
+      "cookies": {}
+    },
+    "after_image_fetch": {
+      "size": 0,
+      "cookies": {}
+    },
+    "cookie_header_for_verify": ""
+  },
+  "setCookieLog": [],
+  "cookieSentLog": [],
+  "jsdomCookies": {
+    "afterTdcLoad": "TDC_itoken=1376794038%3A1776492952",
+    "tdcItokenPresent": true,
+    "tdcItokenValue": "1376794038%3A1776492952",
+    "afterVmSlideLoad": "(empty)"
+  },
+  "conclusion": "No Set-Cookie headers received during the entire CAPTCHA flow. The scraper's CookieJar remains empty throughout. No Cookie header was ever sent. TDC_itoken IS set by tdc.js in jsdom (value: 1376794038%3A1776492952). The scraper never sends TDC_itoken because it is set client-side by tdc.js JS, not by a Set-Cookie header."
+}

@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: **Phase 59** — Cookie inspection: Puppeteer vs scraper
-Current task: **59.1** — Capture Puppeteer cookie state at each flow step
+Current task: **59.2** — Instrument scraper cookie logging
 
 **Phases 38–51 closed.** Detail in git log (`git log --grep="Task:"`) and `history/`.
 
@@ -273,87 +273,77 @@ general-purpose — targeted serializer fix
 
 | ID | Task | Status |
 |----|------|--------|
-| 59.1 | Build `scripts/cookie-inspector.js` — Puppeteer script that runs a full CAPTCHA solve and dumps Chrome's cookie jar at each step: after prehandle, after show page load, after TDC loads, after verify POST. Also dump `Set-Cookie` headers from every response. Write to `output/phase-59/puppeteer-cookies.json`. | in-progress |
-| 59.2 | Instrument the scraper's `CaptchaClient` to log every `Set-Cookie` header received and every `Cookie` header sent, at each flow step. Run the scraper and dump to `output/phase-59/scraper-cookies.json`. | pending |
+| 59.1 | Build `scripts/cookie-inspector.js` — Puppeteer script that runs a full CAPTCHA solve and dumps Chrome's cookie jar at each step: after prehandle, after show page load, after TDC loads, after verify POST. Also dump `Set-Cookie` headers from every response. Write to `output/phase-59/puppeteer-cookies.json`. | done |
+| 59.2 | Instrument the scraper to log every `Set-Cookie` header received and every `Cookie` header sent, at each flow step. Run the scraper and dump to `output/phase-59/scraper-cookies.json`. Confirm `TDC_itoken` is absent. | done |
 | 59.3 | Diff the two cookie logs: which cookies does Chrome have that the scraper doesn't? Are there cookies set by JavaScript (not `Set-Cookie` headers) that the scraper can't capture? Analyze and report findings. | pending |
+
+---
+
+## Phase 59.1 Results (2026-04-18)
+
+- **Only 1 cookie across the entire CAPTCHA flow: `TDC_itoken`**
+- Format: `<uint32>%3A<unix_timestamp>` (e.g., `552728512%3A1776492239`)
+- Set by **client-side JavaScript** inside `tdc.js` via `document.cookie` — NOT by any `Set-Cookie` HTTP header
+- Zero `Set-Cookie` headers observed across the entire flow (setCookieLog empty)
+- Prehandle response sets zero cookies
+- `TDC_itoken` appears after show page load and persists unchanged through verify
+- Decompiled tdc.js reads AND writes `TDC_itoken` (decompiled-polished.js:6885,6934)
+- **The scraper's `CookieJar` only captures HTTP `Set-Cookie` — it misses `TDC_itoken` entirely**
 
 ---
 
 ## Current Task
 
-**ID**: 59.1
-**Title**: Capture Puppeteer cookie state at each flow step
+**ID**: 59.2
+**Title**: Instrument scraper cookie logging
 **Phase**: Phase 59 — Cookie inspection
 **Status**: in-progress
 
 ### Goal
-Build a Puppeteer script that runs a real CAPTCHA solve and captures Chrome's full cookie state at each step of the flow. This reveals which cookies the verify endpoint expects and where they come from.
+Confirm that the scraper never sends `TDC_itoken` (or any cookie) on the verify POST, by instrumenting the scraper's `CaptchaClient` to log every `Set-Cookie` header received and every `Cookie` header sent at each flow step. This provides the scraper-side evidence to pair with the Puppeteer cookie capture from 59.1.
 
 ### Context
 
-**Puppeteer flow** (from `tools/captcha-solver/live-submit.js`):
-1. Prehandle via Node.js `CaptchaClient` (line 536) — gets `sess`, `sid`. CaptchaClient has its own `CookieJar` that captures `Set-Cookie` from prehandle response.
-2. Navigate Chrome to show page URL (line ~580) — Chrome loads the show page, TDC JS, CAPTCHA images. Chrome's native cookie jar handles all `Set-Cookie` headers from these responses.
-3. TDC runs in Chrome, calls `TDC.getData()` — may set additional cookies via JS.
-4. Verify POST via Chrome `fetch()` (line 1316) — Chrome automatically includes all cookies for `t.captcha.qq.com`.
+**59.1 finding**: Chrome has exactly one cookie (`TDC_itoken`) set by `tdc.js` via `document.cookie`. No HTTP `Set-Cookie` headers are sent by the server at any point. The scraper's `CookieJar` (captcha-client.js lines 37-78) only captures HTTP `Set-Cookie` — it cannot capture JS-set cookies.
 
-**Critical gap**: Prehandle cookies (from Node.js CaptchaClient) are NEVER transferred to Chrome. Yet the flow works. This means either:
-- Prehandle doesn't set important cookies, OR
-- The show page re-establishes all needed cookies, OR
-- The verify endpoint doesn't check cookies at all (and cookies are a red herring)
+**Scraper flow** (`tools/scraper/scraper.js`):
+- Creates `CaptchaClient` at line 302
+- `CaptchaClient.prehandle()` — first HTTP request
+- `CaptchaClient.show()` or direct `httpRequest()` for show page
+- Various sub-resource fetches (tdc.js, images, slide-jy.js, vm-slide.enc.js)
+- `CaptchaClient.verify()` or direct `httpRequest()` for verify POST
 
-**Scraper flow** (from `tools/scraper/scraper.js`):
-- Uses `CaptchaClient` for all requests — single `CookieJar` across prehandle → show → verify.
-- `CookieJar` class (captcha-client.js lines 37-78) only captures `Set-Cookie` HTTP headers — it CANNOT capture cookies set by JavaScript (`document.cookie`).
-- The scraper never runs JavaScript in a real DOM (uses jsdom for TDC, but jsdom's cookie handling may differ).
+**`CookieJar` class** (captcha-client.js lines 37-78):
+- `capture(setCookieHeaders)` — parses `Set-Cookie` headers from HTTP responses
+- `toString()` — builds `Cookie` header value
+- Used by `httpRequest()` (line 139-159): injects `Cookie` header if jar non-empty, captures `Set-Cookie` from responses
 
-**What to capture at each step**:
-1. Chrome CDP: `Network.getAllCookies()` returns all cookies for all domains
-2. Chrome CDP: `Network.responseReceived` + `Network.responseReceivedExtraInfo` for `Set-Cookie` headers
-3. Also capture cookies from the Node.js CaptchaClient's cookie jar (for prehandle)
+**What we expect to find**: The scraper's cookie jar is empty throughout the entire flow because no server responses include `Set-Cookie` headers. Therefore no `Cookie` header is sent on the verify POST.
 
 ### Implementation Steps
-1. Create `scripts/cookie-inspector.js` based on the flow from `scripts/collect-experiment.js`
-2. Use Chrome DevTools Protocol (CDP) to capture cookies:
-   - `const cdp = await page.createCDPSession()` (or `page.target().createCDPSession()`)
-   - `await cdp.send('Network.enable')` to get response headers
-   - `await cdp.send('Network.getAllCookies')` at each step to dump all cookies
-   - Listen for `Network.responseReceivedExtraInfo` events to capture `Set-Cookie` headers per-response
-3. At each step (after prehandle, after show page load, after TDC ready, after verify), snapshot:
-   - All Chrome cookies (`Network.getAllCookies`)
-   - The CaptchaClient cookie jar state (for prehandle step only)
-4. Also log every `Set-Cookie` header received during the flow, tagged with the URL that set it
-5. Run a full CAPTCHA solve (submit with Chrome's real collect for baseline)
-6. Write structured output to `output/phase-59/puppeteer-cookies.json`
+1. Create `scripts/scraper-cookie-inspector.js` that:
+   - Imports the scraper's `CaptchaClient` and `httpRequest`
+   - Runs the scraper's CAPTCHA flow (prehandle → show → verify) once
+   - After each step, dumps `client.cookieJar.cookies` (the Map contents)
+   - Monkey-patches `httpRequest` or the `CookieJar` to log every `Set-Cookie` captured and every `Cookie` header sent
+   - Writes results to `output/phase-59/scraper-cookies.json`
+2. Alternatively, if easier: temporarily add logging to `CaptchaClient` and run the normal scraper with `--verbose`, then extract from logs.
 
-### Output format
-```json
-{
-  "timestamp": "...",
-  "steps": {
-    "after_prehandle": {
-      "captchaClientCookies": {"name": "value", ...},
-      "chromeCookies": [{"name": "...", "value": "...", "domain": "...", "path": "...", "httpOnly": bool, "secure": bool}]
-    },
-    "after_show_page": { "chromeCookies": [...] },
-    "after_tdc_ready": { "chromeCookies": [...] },
-    "after_verify": { "chromeCookies": [...] }
-  },
-  "setCookieLog": [
-    {"url": "...", "header": "...", "step": "show_page"}
-  ],
-  "verifyResult": { "errorCode": 0, "ticket": "..." }
-}
-```
+The simplest approach: create a small script that:
+- Creates a `CaptchaClient`
+- Calls `prehandle()`, logs cookies
+- Calls the show page fetch, logs cookies
+- Does the verify flow, logs the `Cookie` header that would be sent
+- Writes JSON output
 
 ### Verification
-- [ ] Script runs without crashing and produces `output/phase-59/puppeteer-cookies.json`
-- [ ] Cookie snapshots are present for all 4 steps
-- [ ] `setCookieLog` captures at least 1 `Set-Cookie` header (verifies CDP instrumentation works)
-- [ ] Verify POST returns errorCode 0 (confirms the flow is valid)
+- [ ] Script runs and produces `output/phase-59/scraper-cookies.json`
+- [ ] Output confirms cookie jar is empty at every step (no `Set-Cookie` headers received)
+- [ ] Output confirms no `Cookie` header is sent on the verify POST
+- [ ] `npm test` still passes
 
 ### Suggested Agent
-general-purpose — CDP instrumentation + Puppeteer scripting
+general-purpose — scraper instrumentation
 
 ---
 
