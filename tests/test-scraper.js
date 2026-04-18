@@ -60,19 +60,6 @@ describe('Scraper: init()', () => {
     assert.strictEqual(typeof s.profile, 'object');
   });
 
-  it('after init(), jQuery source is loaded (non-null string, length > 1000)', async () => {
-    const s = new Scraper();
-    await s.init();
-    assert.ok(typeof s._jquerySource === 'string', 'jQuery source should be a string');
-    assert.ok(s._jquerySource.length > 1000, 'jQuery source should be > 1000 chars');
-  });
-
-  it('after init(), vm-slide fallback is loaded (non-null string, length > 1000)', async () => {
-    const s = new Scraper();
-    await s.init();
-    assert.ok(typeof s._vmSlideSource === 'string', 'vm-slide source should be a string');
-    assert.ok(s._vmSlideSource.length > 1000, 'vm-slide source should be > 1000 chars');
-  });
 });
 
 describe('Scraper: _buildPostFields', () => {

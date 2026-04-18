@@ -21,11 +21,9 @@ const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/ca
 const { AuditLogger } = require('./audit-logger');
 const { solveSlider } = require('../captcha-solver/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd, reorderCdArray } = require('./collect-generator');
-const { generateVData, parseVmSlideUrl } = require('./vdata-harness');
 const { buildVDataForPost } = require('../vdata-generator/for-post');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
 const TemplateCache = require('./template-cache');
-const { buildPreVerifyBeaconUrl, buildPostVerifyBeaconUrl, fireBeacon } = require('./caplog-beacon');
 const { execFile } = require('child_process');
 const os = require('os');
 
@@ -98,23 +96,11 @@ class Scraper {
     this.maxRetries = cfg.maxRetries !== undefined ? cfg.maxRetries : 3;
     this.verbose = !!cfg.verbose;
 
-    // Phase 45.4: vData source selection. Default path is the Phase 45.2
-    // standalone buildVDataForPost (browser-like profile). --legacy-vdata
-    // keeps the jsdom harness path alive for Phase 45.6 A/B comparison.
-    this.legacyVdata = !!cfg.legacyVdata;
-    // Phase 46.4: /caplog telemetry beacons. Default on; --skip-caplog disables.
-    this.skipCaplog = cfg.skipCaplog === true;
     this.vdataProfilePath = cfg.vdataProfile || DEFAULT_VDATA_PROFILE_PATH;
     this._vdataProfile = null;
 
     /** @type {TemplateCache|null} */
     this._templateCache = null;
-
-    /** @type {string|null} Cached jQuery source */
-    this._jquerySource = null;
-
-    /** @type {string|null} Cached vm-slide source */
-    this._vmSlideSource = null;
 
     /** @type {CaptchaClient|null} */
     this._client = null;
@@ -241,34 +227,14 @@ class Scraper {
       this._log('Default profile loaded');
     }
 
-    // Load jQuery source from sample (production would fetch from show page)
-    const jqueryPath = path.join(PROJECT_ROOT, 'sample', 'slide-jy.js');
-    if (fs.existsSync(jqueryPath)) {
-      this._jquerySource = fs.readFileSync(jqueryPath, 'utf8');
-      this._log(`jQuery source loaded (${this._jquerySource.length} chars)`);
-    } else {
-      this._log('WARNING: sample/slide-jy.js not found — vData generation will fail');
-    }
-
-    // Load vm-slide fallback source
-    const vmSlidePath = path.join(PROJECT_ROOT, 'sample', 'vm_slide.js');
-    if (fs.existsSync(vmSlidePath)) {
-      this._vmSlideSource = fs.readFileSync(vmSlidePath, 'utf8');
-      this._log(`vm-slide fallback loaded (${this._vmSlideSource.length} chars)`);
-    }
-
-    // Load vData browser profile for the default (non-legacy) path.
-    if (!this.legacyVdata) {
-      try {
-        this._vdataProfile = loadProfile(this.vdataProfilePath);
-        this._log(`vData profile loaded from ${this.vdataProfilePath}`);
-      } catch (err) {
-        throw new Error(
-          `Failed to load vData profile from ${this.vdataProfilePath}: ${err.message}`
-        );
-      }
-    } else {
-      this._log('Legacy vData path enabled (jsdom harness)');
+    // Load vData browser profile
+    try {
+      this._vdataProfile = loadProfile(this.vdataProfilePath);
+      this._log(`vData profile loaded from ${this.vdataProfilePath}`);
+    } catch (err) {
+      throw new Error(
+        `Failed to load vData profile from ${this.vdataProfilePath}: ${err.message}`
+      );
     }
 
     // Load Chrome fingerprint profile for collect token generation
@@ -363,150 +329,6 @@ class Scraper {
     };
   }
 
-  /**
-   * Try to fetch vm-slide source from the show page config.
-   * Falls back to the cached sample/vm_slide.js.
-   *
-   * @param {Object} sig - From getSig() (may have _raw with script URLs)
-   * @param {Object} [opts]
-   * @param {Object} [opts.auditLogger] - AuditLogger instance
-   * @returns {Promise<string>} vm-slide source code
-   */
-  async _getVmSlideSource(sig, opts) {
-    const auditOpts = opts || {};
-    // Strategy 1: Try to find vm-slide URL in sig._raw config fields
-    if (sig._raw) {
-      const candidates = ['vmSlide', 'vm_slide', 'vmSlideFileName'];
-      for (const field of candidates) {
-        if (sig._raw[field]) {
-          try {
-            const url = sig._raw[field].startsWith('http')
-              ? sig._raw[field]
-              : `https://t.captcha.qq.com/${sig._raw[field].replace(/^\//, '')}`;
-            this._log(`Fetching vm-slide from config field '${field}': ${url}`);
-            const resp = await httpRequest(url, {
-              timeout: 10000,
-              headers: {
-                'User-Agent': this.userAgent,
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br, zstd',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
-                'Referer': sig.showUrl || this._lastShowUrl || 'https://t.captcha.qq.com/',
-                'Sec-Fetch-Dest': 'script',
-                'Sec-Fetch-Mode': 'no-cors',
-                'Sec-Fetch-Site': 'same-origin',
-                'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"Windows"',
-              },
-              auditLogger: auditOpts.auditLogger || null,
-              auditStep: 'vm-slide',
-            });
-            if (resp.statusCode === 200 && resp.body.length > 100) {
-              this._log(`  Got live vm-slide (${resp.body.length} chars)`);
-              return resp.body;
-            }
-          } catch (err) {
-            this._log(`  Failed to fetch vm-slide from ${field}: ${err.message}`);
-          }
-        }
-      }
-    }
-
-    // Strategy 2: Parse vm-slide URL from show page HTML (if available)
-    if (sig._html) {
-      const vmSlideUrl = parseVmSlideUrl(sig._html);
-      if (vmSlideUrl) {
-        try {
-          const fullUrl = vmSlideUrl.startsWith('http')
-            ? vmSlideUrl
-            : `https://t.captcha.qq.com/${vmSlideUrl.replace(/^\//, '')}`;
-          this._log(`Fetching vm-slide from show page HTML: ${fullUrl}`);
-          const resp = await httpRequest(fullUrl, {
-            timeout: 10000,
-            headers: {
-              'User-Agent': this.userAgent,
-              'Accept': '*/*',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Accept-Encoding': 'gzip, deflate, br, zstd',
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Referer': sig.showUrl || this._lastShowUrl || 'https://t.captcha.qq.com/',
-              'Sec-Fetch-Dest': 'script',
-              'Sec-Fetch-Mode': 'no-cors',
-              'Sec-Fetch-Site': 'same-origin',
-              'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-              'sec-ch-ua-mobile': '?0',
-              'sec-ch-ua-platform': '"Windows"',
-            },
-            auditLogger: auditOpts.auditLogger || null,
-            auditStep: 'vm-slide',
-          });
-          if (resp.statusCode === 200 && resp.body.length > 100) {
-            this._log(`  Got live vm-slide (${resp.body.length} chars)`);
-            return resp.body;
-          }
-        } catch (err) {
-          this._log(`  Failed to fetch vm-slide from HTML: ${err.message}`);
-        }
-      }
-    }
-
-    // Strategy 3: Fetch the show page directly and parse vm-slide URL from it
-    if (sig.showUrl) {
-      try {
-        this._log(`Fetching show page to find vm-slide URL: ${sig.showUrl.slice(0, 80)}...`);
-        const showResp = await httpRequest(sig.showUrl, { timeout: 10000, auditLogger: auditOpts.auditLogger || null, auditStep: 'show-refetch' });
-        if (showResp.statusCode === 200 && showResp.body.length > 100) {
-          const vmSlideUrl = parseVmSlideUrl(showResp.body);
-          if (vmSlideUrl) {
-            const fullUrl = vmSlideUrl.startsWith('http')
-              ? vmSlideUrl
-              : `https://t.captcha.qq.com/${vmSlideUrl.replace(/^\//, '')}`;
-            this._log(`  Found vm-slide URL in show page: ${fullUrl}`);
-            const vmResp = await httpRequest(fullUrl, {
-              timeout: 10000,
-              headers: {
-                'User-Agent': this.userAgent,
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br, zstd',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
-                'Referer': sig.showUrl || this._lastShowUrl || 'https://t.captcha.qq.com/',
-                'Sec-Fetch-Dest': 'script',
-                'Sec-Fetch-Mode': 'no-cors',
-                'Sec-Fetch-Site': 'same-origin',
-                'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"Windows"',
-              },
-              auditLogger: auditOpts.auditLogger || null,
-              auditStep: 'vm-slide',
-            });
-            if (vmResp.statusCode === 200 && vmResp.body.length > 100) {
-              this._log(`  Got live vm-slide (${vmResp.body.length} chars)`);
-              return vmResp.body;
-            }
-          } else {
-            this._log('  No vm-slide URL found in show page HTML');
-          }
-        }
-      } catch (err) {
-        this._log(`  Failed to fetch show page for vm-slide: ${err.message}`);
-      }
-    }
-
-    // Strategy 4: Fallback to cached source
-    if (this._vmSlideSource) {
-      this._log('Using cached vm-slide fallback (sample/vm_slide.js)');
-      return this._vmSlideSource;
-    }
-
-    throw new Error('No vm-slide source available');
-  }
 
   /**
    * Build a collect token from the Chrome fingerprint profile.
@@ -629,10 +451,6 @@ class Scraper {
       try {
         this._log(`Attempt ${attempt}/${this.maxRetries}`);
 
-        // Phase 46.4: capture solve-start timestamp for the pre-verify caplog
-        // beacon (HAR entry 8 uses this as its reference t0 for fields 5..16).
-        const t0 = Date.now();
-
         // (a) prehandle — get session
         this._log('Step 1: prehandle');
         const session = await client.prehandle();
@@ -652,37 +470,6 @@ class Scraper {
         this._log('Step 4: downloadTdc');
         const tdcSource = await client.downloadTdc(sig);
         this._log(`  tdc source: ${tdcSource.length} chars`);
-
-        // (d2) Fetch tcaptcha-slide.js from CDN (HAR entry 6).
-        // Real browser loads this via <script> tag in show page HTML.
-        // We don't use the response — only the network request matters.
-        if (sig._html) {
-          const slideScriptMatch = sig._html.match(/src="(https?:\/\/captcha\.gtimg\.com\/[^"]*tcaptcha-slide[^"]*)"/);
-          if (slideScriptMatch) {
-            const slideScriptUrl = slideScriptMatch[1];
-            this._log('Step 4b: fetch tcaptcha-slide.js (HAR entry 6)');
-            try {
-              await httpRequest(slideScriptUrl, {
-                headers: {
-                  'User-Agent': this.userAgent,
-                  'Accept': '*/*',
-                  'Accept-Language': 'en-US,en;q=0.9',
-                  'Accept-Encoding': 'gzip, deflate, br, zstd',
-                  'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
-                  'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-                  'sec-ch-ua-mobile': '?0',
-                  'sec-ch-ua-platform': '"Windows"',
-                },
-                timeout: 10000,
-                auditLogger: auditLogger,
-                auditStep: 'tcaptcha-slide',
-              });
-              this._log('  tcaptcha-slide.js fetched');
-            } catch (err) {
-              this._log('  tcaptcha-slide.js fetch failed (non-fatal): ' + err.message);
-            }
-          }
-        }
 
         // (e) Extract TDC_NAME (for logging) and source hash (cache key)
         const tdcName = extractTdcName(tdcSource);
@@ -807,98 +594,16 @@ class Scraper {
         }
         this._log(`  collect length: ${collectVal.length}`);
 
-        // (j) Get jQuery source
-        if (!this._jquerySource) {
-          const jqueryPath = path.join(PROJECT_ROOT, 'sample', 'slide-jy.js');
-          this._jquerySource = fs.readFileSync(jqueryPath, 'utf8');
-        }
-
-        // (k) Fetch /vm-slide.enc.js from the show-page config URL. Real browsers
-        // always issue this request (HAR entry 6); skipping it is a distinctive
-        // bot tell. The default path discards the fetched body and still uses the
-        // committed sample/vm_slide.js cache for vData generation — only the
-        // network observation matters here.
-        const vmSlideSource = await this._getVmSlideSource(sig, { auditLogger });
-
-        // (k1) Fetch slide-jy.js from CDN (HAR entry 8).
-        // tcaptcha-slide.js loads this dynamically. sig._html may contain
-        // an htdocsPath config, but it's often unavailable. Fall back to the
-        // canonical CDN URL observed in Chrome captures.
-        {
-          let jyScriptUrl = null;
-          if (sig._html) {
-            const htdocsMatch = sig._html.match(/htdocsPath\s*:\s*"(https?:\/\/[^"]*)"/);
-            if (htdocsMatch) {
-              jyScriptUrl = htdocsMatch[1].replace(/\/+$/, '') + '/slide-jy.js';
-            }
-          }
-          if (!jyScriptUrl) {
-            jyScriptUrl = 'https://captcha.gtimg.com/1/slide-jy.js';
-          }
-          this._log('Step 6b: fetch slide-jy.js (HAR entry 8)');
-          try {
-            await httpRequest(jyScriptUrl, {
-              headers: {
-                'User-Agent': this.userAgent,
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br, zstd',
-                'Referer': sig.showUrl || 'https://t.captcha.qq.com/',
-                'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"Windows"',
-              },
-              timeout: 10000,
-              auditLogger: auditLogger,
-              auditStep: 'slide-jy',
-            });
-            this._log('  slide-jy.js fetched');
-          } catch (err) {
-            this._log('  slide-jy.js fetch failed (non-fatal): ' + err.message);
-          }
-        }
-
-        // (k2) Phase 46.4: fire the pre-verify /caplog telemetry beacon. Real
-        // Chrome emits this between tdc.js load and the verify POST (HAR
-        // entry 8). fire-and-forget — errors are swallowed inside fireBeacon.
-        if (!this.skipCaplog) {
-          this._log('Step 7a: caplog pre-verify beacon');
-          const preUrl = buildPreVerifyBeaconUrl({ t0 });
-          await fireBeacon(preUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl, auditLogger: auditLogger, auditStep: 'caplog-pre' });
-        }
-
-        // (l0) Phase 60: inject TDC_itoken cookie. In real Chrome, tdc.js sets
-        // this via document.cookie (not Set-Cookie). Format: <uint32>%3A<unix_ts>.
-        // The scraper's CookieJar only captures HTTP Set-Cookie headers, so this
-        // cookie is never set naturally. Inject it before the verify POST.
-        const itokenValue = Math.floor(Math.random() * 0xFFFFFFFF) + '%3A' + Math.floor(Date.now() / 1000);
-        client.cookieJar.cookies.set('TDC_itoken', itokenValue);
-        this._log('  TDC_itoken injected: ' + itokenValue);
-
         // (l) Build the 38 verify POST fields
         const postFields = this._buildPostFields(client, session, sig, ans, collectVal, eks);
 
         // (m) Generate vData
-        let vData;
-        let serializedBody;
-        if (this.legacyVdata) {
-          this._log('Step 7: generateVData (legacy jsdom harness)');
-          const legacy = generateVData(
-            postFields,
-            vmSlideSource,
-            this._jquerySource,
-            { userAgent: this.userAgent }
-          );
-          vData = legacy.vData;
-          serializedBody = legacy.serializedBody;
-        } else {
-          this._log('Step 7: buildVDataForPost (standalone, browser profile)');
-          serializedBody = serializePostFields(postFields);
-          vData = buildVDataForPost(serializedBody, {
-            profile: this._vdataProfile,
-            overrides: { tp: session.sid || sig.sid || '' },
-          });
-        }
+        this._log('Step 7: buildVDataForPost (standalone, browser profile)');
+        const serializedBody = serializePostFields(postFields);
+        const vData = buildVDataForPost(serializedBody, {
+          profile: this._vdataProfile,
+          overrides: { tp: session.sid || sig.sid || '' },
+        });
         this._log(`  vData: ${vData.slice(0, 30)}...`);
 
         // Audit: log token values for cross-flow diffing
@@ -925,28 +630,51 @@ class Scraper {
         this._log('Step 7b: human-like delay (' + humanDelay + 'ms)');
         await new Promise(r => setTimeout(r, humanDelay));
 
-        // (o) Submit verify
-        this._log('Step 8: verify');
-        let scraperRawBody = null;
-        const result = await client.verify({
-          session,
-          sig,
-          ans,
-          collect: collectEncoded,
-          eks: eks || '',
-          tlg: collectVal.length,
-          vData,
-          prebuiltBody: serializedBody,
-          _rawBodyCapture: (body) => { scraperRawBody = body; },
-        });
+        // (o) Submit verify directly via httpRequest (proven flow from tls-experiment.js)
+        this._log('Step 8: verify (direct httpRequest)');
+        const itokenValue = Math.floor(Math.random() * 0xFFFFFFFF) + '%3A' + Math.floor(Date.now() / 1000);
+        const finalBody = serializedBody + (vData ? '&vData=' + vData : '');
 
         // Phase 55: write raw verify body for diffing
-        if (scraperRawBody) {
-          const phase55Dir = path.join(PROJECT_ROOT, 'output', 'phase-55');
-          fs.mkdirSync(phase55Dir, { recursive: true });
-          fs.writeFileSync(path.join(phase55Dir, 'scraper-verify-body.txt'), scraperRawBody);
-          this._log(`  Wrote scraper-verify-body.txt (${scraperRawBody.length} chars)`);
-        }
+        const phase55Dir = path.join(PROJECT_ROOT, 'output', 'phase-55');
+        fs.mkdirSync(phase55Dir, { recursive: true });
+        fs.writeFileSync(path.join(phase55Dir, 'scraper-verify-body.txt'), finalBody);
+        this._log(`  Wrote scraper-verify-body.txt (${finalBody.length} chars)`);
+
+        const verifyHeaders = {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Content-Length': String(Buffer.byteLength(finalBody)),
+          'User-Agent': this.userAgent,
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Accept-Encoding': 'gzip, deflate, br, zstd',
+          'Origin': 'https://t.captcha.qq.com',
+          'Referer': sig.showUrl || 'https://t.captcha.qq.com/cap_union_new_show',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Sec-Fetch-Dest': 'empty',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Site': 'same-origin',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
+          'sec-ch-ua-mobile': '?0',
+          'sec-ch-ua-platform': '"Windows"',
+          'Cookie': 'TDC_itoken=' + itokenValue,
+        };
+        const resp = await httpRequest('https://t.captcha.qq.com/cap_union_new_verify', {
+          method: 'POST',
+          headers: verifyHeaders,
+          body: finalBody,
+          timeout: 30000,
+        });
+        const data = parseJSONP(resp.body);
+        const result = {
+          errorCode: typeof data.errorCode === 'number' ? data.errorCode
+            : (isNaN(parseInt(data.errorCode, 10)) ? -999 : parseInt(data.errorCode, 10)),
+          ticket: data.ticket || '',
+          randstr: data.randstr || '',
+          _raw: data,
+        };
 
         this._log(`  errorCode: ${result.errorCode}, ticket: ${result.ticket ? result.ticket.slice(0, 30) + '...' : 'none'}`);
 
@@ -956,15 +684,6 @@ class Scraper {
           ticket: result.ticket || '',
           randstr: result.randstr || '',
         });
-
-        // Phase 46.4: fire the post-verify /caplog telemetry beacon (HAR
-        // entry 10). Must fire on both success and failure paths. Uses the
-        // solved x-answer as the field-27 slide-dx proxy.
-        if (!this.skipCaplog) {
-          this._log('Step 9: caplog post-verify beacon');
-          const postUrl = buildPostVerifyBeaconUrl({ ans: xAnswer });
-          await fireBeacon(postUrl, { userAgent: this.userAgent, timeoutMs: 3000, referer: sig.showUrl, auditLogger: auditLogger, auditStep: 'caplog-post' });
-        }
 
         if (result.errorCode === 0 || (result.errorCode === -1 && result.ticket)) {
           auditLogger.save(path.join(PROJECT_ROOT, 'output', 'phase-52-audit', 'scraper-audit.json'));
