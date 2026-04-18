@@ -1,8 +1,0 @@
-{
-  "timestamp": "2026-04-11T10:17:29.879Z",
-  "attempt": 3,
-  "errorCode": -1,
-  "ticket": null,
-  "error": "VM parser failed: Could not identify thisCtx variable",
-  "verifyMethod": "standalone collect + Chrome TLS"
-}
