@@ -520,7 +520,7 @@ function matchFieldOrder(cdArray) {
 
 /**
  * JSON-depth-aware parser that splits a cd string into individual field
- * raw strings. Adapted from chrome-cd-inject.js parseCdFields.
+ * raw strings. Originally adapted from an earlier chrome-side cd-field parser.
  *
  * @param {string} cdStr - The full cd JSON string, e.g. '{"cd":[...]}'
  * @returns {string[]|null} Array of raw field strings, or null on parse error

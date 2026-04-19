@@ -11,7 +11,7 @@ For VM internals (register file, dispatch loop, exception handling, return proto
 Two different notions of "coverage" apply to this document:
 
 - **Semantic coverage — complete.** All 53 non-null handlers in the 69-slot dispatch table have been read and classified from source. The table below is exhaustive for this build.
-- **Behavioral coverage — effectively complete.** The Phase 40.1 control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) decoded 14,134 instructions across 101 distinct function entries, covering the entire `[0, 24273)` byte range of the bytecode (58.2% instruction starts, 42% operand bytes). Every non-null handler classified below has been observed firing at least once. The Phase 39.1 linear disassembler's ~2% coverage limitation is resolved: the pc=512 halt was caused by `FUNC_CREATE` variable-width mis-parse, not by legitimate data at opcode 65.
+- **Behavioral coverage — effectively complete.** The Phase 40.1 control-flow-aware walker decoded 14,134 instructions across 101 distinct function entries, covering the entire `[0, 24273)` byte range of the bytecode (58.2% instruction starts, 42% operand bytes). Every non-null handler classified below has been observed firing at least once. The Phase 39.1 linear disassembler's ~2% coverage limitation is resolved: the pc=512 halt was caused by `FUNC_CREATE` variable-width mis-parse, not by legitimate data at opcode 65.
 
 The 40.1 walker did not contradict any Phase 39.3 source-only classification. Where a row notes "walker-validated" below, the walker explicitly audited that opcode as part of its control-flow analysis.
 
@@ -126,7 +126,7 @@ Phase 40.6 enumerated the opcodes that appear inside the classical-XTEA encrypt 
 - **Control flow:** `JUMP`, `JUMP_IF_TRUE`
 - **Closure creation:** `FUNC_CREATE` (only used by the outer factory that spawns the encrypt/decrypt pair)
 
-Notably absent from the round body: `SHR`, `MUL`, `DIV`, `MOD`, `OR` — classical XTEA uses neither signed right-shift nor arithmetic besides add/sub. See `docs/VM_SLIDE_ARCHITECTURE.md` "XTEA factory and closures" for the full structural description and `research/vm-slide-stack-vm/xtea-hunt.js` for the annotated disassembly windows that produced this list.
+Notably absent from the round body: `SHR`, `MUL`, `DIV`, `MOD`, `OR` — classical XTEA uses neither signed right-shift nor arithmetic besides add/sub. See `docs/VM_SLIDE_ARCHITECTURE.md` "XTEA factory and closures" for the full structural description.
 
 ## Cross-references
 
@@ -134,4 +134,3 @@ Notably absent from the round body: `SHR`, `MUL`, `DIV`, `MOD`, `OR` — classic
 - `docs/OPCODE_REFERENCE.md` — opcode table for the register-based `tdc.js` ChaosVM (the different-variant counterpart to this doc).
 - `docs/VM_ARCHITECTURE.md` — architecture reference for the register-based `tdc.js` ChaosVM.
 - `docs/CRYPTO_ANALYSIS.md` — XTEA round constants and key-derivation details for the register-based `tdc.js` (modified XTEA). Note that vm-slide uses classical XTEA with a key passed in as a factory argument, not the register VM's STATE_A-derived key, so the `keyModConstants` story does not apply here.
-- `research/vm-slide-stack-vm/` — source artifacts for Phase 39 (decoder, disassembler, tests). The decoder produces the 69-slot dispatch table (the primary input for this document), the 24,273-element bytecode array, the linear disassembly (312 instructions, pinned by tests as a regression baseline), and the control-flow-aware full-coverage disassembly (14,134 instructions across 101 function entries).

@@ -21,7 +21,7 @@ console.log(result.cdParsed);   // Array of 60 fingerprint entries
 console.log(result.sdParsed);   // Session data (slide trajectory, etc.)
 ```
 
-> **Key compatibility:** The XTEA key is hardcoded in `tools/token-generator/crypto-core.js` as the Template A key. Template A builds share this key; Templates B and C have distinct keys extracted by `tools/porting-pipeline/key-extractor.js`. If the target build uses a different template's key, `decryptionOk` will be `true` but `parseOk` will be `false` — the JSON will be garbage.
+> **Key compatibility:** The XTEA key is hardcoded in `tools/scraper/token-generator/crypto-core.js` as the Template A key. Template A builds share this key; Templates B and C have distinct keys extracted by `tools/porting-pipeline/key-extractor.js`. If the target build uses a different template's key, `decryptionOk` will be `true` but `parseOk` will be `false` — the JSON will be garbage.
 
 ---
 
@@ -211,7 +211,7 @@ The trajectory ends with a sentinel: `[-1, 0, 259]` followed by `[0, 0, 0]`.
 ### Decrypt a token from a saved payload file
 
 ```js
-const { decrypt } = require('./tools/token-generator/crypto-core');
+const { decrypt } = require('./tools/scraper/token-generator/crypto-core');
 
 const payload = require('fs').readFileSync('payload.txt', 'utf8').trim();
 const collectRaw = payload.match(/collect=([^&]+)/)[1];

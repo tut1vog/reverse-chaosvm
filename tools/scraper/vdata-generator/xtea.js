@@ -4,8 +4,8 @@
 //
 // 32 rounds, delta = 0x9E3779B9, little-endian uint32 packing of
 // 8-byte blocks. The 16-byte key is interpreted as 4 big-endian
-// uint32 words (matches vm-slide's bytecode key schedule recovered
-// in research/vm-slide-stack-vm/VDATA-PIPELINE.md §3).
+// uint32 words (matches vm-slide's bytecode key schedule; see
+// docs/VDATA_FORMAT.md §3).
 //
 // Logic copied verbatim from tests/fixtures/verify-vdata-fixtures.js
 // (the 43.2 reference verifier), then wrapped in a public module

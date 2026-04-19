@@ -39,7 +39,7 @@ r9[0] = v0; r9[1] = v1;
 | r90[0] | func_140 | word→byte serializer (LE) | 35472 |
 | r20[0] | (btoa) | base64 encoder | N/A |
 
-**Reimplementation**: `tools/token-generator/crypto-core.js` — standalone Node.js module, verified against all 802 iterations
+**Reimplementation**: `tools/scraper/token-generator/crypto-core.js` — standalone Node.js module, verified against all 802 iterations
 
 ## Architecture (Corrected — Task 7.3)
 
@@ -295,7 +295,7 @@ With the frozen environment (Date.now, Math.random, crypto.getRandomValues all d
 
 ## Reimplementation (COMPLETED — Task 7.4)
 
-**File**: `tools/token-generator/crypto-core.js`
+**File**: `tools/scraper/token-generator/crypto-core.js`
 
 All four functions have been reimplemented and verified:
 
@@ -340,7 +340,7 @@ Key design decisions:
   - Key finding: cipher is modified XTEA with key-index modifications
   - Loop termination: sum == 32 * DELTA (84,941,944,608) — compared without 32-bit truncation
 
-- **Reimplementation**: `tools/token-generator/crypto-core.js`
+- **Reimplementation**: `tools/scraper/token-generator/crypto-core.js`
   - Verified against all 802 cipher round I/O pairs (100% match)
   - Verified against all 1,604 converter calls (100% match)
   - Verified against all 1,604 serializer calls (100% match)

@@ -4,17 +4,16 @@
 // vData encoder.
 //
 // This is standard base64 (3 bytes -> 4 sextets) using a 65-char
-// alphabet recovered directly from vm-slide bytecode at pc 16932 by
-// research/vm-slide-stack-vm/extract-alphabet.js. Index 64 ('Y') is
-// the padding character — the analog of '=' in RFC 4648. The encoder
-// substitutes the padding char when input bytes run out at the end,
-// matching the isNaN(b1)/isNaN(b2) guards observed in the bytecode at
-// pcs 17084..17418 (output/vm-slide/disassembly-full.txt).
+// alphabet recovered directly from vm-slide bytecode at pc 16932.
+// Index 64 ('Y') is the padding character — the analog of '=' in
+// RFC 4648. The encoder substitutes the padding char when input bytes
+// run out at the end, matching the isNaN(b1)/isNaN(b2) guards observed
+// in the bytecode at pcs 17084..17418.
 //
 // Because 112 % 3 === 1, encoding a 112-byte ciphertext always ends
 // with one data byte plus two padding chars — the canonical 'YY'
 // trailer of every vData string. There is no separate "10 40" trailer
-// (43.1 mistake corrected by 43.2; see VDATA-PIPELINE.md §6).
+// (43.1 mistake corrected by 43.2).
 
 const OUTPUT_ALPHABET =
   'GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY';

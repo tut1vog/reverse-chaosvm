@@ -4,12 +4,9 @@
 // parser) and the fn 22730 + caller-loop composite that computes `obj.key`
 // for the vData plaintext.
 //
-// Ported verbatim from the 45.1a reference impl
-// `research/vm-slide-stack-vm/module18-body-parser.js`, which reproduces the
-// HAR oracle `obj.key = "21L2"` byte-identically against
-// `sample/captcha-har.har`. The pc-level evidence for the two module-18 call
-// sites is recorded in `research/vm-slide-stack-vm/MODULE-18-BODY-PARSER.md`
-// §1 Location:
+// Ported verbatim from the 45.1a reference implementation, which reproduces
+// the HAR oracle `obj.key = "21L2"` byte-identically. The pc-level evidence
+// for the two module-18 call sites:
 //
 //   - `require(18)(body, "tlg")`  — pcs 22814..22820 inside fn 22730
 //     (literal `"tlg"` assembled by `OP_10 116 / 108 / 103` then `OP_66 2`).
@@ -18,7 +15,7 @@
 //     `OP_66 2`), followed by `OP_60 23056` short-circuiting the
 //     `|| "abcdefghijklmn"` fallback.
 //
-// Semantics (from MODULE-18-BODY-PARSER.md §2 and §4):
+// Semantics:
 //   - Raw substring lookup between `&<tag>=` (or leading `<tag>=`) and the
 //     next `&` / EOF. NO URL-decoding — the downstream charAt walk is
 //     byte-indexed, and decoding would corrupt it.

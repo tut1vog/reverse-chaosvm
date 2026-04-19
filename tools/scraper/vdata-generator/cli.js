@@ -8,16 +8,16 @@
 // from-scratch vData from an 8-field obj (no caller-supplied order).
 //
 // Cipher-only usage (Phase 43, unchanged):
-//   node tools/vdata-generator/cli.js --plaintext-hex <224-hex-char string>
-//   echo <hex> | node tools/vdata-generator/cli.js
+//   node tools/scraper/vdata-generator/cli.js --plaintext-hex <224-hex-char string>
+//   echo <hex> | node tools/scraper/vdata-generator/cli.js
 //
 // Replay usage (Phase 44.5a):
-//   node tools/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
-//   node tools/vdata-generator/cli.js replay --self-check
+//   node tools/scraper/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
+//   node tools/scraper/vdata-generator/cli.js replay --self-check
 //
 // From-obj usage (Phase 44.5b):
-//   node tools/vdata-generator/cli.js from-obj --obj <obj.json> [--seed <n>] [--order <order.json>]
-//   node tools/vdata-generator/cli.js from-obj --self-check
+//   node tools/scraper/vdata-generator/cli.js from-obj --obj <obj.json> [--seed <n>] [--order <order.json>]
+//   node tools/scraper/vdata-generator/cli.js from-obj --self-check
 
 const fs = require('fs');
 const path = require('path');
@@ -32,16 +32,16 @@ const HELP_TEXT = `
 vData Encoder — Standalone CLI
 
 Cipher-only mode (Phase 43 — supply your own 112-byte plaintext):
-  node tools/vdata-generator/cli.js --plaintext-hex <hex>
-  echo <hex> | node tools/vdata-generator/cli.js
+  node tools/scraper/vdata-generator/cli.js --plaintext-hex <hex>
+  echo <hex> | node tools/scraper/vdata-generator/cli.js
 
   --plaintext-hex <hex>   112-byte plaintext as 224 hex chars
   --verbose               Print XTEA key + ciphertext hex to stderr
   --help, -h              Show this help and exit
 
 Replay mode (Phase 44.5a — captured 8-field obj + optional overrides):
-  node tools/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
-  node tools/vdata-generator/cli.js replay --self-check
+  node tools/scraper/vdata-generator/cli.js replay --obj <obj.json> [--order <order.json>] [--overrides <ov.json>]
+  node tools/scraper/vdata-generator/cli.js replay --self-check
 
   --obj <path>            JSON file: 8-field fingerprint object
                           ({tp, key, py, env, version, cLod, inf, ss})
@@ -53,8 +53,8 @@ Replay mode (Phase 44.5a — captured 8-field obj + optional overrides):
   --help, -h              Show this help and exit
 
 From-obj mode (Phase 44.5b — full synthesis from an 8-field obj):
-  node tools/vdata-generator/cli.js from-obj --obj <obj.json> [--seed <n>] [--order <order.json>]
-  node tools/vdata-generator/cli.js from-obj --self-check
+  node tools/scraper/vdata-generator/cli.js from-obj --obj <obj.json> [--seed <n>] [--order <order.json>]
+  node tools/scraper/vdata-generator/cli.js from-obj --self-check
 
   --obj <path>            JSON file: 8-field fingerprint object
   --seed <n>              Integer seed for mulberry32 PRNG (deterministic)
@@ -64,7 +64,7 @@ From-obj mode (Phase 44.5b — full synthesis from an 8-field obj):
   --help, -h              Show this help and exit
 
 For-post mode (Phase 45.2 — scraper entry point: key computed from POST body):
-  node tools/vdata-generator/cli.js for-post --body <string-or-@file> --profile <json-or-@file>
+  node tools/scraper/vdata-generator/cli.js for-post --body <string-or-@file> --profile <json-or-@file>
                                              [--overrides <json>] [--order <json-array>]
                                              [--ie9-fallback]
 
@@ -210,9 +210,8 @@ function runCipherMode(args) {
 
 // Hardcoded fixture-derived (obj, order) pairs. These are not captured
 // from the fixture JSON files (which only store the post-cipher artifacts);
-// they are documented in research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md
-// §"Byte-identical cross-check evidence" as the inverse-permute solution
-// for each fixture. Encoded here so --self-check is hermetic.
+// they are the inverse-permute solution for each fixture. Encoded here so
+// --self-check is hermetic.
 const SELF_CHECK_CASES = [
   {
     name: 'jsdom',

@@ -2,10 +2,10 @@
 
 Public reference for the Tencent CAPTCHA slide orchestrator bundle served as
 `/1/tcaptcha-slide.29a33140.js`. This document is the Track 2 public deliverable
-for Phase 41; it transcribes the findings recorded in
-`research/captcha-orchestrator/FLOW.md` (static end-to-end trace) and
-`research/captcha-orchestrator/SURVEY.md` (structural baseline). Every claim
-below cites either a module id with a short role anchor or a FLOW.md section.
+for Phase 41; it transcribes the findings of the original end-to-end static
+trace and structural-baseline analysis. Every claim below cites either a
+module id with a short role anchor or a FLOW.md section (from that original
+analysis).
 
 **Source reference**: the `t_captcha_slide.js` orchestrator bundle the research scripts were run against (213,162 bytes), webpack 4
 IIFE, entry module 64. HAR evidence comes from the captured CAPTCHA HAR the research scripts were run against (one
@@ -19,9 +19,6 @@ vm-slide.enc.js → verify).
 - `docs/EKS_FORMAT.md` — how the `eks` field served by the orchestrator is
   server-baked into `tdc.js`.
 - `docs/HAR_ANALYSIS.md` — network-level flow view of the CAPTCHA protocol.
-- `research/captcha-orchestrator/FLOW.md` — research-side narrative, 9 sections.
-- `research/captcha-orchestrator/SURVEY.md` — structural baseline (bundle
-  shape, module count, graph shape).
 
 ---
 
@@ -90,7 +87,7 @@ Transcribed from FLOW.md §6. HAR entry numbers refer to the captured CAPTCHA HA
        crossorigin="anonymous">` (HAR 4) — this orchestrator bundle;
        byte-identical (sha256) to the `t_captcha_slide.js` build the research scripts were run against.
    (c) `<script src="/vm-slide.e201876f.enc.js">` (HAR 5) — the stack VM
-       (`research/vm-slide-stack-vm/`). **Hardcoded directly in the show-page
+       (the vm-slide stack VM). **Hardcoded directly in the show-page
        HTML**, NOT loaded by the orchestrator bundle. FLOW.md §3 traces
        module 8's only call site and shows it fetches `/slide-jy.js` (jQuery),
        not `vm-slide.enc.js`; the 41.4 survey guess that module 8 was the
@@ -138,7 +135,7 @@ Transcribed from FLOW.md §6. HAR entry numbers refer to the captured CAPTCHA HA
      is intercepted and has `vData=<ciphertext>` injected into its
      body before the underlying `send()` completes. See §6 `vData` for
      the full resolution and
-     `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` for the trace.
+     `docs/VDATA_FORMAT.md` for the end-to-end spec.
    - Either way, module 71 still tolerates absence of `window.vm.entry`
      (it is a separate binding not covered by either branch in this
      HAR, consistent with `vmByteCode` being empty).
@@ -344,7 +341,7 @@ The full per-field origination table is in §5.
 
 ## 5. Verify POST origination table
 
-Source: the machine-readable verify-body origination table produced by the `captcha-orchestrator` research track — 39 rows,
+Source: the machine-readable verify-body origination table produced during the original orchestrator analysis — 39 rows,
 zero leftover HAR fields. Each row records `{name, sample_value_prefix,
 sample_value_length, origin_module, origin_lines, assembly_method,
 provenance}`. Sample values are truncated to roughly 60 characters with `…`;
@@ -402,7 +399,7 @@ iframe URL query was itself populated by the show-page server.
 | `eks` | `+dIC7DOymyJE6Xf1wlsyPi7PrW+JPX8NXGBs23csIVcQkvBvn9mjSBDJvqyS…` (312 chars) | mod 56 (line 1 col 162834–162843) | `d.eks = R()` calling `tdc.getEks()` from module 38 / 70. | Module 38 exposes `getEks: function(){ return (window.TDC.getInfo() \|\| {}).info \|\| ""; }`; module 70 re-exports it as `tdc.getEks`; module 56 reads it via `R = E.getEks`. This is exactly the `eks` string server-baked into `tdc.js` line 123 and surfaced through `TDC.getInfo().info`, consistent with `docs/EKS_FORMAT.md`. |
 | `nonce` | `eda1152f11f1daf0` | mod 56 (line 1 col 162854–162869) | `_.nonce && (d.nonce = _.nonce)`. | Module 56 reads `window.captchaConfig.nonce`, server-baked in the show-page HTML alongside `sess`. The orchestrator never mutates it. |
 | `vlg` | `0_0_1` | mod 71 (line 1 col 179149–179155) | `t.vlg = [vmAvailable?1:0, vmByteCode?1:0, 1].join("_")`, merged into `d` via `$.extend(d, o)` in module 56. | Three-digit availability signal for the stack-VM integration. Both flags are `0` in this HAR because `captchaConfig.vmAvailable` and `captchaConfig.vmByteCode` are empty strings. |
-| `vData` | `7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4…` (152 chars) | vm-slide XHR proxy (bytecode pcs ~15000–20700) injects the field into the POST body before `send()` completes — the orchestrator itself never writes `d.vData` on Chrome. | Chrome path: vm-slide's `proxyXHR` (called at bytecode pc 19662) installs an `XMLHttpRequest.prototype` monkey-patch that encrypts payload data via modified XTEA (delta `0x9E3779B9` at bytecode[15352]/[15530]) + a custom 64-char base64 alphabet at bytecode pc 16932 (`GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` — contains `-_*`) and injects the result as `vData=<ciphertext>` into the outgoing body. IE9 fallback: vm-slide installs `window.getVData` at pc 20066 on the `isIE9Below()` branch, and the orchestrator's `if (a.isLowIE())` block writes `e.vData = window.getVData(n.join("&"))` directly. Resolved Phase 42; see §6 and `research/vm-slide-stack-vm/{VDATA-TRACE,VDATA-RESOLUTION}.md`. |
+| `vData` | `7MjK5yGovGjw1scdQ6-F-LXDV2iAI0b*5ONmLZ4uWoVzJMDN5MvSSrMxILt4…` (152 chars) | vm-slide XHR proxy (bytecode pcs ~15000–20700) injects the field into the POST body before `send()` completes — the orchestrator itself never writes `d.vData` on Chrome. | Chrome path: vm-slide's `proxyXHR` (called at bytecode pc 19662) installs an `XMLHttpRequest.prototype` monkey-patch that encrypts payload data via modified XTEA (delta `0x9E3779B9` at bytecode[15352]/[15530]) + a custom 64-char base64 alphabet at bytecode pc 16932 (`GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` — contains `-_*`) and injects the result as `vData=<ciphertext>` into the outgoing body. IE9 fallback: vm-slide installs `window.getVData` at pc 20066 on the `isIE9Below()` branch, and the orchestrator's `if (a.isLowIE())` block writes `e.vData = window.getVData(n.join("&"))` directly. Resolved Phase 42; see §6 and `docs/VDATA_FORMAT.md`. |
 
 ---
 
@@ -433,16 +430,15 @@ row.
 
 ### `vData`
 
-> **For the byte-level cipher specification (XTEA key, alphabet, padding scheme, worked example, public API), see `docs/VDATA_FORMAT.md` — the authoritative Phase 43 doc.** This section covers only where `vData` enters the verify POST and how vm-slide installs the XHR proxy that calls the cipher; the cipher itself moved to `VDATA_FORMAT.md` when the standalone `tools/vdata-generator/` encoder shipped (Phase 43, 2026-04-13).
+> **For the byte-level cipher specification (XTEA key, alphabet, padding scheme, worked example, public API), see `docs/VDATA_FORMAT.md` — the authoritative Phase 43 doc.** This section covers only where `vData` enters the verify POST and how vm-slide installs the XHR proxy that calls the cipher; the cipher itself moved to `VDATA_FORMAT.md` when the standalone `tools/scraper/vdata-generator/` encoder shipped (Phase 43, 2026-04-13).
 
 **Resolved in Phase 42** via static decode of the `vm-slide.e201876f.enc.js`
 stack-VM bytecode. The orchestrator's `if (a.isLowIE()) { var o =
 window.getVData && window.getVData(n.join("&")); o && (e.vData = o) }` block
 is not the primary path — it's the IE9-only fallback. On modern browsers
 `vData` arrives via a different mechanism installed by vm-slide itself.
-`research/vm-slide-stack-vm/VDATA-TRACE.md` (task 42.1) and
-`research/vm-slide-stack-vm/VDATA-RESOLUTION.md` (task 42.2) document the
-static trace in full; the summary:
+The Phase 42 static trace (tasks 42.1 and 42.2) resolved the mechanism; the
+summary:
 
 **Two mutually exclusive paths, gated inside vm-slide at bytecode pc 19636**.
 Early in vm-slide's outer initializer (`OP_60 19666` at pc 19636),
@@ -462,16 +458,14 @@ is reachable on the fall-through path.
   and appends `&vData=<ciphertext>` onto the outgoing body before forwarding
   to the real `XMLHttpRequest.prototype.send`. The `&vData=` literal is
   built inside vm-slide bytecode at pcs **24211..24223** (`OP_10 38 118 68
-  97 116 97 61`), inside the enclosing function that contains pc 24210 —
-  see `research/captcha-orchestrator/PLAINTEXT-BUILD-ORIGIN.md` §"Build-
-  site identification" for the full decompile of the open-hook (fn 20353
-  at pcs 20353..20462, which guards on URL `== "/cap_union_new_verify"`
-  at pc 20424 and captures `this` as the verify XHR instance) and the
-  send-hook body-rewrite chain. `OP_06 20070` at pc 19663 then skips the
-  entire `getVData` install block. On this path `window.getVData` is
-  **never installed**, so the orchestrator's `if (a.isLowIE())` guard
-  evaluates false and module 56 never writes `d.vData` itself — the field
-  materializes inside the proxy.
+  97 116 97 61`), inside the enclosing function that contains pc 24210.
+  The open-hook (fn 20353 at pcs 20353..20462) guards on URL
+  `== "/cap_union_new_verify"` at pc 20424 and captures `this` as the
+  verify XHR instance, then the send-hook body-rewrite chain runs.
+  `OP_06 20070` at pc 19663 then skips the entire `getVData` install
+  block. On this path `window.getVData` is **never installed**, so the
+  orchestrator's `if (a.isLowIE())` guard evaluates false and module 56
+  never writes `d.vData` itself — the field materializes inside the proxy.
 - **IE9 fallback** — jump-target branch at pc 19666. vm-slide builds the
   descriptor `[window, "getVData"]` (build `"window"` at pc 19667, `OP_32`
   at 19680 to form `[U, "window"]`, build `"getVData"` at pc 19681, `OP_41`
@@ -489,8 +483,7 @@ is reachable on the fall-through path.
   ciphertext.
 
 **Crypto** (summary — full spec in `docs/VDATA_FORMAT.md`). The cipher that produces the 152-char HAR value lives in
-vm-slide, outside the `getVData` function body. **Phase 43 closed-form result**: classical XTEA (32 rounds, delta `0x9E3779B9`, LE uint32 packing, 16-byte key `2e430f8c15b7da96`) followed by standard base64 with a custom 65-char alphabet where index 64 (`Y`) is the padding character. Pipeline = 14 × 8-byte XTEA blocks (= 112 bytes plaintext) → 152 chars of base64 ending in `YY`. **Phase 43.2 correction**: earlier notes claimed a "constant 2-byte trailer `10 40`" — that was a phantom from mis-decoding the trailing `YY` padding chars as raw 6-bit values (`(64<<6)|64 = 0x1040`). There is no trailer; the encoder input is 112 bytes flat. Static evidence from
-`research/vm-slide-stack-vm/VDATA-RESOLUTION.md`:
+vm-slide, outside the `getVData` function body. **Phase 43 closed-form result**: classical XTEA (32 rounds, delta `0x9E3779B9`, LE uint32 packing, 16-byte key `2e430f8c15b7da96`) followed by standard base64 with a custom 65-char alphabet where index 64 (`Y`) is the padding character. Pipeline = 14 × 8-byte XTEA blocks (= 112 bytes plaintext) → 152 chars of base64 ending in `YY`. **Phase 43.2 correction**: earlier notes claimed a "constant 2-byte trailer `10 40`" — that was a phantom from mis-decoding the trailing `YY` padding chars as raw 6-bit values (`(64<<6)|64 = 0x1040`). There is no trailer; the encoder input is 112 bytes flat. Static evidence:
 
 - The **XTEA delta** `0x9E3779B9` (= 2654435769) appears as `OP_08`
   immediate operands at bytecode indices **15352** and **15530** —
@@ -510,14 +503,13 @@ vm-slide, outside the `getVData` function body. **Phase 43 closed-form result**:
 
 **Why `window.getVData` is the only `window.*` property vm-slide installs**.
 Task 42.2 ran a full-bytecode enumeration of `[window, <key>] + FUNC_CREATE
-+ OP_24` property-set patterns (`research/vm-slide-stack-vm/vdata-provenance.js`
-→ committed `window.*` install list). Exactly one entry: `getVData`.
-vm-slide does not expose a second global for the crypto — the XHR proxy
-keeps everything inside a closure.
++ OP_24` property-set patterns. Exactly one entry: `getVData`. vm-slide does
+not expose a second global for the crypto — the XHR proxy keeps everything
+inside a closure.
 
-**What's now resolved** (Phase 43, 2026-04-13). The XTEA key is `2e430f8c15b7da96`; the cipher is classical (not modified) XTEA with LE uint32 packing; the alphabet is 65 chars with `Y` as the padding char; byte-identical reproducibility for the cipher half is achieved by `tools/vdata-generator/` against both a synthetic jsdom fixture and a real Chrome 146 HAR capture — see `docs/VDATA_FORMAT.md` for the full spec and `tests/test-vdata-generator-encoder.js` for the test coverage.
+**What's now resolved** (Phase 43, 2026-04-13). The XTEA key is `2e430f8c15b7da96`; the cipher is classical (not modified) XTEA with LE uint32 packing; the alphabet is 65 chars with `Y` as the padding char; byte-identical reproducibility for the cipher half is achieved by `tools/scraper/vdata-generator/` against both a synthetic jsdom fixture and a real Chrome 146 HAR capture — see `docs/VDATA_FORMAT.md` for the full spec and `tests/test-vdata-generator-encoder.js` for the test coverage.
 
-**What's now resolved — plaintext half** (Phase 44, 2026-04-15). The 112-byte pre-cipher plaintext is NOT a reduction of the caller's 9345-byte POST body. It is a fresh **8-field tdc runtime-state probe** built inside `fn 22317 = module.exports.getCaptchaData` (webpack module fn 20970, exported at bytecode pc 24252, FUNC_CREATE at pc 24234, body `[22317..24233]`). The field schema is fixed: `{tp, key, py, env, version, cLod, inf, ss}`. Five fields are built inline (`py` = `arguments[1].py`, `env` = `require(0)() ? '0' : '1'`, `version` = literal `"2"`, `cLod` = TDC lifecycle probe, `inf` = `window===window.top?'top':'iframe'`); three delegate to helpers (`tp` = fn 22400 captures a JS runtime error string, `key` = fn 22730 via `require(18)(body,'tlg')` char-lookup digest of `arguments[0]`, `ss` = fn 23399). See `docs/VDATA_FORMAT.md` §7 for the full per-field table, source rules, and the `tools/vdata-generator/` `replay` + `from-obj` public API.
+**What's now resolved — plaintext half** (Phase 44, 2026-04-15). The 112-byte pre-cipher plaintext is NOT a reduction of the caller's 9345-byte POST body. It is a fresh **8-field tdc runtime-state probe** built inside `fn 22317 = module.exports.getCaptchaData` (webpack module fn 20970, exported at bytecode pc 24252, FUNC_CREATE at pc 24234, body `[22317..24233]`). The field schema is fixed: `{tp, key, py, env, version, cLod, inf, ss}`. Five fields are built inline (`py` = `arguments[1].py`, `env` = `require(0)() ? '0' : '1'`, `version` = literal `"2"`, `cLod` = TDC lifecycle probe, `inf` = `window===window.top?'top':'iframe'`); three delegate to helpers (`tp` = fn 22400 captures a JS runtime error string, `key` = fn 22730 via `require(18)(body,'tlg')` char-lookup digest of `arguments[0]`, `ss` = fn 23399). See `docs/VDATA_FORMAT.md` §7 for the full per-field table, source rules, and the `tools/scraper/vdata-generator/` `replay` + `from-obj` public API.
 
 **Live Chrome call chain, end-to-end** (Phase 44.2.8):
 
@@ -540,9 +532,9 @@ vm-slide internal orchestrator (fn 19604, INSIDE vm-slide — not in this bundle
       final body: 9504 = 9345 + 7 ("&vData=") + 152
 ```
 
-The important mental-model correction: **`getCaptchaData` is defined and bound inside vm-slide itself, not in `t_captcha_slide.js`**. The orchestrator bundle contains zero references to `getCaptchaData`, `CaptchaData`, `TENCENT_CHAOS`, etc. (confirmed by `research/captcha-orchestrator/GETCAPTCHADATA-CALLSITE.md`). The orchestrator bundle's only vData-related code is the `if (a.isLowIE())` IIFE at bytes 162929..163108 that calls `window.getVData` on the IE9 fallback path — on modern browsers this is a no-op, and the Chrome path is entirely driven by vm-slide's internal `fn 19604 → init → proxyXHR(fn 22317) → fn 20539 XHR.send patch → fn 22317 kv build + encrypt` chain described above.
+The important mental-model correction: **`getCaptchaData` is defined and bound inside vm-slide itself, not in `t_captcha_slide.js`**. The orchestrator bundle contains zero references to `getCaptchaData`, `CaptchaData`, `TENCENT_CHAOS`, etc. (confirmed by an exhaustive bundle scan). The orchestrator bundle's only vData-related code is the `if (a.isLowIE())` IIFE at bytes 162929..163108 that calls `window.getVData` on the IE9 fallback path — on modern browsers this is a no-op, and the Chrome path is entirely driven by vm-slide's internal `fn 19604 → init → proxyXHR(fn 22317) → fn 20539 XHR.send patch → fn 22317 kv build + encrypt` chain described above.
 
-**Historical correction note.** An earlier draft of this section (pre-Phase 44) stated that the 112-byte plaintext is "a canonical reduction of the caller-supplied verify body (`arguments[0]`)". That was incorrect. `arguments[0]` is read by fn 22317 only as an input to the `key` digest helper (fn 22730 → `require(18)(body,'tlg')`); the other 7 fields are independent runtime-state probes with no dependence on the POST body at all. The `tp` field is a JS runtime error string captured at page load, not a field derived from the body. The `&vData=` literal at bytecode pcs 24211..24223 lives inside **fn 22317**, not inside a separate "send replacement" function at pc 24210. See `research/vm-slide-stack-vm/FN-20539-SLOT8-HOP.md` for the pc-level reconciliation of this misreading.
+**Historical correction note.** An earlier draft of this section (pre-Phase 44) stated that the 112-byte plaintext is "a canonical reduction of the caller-supplied verify body (`arguments[0]`)". That was incorrect. `arguments[0]` is read by fn 22317 only as an input to the `key` digest helper (fn 22730 → `require(18)(body,'tlg')`); the other 7 fields are independent runtime-state probes with no dependence on the POST body at all. The `tp` field is a JS runtime error string captured at page load, not a field derived from the body. The `&vData=` literal at bytecode pcs 24211..24223 lives inside **fn 22317**, not inside a separate "send replacement" function at pc 24210.
 
 ### `nonce`
 
@@ -628,9 +620,8 @@ every response regardless of outcome.
   monkey-patch installed by `proxyXHR` at pc 19662, (b) the IE9 fallback
   via a direct `window.getVData` install at pc 20066, (c) the modified-XTEA
   + custom-base64 crypto ingredients at bytecode indices 15352 / 15530
-  (XTEA delta) and pc 16932 (alphabet). See §6 for the full narrative and
-  `research/vm-slide-stack-vm/{VDATA-TRACE,VDATA-RESOLUTION}.md` for the
-  static traces. The original FLOW.md §9 Q1 "jQuery `ajaxPrefilter`
+  (XTEA delta) and pc 16932 (alphabet). See §6 for the full narrative.
+  The original FLOW.md §9 Q1 "jQuery `ajaxPrefilter`
   hypothesis" was wrong in its specific hook mechanism but correct about
   the location (vm-slide); the actual hook is on
   `XMLHttpRequest.prototype`, which is why it also works when module 56
@@ -645,8 +636,7 @@ every response regardless of outcome.
 - **Module 41 is the i18n caption table**, not obfuscated opcodes or an
   encoded payload. It is the largest module in the bundle (62,329 bytes,
   29% of the whole) and the 41.4 survey flagged it as the top obfuscation
-  risk. The 41.5 15-minute spike (see
-  `research/captcha-orchestrator/MODULE-41-NOTES.md`) confirmed it defines
+  risk. The 41.5 15-minute spike confirmed it defines
   `i = ["c1".."c23", "puzzle1".."puzzle10", "aged", "appid-region-wrong"]`
   plus a language map `a = { "zh-cn": [...], "en": [...], ... }` and
   exports `u` with `u.init`, `u.get`, `u.initWxLang`, `u.rightToLeft`.

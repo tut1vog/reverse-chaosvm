@@ -1,4 +1,4 @@
-# tools/vdata-generator
+# tools/scraper/vdata-generator
 
 Standalone byte-identical encoder for vm-slide's vData pipeline.
 
@@ -39,14 +39,14 @@ trailer" reading was wrong; corrected by 43.2.
 
 | Parameter           | Value                                                                | Source                                |
 |---------------------|----------------------------------------------------------------------|---------------------------------------|
-| XTEA key (hex)      | `32653433306638633135623764613936` (ASCII `2e430f8c15b7da96`)        | `VDATA-PIPELINE.md` §3                |
-| XTEA delta          | `0x9E3779B9`                                                         | `VDATA-PIPELINE.md` §3                |
-| XTEA rounds         | 32                                                                   | `VDATA-PIPELINE.md` §3                |
-| Block packing       | little-endian uint32 pairs                                           | `VDATA-PIPELINE.md` §3                |
-| Output alphabet     | `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`   | `VDATA-PIPELINE.md` §5                |
-| Padding char index  | 64 (`Y`)                                                             | `VDATA-PIPELINE.md` §6                |
-| Plaintext size      | 112 bytes (14 blocks)                                                | `VDATA-PIPELINE.md` §3                |
-| Output size         | 152 chars                                                            | `VDATA-PIPELINE.md` §6                |
+| XTEA key (hex)      | `32653433306638633135623764613936` (ASCII `2e430f8c15b7da96`)        | `docs/VDATA_FORMAT.md` §3             |
+| XTEA delta          | `0x9E3779B9`                                                         | `docs/VDATA_FORMAT.md` §3             |
+| XTEA rounds         | 32                                                                   | `docs/VDATA_FORMAT.md` §3             |
+| Block packing       | little-endian uint32 pairs                                           | `docs/VDATA_FORMAT.md` §3             |
+| Output alphabet     | `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY`   | `docs/VDATA_FORMAT.md` §3             |
+| Padding char index  | 64 (`Y`)                                                             | `docs/VDATA_FORMAT.md` §2             |
+| Plaintext size      | 112 bytes (14 blocks)                                                | `docs/VDATA_FORMAT.md` §2             |
+| Output size         | 152 chars                                                            | `docs/VDATA_FORMAT.md` §2             |
 
 ## CLI usage
 
@@ -54,20 +54,20 @@ trailer" reading was wrong; corrected by 43.2.
 
 ```bash
 # Argument form:
-node tools/vdata-generator/cli.js --plaintext-hex <224-hex-char string>
+node tools/scraper/vdata-generator/cli.js --plaintext-hex <224-hex-char string>
 
 # Stdin form:
-echo <224-hex-char string> | node tools/vdata-generator/cli.js
+echo <224-hex-char string> | node tools/scraper/vdata-generator/cli.js
 
 # Verbose (key + ciphertext hex to stderr; stdout stays clean):
-node tools/vdata-generator/cli.js --plaintext-hex <hex> --verbose
+node tools/scraper/vdata-generator/cli.js --plaintext-hex <hex> --verbose
 ```
 
 ### Replay mode (Phase 44.5a)
 
 ```bash
 # Self-check both committed fixtures end-to-end:
-node tools/vdata-generator/cli.js replay --self-check
+node tools/scraper/vdata-generator/cli.js replay --self-check
 
 # Replay an obj + explicit order from JSON files (jsdom fixture form):
 cat > /tmp/jsdom-obj.json <<'JSON'
@@ -85,7 +85,7 @@ JSON
 cat > /tmp/jsdom-order.json <<'JSON'
 ["inf","env","tp","key","py","ss","cLod","version"]
 JSON
-node tools/vdata-generator/cli.js replay \
+node tools/scraper/vdata-generator/cli.js replay \
   --obj /tmp/jsdom-obj.json --order /tmp/jsdom-order.json
 # -> reproduces the jsdom fixture's vdata_string byte-for-byte
 
@@ -105,13 +105,13 @@ JSON
 cat > /tmp/har-order.json <<'JSON'
 ["inf","env","tp","cLod","version","key","ss","py"]
 JSON
-node tools/vdata-generator/cli.js replay \
+node tools/scraper/vdata-generator/cli.js replay \
   --obj /tmp/har-obj.json --order /tmp/har-order.json
 # -> reproduces the HAR fixture's har_vdata_string byte-for-byte
 
 # Substitution: override one or more fields and re-emit:
 echo '{"key":"ZZZZ"}' > /tmp/ov.json
-node tools/vdata-generator/cli.js replay \
+node tools/scraper/vdata-generator/cli.js replay \
   --obj /tmp/jsdom-obj.json --order /tmp/jsdom-order.json --overrides /tmp/ov.json
 # -> a new 152-char vData string on the Phase 43 alphabet
 ```
@@ -125,19 +125,19 @@ Nondeterministic by default — different invocations produce different
 
 ```bash
 # Self-check (one fixture via --seed, the other via --order, both byte-identical):
-node tools/vdata-generator/cli.js from-obj --self-check
+node tools/scraper/vdata-generator/cli.js from-obj --self-check
 
 # Nondeterministic (real Math.random, default):
-node tools/vdata-generator/cli.js from-obj --obj /tmp/jsdom-obj.json
+node tools/scraper/vdata-generator/cli.js from-obj --obj /tmp/jsdom-obj.json
 # -> a fresh 152-char vData each call
 
 # Deterministic via seeded mulberry32 PRNG:
-node tools/vdata-generator/cli.js from-obj --obj /tmp/jsdom-obj.json --seed 84121
+node tools/scraper/vdata-generator/cli.js from-obj --obj /tmp/jsdom-obj.json --seed 84121
 # -> reproduces the jsdom fixture's vdata_string on Node 20
 #    (HAR fixture: --seed 53818)
 
 # Deterministic via explicit order override (skips shuffle entirely):
-node tools/vdata-generator/cli.js from-obj \
+node tools/scraper/vdata-generator/cli.js from-obj \
   --obj /tmp/jsdom-obj.json --order /tmp/jsdom-order.json
 # -> reproduces the jsdom fixture's vdata_string byte-for-byte
 ```
@@ -172,12 +172,12 @@ diagnostics go to stderr. Exit codes: `0` success, `1` runtime error,
 
 ```js
 // Cipher-only (Phase 43):
-const { encodeVData, encryptOnly } = require('./tools/vdata-generator/encode.js');
+const { encodeVData, encryptOnly } = require('./tools/scraper/vdata-generator/encode.js');
 const vdata = encodeVData(buf112);          // Buffer or hex string -> 152-char string
 const ciphertext = encryptOnly(buf112);     // Buffer or hex string -> 112-byte Buffer
 
 // Replay-with-substitution (Phase 44.5a):
-const { buildVData } = require('./tools/vdata-generator/replay.js');
+const { buildVData } = require('./tools/scraper/vdata-generator/replay.js');
 const out = buildVData({
   obj: { inf: 'top', env: '1', tp: '...', key: 'qLCZ', py: '0',
          ss: '0%2C', cLod: 'unloadTDC', version: '2' },
@@ -186,13 +186,13 @@ const out = buildVData({
 });
 
 // Full-synthesis from-scratch (Phase 44.5b):
-const { buildVDataFromObj } = require('./tools/vdata-generator/build-from-obj.js');
+const { buildVDataFromObj } = require('./tools/scraper/vdata-generator/build-from-obj.js');
 const v1 = buildVDataFromObj({ obj });                  // nondeterministic
 const v2 = buildVDataFromObj({ obj, seed: 84121 });     // deterministic via seed
 const v3 = buildVDataFromObj({ obj, order: ['inf','env','tp','key','py','ss','cLod','version'] }); // explicit
 
 // Scraper entry point: key computed from POST body (Phase 45.2):
-const { buildVDataForPost } = require('./tools/vdata-generator/for-post.js');
+const { buildVDataForPost } = require('./tools/scraper/vdata-generator/for-post.js');
 const profile = {
   tp: '7446039806946242560',
   py: '0',
@@ -208,7 +208,7 @@ const vdata = buildVDataForPost(body, { profile });
 if (vdata.length !== 152) throw new Error('expected 152-char vData');
 
 // Pre-cipher plaintext builder, exposed standalone:
-const { buildPlaintext } = require('./tools/vdata-generator/build-plaintext.js');
+const { buildPlaintext } = require('./tools/scraper/vdata-generator/build-plaintext.js');
 const buf112 = buildPlaintext({ obj, order });
 ```
 
@@ -233,11 +233,8 @@ boundary by the porter of fn 13989).
 
 ## Provenance
 
-- `research/vm-slide-stack-vm/extract-alphabet.js` — extracts the 65-char alphabet from vm-slide pc 16932.
-- `research/vm-slide-stack-vm/vdata-dynamic-trace.js` — original dynamic-trace harness.
-- `research/vm-slide-stack-vm/VDATA-PIPELINE.md` — authoritative spec (43.1 + 43.2 corrections).
+- `docs/VDATA_FORMAT.md` — authoritative end-to-end spec for the cipher and plaintext halves (supersedes the earlier research-track notes).
 - `tests/fixtures/vdata-jsdom-capture.json` — synthetic fixture (jsdom capture).
 - `tests/fixtures/vdata-har-capture.json` — real Chrome 146 HAR fixture.
 - `tests/fixtures/verify-vdata-fixtures.js` — 43.2 reference verifier (logic copied here, then factored).
-- `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` — Phase 44.4 reference replay tool. The logic for `build-plaintext.js` was copied verbatim from this file (per `.claude/rules/research-artifacts.md`, tools must not import from `research/`).
-- `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md` — schema for the 8 fingerprint fields and the per-fixture observed orders.
+- The 65-char alphabet was extracted from vm-slide pc 16932. The logic for `build-plaintext.js` was originally ported verbatim from an earlier reference replay tool.

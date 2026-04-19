@@ -245,7 +245,7 @@ Assembly order, segment roles, and URL encoding are likely the same. The crypto 
 
 These steps require zero manual work if the VM architecture hasn't changed:
 
-1. **Decode bytecode**: Run `research/tdc-register-vm/decoder.js` on the new bytecode string — the encoding pipeline is identical, so this works as-is
+1. **Decode bytecode**: Run the porting pipeline's decoder stage on the new bytecode string — the encoding pipeline is identical, so this works as-is
 2. **Extract base64 lookup table**: Verify it matches (it should)
 3. **Count opcodes**: Scan the switch statement for case numbers
 
@@ -274,7 +274,7 @@ Steps:
 ### Phase 2: Re-disassemble (~1 hour)
 
 With the new opcode mapping:
-1. Update `research/tdc-register-vm/disassembler.js` with the new opcode table
+1. Update the porting pipeline's disassembler with the new opcode table
 2. Run disassembler on the new bytecode
 3. Verify: zero PC gaps, all instructions decoded
 
@@ -325,34 +325,26 @@ When a new tdc.js build is released, here's what you can reuse from this project
 
 | File | Why |
 |------|-----|
-| `research/tdc-register-vm/decoder.js` | Bytecode encoding pipeline (base64→varint→zigzag) is identical across builds |
-| `tools/token-generator/outer-pipeline.js` | Token assembly logic (4 segments, btoa, URL-encode) is structurally the same |
-| `tools/token-generator/generate-token.js` | Pipeline wiring doesn't change |
-| `tools/token-generator/collector-schema.js` | Collector architecture (59 fields, hand-rolled JSON, sd format) is likely identical |
-| `tools/token-generator/cli.js` | CLI wrapper with no build-specific logic |
+| Porting-pipeline decoder | Bytecode encoding pipeline (base64→varint→zigzag) is identical across builds |
+| `tools/scraper/token-generator/outer-pipeline.js` | Token assembly logic (4 segments, btoa, URL-encode) is structurally the same |
+| `tools/scraper/token-generator/generate-token.js` | Pipeline wiring doesn't change |
+| `tools/scraper/token-generator/collector-schema.js` | Collector architecture (59 fields, hand-rolled JSON, sd format) is likely identical |
+| `tools/scraper/token-generator/cli.js` | CLI wrapper with no build-specific logic |
 
 ### Reusable But Needs Re-Verification
 
 | File | What might change |
 |------|-------------------|
-| `tools/token-generator/crypto-core.js` | Algorithm (Modified XTEA, delta, rounds) is likely the same, but the **key** (`STATE_A`) and **key modifications** (+2368517, +592130) could be build-specific. Run the crypto tracer to confirm. |
-| `tools/token-generator/collector-schema.js` | Field count might change (collectors added/removed). Run the dynamic harness to check. |
+| `tools/scraper/token-generator/crypto-core.js` | Algorithm (Modified XTEA, delta, rounds) is likely the same, but the **key** (`STATE_A`) and **key modifications** (+2368517, +592130) could be build-specific. Run the crypto tracer to confirm. |
+| `tools/scraper/token-generator/collector-schema.js` | Field count might change (collectors added/removed). Run the dynamic harness to check. |
 
 ### Must Be Redone (opcode/PC dependent)
 
-| File | Why |
-|------|-----|
-| `research/tdc-register-vm/disassembler.js` | Opcode numbers are completely reshuffled per build. Handler code is structurally identical so you can pattern-match, but the mapping table must be rebuilt. |
-| `research/tdc-register-vm/string-extractor.js` | Depends on opcode numbers |
-| `research/tdc-register-vm/function-extractor.js` | Depends on opcode numbers + PC offsets |
-| `research/tdc-register-vm/cfg-builder.js` | All PC-based data (jump targets, function entries) changes |
-| `research/tdc-register-vm/pattern-recognizer.js` | Depends on CFG |
-| `research/tdc-register-vm/opcode-semantics.js` | Opcode numbering changes |
-| Decompiled-annotated output | Bytecode is fully recompiled — different PCs, strings, offsets |
+The porting pipeline (`tools/porting-pipeline/run.js`) handles all opcode/PC-dependent reprocessing automatically for a new build: disassembly, string extraction, function extraction, CFG construction, pattern recognition, and opcode-semantics remapping all rerun against the new opcode table. No manual tool updates are needed — the pipeline's internal stages consume the extracted opcode table and regenerate their outputs against the new bytecode.
 
 ### Summary
 
-The **token generation pipeline** (`tools/token-generator/`) is ~90% reusable — the main risk is the crypto key changing. The **decompilation toolchain** (`research/tdc-register-vm/`) requires a full re-run of its stages with the new opcode table, but the tools themselves just need their opcode mapping updated, not rewritten.
+The **token generation pipeline** (`tools/scraper/token-generator/`) is ~90% reusable — the main risk is the crypto key changing. The **porting pipeline** (`tools/porting-pipeline/`) handles a full re-run of the decompilation stages with the new opcode table automatically.
 
 ---
 
@@ -376,7 +368,7 @@ The jsdom approach (running the VM as a black box inside jsdom) was investigated
 
 2. **Are compound opcodes stable?** The set of fused operations might vary — one build may fuse STR_APPEND+PROP_SET while another doesn't. Matters for decompilation but not for the standalone generator.
 
-3. **Does the collector count change?** Both builds presumably collect the same browser fingerprint data, but new collectors could be added or old ones removed in future versions. New collectors would require updates to `tools/token-generator/collector-schema.js`.
+3. **Does the collector count change?** Both builds presumably collect the same browser fingerprint data, but new collectors could be added or old ones removed in future versions. New collectors would require updates to `tools/scraper/token-generator/collector-schema.js`.
 
 4. **Is the assembly order fixed?** We confirmed `btoa[1]+btoa[0]+btoa[2]+btoa[3]` for Build B. Build A's old report claimed `btoa[1]+btoa[2]+btoa[0]+btoa[3]` (though this may have been an error in their analysis rather than a real difference). Verified across 10+ builds in Phase 33 survey — no variation observed.
 

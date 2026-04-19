@@ -8,9 +8,9 @@
  * This is the production-quality path that generates valid tokens.
  *
  * Usage:
- *   node puppeteer/cli.js --domain example.com
- *   node puppeteer/cli.js --domains domain.lst --output results.json
- *   node puppeteer/cli.js --help
+ *   node tools/puppeteer/cli.js --domain example.com
+ *   node tools/puppeteer/cli.js --domains domain.lst --output results.json
+ *   node tools/puppeteer/cli.js --help
  */
 
 const fs = require('fs');
@@ -22,8 +22,8 @@ const USAGE = `
 Puppeteer CAPTCHA Solver — Tencent Slide CAPTCHA
 
 Usage:
-  node puppeteer/cli.js --domain <domain>
-  node puppeteer/cli.js --domains <file> [--output results.json]
+  node tools/puppeteer/cli.js --domain <domain>
+  node tools/puppeteer/cli.js --domains <file> [--output results.json]
 
 Options:
   --domain <domain>     Solve CAPTCHA for a single domain

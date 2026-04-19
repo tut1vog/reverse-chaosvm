@@ -18,7 +18,7 @@ Good: updating a doc after a trace
 
 Good: adding a finding backed by a fixture
 
-> `tests/fixtures/vdata-har-capture.json` round-trips byte-identically through `tools/vdata-generator/encode.js`. Documented in `docs/VDATA_FORMAT.md` with a pointer to the fixture and the verifier at `tests/fixtures/verify-vdata-fixtures.js`.
+> `tests/fixtures/vdata-har-capture.json` round-trips byte-identically through `tools/scraper/vdata-generator/encode.js`. Documented in `docs/VDATA_FORMAT.md` with a pointer to the fixture and the verifier at `tests/fixtures/verify-vdata-fixtures.js`.
 
 Bad: assertion without evidence
 

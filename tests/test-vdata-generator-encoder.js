@@ -1,6 +1,6 @@
 'use strict';
 
-// Phase 43 task 43.4 — tests for tools/vdata-generator/ encoder.
+// Phase 43 task 43.4 — tests for tools/scraper/vdata-generator/ encoder.
 //
 // Exercises xtea.js, custom-base64.js, and encode.js as a consumer.
 // Asserts byte-identical output against the two committed fixtures

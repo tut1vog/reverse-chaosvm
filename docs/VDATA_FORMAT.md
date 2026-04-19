@@ -1,8 +1,8 @@
 # vData Format Reference — vm-slide ChaosVM
 
-> **Authoritative document for vm-slide's `vData` field, end-to-end.** Phase 43 closed the cipher half (2026-04-13); Phase 44 closed the plaintext half (2026-04-15). Supersedes the cipher-pipeline notes that previously lived only in `research/vm-slide-stack-vm/VDATA-PIPELINE.md`.
+> **Authoritative document for vm-slide's `vData` field, end-to-end.** Phase 43 closed the cipher half (2026-04-13); Phase 44 closed the plaintext half (2026-04-15). Supersedes the earlier research-track cipher-pipeline notes.
 >
-> **Scope**: both halves. This doc covers the 8-field tdc-runtime-state-probe that vm-slide assembles inside `fn 22317 = module.exports.getCaptchaData`, the padder + ShiftRows permuter + classical XTEA + custom base64 pipeline that turns it into a 152-character string, and the `tools/vdata-generator/` public API (three modes: cipher-only, replay-with-substitution, from-obj synthesis).
+> **Scope**: both halves. This doc covers the 8-field tdc-runtime-state-probe that vm-slide assembles inside `fn 22317 = module.exports.getCaptchaData`, the padder + ShiftRows permuter + classical XTEA + custom base64 pipeline that turns it into a 152-character string, and the `tools/scraper/vdata-generator/` public API (three modes: cipher-only, replay-with-substitution, from-obj synthesis).
 
 ## 1. Overview
 
@@ -63,7 +63,7 @@ vm-slide internal orchestrator (fn 19604)
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-**Verified.** The standalone reimplementation (`tools/vdata-generator/`) produces byte-identical output against two committed fixtures: `tests/fixtures/vdata-jsdom-capture.json` (synthetic via jsdom) and `tests/fixtures/vdata-har-capture.json` (a real Chrome 146 HAR capture). Both directions (encode + decode + XTEA encrypt + XTEA decrypt) round-trip in `tests/test-vdata-generator-encoder.js` (Phase 43.4) and in the standalone `tests/fixtures/verify-vdata-fixtures.js` (Phase 43.2).
+**Verified.** The standalone reimplementation (`tools/scraper/vdata-generator/`) produces byte-identical output against two committed fixtures: `tests/fixtures/vdata-jsdom-capture.json` (synthetic via jsdom) and `tests/fixtures/vdata-har-capture.json` (a real Chrome 146 HAR capture). Both directions (encode + decode + XTEA encrypt + XTEA decrypt) round-trip in `tests/test-vdata-generator-encoder.js` (Phase 43.4) and in the standalone `tests/fixtures/verify-vdata-fixtures.js` (Phase 43.2).
 
 ## 2. Pipeline
 
@@ -109,18 +109,18 @@ For a 112-byte input, `112 = 37·3 + 1`. The first 37 input groups produce 4 dat
 | Length | 16 bytes (the 4-uint32 XTEA key schedule) |
 | Word-packing for the schedule | **Big-endian** (each 4-byte slice → one uint32) |
 | Schedule words | `[0x32653433, 0x30663863, 0x31356237, 0x64613936]` |
-| Source | Bytecode constant inside vm-slide's `__TENCENT_CHAOS_STACK`, recovered live by `research/vm-slide-stack-vm/vdata-dynamic-trace.js` (Phase 43.1) and verified against the bytecode at the encrypt closure entry (pc 15241) |
+| Source | Bytecode constant inside vm-slide's `__TENCENT_CHAOS_STACK`, recovered live by Phase 43.1 dynamic tracing and verified against the bytecode at the encrypt closure entry (pc 15241) |
 
 The key is **constant across runs and across sessions**, identical between the jsdom harness and the real Chrome 146 HAR. It is not derived from session state, the verify POST body, the nonce, or the eks token.
 
-> **Note on the two endiannesses**. The 16-byte key is read as four big-endian uint32 words to form the XTEA key schedule, but the per-block plaintext/ciphertext bytes are read and written as little-endian uint32 words. This split is unusual but is what the bytecode actually does — see `tools/vdata-generator/xtea.js` `keyFromHex` (BE) versus `xteaEncryptLE` (LE).
+> **Note on the two endiannesses**. The 16-byte key is read as four big-endian uint32 words to form the XTEA key schedule, but the per-block plaintext/ciphertext bytes are read and written as little-endian uint32 words. This split is unusual but is what the bytecode actually does — see `tools/scraper/vdata-generator/xtea.js` `keyFromHex` (BE) versus `xteaEncryptLE` (LE).
 
 > **Key reconciliation across builds (Phase 44.0.1, updated Phase 44.2.7)**. Two hex strings have been observed in vm-slide traces, and they correspond to two different builds (or two different sampling points):
 >
-> - `2e430f8c15b7da96` — the key observed in the encrypt closure's local 4 when Phase 43 instrumented `research/vm-slide-stack-vm/vdata-dynamic-trace.js`. Both committed fixtures (`tests/fixtures/vdata-{jsdom,har}-capture.json`) round-trip byte-identically with this key, so it is the canonical key for the `tools/vdata-generator/` reference implementation and for all `tests/fixtures/verify-vdata-fixtures.js` assertions.
-> - `34e2c8f07b5169ad` — the 16-byte bytecode literal pushed into fn 13860 at pcs 13931 and 15149 inside the vm-slide build the research scripts were run against. This is ALSO the value observed live as fn 15918's second argument by the 44.2.7 tracer `research/vm-slide-stack-vm/trace-fn20539-entry.js`, which means that vm-slide build encrypts with the bytecode literal directly (no seed→key transform on that build).
+> - `2e430f8c15b7da96` — the key observed in the encrypt closure's local 4 when Phase 43 dynamic-traced the jsdom harness. Both committed fixtures (`tests/fixtures/vdata-{jsdom,har}-capture.json`) round-trip byte-identically with this key, so it is the canonical key for the `tools/scraper/vdata-generator/` reference implementation and for all `tests/fixtures/verify-vdata-fixtures.js` assertions.
+> - `34e2c8f07b5169ad` — the 16-byte bytecode literal pushed into fn 13860 at pcs 13931 and 15149 inside a later vm-slide build observed during research. This is ALSO the value observed live as fn 15918's second argument by the 44.2.7 tracer, which means that vm-slide build encrypts with the bytecode literal directly (no seed→key transform on that build).
 >
-> The 44.0.1 reconciliation originally hypothesized a seed→key prologue transform inside fn 13860 on that vm-slide build. The 44.2.7 runtime capture shows no such transform — the literal IS the runtime key. The remaining contradiction (the fixtures' canonical key `2e43...` vs the vm-slide build's runtime key `34e2...`) therefore reduces to "the committed fixtures were generated against a different vm-slide build than the one the research scripts were run against." This does not affect the fixture reproducibility contract or any Phase 43/44 deliverable — reconfirming which live build `tests/fixtures/` was captured from is an optional follow-up. See `research/vm-slide-stack-vm/BUILD-RECONCILE.md`.
+> The 44.0.1 reconciliation originally hypothesized a seed→key prologue transform inside fn 13860 on that vm-slide build. The 44.2.7 runtime capture shows no such transform — the literal IS the runtime key. The remaining contradiction (the fixtures' canonical key `2e43...` vs the vm-slide build's runtime key `34e2...`) therefore reduces to "the committed fixtures were generated against a different vm-slide build than the one the later research scripts were run against." This does not affect the fixture reproducibility contract or any Phase 43/44 deliverable — reconfirming which live build `tests/fixtures/` was captured from is an optional follow-up.
 
 ### Encoding alphabet
 
@@ -129,7 +129,7 @@ The key is **constant across runs and across sessions**, identical between the j
 | Alphabet | `GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY` |
 | Length | 65 |
 | Padding char | `Y` (index 64) |
-| Source | Built at vm-slide bytecode pc 16932 by an `OP_04 + 65 × OP_10 + OP_24` string-build sequence; encoder body lives at pcs 17084..17418 with `isNaN`-guarded `OP_08 64` padding immediates at pcs 17395 and 17409. Recovered by `research/vm-slide-stack-vm/extract-alphabet.js` (Phase 43.2). |
+| Source | Built at vm-slide bytecode pc 16932 by an `OP_04 + 65 × OP_10 + OP_24` string-build sequence; encoder body lives at pcs 17084..17418 with `isNaN`-guarded `OP_08 64` padding immediates at pcs 17395 and 17409. Recovered by a Phase 43.2 bytecode walker. |
 
 The alphabet was wrongly described in earlier notes as a "64-char alphabet". It contains **65 distinct characters** because vm-slide stores the data symbols and the padding symbol in a single contiguous string and indexes into it directly by 6-bit value, with index 64 conventionally meaning padding. The semantics are still standard base64 — `Y` plays the same role `=` plays in RFC 4648.
 
@@ -164,7 +164,7 @@ Note the trailing `YY` — the 2 padding chars for the 1-data-byte-in-final-grou
 
 ```bash
 node -e "
-const { encodeVData } = require('./tools/vdata-generator/encode.js');
+const { encodeVData } = require('./tools/scraper/vdata-generator/encode.js');
 const f = require('./tests/fixtures/vdata-jsdom-capture.json');
 console.log(encodeVData(Buffer.from(f.plaintext_hex, 'hex')));
 "
@@ -172,7 +172,7 @@ console.log(encodeVData(Buffer.from(f.plaintext_hex, 'hex')));
 
 The HAR fixture (`tests/fixtures/vdata-har-capture.json`) demonstrates the same pipeline against a real Chrome 146 capture — same key, same alphabet, different plaintext, byte-identical reproduction of the live `vData` string.
 
-## 5. Public API — `tools/vdata-generator/`
+## 5. Public API — `tools/scraper/vdata-generator/`
 
 The standalone generator is a CommonJS module with no external dependencies. It exposes **three** modes of increasing power:
 
@@ -185,7 +185,7 @@ The standalone generator is a CommonJS module with no external dependencies. It 
 | `xtea.js` | `xteaEncryptBlock`, `xteaDecryptBlock`, `xteaEncryptLE(buf, keyWords)`, `xteaDecryptLE(buf, keyWords)`, `keyFromHex(hex)`, `XTEA_DELTA`, `XTEA_ROUNDS` | Classical XTEA. Block + buffer wrappers. |
 | `custom-base64.js` | `customBase64Encode(buf) → string`, `customBase64Decode(str) → Buffer`, `OUTPUT_ALPHABET`, `PADDING_CHAR_INDEX` (= 64), `PADDING_CHAR` (= `'Y'`) | Standard base64 with the custom 65-char alphabet. |
 | `encode.js` | `encodeVData(buf \| hex) → string`, `encryptOnly(buf \| hex) → Buffer`, `XTEA_KEY_HEX`, `KEY_WORDS`, `OUTPUT_ALPHABET`, `PLAINTEXT_LENGTH` (= 112), `EXPECTED_VDATA_LENGTH` (= 152) | Top-level cipher-only API. Hardcoded key, pre-computed key schedule. Enforces 112-byte plaintext requirement. |
-| `build-plaintext.js` | `buildPlaintext({obj, order}) → string` | Builds the ≤110-byte `k=v&k=v&...` kv string from an 8-field obj + explicit order. Ports `research/vm-slide-stack-vm/build-fingerprint-plaintext.js` verbatim. |
+| `build-plaintext.js` | `buildPlaintext({obj, order}) → string` | Builds the ≤110-byte `k=v&k=v&...` kv string from an 8-field obj + explicit order. Ports an earlier reference replay tool verbatim. |
 | `replay.js` | `buildVData({obj, order, overrides}) → string` | Phase 44.5a replay entry point. Merges overrides via spread, calls `buildPlaintext`, pipes through `encodeVData`. |
 | `build-from-obj.js` | `buildVDataFromObj({obj, seed, order}) → string`, `SCHEMA` (= `['tp','key','py','env','version','cLod','inf','ss']`), `mulberry32`, `shuffleSchema` | Phase 44.5b from-obj entry point. Three order sources: explicit `order` override, seeded mulberry32 PRNG (`seed`), or live `Math.random` (default). |
 | `cli.js` | (script) | CLI with three subcommands: cipher-only (`--plaintext-hex <hex>` or stdin), `replay` (`--obj`, `--order`, `--overrides`, `--self-check`, `--verbose`), `from-obj` (`--obj`, `--seed`, `--order`, `--self-check`, `--verbose`). `--help` prints usage. |
@@ -193,7 +193,7 @@ The standalone generator is a CommonJS module with no external dependencies. It 
 
 **Example — cipher-only (Phase 43)**:
 ```javascript
-const { encodeVData } = require('./tools/vdata-generator/encode.js');
+const { encodeVData } = require('./tools/scraper/vdata-generator/encode.js');
 const plaintext = Buffer.alloc(112); // your captured 112-byte plaintext
 const vdata = encodeVData(plaintext);
 // vdata is a 152-char string ending in 'YY'
@@ -201,7 +201,7 @@ const vdata = encodeVData(plaintext);
 
 **Example — replay (Phase 44.5a)**:
 ```javascript
-const { buildVData } = require('./tools/vdata-generator/replay.js');
+const { buildVData } = require('./tools/scraper/vdata-generator/replay.js');
 const obj = { inf: 'top', env: '1', tp: '...', key: 'qLCZ', py: '0', ss: '0%2C', cLod: 'unloadTDC', version: '2' };
 const order = ['inf', 'env', 'tp', 'key', 'py', 'ss', 'cLod', 'version'];
 const vdata = buildVData({ obj, order });
@@ -210,7 +210,7 @@ const vdata = buildVData({ obj, order });
 
 **Example — from-obj (Phase 44.5b)**:
 ```javascript
-const { buildVDataFromObj } = require('./tools/vdata-generator/build-from-obj.js');
+const { buildVDataFromObj } = require('./tools/scraper/vdata-generator/build-from-obj.js');
 const obj = { /* 8 fields in any key order */ };
 const vdata1 = buildVDataFromObj({ obj });                 // random Math.random order
 const vdata2 = buildVDataFromObj({ obj, seed: 84121 });    // deterministic (Node 20 TimSort)
@@ -220,16 +220,16 @@ const vdata3 = buildVDataFromObj({ obj, order: [...] });   // explicit override 
 **Example — CLI**:
 ```bash
 # cipher-only
-echo 697465316f6e... | node tools/vdata-generator/cli.js
-node tools/vdata-generator/cli.js --plaintext-hex 697465316f6e... --verbose
+echo 697465316f6e... | node tools/scraper/vdata-generator/cli.js
+node tools/scraper/vdata-generator/cli.js --plaintext-hex 697465316f6e... --verbose
 
 # replay
-node tools/vdata-generator/cli.js replay --self-check
-node tools/vdata-generator/cli.js replay --obj obj.json --order order.json --overrides '{"key":"ZZZZ"}'
+node tools/scraper/vdata-generator/cli.js replay --self-check
+node tools/scraper/vdata-generator/cli.js replay --obj obj.json --order order.json --overrides '{"key":"ZZZZ"}'
 
 # from-obj
-node tools/vdata-generator/cli.js from-obj --self-check
-node tools/vdata-generator/cli.js from-obj --obj obj.json --seed 84121
+node tools/scraper/vdata-generator/cli.js from-obj --self-check
+node tools/scraper/vdata-generator/cli.js from-obj --obj obj.json --seed 84121
 ```
 
 `encodeVData` and `encryptOnly` both throw if the plaintext is not exactly 112 bytes. The error message references this doc so callers cannot accidentally pass a too-short or too-long buffer through the cipher.
@@ -244,20 +244,14 @@ Every claim in this doc is grounded in either bytecode reading, a dynamic trace,
 |---|---|
 | Cipher is classical XTEA, not modified | Phase 40 walker disassembly at pcs 15241 (encrypt entry) and 15416 (decrypt entry); cross-checked by Phase 43.1 dynamic decrypt of HAR ciphertext with the recovered key |
 | XTEA delta `0x9E3779B9`, 32 rounds | `OP_08` immediates at bytecode indices 15352 / 15530 (encrypt and decrypt round constants) |
-| LE uint32 packing at the cipher boundary | Phase 43.1 dynamic trace `research/vm-slide-stack-vm/vdata-dynamic-trace.js` — the captured pre-XTEA buffer matches the 112-byte plaintext only under LE packing |
+| LE uint32 packing at the cipher boundary | Phase 43.1 dynamic trace — the captured pre-XTEA buffer matches the 112-byte plaintext only under LE packing |
 | 16-byte XTEA key | Live capture of the encrypt closure call in Phase 43.1; confirmed identical between jsdom and HAR via decrypt round-trip |
-| Alphabet length = 65, index 64 = padding | Phase 43.2 walker `research/vm-slide-stack-vm/extract-alphabet.js` reads `OP_04 + 65 × OP_10 + OP_24` at pc 16932; encoder body at pcs 17084..17418 contains `isNaN`-guarded `OP_08 64` padding immediates at pcs 17395 and 17409 |
+| Alphabet length = 65, index 64 = padding | Phase 43.2 bytecode walker reads `OP_04 + 65 × OP_10 + OP_24` at pc 16932; encoder body at pcs 17084..17418 contains `isNaN`-guarded `OP_08 64` padding immediates at pcs 17395 and 17409 |
 | 152-char output ends in `YY` | Arithmetic: `112 = 37·3 + 1` → final group needs 2 padding chars. Verified against both fixtures. |
 | Plaintext is a tdc runtime-state probe, not the verify POST body nor a browser fingerprint | Phase 44.2.8 — fn 22317 `module.exports.getCaptchaData` walked end-to-end. Five fields inline (`py`, `env`, `version`, `cLod`, `inf`), three helpers decompiled (`tp` = fn 22400, `key` = fn 22730 via `require(18)(body,'tlg')`, `ss` = fn 23399). `tp` is a captured JS runtime error string — not a fingerprint. See §7.1. |
-| Per-call field order is randomized, not derived from `obj` | Phase 44.4.1 — fn 23898 body `[23898..23944]` is `Math.random() > 0.5 ? -1 : 1`, created at pc 23945, passed to `arr.sort` at pc 23949. Runtime cross-check: `all_entry_counts[23898] = 15` per send (TimSort comparisons for an 8-element sort). See §7.2 + `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md`. |
+| Per-call field order is randomized, not derived from `obj` | Phase 44.4.1 — fn 23898 body `[23898..23944]` is `Math.random() > 0.5 ? -1 : 1`, created at pc 23945, passed to `arr.sort` at pc 23949. Runtime cross-check: `all_entry_counts[23898] = 15` per send (TimSort comparisons for an 8-element sort). See §7.2. |
 | Pre-cipher transform chain is pad → ShiftRows → XTEA | Phase 44.4 — fn 13860 (webpack module 40) decompiled to fn 13989 (PKCS#7-style padder, alphabet `"0abcdefghijklmnop"`) → fn 14153 (ShiftRows permuter, `PERM = [0,4,8,12,5,9,13,1,10,14,2,6,15,3,7,11]`) → XTEA. See §7.3. |
 | No `10 40` trailer | Phase 43.2 — corrects the 43.1 reading that mistook the trailing `YY` padding for raw 6-bit values `(64 << 6) | 64 = 0x1040` |
-
-**Research artifacts**:
-- `research/vm-slide-stack-vm/VDATA-PIPELINE.md` — full research-track spec with all 8 sections.
-- `research/vm-slide-stack-vm/vdata-dynamic-trace.js` — instrumented jsdom harness; the dynamic oracle for new captures.
-- `research/vm-slide-stack-vm/extract-alphabet.js` — bytecode walker that authoritatively counted the 65 alphabet characters.
-- `research/vm-slide-stack-vm/VDATA-RESOLUTION.md` — Phase 42 mechanism resolution (XHR proxy installation).
 
 **Test fixtures**:
 - `tests/fixtures/vdata-jsdom-capture.json` — frozen single-run jsdom capture.
@@ -290,7 +284,7 @@ The schema is **8 fields, fixed**. Every call produces a kv string of the form `
 | `inf` | `window === window.top ? 'top' : 'iframe'` — iframe-position probe | `top` | `iframe` |
 | `ss` | fn 23399 — small helper that emits a percent-encoded CSV-like summary string | `0%2C` | `11%2Ctdc%2Cslide%2Cvm` |
 
-Five fields are built inline in fn 22317 (`py`, `env`, `version`, `cLod`, `inf`); three delegate to helper functions (`tp` = fn 22400, `key` = fn 22730, `ss` = fn 23399). All three helpers have been decompiled into `research/vm-slide-stack-vm/FINGERPRINT-SCHEMA.md`.
+Five fields are built inline in fn 22317 (`py`, `env`, `version`, `cLod`, `inf`); three delegate to helper functions (`tp` = fn 22400, `key` = fn 22730, `ss` = fn 23399). All three helpers were decompiled during the Phase 44 closeout.
 
 ### 7.2 Per-call field-order shuffle
 
@@ -306,11 +300,9 @@ function cmp(a, b) {
 This is the classic "random shuffle via a nondeterministic comparator" footgun — it does not produce a uniform permutation, but it DOES scramble the order nondeterministically on every call. This is why the two committed fixtures ship different orders (`[inf,env,tp,key,py,ss,cLod,version]` for jsdom vs `[inf,env,tp,cLod,version,key,ss,py]` for HAR) despite having the same schema. Runtime cross-check: the fn-20539 entry trace shows `all_entry_counts[23898] = 15` per send, consistent with Node's TimSort comparing an 8-element array 15 times.
 
 **Determinism implications for reproducers**:
-- To byte-identically reproduce a captured fixture, you must supply the observed `order` explicitly (the `--order` / `{obj, order}` path in `tools/vdata-generator/`). This is portable across Node versions.
+- To byte-identically reproduce a captured fixture, you must supply the observed `order` explicitly (the `--order` / `{obj, order}` path in `tools/scraper/vdata-generator/`). This is portable across Node versions.
 - Alternatively, under Node 20 TimSort specifically, a mulberry32-seeded `Math.random` replacement can reproduce the observed order: HAR fixture seed = `53818`, jsdom fixture seed = `84121`. Seeds are not portable to Node 22+ (different sort algorithm) or other JS engines.
 - For synthesizing a fresh `vData` (no captured reference), any order will do — Tencent's verifier accepts whatever order the shuffle produces.
-
-See `research/vm-slide-stack-vm/SORT-ORDER-RESOLUTION.md` for the full pc-level walk of fn 23898.
 
 ### 7.3 Pre-cipher transform chain (fn 13860 = webpack module 40 `encryptData`)
 
@@ -320,7 +312,7 @@ Once fn 22317 has built the kv string, it passes the result to fn 13860 which ru
 2. **ShiftRows permute (fn 14153)** — applies an AES-ShiftRows-style byte permutation to each 16-byte block with `PERM = [0,4,8,12,5,9,13,1,10,14,2,6,15,3,7,11]`. The forward permutation is used on encrypt; the inverse is used when decrypting a captured ciphertext back to the kv string.
 3. **XTEA encrypt (module 41)** — 14 × 8-byte classical XTEA blocks with the key and parameters from §3.
 
-All three sub-steps are ported into `tools/vdata-generator/build-plaintext.js` (steps 1–2) and `tools/vdata-generator/encode.js` (step 3). The reference implementation against the committed fixtures is `research/vm-slide-stack-vm/build-fingerprint-plaintext.js`.
+All three sub-steps are ported into `tools/scraper/vdata-generator/build-plaintext.js` (steps 1–2) and `tools/scraper/vdata-generator/encode.js` (step 3). The logic was originally ported verbatim from an earlier reference replay tool.
 
 ### 7.4 Reproducibility contract
 

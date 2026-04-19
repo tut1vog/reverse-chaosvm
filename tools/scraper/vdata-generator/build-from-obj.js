@@ -6,8 +6,8 @@
 // : 1)` (matching fn 23898's comparator body exactly), then hand the
 // ordered list to 44.5a's buildPlaintext and the Phase 43 encoder.
 //
-// Runtime evidence: research/vm-slide-stack-vm/FN-20539-SLOT8-HOP.md §4d-4f
-// (schema array) and §5 (per-run randomised comparator, category iii).
+// Runtime evidence (original fn-20539 entry trace): §4d-4f for the schema
+// array and §5 for the per-run randomised comparator (category iii).
 //
 // Unlike 44.5a's replay wrapper, this entry point does NOT require a
 // caller-supplied `order` — by default the join order is chosen at call

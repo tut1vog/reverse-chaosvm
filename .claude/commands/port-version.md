@@ -76,7 +76,7 @@ Output location: output/<target-stem>/
 The agent will:
 1. Capture a live `collect` token from the target tdc.js via Puppeteer
 2. Capture the `eks` token from `TDC.getInfo().info`
-3. Generate a standalone token using extracted parameters via `tools/token-generator/generate-token.js`
+3. Generate a standalone token using extracted parameters via `tools/scraper/token-generator/generate-token.js`
 4. Byte-compare each segment (hash, header, cdBody, sig) between live and standalone
 5. Diagnose any mismatches (XTEA key, collector schema, assembly order, timestamp drift)
 

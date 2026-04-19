@@ -10,7 +10,7 @@
  * The browser token is a single base64-encoded XTEA-encrypted blob that
  * decrypts to JSON: {"cd":[...],"sd":{...}}
  *
- * Usage: node tools/token-generator/decrypt.js
+ * Usage: node tools/scraper/token-generator/decrypt.js
  */
 
 const fs = require('fs');

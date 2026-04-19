@@ -4,7 +4,7 @@
 
 The vm-slide build the research scripts were run against is a stack-based ChaosVM variant (the `__TENCENT_CHAOS_STACK` global) used by Tencent's slide CAPTCHA. It is a **different VM** from the register-based `tdc.js` ChaosVM documented in `docs/VM_ARCHITECTURE.md`: instead of a switch-dispatched register machine, it is a table-dispatched stack machine with an explicit operand stack, a small dispatch table (69 slots), and an exception-history stack.
 
-This document reflects analysis of that vm-slide build. First-pass source classification of all 53 non-null handler source strings has been validated by a control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) that decodes **14,134 instructions across 101 distinct function entries** with zero unreached bytecode bytes — the visited range `[0, 24273)` is fully covered, with 58.2% of bytes being instruction starts and the remainder being operand bytes of visited instructions. A cross-track investigation (`research/vm-slide-stack-vm/xtea-hunt.js`) confirmed the presence of **classical XTEA encrypt and decrypt closures** inside the bytecode at entry PCs `15241` and `15416`, both instantiated by an outer factory at entry PC `15220`. The earlier linear disassembler's pc=512 halt is now understood to have been caused entirely by `FUNC_CREATE` mis-parse, not by reaching a legitimate dispatch-table hole.
+This document reflects analysis of that vm-slide build. First-pass source classification of all 53 non-null handler source strings has been validated by a control-flow-aware walker that decodes **14,134 instructions across 101 distinct function entries** with zero unreached bytecode bytes — the visited range `[0, 24273)` is fully covered, with 58.2% of bytes being instruction starts and the remainder being operand bytes of visited instructions. A cross-track investigation confirmed the presence of **classical XTEA encrypt and decrypt closures** inside the bytecode at entry PCs `15241` and `15416`, both instantiated by an outer factory at entry PC `15220`. The earlier linear disassembler's pc=512 halt is now understood to have been caused entirely by `FUNC_CREATE` mis-parse, not by reaching a legitimate dispatch-table hole.
 
 ## File layout
 
@@ -37,7 +37,7 @@ __TENCENT_CHAOS_STACK.g = function () { return __TENCENT_CHAOS_STACK.shift()[0] 
 Key anchors:
 
 - **Dispatch table `Q`**: 69 slots, 53 non-null handlers, 16 sparse-array holes. Each non-null entry is a zero-argument function that reads operands via `m[g++]` and manipulates the operand stack `n`.
-- **Inline bytecode**: the 2nd argument to the outer `__TENCENT_CHAOS_VM` invocation is a literal number array. The decoder (`research/vm-slide-stack-vm/decoder.js`) extracts 24,273 elements from this literal.
+- **Inline bytecode**: the 2nd argument to the outer `__TENCENT_CHAOS_VM` invocation is a literal number array. The decoder used during analysis extracts 24,273 elements from this literal.
 - **Outer invocation**: `__TENCENT_CHAOS_VM(0, [...bytecode...], window)` — pc starts at 0, constant pool is `window`, and all other arguments default inside the function.
 - **Result helper**: `__TENCENT_CHAOS_STACK.g = function(){ return __TENCENT_CHAOS_STACK.shift()[0] }`. The VM invocation returns an array-like; callers pull one result at a time by shifting and unwrapping the single-cell pair.
 
@@ -187,7 +187,7 @@ Format properties:
 
 ## Observed coverage and limitations
 
-**Behavioral coverage is now effectively complete for this vm-slide build.** The control-flow-aware walker (`research/vm-slide-stack-vm/walker.js`) decodes **14,134 instructions across 101 distinct function entries** — a 45.3× increase over the earlier linear disassembler's 312 instructions. Walker output is 14,486 lines of disassembly.
+**Behavioral coverage is now effectively complete for this vm-slide build.** The control-flow-aware walker decodes **14,134 instructions across 101 distinct function entries** — a 45.3× increase over the earlier linear disassembler's 312 instructions. Walker output is 14,486 lines of disassembly.
 
 Key coverage facts:
 
@@ -201,7 +201,7 @@ The honest remaining limitation is **module-export indirection**: static analysi
 
 ## XTEA factory and closures
 
-The Phase 40.6 cross-track investigation (`research/vm-slide-stack-vm/xtea-hunt.js`) identified a pair of classical-XTEA cipher closures embedded in the bytecode. They are created together by a single outer factory function:
+The Phase 40.6 cross-track investigation identified a pair of classical-XTEA cipher closures embedded in the bytecode. They are created together by a single outer factory function:
 
 - **Outer factory — entry PC `15220`.** Instantiated by a `FUNC_CREATE 15220 0 3 3 4 5` near PC `16835` from within a CommonJS-style `__esModule` module bootstrap routine. Takes **3 arguments** bound into local slots 3, 4, and 5. Local slot 4 holds the XTEA key material per the 40.6 disassembly windows; the other two slots have not been resolved statically.
 - **Encrypt closure — entry PC `15241`.** Created by `FUNC_CREATE` at PC `15404` inside the factory body. Loop head at PC `15284`; 32-round loop bound is the `PUSH_K 84941944608` at PC `15284` (decimal `84941944608 = 32·0x9E3779B9`). Uses `ADD` for `sum += delta` and `v += ...`. Backward `JUMP 15284` at PC `15377` closes the loop. The delta `0x9E3779B9` (decimal `2654435769`) appears as the `PUSH_K` operand at bytecode index `15353`.
@@ -211,7 +211,6 @@ Both closures implement the **vanilla XTEA round** from Needham & Wheeler — sh
 
 The presence of both encrypt and decrypt strongly suggests vm-slide handles a round-trip cipher — the most likely use is `eks`-payload decryption on incoming data and verify-body encryption on outbound, but the module-export indirection described above prevents static pinning of the real-world callers. This is a natural handoff to the `captcha-orchestrator` research track and to future work on `eks` derivation.
 
-See `research/vm-slide-stack-vm/xtea-hunt.js` for the reproducible analysis and the semantic disassembly windows around both closures.
 
 ## Unresolved findings
 

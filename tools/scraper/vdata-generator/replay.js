@@ -1,9 +1,9 @@
 'use strict';
 
 // Phase 44.5a — replay-with-substitution vData builder. Composes the
-// pre-cipher plaintext builder (build-plaintext.js, ported from
-// research/vm-slide-stack-vm/build-fingerprint-plaintext.js) with the Phase
-// 43 cipher encoder (encode.js) into one entry point.
+// pre-cipher plaintext builder (build-plaintext.js, originally derived
+// from an earlier reference replay tool) with the Phase 43 cipher
+// encoder (encode.js) into one entry point.
 //
 // This is NOT from-scratch synthesis. It takes a captured 8-field
 // fingerprint object, optionally merges in an override map, joins fields in

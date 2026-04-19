@@ -11,7 +11,7 @@ Both `collect` and `vData` tokens round-trip through decrypt → re-encrypt with
 | `collect` | URL-decode → base64-decode → XTEA-ECB decrypt (Template C key) | 3,637 bytes JSON | 4,856 chars base64 | ✅ byte-identical |
 | `vData` | custom-base64-decode → XTEA decrypt → un-ShiftRows → unpad → repad → ShiftRows → XTEA encrypt → custom-base64-encode | 98 bytes URL-encoded KV | 152 chars custom-base64 | ✅ byte-identical |
 
-**Implication**: the encryption pipelines in `tools/token-generator/` and `tools/vdata-generator/` are correct. Any difference between the scraper's output and Chrome's output comes from the **plaintext content**, not the cipher.
+**Implication**: the encryption pipelines in `tools/scraper/token-generator/` and `tools/scraper/vdata-generator/` are correct. Any difference between the scraper's output and Chrome's output comes from the **plaintext content**, not the cipher.
 
 ## 2. Token Format: Single-Blob vs 4-Segment
 

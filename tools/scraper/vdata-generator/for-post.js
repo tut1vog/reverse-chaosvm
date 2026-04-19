@@ -1,17 +1,17 @@
 'use strict';
 
 // Phase 45.2 — `buildVDataForPost` entry point. Fourth public mode of
-// tools/vdata-generator/ alongside encodeVData (cipher-only), buildVData
-// (replay-with-substitution), and buildVDataFromObj (full synthesis).
+// tools/scraper/vdata-generator/ alongside encodeVData (cipher-only),
+// buildVData (replay-with-substitution), and buildVDataFromObj (full
+// synthesis).
 //
 // This is the scraper-facing API: feed it the pre-vData verify POST body
 // and a browser-like profile object, and it returns the 152-char vData
 // string with `obj.key` computed per-body via computeKeyField (the 45.1a
 // port of vm-slide module 18 + fn 22730). The profile supplies the other
-// 7 fields; see `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md` §3
-// for the canonical browser-default shape and per-field justifications.
+// 7 fields.
 //
-// See `tools/vdata-generator/README.md` for the full mode overview.
+// See `tools/scraper/vdata-generator/README.md` for the full mode overview.
 
 const { computeKeyField } = require('./build-key-field.js');
 const { buildVDataFromObj } = require('./build-from-obj.js');
@@ -28,12 +28,11 @@ const REQUIRED_PROFILE_FIELDS = [
  * (the 45.1a port of vm-slide module 18 + fn 22730). The other 7 fields come
  * from `profile` and may be selectively overridden via `overrides`. Any
  * attempt to override `key` throws — callers must not supply a key, because a
- * body-independent key would be a trivial server-side detector (see
- * `PHASE-45-FIELD-SOURCES.md` §1, `key` row).
+ * body-independent key would be a trivial server-side detector.
  *
  * @param {string} postBody - pre-vData verify POST body. Must contain
  *   `tlg=<digits>` and `sess=<string>` substrings; see "Caller preconditions"
- *   in `tools/vdata-generator/README.md`.
+ *   in `tools/scraper/vdata-generator/README.md`.
  * @param {object} options
  * @param {object} options.profile - 8-field fingerprint profile (7 required
  *   fields plus an optional `key` slot that must be absent or equal to

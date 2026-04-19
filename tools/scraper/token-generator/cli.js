@@ -8,10 +8,10 @@
  *   - generate-token.js    (generateToken)
  *
  * Usage:
- *   node src/token/cli.js --profile profiles/default.json
- *   node src/token/cli.js --profile profiles/default.json --timestamp 1751882803000
- *   node src/token/cli.js --profile profiles/default.json --validate
- *   node src/token/cli.js --profile profiles/default.json --verbose
+ *   node tools/scraper/token-generator/cli.js --profile profiles/default.json
+ *   node tools/scraper/token-generator/cli.js --profile profiles/default.json --timestamp 1751882803000
+ *   node tools/scraper/token-generator/cli.js --profile profiles/default.json --validate
+ *   node tools/scraper/token-generator/cli.js --profile profiles/default.json --verbose
  *
  * Flags:
  *   --profile <path>    Path to browser profile JSON file (required)
@@ -72,7 +72,7 @@ const HELP_TEXT = `
 TDC Token Generator — Standalone CLI
 
 Usage:
-  node src/token/cli.js --profile <path> [options]
+  node tools/scraper/token-generator/cli.js --profile <path> [options]
 
 Required:
   --profile <path>    Path to browser profile JSON file
@@ -86,10 +86,10 @@ Options:
   --help              Show this help message
 
 Examples:
-  node src/token/cli.js --profile profiles/default.json
-  node src/token/cli.js --profile profiles/default.json --timestamp 1751882803000
-  node src/token/cli.js --profile profiles/default.json --validate
-  node src/token/cli.js --profile profiles/default.json --verbose
+  node tools/scraper/token-generator/cli.js --profile profiles/default.json
+  node tools/scraper/token-generator/cli.js --profile profiles/default.json --timestamp 1751882803000
+  node tools/scraper/token-generator/cli.js --profile profiles/default.json --validate
+  node tools/scraper/token-generator/cli.js --profile profiles/default.json --verbose
 `.trim();
 
 // ═══════════════════════════════════════════════════════════════════════

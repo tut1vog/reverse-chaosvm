@@ -1,7 +1,7 @@
 'use strict';
 
 // Phase 45.3 — black-box tests for `computeKeyField`, `lookupFormField`, and
-// `buildVDataForPost` (the 45.2 entry points in tools/vdata-generator/).
+// `buildVDataForPost` (the 45.2 entry points in tools/scraper/vdata-generator/).
 //
 // These tests are the byte-identity regression guard for the
 // body-parser + key-digest + POST-body-driven vData pipeline. They are written
@@ -24,9 +24,9 @@ const {
 const ALPHABET = 'GV5yc1_twaSpHPOE7R3jv9fqC2L-0TxMi4FuolBAbQeIgJU*XzZKWkDNh6n8dsrmY';
 const VDATA_LENGTH = 152;
 
-// §3 browser profile template from research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md
-// — inlined (not stored as a fixture, per 45.3 spec). `key` slot is absent so
-// `buildVDataForPost` computes it per-body.
+// §3 browser profile template originally derived from an earlier vm-slide
+// field-sources analysis — inlined (not stored as a fixture, per 45.3 spec).
+// `key` slot is absent so `buildVDataForPost` computes it per-body.
 const BROWSER_PROFILE = {
   tp: '7446039806946242560',
   py: '0',

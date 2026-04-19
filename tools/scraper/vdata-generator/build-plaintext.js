@@ -2,10 +2,8 @@
 
 // Phase 44.5a — productized port of vm-slide's pre-cipher plaintext builder
 // (kv-build → PKCS#7-style pad → ShiftRows-style permute). Input to Phase
-// 43's encodeVData. The reference implementation lives at
-// research/vm-slide-stack-vm/build-fingerprint-plaintext.js; per
-// .claude/rules/research-artifacts.md we copy the logic into tools/ rather
-// than importing across the research/tools boundary.
+// 43's encodeVData. Logic ported verbatim from an earlier reference replay
+// tool.
 //
 // Pipeline (static analysis of bytecode, fn 22317 + webpack module 40):
 //

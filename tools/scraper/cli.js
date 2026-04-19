@@ -7,16 +7,16 @@
  * Solves Tencent slide CAPTCHAs and optionally queries urlsec.qq.com.
  *
  * Usage:
- *   node scraper/cli.js [options] [url]
- *   node scraper/cli.js --captcha-only --verbose
- *   node scraper/cli.js --help
+ *   node tools/scraper/cli.js [options] [url]
+ *   node tools/scraper/cli.js --captcha-only --verbose
+ *   node tools/scraper/cli.js --help
  */
 
 const USAGE = `
 Headless Scraper — Tencent CAPTCHA + urlsec.qq.com
 
 Usage:
-  node scraper/cli.js [options] [url]
+  node tools/scraper/cli.js [options] [url]
 
 Arguments:
   url                  URL or domain to check via urlsec.qq.com
@@ -34,9 +34,9 @@ Options:
   --help, -h           Show this help message
 
 Examples:
-  node scraper/cli.js --verbose https://example.com
-  node scraper/cli.js --captcha-only --verbose
-  node scraper/cli.js --ratio 1.0 --retries 5 https://example.com
+  node tools/scraper/cli.js --verbose https://example.com
+  node tools/scraper/cli.js --captcha-only --verbose
+  node tools/scraper/cli.js --ratio 1.0 --retries 5 https://example.com
 `.trim();
 
 function parseArgs(argv) {

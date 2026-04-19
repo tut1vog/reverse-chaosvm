@@ -1,11 +1,11 @@
 'use strict';
 
 // Black-box tests for the vdata-generator builders:
-//   - tools/vdata-generator/replay.js       (Phase 44.5a: buildVData)
-//   - tools/vdata-generator/build-from-obj.js (Phase 44.5b: buildVDataFromObj)
+//   - tools/scraper/vdata-generator/replay.js       (Phase 44.5a: buildVData)
+//   - tools/scraper/vdata-generator/build-from-obj.js (Phase 44.5b: buildVDataFromObj)
 //
 // These tests lock down the builders' observable behavior using only the
-// documented public API (see tools/vdata-generator/README.md). They intentionally
+// documented public API (see tools/scraper/vdata-generator/README.md). They intentionally
 // do not reach into build-plaintext.js, encode.js, xtea.js, or custom-base64.js.
 //
 // Note: the committed fixtures (tests/fixtures/vdata-*-capture.json) record the

@@ -8,7 +8,7 @@
 - **Research-track scripts write to `output/<track>/`** or `output/<track>-<label>/` for per-input subdirs. Pick one scheme per track and stick to it so `git diff output/` between runs is meaningful.
 - **Artifact filenames are stable across runs.** The same script against the same input must overwrite the same filenames — not emit a new timestamped set. Stability is what lets `git diff` show what changed between runs. If you need per-run history, commit between runs instead of versioning the filenames.
 - **Never commit large binary blobs.** JSON artifacts, disassembly, decompiled source, and structured traces diff well and may be committed as needed. Raw HAR captures, screenshots, video, multi-megabyte traces, and browser profile data stay under `output/` and remain untracked unless one is specifically promoted to `tests/fixtures/` as a regression input.
-- **Never write inside `research/<track>/` during a run.** Research directories are source-only (see `.claude/rules/research-artifacts.md`). If a script under `research/` produces output, that output goes to `output/<track>/`, never next to the script.
+- **Never write inside a source directory during a run.** Source directories (`tools/`, `research/`) are source-only. If a script produces bulk output, that output goes to `output/<stem>/`, never next to the script.
 
 ## Examples
 
@@ -18,8 +18,8 @@ Good:
 node tools/porting-pipeline/run.js /path/to/fresh-tdc.js
 # writes to output/<sourcehash>/{opcode-table.json, xtea-params.json, pipeline-config.json, ...}
 
-node research/vm-slide-stack-vm/decoder.js /path/to/vm-slide.js
-# writes to output/vm-slide/{bytecode.json, disassembly.txt, ...}
+node tools/scraper/vdata-generator/cli.js from-obj --obj /tmp/obj.json --verbose
+# writes diagnostics to stderr only; any bulk artifact goes to output/vdata-generator/
 ```
 
 Bad:
@@ -28,8 +28,8 @@ Bad:
 # writes to project root
 node tools/porting-pipeline/run.js /path/to/tdc.js > opcode-table.json
 
-# writes inside a research directory — pollutes the source tree
-node research/vm-slide-stack-vm/decoder.js > research/vm-slide-stack-vm/bytecode.json
+# writes inside a tool directory — pollutes the source tree
+node tools/scraper/vdata-generator/cli.js > tools/scraper/vdata-generator/vdata.txt
 
 # timestamped directory breaks git-based diffing of consecutive runs
 node tools/porting-pipeline/run.js /path/to/tdc.js --output output/run-2026-04-18-1453/

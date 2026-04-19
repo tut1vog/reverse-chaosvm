@@ -26,7 +26,7 @@ The TDC token is a **URL-encoded string (~4,500–5,000 characters)** containing
 
 **Purpose:** Transmit an encrypted device fingerprint from the browser to Tencent's verification servers. The fingerprint includes hardware specs, browser APIs, canvas/audio/WebGL hashes, timing data, and session metadata — 59 collector fields total.
 
-**Verified:** The standalone reimplementation (`tools/token-generator/generate-token.js`) produces **byte-identical** tokens to the live `tdc.js` VM when given the same inputs, confirmed across multiple runs (Task 8.1).
+**Verified:** The standalone reimplementation (`tools/scraper/token-generator/generate-token.js`) produces **byte-identical** tokens to the live `tdc.js` VM when given the same inputs, confirmed across multiple runs (Task 8.1).
 
 ---
 
@@ -550,15 +550,15 @@ Key `tdc.js` functions and their roles in the token pipeline:
 
 | tdc.js Function | Standalone Module | Standalone Function |
 |-----------------|-------------------|---------------------|
-| `func_276` | `tools/token-generator/outer-pipeline.js` | `buildCdString()` |
-| `func_212` (sd part) | `tools/token-generator/outer-pipeline.js` | `buildSdString()` |
-| `func_212` (assembly) | `tools/token-generator/outer-pipeline.js` | `assembleToken()` |
-| `func_177` | `tools/token-generator/outer-pipeline.js` | `urlEncode()` |
-| `func_271` (cipher) | `tools/token-generator/crypto-core.js` | `encrypt()`, `cipherRound()` |
-| `func_136` | `tools/token-generator/crypto-core.js` | `convertBytesToWord()` |
-| `func_140` | `tools/token-generator/crypto-core.js` | `convertWordToBytes()` |
-| Full pipeline | `tools/token-generator/generate-token.js` | `generateToken()` |
-| Collector schema | `tools/token-generator/collector-schema.js` | `COLLECTOR_SCHEMA`, `buildDefaultCdArray()` |
+| `func_276` | `tools/scraper/token-generator/outer-pipeline.js` | `buildCdString()` |
+| `func_212` (sd part) | `tools/scraper/token-generator/outer-pipeline.js` | `buildSdString()` |
+| `func_212` (assembly) | `tools/scraper/token-generator/outer-pipeline.js` | `assembleToken()` |
+| `func_177` | `tools/scraper/token-generator/outer-pipeline.js` | `urlEncode()` |
+| `func_271` (cipher) | `tools/scraper/token-generator/crypto-core.js` | `encrypt()`, `cipherRound()` |
+| `func_136` | `tools/scraper/token-generator/crypto-core.js` | `convertBytesToWord()` |
+| `func_140` | `tools/scraper/token-generator/crypto-core.js` | `convertWordToBytes()` |
+| Full pipeline | `tools/scraper/token-generator/generate-token.js` | `generateToken()` |
+| Collector schema | `tools/scraper/token-generator/collector-schema.js` | `COLLECTOR_SCHEMA`, `buildDefaultCdArray()` |
 
 ---
 
@@ -568,23 +568,23 @@ Key `tdc.js` functions and their roles in the token pipeline:
 
 ```bash
 # Generate with default Chrome/Linux profile
-node tools/token-generator/cli.js
+node tools/scraper/token-generator/cli.js
 
 # Generate with a specific profile
-node tools/token-generator/cli.js --profile headless-chrome
+node tools/scraper/token-generator/cli.js --profile headless-chrome
 
 # Generate with custom session data
-node tools/token-generator/cli.js --appid 2090803262 --nonce 0.12345678 --token my_token
+node tools/scraper/token-generator/cli.js --appid 2090803262 --nonce 0.12345678 --token my_token
 
 # Generate with frozen timestamp (for reproducibility)
-node tools/token-generator/cli.js --timestamp 1700000000000
+node tools/scraper/token-generator/cli.js --timestamp 1700000000000
 ```
 
 ### Programmatic Usage
 
 ```javascript
-const { generateToken } = require('./tools/token-generator/generate-token.js');
-const { buildDefaultCdArray } = require('./tools/token-generator/collector-schema.js');
+const { generateToken } = require('./tools/scraper/token-generator/generate-token.js');
+const { buildDefaultCdArray } = require('./tools/scraper/token-generator/collector-schema.js');
 
 // 1. Build collector data (59 fields)
 const cdEntries = buildDefaultCdArray({
@@ -613,9 +613,9 @@ const token = generateToken(cdEntries, sdObject, Date.now());
 For maximum control, you can invoke each pipeline stage individually:
 
 ```javascript
-const { buildCdString, buildSdString, urlEncode } = require('./tools/token-generator/outer-pipeline.js');
-const { encryptSegments } = require('./tools/token-generator/crypto-core.js');
-const { buildInputChunks } = require('./tools/token-generator/generate-token.js');
+const { buildCdString, buildSdString, urlEncode } = require('./tools/scraper/token-generator/outer-pipeline.js');
+const { encryptSegments } = require('./tools/scraper/token-generator/crypto-core.js');
+const { buildInputChunks } = require('./tools/scraper/token-generator/generate-token.js');
 
 // Step 1: Serialize collector data
 const cdString = buildCdString(cdEntries);    // '{"cd":[1,"linux",2,800,...]}'
@@ -669,7 +669,7 @@ ikzSeGRGcRz8GZEj2qqQFT1xbszOO2%2FzvXSwkK5TXrAUpCuqF%2BNqWTQ%2BE%2FXVWK%2FM3yY6MP
 To reverse the encoding and inspect a token:
 
 ```javascript
-const { decryptSegments } = require('./tools/token-generator/crypto-core.js');
+const { decryptSegments } = require('./tools/scraper/token-generator/crypto-core.js');
 
 // 1. URL-decode
 let raw = token.replace(/%2B/g, '+').replace(/%2F/g, '/').replace(/%3D/g, '=');

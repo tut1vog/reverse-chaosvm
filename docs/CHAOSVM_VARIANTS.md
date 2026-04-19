@@ -36,7 +36,7 @@ Tencent's CAPTCHA stack ships a family of JavaScript bytecode virtual machines t
 | Crypto | Modified XTEA, `delta = 0x9E3779B9`, 32 rounds, per-template STATE_A keys; fully reverse-engineered and reimplemented byte-identically (`docs/CRYPTO_ANALYSIS.md`; `CLAUDE.md` / "Project Memory") | XTEA delta `0x9E3779B9` appears exactly **twice** in the bytecode (`docs/VM_SLIDE_ARCHITECTURE.md` / "Unresolved findings"). Whether this is an XTEA key schedule, a plain embedded constant literal, or something else is unresolved; Phase 40 task 40.6 will investigate |
 | Toolchain status | Fully decompiled · byte-identical standalone `collect` token generator · automated porting pipeline (parse → opcode-map → key-extract → verify) for all 5 known targets (`CLAUDE.md` / "Project Memory"; `docs/VERSION_DIFFERENCES.md`) | First-pass decoder + disassembler + opcode classifications from source; ~2% linear disassembly coverage (312 instructions decoded before halting on a dispatch-table hole); full-coverage walker pending Phase 40 task 40.1 (`docs/VM_SLIDE_ARCHITECTURE.md` / "Observed coverage and limitations") |
 | Observed in | The register-machine `tdc.js` builds observed to date — across known templates A / B / C (`CLAUDE.md` / "Project Memory") | The vm-slide build the research scripts were run against (`docs/VM_SLIDE_ARCHITECTURE.md` / "File layout") |
-| Carrier script | Served directly as `tdc.js` by Tencent's CDN; runs in the browser as the `TDC` global and exposes `TDC.getInfo()` / `TDC.setData()` / `TDC.clearTc()` / `TDC.getData()` (`docs/VM_ARCHITECTURE.md` / "TDC Public API") | Embedded inside the slide-CAPTCHA orchestrator `t_captcha_slide.js`; loaded by that script's control flow — owned by `research/captcha-orchestrator/README.md` |
+| Carrier script | Served directly as `tdc.js` by Tencent's CDN; runs in the browser as the `TDC` global and exposes `TDC.getInfo()` / `TDC.setData()` / `TDC.clearTc()` / `TDC.getData()` (`docs/VM_ARCHITECTURE.md` / "TDC Public API") | Embedded inside the slide-CAPTCHA orchestrator `t_captcha_slide.js`; loaded by that script's control flow — see `docs/CAPTCHA_ORCHESTRATOR.md` |
 
 ## What they share
 
@@ -47,7 +47,7 @@ Tencent's CAPTCHA stack ships a family of JavaScript bytecode virtual machines t
 ## When you'll encounter each variant
 
 - **Register VM (`tdc.js`).** Served directly by Tencent's CDN as the `tdc.js` endpoint. Runs in the browser and exposes the `TDC` global; its primary output is the `collect` token consumed by verify POST bodies (`docs/TOKEN_FORMAT.md`, `docs/VM_ARCHITECTURE.md` / "TDC Public API"). This is the variant the network flow analysis in `docs/HAR_ANALYSIS.md` traces end-to-end.
-- **Stack VM (`vm-slide`).** Not served directly — it is loaded by the slide-CAPTCHA orchestrator `t_captcha_slide.js` as `vm-slide.enc.js` and decodes to the vm-slide source that the research scripts were run against. Its role in the verify flow is not yet resolved: the orchestrator's control flow (how and when it instantiates the VM, what it reads back via `__TENCENT_CHAOS_STACK.g()`, and how that output feeds verify bodies, `eks`, or `vData`) is owned by a separate research track — see `research/captcha-orchestrator/README.md`. Use that track as the starting point when investigating where a stack-VM result actually lands in the CAPTCHA protocol.
+- **Stack VM (`vm-slide`).** Not served directly — it is loaded by the slide-CAPTCHA orchestrator `t_captcha_slide.js` as `vm-slide.enc.js` and decodes to the vm-slide source that the research scripts were run against. Its role in the verify flow is now resolved: see `docs/CAPTCHA_ORCHESTRATOR.md` for the orchestrator's control flow and how vm-slide installs the XHR proxy that injects `vData` on Chrome.
 
 ## Open cross-variant questions
 
@@ -73,4 +73,4 @@ Jump off to the authoritative doc for whichever slice of the family you need:
 - `docs/EKS_FORMAT.md` — `eks` token structure (current facts + open questions); relevant to the open cross-variant question of whether `vm-slide` touches `eks`.
 - `docs/TOKEN_DECRYPTION.md` — how to decrypt a captured register-VM `collect` token end-to-end.
 - `docs/HAR_ANALYSIS.md` — network-flow analysis of the CAPTCHA protocol (register VM traced end-to-end; stack VM's placement in the flow is still open).
-- `research/captcha-orchestrator/README.md` — research track owning the `t_captcha_slide.js` orchestrator bundle, the script that loads `vm-slide`; start here when investigating where stack-VM results land in the verify flow.
+- `docs/CAPTCHA_ORCHESTRATOR.md` — end-to-end orchestrator reference for the `t_captcha_slide.js` bundle, the script that loads `vm-slide`; start here when investigating where stack-VM results land in the verify flow.
