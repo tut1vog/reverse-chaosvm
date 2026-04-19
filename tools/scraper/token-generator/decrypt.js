@@ -154,7 +154,7 @@ function main() {
 
   // 3. Generate scraper token
   console.log('\n--- Generating scraper collect token ---');
-  const { generateCollect } = require('../scraper/collect-generator.js');
+  const { generateCollect } = require('../collect-generator.js');
   const profile = JSON.parse(
     fs.readFileSync(path.join(projectRoot, 'profiles', 'default.json'), 'utf8')
   );
