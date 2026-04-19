@@ -516,7 +516,7 @@ replicate fn 22317's behavior. The minimal recipe to produce a
    body.
 
 The known-correct replay oracle `build-fingerprint-plaintext.js`
-(`/home/ubuntu/github.com/tut1vog/reverse-chaosvm/research/vm-slide-stack-vm/build-fingerprint-plaintext.js`)
+(`./research/vm-slide-stack-vm/build-fingerprint-plaintext.js`)
 already encodes some of this; 44.5b's job is to make the schema-array
 construction + sort step explicit and parameterise it on either
 (seeded PRNG) or (fixed-permutation replay) — pick the latter for
