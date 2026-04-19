@@ -13,23 +13,7 @@ Report progress at each stage. If any stage fails, halt immediately and report d
 
 ---
 
-## Stage 1 — Decode Bytecode
-
-Run the decoder on the target file:
-
-```
-node research/tdc-register-vm/decoder.js $ARGUMENTS
-```
-
-Or use the decoder module directly in a script. The decoder (`research/tdc-register-vm/decoder.js`) works on ALL tdc.js builds unchanged — it handles the base64 -> varint/zigzag -> integer array transformation, which is invariant across all templates. This stage should always succeed if the file is a valid tdc.js build.
-
-Verify the output: the decoded integer array should contain tens of thousands of integers. Report the array length.
-
-Output: decoded integer array saved to `output/<target-stem>/decoded.json`.
-
----
-
-## Stage 2 — Auto-Map Opcodes
+## Stage 1 — Auto-Map Opcodes
 
 Dispatch the `opcode-mapper` agent to analyze the VM dispatch loop and produce an opcode table:
 
@@ -55,7 +39,7 @@ Report: total opcode count, how many mapped cleanly, how many flagged as ambiguo
 
 ---
 
-## Stage 3 — Extract XTEA Key
+## Stage 2 — Extract XTEA Key
 
 Dispatch the `key-extractor` agent to dynamically trace the cipher and extract crypto parameters:
 
@@ -67,7 +51,7 @@ Output location: output/<target-stem>/
 
 The agent will:
 1. Set up a Puppeteer-based tracing environment
-2. Instrument the VM dispatch loop using the opcode table from Stage 2
+2. Instrument the VM dispatch loop using the opcode table from Stage 1
 3. Trigger token generation (`TDC.getData()`) to invoke the cipher
 4. Capture register values during cipher round execution
 5. Extract: STATE_A (4 x uint32 key), delta, round count, key modification constants
@@ -79,7 +63,7 @@ Report: extracted key (hex), delta value, round count, key modification constant
 
 ---
 
-## Stage 4 — Verify Token
+## Stage 3 — Verify Token
 
 Dispatch the `token-verifier` agent to capture a live token and byte-compare against standalone generation:
 
@@ -103,7 +87,7 @@ Report: overall match (yes/no), per-segment match status, and diagnostics for an
 
 ---
 
-## Stage 5 — Report
+## Stage 4 — Report
 
 Summarize the full porting result:
 
