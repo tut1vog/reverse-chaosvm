@@ -44,8 +44,8 @@ const FROZEN_PERF_NOW = 100.5;
 // Standalone token generator (imported)
 // ═══════════════════════════════════════════════════════════════════════
 
-const { generateTokenFromStrings, buildInputChunks } = require('../token-generator/generate-token.js');
-const { encryptSegments, decryptSegments } = require('../token-generator/crypto-core.js');
+const { generateTokenFromStrings, buildInputChunks } = require('../scraper/token-generator/generate-token.js');
+const { encryptSegments, decryptSegments } = require('../scraper/token-generator/crypto-core.js');
 
 // ═══════════════════════════════════════════════════════════════════════
 // Deterministic Instrumentation (injected into browser)

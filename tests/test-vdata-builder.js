@@ -19,8 +19,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { buildVData } = require('../tools/vdata-generator/replay.js');
-const { buildVDataFromObj } = require('../tools/vdata-generator/build-from-obj.js');
+const { buildVData } = require('../tools/scraper/vdata-generator/replay.js');
+const { buildVDataFromObj } = require('../tools/scraper/vdata-generator/build-from-obj.js');
 
 // ---- Constants from docs/VDATA_FORMAT.md / README.md ----------------------
 

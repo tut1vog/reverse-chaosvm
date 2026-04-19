@@ -19,7 +19,7 @@ const {
   buildDefaultCdArray,
   encrypt,
 } = require('../tools/scraper/collect-generator.js');
-const { urlEncode } = require('../tools/token-generator/outer-pipeline.js');
+const { urlEncode } = require('../tools/scraper/token-generator/outer-pipeline.js');
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 

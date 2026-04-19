@@ -14,7 +14,7 @@ const assert = require('node:assert');
 const {
   buildInputChunks,
   HEADER_SIZE,
-} = require('../tools/token-generator/generate-token');
+} = require('../tools/scraper/token-generator/generate-token');
 
 // ---------------------------------------------------------------------------
 // Helpers

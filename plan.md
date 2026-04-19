@@ -2,21 +2,21 @@
 
 ## Status
 Current phase: Phase 66 — Simplification Pass
-Current task: 66.3 — Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`
+Current task: 66.4 — Investigate `tools/puppeteer/live-submit.js`; report recommendation and pause for user
 
 ---
 
 ## Phases
 
 ### Phase 66: Simplification Pass
-> Shrink the project surface area to (1) pure-Node scraper, (2) Puppeteer scraper (renamed from `captcha-solver`), (3) porting pipeline, (4) docs. Inline `tools/token-generator/` and `tools/vdata-generator/` into `tools/scraper/`. Delete three obsolete research tracks, `.claude/skills/port-opcodes.md`, `.claude/rules/research-artifacts.md`, and two dead tests. Decide on `tools/captcha-solver/live-submit.js`. Commit at the logical checkpoints recommended by the brief (after each structural task), then batch prose/doc citation cleanup into one dedicated sweep at the end.
+> Shrink the project surface area to (1) pure-Node scraper, (2) Puppeteer scraper (renamed from `captcha-solver`), (3) porting pipeline, (4) docs. Inline `tools/token-generator/` and `tools/vdata-generator/` into `tools/scraper/`. Delete three obsolete research tracks, `.claude/skills/port-opcodes.md`, `.claude/rules/research-artifacts.md`, and two dead tests. Decide on `tools/puppeteer/live-submit.js`. Commit at the logical checkpoints recommended by the brief (after each structural task), then batch prose/doc citation cleanup into one dedicated sweep at the end.
 
 | ID | Task | Status |
 |----|------|--------|
 | 66.1 | Deletions + port-version.md Stage 1 reconciliation | done |
 | 66.2 | Rename `tools/captcha-solver/` → `tools/puppeteer/` + code-level path sweep | done |
-| 66.3 | Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`; land CLAUDE.md/README.md updates | in-progress |
-| 66.4 | Investigate `tools/puppeteer/live-submit.js`; report recommendation and pause for user | pending |
+| 66.3 | Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`; land CLAUDE.md/README.md updates | done |
+| 66.4 | Investigate `tools/puppeteer/live-submit.js`; report recommendation and pause for user | in-progress |
 | 66.5 | Act on live-submit decision (shape defined after 66.4) | pending |
 | 66.6 | Doc-citation sweep — update prose/comments/JSON metadata that cites deleted or renamed paths | pending |
 | 66.7 | Final verification sweep + close phase (delete plan.md, project-brief.md) | pending |
@@ -25,10 +25,39 @@ Current task: 66.3 — Inline `tools/token-generator/` + `tools/vdata-generator/
 
 ## Current Task
 
-**ID**: 66.3
-**Title**: Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`
+**ID**: 66.4
+**Title**: Investigate `tools/puppeteer/live-submit.js`; report recommendation and pause for user
 **Phase**: Phase 66 — Simplification Pass
 **Status**: in-progress
+
+### Goal
+Read both `tools/puppeteer/captcha-solver.js` (the one wired up by `tools/puppeteer/cli.js`) and `tools/puppeteer/live-submit.js` (a separate 1500-line Puppeteer driver not invoked by any quick-start path). Produce a concise comparison — what each does, where they overlap, what `live-submit.js` uniquely offers that `captcha-solver.js` does not — then return a recommendation (keep / merge / delete) with reasoning. Do not modify any files. Director relays to user, who decides 66.5.
+
+### Context
+- `tools/puppeteer/cli.js:18` imports `./captcha-solver` (i.e. `captcha-solver.js`), which is the canonical Puppeteer driver used by `npm run solve:puppeteer` and by the porting-pipeline structure-extractor.
+- `tools/puppeteer/live-submit.js` (~1504 lines per `wc -l`) has its own `main()` entry and a header docstring that says "ALWAYS extracts XTEA params via pipeline (never cache-only), decrypts Chrome's collect to detect cdFieldOrder/headerSplit/serializationDiffs, generates a fully STANDALONE collect token (not cdArrayOverride), submits via Chrome fetch() for proper TLS fingerprint". Not referenced by `cli.js`, `scraper.js`, `porting-pipeline/run.js`, `comparison-harness.js`, or any test.
+- The brief's "Open Consolidation Note" asks specifically: "summarize what `live-submit.js` does that `captcha-solver.js` does not, and report back to the user with a recommendation (keep / merge / delete) before acting."
+- Its internal requires were updated in 66.3 so the file currently works (imports resolve). That says nothing about whether it's valuable.
+- Historical context: the header docstring's phrasing ("Phase 22-24 fixes", "chrome-cd-inject.js") suggests `live-submit.js` was an investigation harness from an earlier phase. The reference file `chrome-cd-inject.js` doesn't exist in the current repo — the comment is stale. Whether the harness still has a reason to exist is the question.
+
+### Implementation Steps
+1. Read `tools/puppeteer/captcha-solver.js` end-to-end. Note: entry-point signature, flow stages (launch → navigate → intercept images → solve → drag → capture ticket → return), what data it returns, any modes/flags it supports.
+2. Read `tools/puppeteer/live-submit.js` end-to-end. Note: entry-point signature, flow stages, what it does with the `collect` token (decrypt? modify? inject?), how it obtains XTEA params (pipeline extraction? cache?), how it submits (Chrome fetch? direct HTTP?), what artifacts it writes, what command-line flags it accepts.
+3. For each distinct capability in `live-submit.js`, decide: is this already covered by `captcha-solver.js` (redundant), a separate investigation tool useful enough to keep (retain), or something whose value should be rolled into `captcha-solver.js` (merge)?
+4. Write a ≤ 300-word comparison report covering:
+   - One-sentence description of each file's role.
+   - 3-6 bulleted capabilities unique to `live-submit.js` that `captcha-solver.js` lacks.
+   - 2-4 bulleted capabilities in `captcha-solver.js` that `live-submit.js` lacks or handles differently.
+   - Whether `live-submit.js` has any consumer (already confirmed: no, but re-verify).
+   - A single recommendation with one-paragraph reasoning: **keep** (separate path remains valuable), **merge** (fold X into Y), or **delete** (functionality is dead or duplicated).
+
+### Verification
+- [ ] Report delivered to the director in the specified format.
+- [ ] No file changes — `git diff --stat HEAD` shows zero lines changed by this task.
+- [ ] Re-verified "no consumer" claim by running `grep -rn "live-submit" --include='*.js' --include='*.md' --exclude-dir=output --exclude-dir=node_modules .` and confirming the only hits are inside the file itself, `plan.md`, and `project-brief.md`.
+
+### Suggested Agent
+`general-purpose` — read-only investigation and synthesis. No code authored.
 
 ### Goal
 Move `tools/token-generator/` → `tools/scraper/token-generator/` and `tools/vdata-generator/` → `tools/scraper/vdata-generator/` via `git mv` so both records as renames. Update every code-level `require()` that crosses the moved boundary, update two `package.json` script paths, update one internal cross-import inside the moved token-generator tree, and stage the already-modified `CLAUDE.md` and `README.md` — which were pre-written to describe this post-inline state and become accurate only once this task lands. `npm test` must stay green.

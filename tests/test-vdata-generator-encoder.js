@@ -21,7 +21,7 @@ const {
   xteaEncryptLE,
   xteaDecryptLE,
   keyFromHex,
-} = require('../tools/vdata-generator/xtea.js');
+} = require('../tools/scraper/vdata-generator/xtea.js');
 
 const {
   OUTPUT_ALPHABET: B64_ALPHABET,
@@ -29,7 +29,7 @@ const {
   PADDING_CHAR,
   customBase64Encode,
   customBase64Decode,
-} = require('../tools/vdata-generator/custom-base64.js');
+} = require('../tools/scraper/vdata-generator/custom-base64.js');
 
 const {
   XTEA_KEY_HEX,
@@ -39,7 +39,7 @@ const {
   EXPECTED_VDATA_LENGTH,
   encodeVData,
   encryptOnly,
-} = require('../tools/vdata-generator/encode.js');
+} = require('../tools/scraper/vdata-generator/encode.js');
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 const JSDOM_FIXTURE = JSON.parse(

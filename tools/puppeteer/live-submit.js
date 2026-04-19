@@ -29,7 +29,7 @@ puppeteer.use(StealthPlugin());
 const { CaptchaClient } = require('./captcha-client');
 const { solveSlider } = require('./slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd, buildDefaultCdArray, buildSerializationOverrides } = require('../scraper/collect-generator');
-const { buildSdString, buildCdString } = require('../token-generator/outer-pipeline');
+const { buildSdString, buildCdString } = require('../scraper/token-generator/outer-pipeline');
 const { extractTdcName, extractEks } = require('../scraper/tdc-utils');
 const { parseVmFunction } = require('../porting-pipeline/vm-parser');
 const { mapOpcodes } = require('../porting-pipeline/opcode-mapper');

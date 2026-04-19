@@ -14,10 +14,10 @@ const assert = require('node:assert/strict');
 const {
   lookupFormField,
   computeKeyField,
-} = require('../tools/vdata-generator/build-key-field.js');
+} = require('../tools/scraper/vdata-generator/build-key-field.js');
 const {
   buildVDataForPost,
-} = require('../tools/vdata-generator/for-post.js');
+} = require('../tools/scraper/vdata-generator/for-post.js');
 
 // Phase 43 constants — the 65-char custom base64 alphabet; index 64 ('Y') is
 // the padding char. See docs/VDATA_FORMAT.md §3 and tests/test-vdata-builder.js.
