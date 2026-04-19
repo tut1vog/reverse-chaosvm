@@ -11,7 +11,7 @@
 - **Variables**: `const` by default, `let` when reassignment is needed. Never `var`.
 - **Naming**: camelCase for variables and functions, PascalCase for classes, SCREAMING_SNAKE for module-level constants.
 - **Dependencies**: minimize external packages — prefer Node.js built-ins (`crypto`, `fs`, `path`, `http`, `zlib`, `util`, etc.). Adding a new npm dependency requires explicit user confirmation.
-- **Language**: Node.js for all JavaScript. Python is only used for `tools/captcha-solver/slide-solver.py` (OpenCV).
+- **Language**: Node.js for all JavaScript. Python is only used for `tools/puppeteer/slide-solver.py` (OpenCV).
 - **File headers**: every new source file starts with a block comment stating its responsibility in one or two sentences.
 
 ## Examples

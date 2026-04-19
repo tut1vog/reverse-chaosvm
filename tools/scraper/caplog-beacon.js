@@ -18,7 +18,7 @@
  * are not yet reversed. TODO: pin them in a later reversal pass.
  */
 
-const { httpRequest } = require('../captcha-solver/captcha-client');
+const { httpRequest } = require('../puppeteer/captcha-client');
 
 const CAPLOG_HOST = 't.captcha.qq.com';
 const CAPLOG_URL_BASE = 'https://' + CAPLOG_HOST + '/caplog';

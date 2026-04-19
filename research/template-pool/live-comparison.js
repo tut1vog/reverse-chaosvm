@@ -21,7 +21,7 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 
-const { CaptchaClient } = require('../../tools/captcha-solver/captcha-client');
+const { CaptchaClient } = require('../../tools/puppeteer/captcha-client');
 const { generateCollect } = require('../../tools/scraper/collect-generator');
 const { extractTdcName, extractEks } = require('../../tools/scraper/tdc-utils');
 const TemplateCache = require('../../tools/scraper/template-cache');

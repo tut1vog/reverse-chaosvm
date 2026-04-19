@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 66 — Simplification Pass
-Current task: 66.2 — Rename `tools/captcha-solver/` → `tools/puppeteer/` + code-level path sweep
+Current task: 66.3 — Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`
 
 ---
 
@@ -14,8 +14,8 @@ Current task: 66.2 — Rename `tools/captcha-solver/` → `tools/puppeteer/` + c
 | ID | Task | Status |
 |----|------|--------|
 | 66.1 | Deletions + port-version.md Stage 1 reconciliation | done |
-| 66.2 | Rename `tools/captcha-solver/` → `tools/puppeteer/` + code-level path sweep | in-progress |
-| 66.3 | Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`; land CLAUDE.md/README.md updates | pending |
+| 66.2 | Rename `tools/captcha-solver/` → `tools/puppeteer/` + code-level path sweep | done |
+| 66.3 | Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`; land CLAUDE.md/README.md updates | in-progress |
 | 66.4 | Investigate `tools/puppeteer/live-submit.js`; report recommendation and pause for user | pending |
 | 66.5 | Act on live-submit decision (shape defined after 66.4) | pending |
 | 66.6 | Doc-citation sweep — update prose/comments/JSON metadata that cites deleted or renamed paths | pending |
@@ -25,65 +25,92 @@ Current task: 66.2 — Rename `tools/captcha-solver/` → `tools/puppeteer/` + c
 
 ## Current Task
 
-**ID**: 66.2
-**Title**: Rename `tools/captcha-solver/` → `tools/puppeteer/` + code-level path sweep
+**ID**: 66.3
+**Title**: Inline `tools/token-generator/` + `tools/vdata-generator/` under `tools/scraper/`
 **Phase**: Phase 66 — Simplification Pass
 **Status**: in-progress
 
 ### Goal
-Rename `tools/captcha-solver/` to `tools/puppeteer/` via `git mv` (so it records as a rename, not delete+add), update every `require(...)` that points into the renamed directory, update the `solve:puppeteer` script in `package.json`, and update the one already-known stale path in `.claude/rules/coding-style.md` (line 14: `tools/captcha-solver/slide-solver.py`). File basenames inside the directory are unchanged — only the directory name moves.
+Move `tools/token-generator/` → `tools/scraper/token-generator/` and `tools/vdata-generator/` → `tools/scraper/vdata-generator/` via `git mv` so both records as renames. Update every code-level `require()` that crosses the moved boundary, update two `package.json` script paths, update one internal cross-import inside the moved token-generator tree, and stage the already-modified `CLAUDE.md` and `README.md` — which were pre-written to describe this post-inline state and become accurate only once this task lands. `npm test` must stay green.
 
 ### Context
-Fresh greps performed against the current (post-66.1) working tree; these are the exact importers that must be updated:
+Fresh greps performed against the current (post-66.2) working tree; these are the exact `require()` sites that must be updated:
 
-**Code-level `require()` references** (from `tools/`, `tests/`, `research/`):
-- `tools/scraper/scraper.js:21` — `require('../captcha-solver/captcha-client')`
-- `tools/scraper/scraper.js:23` — `require('../captcha-solver/slide-solver')`
-- `tools/scraper/caplog-beacon.js:21` — `require('../captcha-solver/captcha-client')`
-- `tools/porting-pipeline/structure-extractor.js:25` — `require('../captcha-solver/captcha-client')`
-- `research/template-pool/live-comparison.js:24` — `require('../../tools/captcha-solver/captcha-client')`
-- `tests/test-slide-solver.js:24` — `require('../tools/captcha-solver/slide-solver.js')` (not currently in `npm test`, but still must be updated so the file is not left broken)
-- `tests/test-slide-solver-real.js:11` — `require('../tools/captcha-solver/slide-solver.js')` (not in `npm test`, same reason)
+**From `tools/scraper/` (siblings become children — `../` collapses to `./`):**
+- `tools/scraper/collect-generator.js:19` — `require('../token-generator/collector-schema.js')` → `require('./token-generator/collector-schema.js')`
+- `tools/scraper/collect-generator.js:25` — `require('../token-generator/outer-pipeline.js')` → `require('./token-generator/outer-pipeline.js')`
+- `tools/scraper/collect-generator.js:26` — `require('../token-generator/generate-token.js')` → `require('./token-generator/generate-token.js')`
+- `tools/scraper/scraper.js:25` — `require('../vdata-generator/for-post')` → `require('./vdata-generator/for-post')`
 
-**Internal requires that need NO change** (sibling-relative, move together with the directory):
-- `tools/captcha-solver/cli.js:18` — `require('./captcha-solver')` — stays unchanged after the move.
-- `tools/captcha-solver/live-submit.js` — internal requires of `../token-generator/...` stay unchanged in this task (token-generator is not moved until 66.3; this file's fate will be decided in 66.4).
+**From `tools/puppeteer/` (cross-sibling now goes via scraper):**
+- `tools/puppeteer/live-submit.js:32` — `require('../token-generator/outer-pipeline')` → `require('../scraper/token-generator/outer-pipeline')`
+
+**From `tools/porting-pipeline/` (cross-sibling now goes via scraper):**
+- `tools/porting-pipeline/token-verifier.js:18` — `require('../token-generator/generate-token.js')` → `require('../scraper/token-generator/generate-token.js')`
+- `tools/porting-pipeline/token-verifier.js:19` — `require('../token-generator/outer-pipeline.js')` → `require('../scraper/token-generator/outer-pipeline.js')`
+- `tools/porting-pipeline/structure-extractor.js:26` — `require('../token-generator/outer-pipeline')` → `require('../scraper/token-generator/outer-pipeline')`
+- `tools/porting-pipeline/structure-extractor.js:27` — `require('../token-generator/collector-schema')` → `require('../scraper/token-generator/collector-schema')`
+
+**From `tools/dynamic-tracers/` (brief missed this; verified via grep):**
+- `tools/dynamic-tracers/comparison-harness.js:47` — `require('../token-generator/generate-token.js')` → `require('../scraper/token-generator/generate-token.js')`
+- `tools/dynamic-tracers/comparison-harness.js:48` — `require('../token-generator/crypto-core.js')` → `require('../scraper/token-generator/crypto-core.js')`
+
+**From `tests/` (add an extra `scraper/` segment to the relative path):**
+- `tests/test-outer-pipeline.js:17` — `require('../tools/token-generator/generate-token')` → `require('../tools/scraper/token-generator/generate-token')` [in `npm test`]
+- `tests/test-chrome-profile-collect.js:22` — `require('../tools/token-generator/outer-pipeline.js')` → `require('../tools/scraper/token-generator/outer-pipeline.js')` [not in `npm test` but update anyway]
+- `tests/test-vdata-generator-encoder.js:24,32,42` — `../tools/vdata-generator/{xtea.js,custom-base64.js,encode.js}` → `../tools/scraper/vdata-generator/{xtea.js,custom-base64.js,encode.js}` [in `npm test`]
+- `tests/test-vdata-builder.js:22,23` — `../tools/vdata-generator/{replay.js,build-from-obj.js}` → `../tools/scraper/vdata-generator/{replay.js,build-from-obj.js}` [in `npm test`]
+- `tests/test-vdata-for-post.js:17,20` — `../tools/vdata-generator/{build-key-field.js,for-post.js}` → `../tools/scraper/vdata-generator/{build-key-field.js,for-post.js}` [in `npm test`]
+
+**Internal cross-import inside the moved tree** (brief flagged; verified):
+- `tools/token-generator/decrypt.js:157` currently reads `const { generateCollect } = require('../scraper/collect-generator.js');`. After `git mv`, the file is at `tools/scraper/token-generator/decrypt.js` and `collect-generator.js` is a parent-sibling, so the require becomes `require('../collect-generator.js')`. Update.
+
+**Sibling-relative internal requires inside each moved directory** (`./xxx.js` patterns between files in the same directory):
+- Stay unchanged — they move together with their containing directory.
 
 **`package.json`** — one script path to update:
-- `"solve:puppeteer": "node tools/captcha-solver/cli.js"` → `"node tools/puppeteer/cli.js"`
+- `"token:standalone": "node tools/token-generator/cli.js"` → `"node tools/scraper/token-generator/cli.js"`
 
-**`.claude/rules/coding-style.md`** — line 14 currently reads:
-- `- **Language**: Node.js for all JavaScript. Python is only used for `tools/captcha-solver/slide-solver.py` (OpenCV).`
-This is an executable-relevant path embedded in the rule body (`slide-solver.py` is a real file that is being renamed along with its directory), not a prose citation. Update to `tools/puppeteer/slide-solver.py`. This is the only `.claude/` file that needs a 66.2 edit — `.claude/commands/scrape.md` references only `tools/scraper/cli.js` (unchanged), and `.claude/commands/port-version.md` does not reference `captcha-solver`.
+**`research/template-pool/live-comparison.js`** — NO change for this task. Fresh grep confirms it does not import from `tools/token-generator/` or `tools/vdata-generator/`; its only `tools/*` imports are scraper, puppeteer, and porting-pipeline — all paths unaffected by this move.
+
+**CLAUDE.md and README.md (already unstaged-modified before the phase started)** — both docs describe the post-inline state (`tools/scraper/token-generator/`, `tools/scraper/vdata-generator/`) and are currently inaccurate because the code hasn't caught up yet. After this task lands, the docs will match reality. **Stage them as part of this task's commit.**
 
 **Do NOT update in this task** (deferred to 66.6 doc-citation sweep):
-- Any prose/comment/docstring citation of `tools/captcha-solver/` in `docs/*.md`, `tests/*.md`, file-header comments, or JSON metadata. 66.6 will batch these with the `research/*` citation cleanup from 66.1.
+- Any prose/comment citation of `tools/token-generator/` or `tools/vdata-generator/` in `docs/*.md`, file-header comments (the moved dirs each have ~10 files with comment headers that may cite paths), `tools/scraper/token-generator/README.md` or `tools/scraper/vdata-generator/README.md` if they exist. 66.6 will batch these with the earlier-deferred cleanup.
 
-**Do NOT touch** `CLAUDE.md` or `README.md` — those already describe the post-cleanup state with `tools/puppeteer/` as the correct path, and will land staged in 66.3. Don't touch `tests/fixtures/`, `tests/asset/`, `profiles/`, or `.claude/settings.local.json`.
+**Do NOT touch** `tests/fixtures/`, `tests/asset/`, `profiles/`, `.claude/settings*.json`, `plan.md`, `project-brief.md`, `results.json`, or anything under `output/`.
 
 ### Implementation Steps
-1. `git mv tools/captcha-solver tools/puppeteer` from the repo root. Verify with `git status --short` that the rename is recorded as `R  tools/captcha-solver/X -> tools/puppeteer/X` for every file.
-2. Update `require()` paths in each of the seven importers listed in the Context section. All updates are a literal substring replacement of `captcha-solver` → `puppeteer` inside the `require(...)` string. Do not touch anything else in these files.
-3. Update `package.json`: change `"solve:puppeteer": "node tools/captcha-solver/cli.js"` → `"node tools/puppeteer/cli.js"`. No other edits to the file.
-4. Update `.claude/rules/coding-style.md:14`: replace `tools/captcha-solver/slide-solver.py` → `tools/puppeteer/slide-solver.py`. No other edits.
-5. Run the code-level-importer sweep (this must return zero hits):
+1. `git mv tools/token-generator tools/scraper/token-generator`.
+2. `git mv tools/vdata-generator tools/scraper/vdata-generator`.
+3. Verify both moves with `git status --short` — expect `R  tools/token-generator/X -> tools/scraper/token-generator/X` and `R  tools/vdata-generator/X -> tools/scraper/vdata-generator/X` for every file in each directory.
+4. Update the fifteen code-level `require()` call sites listed in the Context section (4 from scraper, 1 from puppeteer, 4 from porting-pipeline, 2 from dynamic-tracers, 1 + 1 + 3 + 2 + 2 = 9 from tests, minus overlap gives the 15 call sites). Each edit is a narrow substring replacement in the `require(...)` string. Do not modify anything else in these files.
+5. Update the internal cross-import in `tools/scraper/token-generator/decrypt.js:157` — `require('../scraper/collect-generator.js')` → `require('../collect-generator.js')`.
+6. Update `package.json`: `"token:standalone"` script — `tools/token-generator/cli.js` → `tools/scraper/token-generator/cli.js`. No other edits.
+7. Stage `CLAUDE.md` and `README.md` for inclusion in this commit (`git add CLAUDE.md README.md`). Do NOT modify their contents — they were pre-written by the user and describe the post-66.3 reality. Just include them in the staging area so they land with this task.
+8. Run the code-level-importer sweep — all four must return zero hits:
    ```
-   grep -rn -e "require([^)]*captcha-solver" --include='*.js' .
-   grep -rn -e "tools/captcha-solver" --include='*.json' .
+   grep -rn -E "require\(['\"]\.\./token-generator" --include='*.js' .
+   grep -rn -E "require\(['\"]\.\./vdata-generator" --include='*.js' .
+   grep -rn -E "require\(['\"]\.\./\.\./tools/token-generator" --include='*.js' .
+   grep -rn -E "require\(['\"]\.\./\.\./tools/vdata-generator" --include='*.js' .
    ```
-   The `.js` grep catches any missed `require()`. The `.json` grep catches any missed script path in `package.json` or fixtures.
-6. Run `npm test` — must be 8/8 green (same 8 files as the post-66.1 baseline).
-7. Run `node tools/puppeteer/cli.js --help` — must exit 0 and print usage referring to the new path.
+   Plus one more to catch any `package.json` leftovers:
+   ```
+   grep -rn "tools/token-generator\|tools/vdata-generator" --include='*.json' .
+   ```
+9. Run `npm test` — must be 8/8 green (same baseline as post-66.2).
+10. Run `node tools/scraper/token-generator/cli.js --help` — must exit 0.
+11. Run `node tools/scraper/vdata-generator/cli.js --help` — must exit 0.
 
 ### Verification
-- [ ] `git status --short` shows `tools/captcha-solver/*` → `tools/puppeteer/*` recorded as `R  ` renames (not delete+add pairs) for every file in the directory, plus `M .claude/rules/coding-style.md`, `M package.json`, and `M` entries for the seven importer files listed above.
-- [ ] `grep -rn -e "require([^)]*captcha-solver" --include='*.js' .` returns zero hits.
-- [ ] `grep -rn "tools/captcha-solver" --include='*.json' .` returns zero hits.
-- [ ] `grep -n "solve:puppeteer" package.json` shows the new path `tools/puppeteer/cli.js`.
-- [ ] `grep -n "slide-solver.py" .claude/rules/coding-style.md` shows the new path `tools/puppeteer/slide-solver.py`.
-- [ ] `npm test` passes — 8 test files, same baseline as post-66.1.
-- [ ] `node tools/puppeteer/cli.js --help` exits 0.
-- [ ] Residual prose/comment citations of `tools/captcha-solver/` in `docs/*.md` and elsewhere are **expected to exist after this task** — they will be cleaned up in 66.6. Do not fail verification on those.
+- [ ] `git status --short` shows every file in the former `tools/token-generator/` recorded as `R  tools/token-generator/X -> tools/scraper/token-generator/X`, ditto for `vdata-generator`. No delete+add pairs.
+- [ ] Modified entries include all fifteen importer files plus `tools/scraper/token-generator/decrypt.js`, `package.json`, `CLAUDE.md`, `README.md`. No unexpected modifications.
+- [ ] All five post-edit grep sweeps from step 8 return zero hits.
+- [ ] `grep -n "token:standalone" package.json` shows `tools/scraper/token-generator/cli.js`.
+- [ ] `npm test` passes — 8 test files, same baseline as post-66.2.
+- [ ] `node tools/scraper/token-generator/cli.js --help` and `node tools/scraper/vdata-generator/cli.js --help` both exit 0.
+- [ ] Residual prose/comment citations of `tools/token-generator/` or `tools/vdata-generator/` in docs, file-header comments, and README files under the moved dirs are **expected to exist after this task** — they will be cleaned up in 66.6. Do not fail verification on those.
 
 ### Suggested Agent
-`general-purpose` — mechanical rename + require-string sweep with one ancillary config update; no specialized agent fits better.
+`general-purpose` — mechanical `git mv` + require-path sweep with one narrowly-scoped cross-import fix and one config update. No specialized agent fits better.

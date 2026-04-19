@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { solveSlider } = require('../tools/captcha-solver/slide-solver.js');
+const { solveSlider } = require('../tools/puppeteer/slide-solver.js');
 
 let passed = 0, failed = 0, total = 0;
 

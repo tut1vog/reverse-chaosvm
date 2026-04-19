@@ -18,9 +18,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const { CaptchaClient, httpRequest, parseJSONP } = require('../captcha-solver/captcha-client');
+const { CaptchaClient, httpRequest, parseJSONP } = require('../puppeteer/captcha-client');
 const { AuditLogger } = require('./audit-logger');
-const { solveSlider } = require('../captcha-solver/slide-solver');
+const { solveSlider } = require('../puppeteer/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd, reorderCdArray } = require('./collect-generator');
 const { buildVDataForPost } = require('../vdata-generator/for-post');
 const { extractTdcName, extractEks, computeSourceHash } = require('./tdc-utils');
