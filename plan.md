@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 65 — Legacy code cleanup
-Current task: 65.1 — Delete dead `_getSigLegacy()` method from captcha-client.js
+Current task: 65.2 — Relocate `vdata-harness.js` out of `tools/scraper/`
 
 ---
 
@@ -13,7 +13,7 @@ Current task: 65.1 — Delete dead `_getSigLegacy()` method from captcha-client.
 
 | ID | Task | Status |
 |----|------|--------|
-| 65.1 | Delete dead `_getSigLegacy()` method from `tools/captcha-solver/captcha-client.js` | pending |
+| 65.1 | Delete dead `_getSigLegacy()` method from `tools/captcha-solver/captcha-client.js` | done |
 | 65.2 | Relocate `tools/scraper/vdata-harness.js` → `research/vm-slide-stack-vm/vdata-harness.js`; update 2 research-script importers, 4 research doc references, and the CLAUDE.md/README.md/scraper.js header carve-outs | pending |
 | 65.3 | Delete four orphan tracers in `tools/dynamic-tracers/`: `harness.js`, `encoding-tracer.js`, `instrument.js`, `payload-tracer.js` | pending |
 | 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (broken — references non-existent `src/bot/` and `browser-mock.js`; re-harvest capability not preserved) | pending |
@@ -24,55 +24,56 @@ Current task: 65.1 — Delete dead `_getSigLegacy()` method from captcha-client.
 
 ## Current Task
 
-**ID**: 65.1
-**Title**: Delete dead `_getSigLegacy()` method from captcha-client.js
+**ID**: 65.2
+**Title**: Relocate `vdata-harness.js` out of `tools/scraper/`
 **Phase**: Phase 65 — Legacy code cleanup
-**Status**: in-progress
+**Status**: pending (awaiting dispatch)
 
 ### Goal
-Remove a dead captcha endpoint method that has zero callers and whose target endpoint (`/cap_union_new_getsig`) returns 404 as of 2026 per the file's own comment. Smallest, lowest-risk task — serves as Phase 65 warmup.
+Move `tools/scraper/vdata-harness.js` to its real conceptual home — the vm-slide stack VM research track — so the `tools/scraper/` tree cleanly reflects what the live Node-only scraper actually uses. After this task, jsdom/canvas are pure research-track dependencies and the scraper headers stop carrying the "retained for research" carve-out.
 
 ### Context
-- File: `tools/captcha-solver/captcha-client.js`.
-- Method `_getSigLegacy()` span (verified by Read): **doc comment starts at line 453, method closes at line 557**. Delete lines 453–557 inclusive. The blank line at 558 stays and becomes the separator between `getSig()` (ends at 451) and `_getShowConfig()` (starts at 559).
-- `grep '_getSigLegacy|getSigLegacy'` across the whole repo returns exactly one hit: the definition itself. Zero callers.
-- **Narrative comments at lines 442–444 and 562–564 refer to "the legacy endpoint" (i.e., the `/cap_union_new_getsig` URL), NOT to the method `_getSigLegacy`. They remain factually correct after the method is gone. Leave them alone.**
-- The live code path is `getSig()` (line 449) → `_getShowConfig()` (line 451). `_getShowConfig()` begins at line 559.
+- The file is **not** imported by the live scraper. Only two research scripts depend on it:
+  - `research/template-pool/survey.js:22` — `require('../../tools/scraper/vdata-harness')`
+  - `research/template-pool/diagnose.js:24` — `require('../../tools/scraper/vdata-harness')`
+- New path: `research/vm-slide-stack-vm/vdata-harness.js` (the harness executes `vm-slide.enc.js` inside jsdom — conceptually it's a white-box trace tool for the vm-slide stack VM).
+- **Doc references** (paths only; text around them stays accurate):
+  - `research/vm-slide-stack-vm/VDATA-PIPELINE.md:80`
+  - `research/vm-slide-stack-vm/vdata-dynamic-trace.js:8` (source comment, not an import)
+  - `research/vm-slide-stack-vm/BUILD-RECONCILE.md:96, 140`
+  - `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md:4`
+- **Carve-outs to remove** (these are currently-uncommitted edits in the working tree — this task is the commit point):
+  - `CLAUDE.md:8` — "…`jsdom` ^29 + `canvas` ^3 (research scripts and the legacy `tools/scraper/vdata-harness.js` only — the live scraper synthesizes vData without a DOM)." → simplify to something like "…`jsdom` ^29 + `canvas` ^3 (research scripts only — the live scraper runs entirely in Node with no DOM)."
+  - `README.md:23` — same edit in parallel wording (the text is near-identical).
+  - `tools/scraper/scraper.js:10` — header line referencing "jsdom-based tools/scraper/vdata-harness.js is retained only for research" — delete that clause; the header can simply state the scraper runs entirely in Node with no DOM.
+- **Naming touch-up**: `tools/scraper/scraper.js:570` has a code comment `// Legacy synthetic mode: build cd from profiles/default.json`. The `--no-chrome-profile` path is a supported fallback, not deprecated legacy. Rename to `// Synthetic fallback mode: build cd from profiles/default.json`.
+- **Before editing, re-read `tools/scraper/vdata-harness.js` in full** to confirm (a) it is self-contained or only requires relative paths that still resolve after the move, (b) any `require('./...')` or `require('../...')` statements inside it are updated correctly if affected by the new location. Its current location is `tools/scraper/`; the new location is `research/vm-slide-stack-vm/`. Depth-from-root is the same (2 levels), so sibling-sibling relative requires would change. Verify and adjust.
 
 ### Implementation Steps
-1. Delete lines 453–557 (the doc comment through the closing `}` of `_getSigLegacy`). After the edit, line 451's `}` (end of `getSig`) is followed by a blank line, then the `/**` at (old) line 559 starting `_getShowConfig`'s doc.
-2. Do NOT modify the narrative comments in `getSig()` (lines 442–444) or `_getShowConfig()` (lines 562–564) — they correctly reference the *endpoint*, not the deleted method.
-3. Do not touch any other method, field, or import in the file.
+1. Read `tools/scraper/vdata-harness.js` in full. Note every `require(...)` it makes and figure out each target's new relative path from `research/vm-slide-stack-vm/`. Adjust each require before the move, or adjust post-move — either ordering works; do whichever is cleanest in a single Edit.
+2. Move the file: `git mv tools/scraper/vdata-harness.js research/vm-slide-stack-vm/vdata-harness.js`.
+3. Update the two importers:
+   - `research/template-pool/survey.js:22` → `require('../vm-slide-stack-vm/vdata-harness')`
+   - `research/template-pool/diagnose.js:24` → `require('../vm-slide-stack-vm/vdata-harness')`
+4. Update the four doc/path references to point at the new location. Preserve surrounding prose; only change the path string.
+5. Simplify the two doc headers (`CLAUDE.md:8`, `README.md:23`) and the scraper-file header (`tools/scraper/scraper.js:10`) to drop the "retained legacy" carve-out. Keep the factual statement that the live scraper runs in Node with no DOM.
+6. Rename the `// Legacy synthetic mode` comment at `tools/scraper/scraper.js:570` to `// Synthetic fallback mode`.
 
 ### Verification
-- [ ] `grep -n "_getSigLegacy\|getSigLegacy" .` returns zero hits (ripgrep via the Grep tool; exclude `node_modules/` and `.git/`).
-- [ ] `node -c tools/captcha-solver/captcha-client.js` (via `node --check`) — parses clean.
-- [ ] `npm test` — all currently-green suites still pass; no new failures.
-- [ ] `git diff --stat tools/captcha-solver/captcha-client.js` shows a single-file change with deletions only (no unrelated additions).
+- [ ] `grep -n "tools/scraper/vdata-harness" .` (via the Grep tool) returns **zero** hits anywhere in the repo outside `plan.md`.
+- [ ] `ls tools/scraper/vdata-harness.js` → absent; `ls research/vm-slide-stack-vm/vdata-harness.js` → present.
+- [ ] `node --check research/vm-slide-stack-vm/vdata-harness.js` parses clean.
+- [ ] `node --check research/template-pool/survey.js` and `node --check research/template-pool/diagnose.js` parse clean.
+- [ ] `node --check tools/scraper/scraper.js` parses clean.
+- [ ] `npm test` — still 230 pass, 0 fail, 2 skip (or whatever the current baseline is — must not regress).
+- [ ] `git diff --stat` shows: one rename (tools/scraper/vdata-harness.js → research/vm-slide-stack-vm/vdata-harness.js), edits to the 2 importers, edits to the 4 research docs, edits to CLAUDE.md / README.md / tools/scraper/scraper.js. No unrelated changes.
 
 ### Suggested Agent
-`general-purpose` — small, mechanical deletion on a well-scoped file; doesn't need a specialist.
+`general-purpose` — mechanical rename + path updates across a small, fully-enumerated set of files. No domain expertise required.
 
 ---
 
 ## Upcoming task briefs (for user review — not yet dispatched)
-
-### 65.2 — Relocate `vdata-harness.js` out of `tools/scraper/`
-
-**Why**: `tools/scraper/vdata-harness.js` is not imported by the live scraper. Only `research/template-pool/{survey,diagnose}.js` depend on it. Per `.claude/rules/research-artifacts.md`, research-only tools belong inside a research track. Its conceptual home is the vm-slide stack VM research track (it executes `vm-slide.enc.js` in jsdom), so it moves to `research/vm-slide-stack-vm/vdata-harness.js`.
-
-**Touches**:
-- Move the file.
-- Update imports in `research/template-pool/survey.js:22` and `research/template-pool/diagnose.js:24` from `'../../tools/scraper/vdata-harness'` to `'../vm-slide-stack-vm/vdata-harness'`.
-- Update doc path references in `research/vm-slide-stack-vm/VDATA-PIPELINE.md:80`, `research/vm-slide-stack-vm/vdata-dynamic-trace.js:8` (comment), `research/vm-slide-stack-vm/PHASE-45-FIELD-SOURCES.md:4`, `research/vm-slide-stack-vm/BUILD-RECONCILE.md:96,140`.
-- Remove the "legacy `tools/scraper/vdata-harness.js`" carve-outs from `CLAUDE.md:8`, `README.md:23`, and `tools/scraper/scraper.js:10`. After the move, jsdom is only a research-track dependency; the scraper header can simply say "Runs entirely in Node — no jsdom, no browser" without the retained-legacy clause.
-- Rename "Legacy synthetic mode" comment at `tools/scraper/scraper.js:570` to a neutral "Synthetic fallback mode" (the `--no-chrome-profile` path is a supported fallback, not legacy).
-
-**Verification**:
-- `grep -n "tools/scraper/vdata-harness" .` returns zero hits (all cited paths updated).
-- `node --check research/template-pool/survey.js` and `node --check research/template-pool/diagnose.js` parse clean.
-- `node --check research/vm-slide-stack-vm/vdata-harness.js` parses clean at its new path.
-- `npm test` — green.
 
 ### 65.3 — Delete four orphan tracers
 
