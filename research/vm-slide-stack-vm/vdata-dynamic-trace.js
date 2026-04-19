@@ -5,7 +5,7 @@
 // Goal: pin down the byte-level vData pipeline (XTEA key, plaintext layout,
 // ciphertext, output assembly) by instrumenting vm-slide's own VM dispatch
 // loop while it runs the proxyXHR XHR-interceptor path inside a jsdom
-// harness. This is the white-box counterpart to tools/scraper/vdata-harness.js
+// harness. This is the white-box counterpart to research/vm-slide-stack-vm/vdata-harness.js
 // (which is purely black-box).
 //
 // Strategy:

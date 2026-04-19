@@ -1,7 +1,7 @@
 # Phase 45.1 — Per-field source decisions for live scraper vData use
 
 Phase 45 swaps the scraper's vData generator from "run vm-slide live in jsdom"
-(`tools/scraper/vdata-harness.js`) to the standalone byte-identical pipeline in
+(`research/vm-slide-stack-vm/vdata-harness.js`) to the standalone byte-identical pipeline in
 `tools/vdata-generator/`. That pipeline consumes an 8-field plaintext object
 `{tp, key, py, env, version, cLod, inf, ss}`, but the scraper no longer has the
 live vm-slide runtime around to compute those fields. 45.1 is the decision gate:

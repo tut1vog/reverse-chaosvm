@@ -77,7 +77,7 @@ jsdom window:
 
 The taps record into Node-side arrays via `window.__VMTAP_*` callbacks.
 Neither tap mutates VM state. The black-box harness
-`tools/scraper/vdata-harness.js` produces the same `vData` value
+`research/vm-slide-stack-vm/vdata-harness.js` produces the same `vData` value
 regardless of whether the patches are present, confirming the
 instrumentation does not perturb the proxyXHR path on Chrome 146.
 

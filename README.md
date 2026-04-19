@@ -1,6 +1,6 @@
 # reverse-chaosvm
 
-Research platform for reverse-engineering Tencent's ChaosVM (JSVMP) — a family of JavaScript bytecode virtual machines used in Tencent's CAPTCHA stack. Delivers a `tdc.js` register-VM decompiler, a standalone `collect` / `vData` token generator (byte-identical to live traffic), an automated porting pipeline for new `tdc.js` builds, a Puppeteer-based CAPTCHA solver, and a headless jsdom urlsec scraper.
+Research platform for reverse-engineering Tencent's ChaosVM (JSVMP) — a family of JavaScript bytecode virtual machines used in Tencent's CAPTCHA stack. Delivers a `tdc.js` register-VM decompiler, a standalone `collect` / `vData` token generator (byte-identical to live traffic), an automated porting pipeline for new `tdc.js` builds, a Puppeteer-based CAPTCHA solver, and a headless Node-only urlsec scraper (no browser, no DOM).
 
 ## What this project does
 
@@ -14,13 +14,13 @@ Research platform for reverse-engineering Tencent's ChaosVM (JSVMP) — a family
 
 5. **Solves Tencent slide CAPTCHAs** — Puppeteer-based bot that intercepts CAPTCHA images, solves the slide puzzle with OpenCV (Canny edge detection + normalized cross-correlation), performs a realistic mouse drag, and captures the verification ticket.
 
-6. **Headless urlsec scraper** — jsdom-based scraper that fetches `tdc.js` at runtime, solves the slide CAPTCHA, and submits the ticket to `urlsec.qq.com` without Puppeteer.
+6. **Headless urlsec scraper** — pure-Node scraper (no browser, no jsdom) that fetches `tdc.js` at runtime, solves the slide CAPTCHA, synthesizes `vData` via the standalone from-obj builder, and submits the ticket to `urlsec.qq.com` without Puppeteer.
 
 ## Stack
 
 - **Runtime**: Node.js >= 18, CommonJS.
 - **Python**: 3.x — only for the OpenCV slide solver.
-- **Key dependencies**: `acorn` ^8 (AST parsing — porting pipeline), `jsdom` ^29 (vData generation — headless scraper), `puppeteer` ^24 + `puppeteer-extra-plugin-stealth` ^2 (CAPTCHA solver + dynamic tracing), `canvas` ^3 (jsdom DOM rendering).
+- **Key dependencies**: `acorn` ^8 (AST parsing — porting pipeline), `puppeteer` ^24 + `puppeteer-extra-plugin-stealth` ^2 (CAPTCHA solver + dynamic tracing), `jsdom` ^29 + `canvas` ^3 (research scripts only — the live scraper does not use a DOM).
 
 ## Quick start
 
@@ -63,7 +63,7 @@ reverse-chaosvm/
 ├── tools/                       # stable runnable utilities
 │   ├── token-generator/         # standalone collect-token generator
 │   ├── porting-pipeline/        # parse → opcode-map → key-extract → verify
-│   ├── scraper/                 # headless urlsec scraper (jsdom, no browser)
+│   ├── scraper/                 # headless urlsec scraper (pure Node, no DOM, no browser)
 │   ├── captcha-solver/          # Puppeteer CAPTCHA solver + OpenCV slide solver
 │   ├── vdata-generator/         # byte-identical vData builder
 │   └── dynamic-tracers/         # runtime instrumentation harnesses

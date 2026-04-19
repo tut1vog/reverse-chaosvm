@@ -1,11 +1,11 @@
 # reverse-chaosvm
 
-Research platform for reverse-engineering Tencent's ChaosVM (JSVMP) — a family of JavaScript bytecode virtual machines used in Tencent's CAPTCHA stack. Delivers a `tdc.js` register-VM decompiler, a standalone `collect` / `vData` token generator (byte-identical to live traffic), an automated porting pipeline for new `tdc.js` builds, a Puppeteer-based CAPTCHA solver, and a headless jsdom urlsec scraper.
+Research platform for reverse-engineering Tencent's ChaosVM (JSVMP) — a family of JavaScript bytecode virtual machines used in Tencent's CAPTCHA stack. Delivers a `tdc.js` register-VM decompiler, a standalone `collect` / `vData` token generator (byte-identical to live traffic), an automated porting pipeline for new `tdc.js` builds, a Puppeteer-based CAPTCHA solver, and a headless Node-only urlsec scraper (no browser, no DOM).
 
 ## Stack
 - **Runtime**: Node.js ≥18, CommonJS (`'use strict';`, `require()`, `module.exports`).
 - **Python**: 3.x — only for `tools/captcha-solver/slide-solver.py` (OpenCV).
-- **Key dependencies**: `acorn` ^8 (AST parsing — porting pipeline), `jsdom` ^29 (vData generation — headless scraper), `puppeteer` ^24 + `puppeteer-extra-plugin-stealth` ^2 (CAPTCHA solver + dynamic tracing), `canvas` ^3 (jsdom DOM rendering).
+- **Key dependencies**: `acorn` ^8 (AST parsing — porting pipeline), `puppeteer` ^24 + `puppeteer-extra-plugin-stealth` ^2 (CAPTCHA solver + dynamic tracing), `jsdom` ^29 + `canvas` ^3 (research scripts only — the live scraper runs entirely in Node with no DOM).
 
 ## Directory Layout
 
@@ -19,7 +19,7 @@ reverse-chaosvm/
 ├── tools/                       # stable runnable utilities
 │   ├── token-generator/         # standalone collect-token generator
 │   ├── porting-pipeline/        # parse → opcode-map → key-extract → verify
-│   ├── scraper/                 # headless urlsec scraper (jsdom, no browser)
+│   ├── scraper/                 # headless urlsec scraper (pure Node, no DOM, no browser)
 │   ├── captcha-solver/          # Puppeteer CAPTCHA solver + OpenCV slide solver
 │   ├── vdata-generator/         # byte-identical vData builder
 │   └── dynamic-tracers/         # runtime instrumentation harnesses

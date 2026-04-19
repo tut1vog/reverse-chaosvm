@@ -21,7 +21,7 @@ const { execFile } = require('child_process');
 const { CaptchaClient } = require('../../tools/captcha-solver/captcha-client');
 const { solveSlider } = require('../../tools/captcha-solver/slide-solver');
 const { generateCollect, generateBehavioralEvents, buildSlideSd } = require('../../tools/scraper/collect-generator');
-const { generateVData, parseVmSlideUrl } = require('../../tools/scraper/vdata-harness');
+const { generateVData, parseVmSlideUrl } = require('../vm-slide-stack-vm/vdata-harness');
 const { extractTdcName, extractEks, computeSourceHash } = require('../../tools/scraper/tdc-utils');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');

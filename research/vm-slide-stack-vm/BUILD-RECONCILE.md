@@ -93,7 +93,7 @@ transform* — `XTEA_FUNC_PRE_DISPATCH` in their note).
 
 ### 4. Fixture-generating build
 
-- `tools/scraper/vdata-harness.js` takes `vmSlideSource` as a string parameter —
+- `research/vm-slide-stack-vm/vdata-harness.js` takes `vmSlideSource` as a string parameter —
   it hardcodes no path. Its only caller under `tools/scraper/` is
   `scraper.js:525`, which resolves `vmSlidePath = path.join(PROJECT_ROOT,
   'sample', 'vm_slide.js')` (line 199) as the default source, with a
@@ -137,7 +137,7 @@ transform* — `XTEA_FUNC_PRE_DISPATCH` in their note).
 - `grep` for every substring of both keys in `sample/vm_slide.js` (source text) and
   `output/vm-slide/bytecode.json` (flat integer array). Only `34e2c8f07b5169ad`
   is present, at pcs 13931 and 15149, as `OP_10` per-char pushes.
-- Confirmed `tools/scraper/vdata-harness.js` loads `vmSlideSource` from
+- Confirmed `research/vm-slide-stack-vm/vdata-harness.js` loads `vmSlideSource` from
   `sample/vm_slide.js` via `scraper.js:199`.
 - Confirmed `research/vm-slide-stack-vm/vdata-dynamic-trace.js:48` loads the
   same file.

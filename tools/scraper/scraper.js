@@ -3,9 +3,10 @@
 /**
  * scraper.js — Main Scraper Orchestrator
  *
- * Wires together CaptchaClient, slide-solver, collect-generator, vdata-harness,
- * template-cache, and tdc-utils into a complete headless CAPTCHA-solving and
- * URL security checking flow.
+ * Wires together CaptchaClient, slide-solver, collect-generator, the
+ * vdata-generator from-obj builder (via buildVDataForPost), template-cache,
+ * and tdc-utils into a complete headless CAPTCHA-solving and URL security
+ * checking flow. Runs entirely in Node — no jsdom, no browser.
  *
  * Usage:
  *   const Scraper = require('./tools/scraper/scraper');
@@ -564,7 +565,7 @@ class Scraper {
             xteaParams, cached, sig, slideSd, behavioralEvents, now, session
           );
         } else {
-          // Legacy synthetic mode: build cd from profiles/default.json
+          // Synthetic fallback mode: build cd from profiles/default.json
           const nowSec = Math.round(Date.now() / 1000);
           const profileOverrides = Object.assign({}, this.profile, {
             pageUrl: 'https://t.captcha.qq.com/cap_union_new_show?rand=' + Math.floor(Math.random() * 1e16),
