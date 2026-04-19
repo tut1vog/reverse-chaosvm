@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 65 — Legacy code cleanup
-Current task: 65.4 — Delete `tools/captcha-solver/fingerprint-harvester.js`
+Current task: 65.5 — End-to-end smoke test of the four protected pipelines
 
 ---
 
@@ -17,7 +17,7 @@ Current task: 65.4 — Delete `tools/captcha-solver/fingerprint-harvester.js`
 | 65.2 | Relocate `tools/scraper/vdata-harness.js` → `research/vm-slide-stack-vm/vdata-harness.js`; update 2 research-script importers, 4 research doc references, and the CLAUDE.md/README.md/scraper.js header carve-outs | done |
 | 65.3 | Delete four orphan tracers in `tools/dynamic-tracers/`: `harness.js`, `encoding-tracer.js`, `instrument.js`, `payload-tracer.js` | done |
 | 65.3.1 | Delete orphan `tools/token-generator/integration-verify.js` (user-confirmed) | done |
-| 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (user-confirmed delete — re-harvest capability not preserved; committed `profiles/chrome-fingerprint.json` already covers the live scraper) | pending |
+| 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (user-confirmed delete — re-harvest capability not preserved; committed `profiles/chrome-fingerprint.json` already covers the live scraper) | done |
 | 65.5 | End-to-end smoke test of the four protected pipelines: decompiler, auto-port pipeline, Puppeteer CAPTCHA solver, Node.js scraper | pending |
 | 65.6 | Delete `plan.md` and close Phase 65 | pending |
 
@@ -25,34 +25,52 @@ Current task: 65.4 — Delete `tools/captcha-solver/fingerprint-harvester.js`
 
 ## Current Task
 
-**ID**: 65.4
-**Title**: Delete `tools/captcha-solver/fingerprint-harvester.js`
+**ID**: 65.5
+**Title**: End-to-end smoke test of the four protected pipelines
 **Phase**: Phase 65 — Legacy code cleanup
 **Status**: pending (awaiting dispatch)
 
 ### Goal
-Delete a broken, orphan harvester that is unrunnable as-written and produces an output already committed to the repo. User has confirmed delete over fix; re-harvest capability is intentionally dropped.
+Prove that nothing Phase 65 touched broke the four protected pipelines (decompiler, auto-port pipeline, Puppeteer CAPTCHA solver, Node.js scraper). `npm test` is the primary safety net — it already exercises the scraper + porting-pipeline codepaths — this task adds an invocation-level readiness check plus best-effort live runs.
 
-### Context (verified by the director against the working tree)
-- File: `tools/captcha-solver/fingerprint-harvester.js`. Exists at that path.
-- Zero external references repo-wide: `grep 'fingerprint-harvester'` returns only two hits outside `plan.md`, and both are self-references inside the file itself (line 4 header title, line 12 usage comment pointing at the broken `src/bot/` path).
-- Module header (line 12) documents the expected invocation as `node src/bot/fingerprint-harvester.js` — the `src/bot/` directory does not exist in the current tree. The harvester is therefore unrunnable without reconstructing a path layout that was removed in an earlier refactor.
-- Expected output `profiles/chrome-fingerprint.json` is already committed; the live scraper's fingerprint needs are fully covered.
-- **Sibling files in `tools/captcha-solver/` are live and must not be touched**: `captcha-client.js`, `captcha-solver.js`, `cli.js`, `live-submit.js`, `slide-solver.js`, `slide-solver.py`. Confirm they all remain after the delete.
+### Context
+- All four pipelines live under `tools/` and `research/`:
+  - Decompiler: `node research/tdc-register-vm/run.js --input <path> --output <path>` (offline; requires a tdc.js file).
+  - Auto-port pipeline: `node tools/porting-pipeline/run.js <tdc-path> [--skip-verify]` (offline; requires a tdc.js file).
+  - Puppeteer CAPTCHA solver: `node tools/captcha-solver/cli.js --domain <host>` (live network; needs Chromium).
+  - Node.js scraper: `node tools/scraper/cli.js --captcha-only --verbose` (live network).
+- Fresh `tdc.js` acquisition requires the full captcha flow (prehandle → getSig → downloadTdc) — it can't be fetched standalone. The scraper's `--captcha-only` run fetches it internally during its pipeline; if that run succeeds, the captured tdc.js can be reused by the decompiler and porting pipeline. If the live run fails (rate-limiting, network), the offline tier is sufficient to declare the task passed.
+- Baseline: `npm test` currently reports 230 pass / 0 fail / 2 skip.
+- This task is **evidence gathering only** — do not modify any file. The agent's report is the deliverable.
 
 ### Implementation Steps
-1. One Bash call: `git rm tools/captcha-solver/fingerprint-harvester.js`.
-2. Do not touch any other file. In particular, do not modify `profiles/chrome-fingerprint.json` or any sibling in `tools/captcha-solver/`.
 
-### Verification
-- [ ] `ls tools/captcha-solver/fingerprint-harvester.js` — fails.
-- [ ] `ls tools/captcha-solver/` — returns exactly six entries: `captcha-client.js`, `captcha-solver.js`, `cli.js`, `live-submit.js`, `slide-solver.js`, `slide-solver.py`.
-- [ ] Grep for `fingerprint-harvester` repo-wide — zero hits outside `plan.md`.
-- [ ] `npm test` — baseline holds at 230 pass / 0 fail / 2 skip.
-- [ ] `git status --short` — one staged `D` line for `tools/captcha-solver/fingerprint-harvester.js`.
+**Tier 1 — offline (hard requirements, must all pass)**:
+1. `node --check research/tdc-register-vm/run.js`
+2. `node --check tools/porting-pipeline/run.js`
+3. `node --check tools/captcha-solver/cli.js`
+4. `node --check tools/scraper/cli.js`
+5. `npm test` — must print `230 pass / 0 fail / 2 skip`.
+6. Confirm the two preserved dynamic tracers are still syntactically valid:
+   - `node --check tools/dynamic-tracers/comparison-harness.js`
+   - `node --check tools/dynamic-tracers/crypto-tracer-v3.js`
+
+**Tier 2 — live network (best-effort; document outcome, do not fail the task if network is unreliable)**:
+7. Run the scraper once with a 120s timeout: `timeout 120 node tools/scraper/cli.js --captcha-only --verbose 2>&1 | tail -60`. Report whether it produced a non-empty ticket or what stage it reached before timing out / erroring. If it wrote artifacts under `output/<hash>/`, note the paths.
+8. If the scraper run landed a fresh `tdc.js` on disk (check `output/` for the most recent `tdc.js` — the scraper may or may not dump it; if not, skip this step rather than inventing one):
+   - Run the auto-port pipeline against it: `timeout 180 node tools/porting-pipeline/run.js <path> --skip-verify 2>&1 | tail -30`. Report which stages completed.
+   - Run the decompiler against it: `timeout 180 node research/tdc-register-vm/run.js --input <path> --output output/phase-65-smoke/decompile/ 2>&1 | tail -30`. Report whether the output directory was populated.
+9. Puppeteer CAPTCHA solver: `timeout 120 node tools/captcha-solver/cli.js --domain example.com 2>&1 | tail -40`. Report whether it reached the solver step or what failed first.
+
+**Treatment of network failures**: if Tier 2 steps fail for network/rate-limiting/headless-Chrome reasons (symptoms: HTTP 403/429, connection reset, `TimeoutError: Timed out after 120000 ms`, puppeteer launch failure), report the symptom verbatim and mark that step "inconclusive — network". This is acceptable; the task still passes if Tier 1 is green. Phase 62 established that `urlsec.qq.com` has rate-limiting, so these failures are expected and do not indicate breakage from Phase 65.
+
+### Verification (director will treat the agent's report as evidence)
+- [ ] All six Tier-1 checks pass (four `node --check`, one `npm test` at 230/0/2, and two tracer `node --check`).
+- [ ] Tier-2 outcomes are documented with raw output (tail-40 excerpt per step is enough).
+- [ ] No file in the repo was modified by the agent (confirm via `git status --short` — it should match the pre-task state: only the pre-existing `M research/vm-slide-stack-vm/FN-20539-SLOT8-HOP.md` and untracked `output/`).
 
 ### Suggested Agent
-`general-purpose` — one-file delete with verification sweep. Trivial.
+`general-purpose` — this is an evidence-gathering task (runs + reports), no code changes. No specialist needed.
 
 ---
 
