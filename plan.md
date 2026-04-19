@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 65 — Legacy code cleanup
-Current task: 65.3 — Delete four orphan tracers from `tools/dynamic-tracers/`
+Current task: **awaiting user decisions** (see Open questions below) before dispatching 65.4
 
 ---
 
@@ -15,47 +15,43 @@ Current task: 65.3 — Delete four orphan tracers from `tools/dynamic-tracers/`
 |----|------|--------|
 | 65.1 | Delete dead `_getSigLegacy()` method from `tools/captcha-solver/captcha-client.js` | done |
 | 65.2 | Relocate `tools/scraper/vdata-harness.js` → `research/vm-slide-stack-vm/vdata-harness.js`; update 2 research-script importers, 4 research doc references, and the CLAUDE.md/README.md/scraper.js header carve-outs | done |
-| 65.3 | Delete four orphan tracers in `tools/dynamic-tracers/`: `harness.js`, `encoding-tracer.js`, `instrument.js`, `payload-tracer.js` | pending |
-| 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (broken — references non-existent `src/bot/` and `browser-mock.js`; re-harvest capability not preserved) | pending |
+| 65.3 | Delete four orphan tracers in `tools/dynamic-tracers/`: `harness.js`, `encoding-tracer.js`, `instrument.js`, `payload-tracer.js` | done |
+| 65.3.1 | (proposed) Delete `tools/token-generator/integration-verify.js` — surfaced as orphaned during 65.3 | **awaiting user decision** |
+| 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (broken — references non-existent `src/bot/` and `browser-mock.js`; re-harvest capability not preserved) | **awaiting user decision** (delete vs. fix) |
 | 65.5 | End-to-end smoke test of the four protected pipelines: decompiler, auto-port pipeline, Puppeteer CAPTCHA solver, Node.js scraper | pending |
 | 65.6 | Delete `plan.md` and close Phase 65 | pending |
 
 ---
 
-## Current Task
+## Open questions — awaiting user decision before dispatching further
 
-**ID**: 65.3
-**Title**: Delete four orphan tracers from `tools/dynamic-tracers/`
-**Phase**: Phase 65 — Legacy code cleanup
-**Status**: pending (awaiting dispatch)
+### Q1 — `tools/token-generator/integration-verify.js` is now doubly-orphaned (surfaced during 65.3)
 
-### Goal
-Delete four dynamic-tracer scripts that have zero references anywhere in the repo (tools, tests, docs, agents, research). Reduces the `tools/dynamic-tracers/` tree to just the two files actually cited by the agent definitions.
+**Finding**: `integration-verify.js` reads its ground-truth input from `output/dynamic/payload-trace.json`. That file was removed in Phase 64.1 (`output/` purge), and the capture tool that produced it (`payload-tracer.js`) was just deleted in 65.3. It also has **zero external references** in the repo — no `require()`, no `npm test` hookup, no doc link, no agent mention. It is not wired into any live pipeline.
 
-### Context (all verified by the director against the working tree)
-- Current contents of `tools/dynamic-tracers/`:
-  - `comparison-harness.js` — **keep**; cited at `.claude/agents/token-verifier.md:115`.
-  - `crypto-tracer-v3.js` — **keep**; cited at `.claude/agents/key-extractor.md:35, 106` and `docs/CRYPTO_ANALYSIS.md:337`.
-  - `encoding-tracer.js` — **delete**; zero references (verified).
-  - `harness.js` — **delete**; zero references (verified).
-  - `instrument.js` — **delete**; zero references (verified).
-  - `payload-tracer.js` — **delete**; zero references (verified).
-- Reference verification: Grep for `dynamic-tracers/(harness|encoding-tracer|instrument|payload-tracer)` across the repo returns **zero matches**. Grep for `dynamic-tracers/(comparison-harness|crypto-tracer-v3)` returns the 4 citations above — both preserved.
-- The delete targets are self-contained — no sibling tracer or research script requires them.
+**Options**:
+- **(a) Delete** `integration-verify.js` as task 65.3.1 (fits the Phase 65 theme: "zero references + no way to run ⇒ dead").
+- **(b) Rescue**: restore `payload-tracer.js` from git history and document the capture/verify workflow as a supported utility. Larger scope — outside Phase 65 as originally framed.
+- **(c) Defer**: leave as-is for a future cleanup pass. The stale docstring at line 12 ("captured from tdc.js via payload-tracer.js") becomes a loose thread.
 
-### Implementation Steps
-1. `git rm tools/dynamic-tracers/harness.js tools/dynamic-tracers/encoding-tracer.js tools/dynamic-tracers/instrument.js tools/dynamic-tracers/payload-tracer.js` via a single Bash call.
-2. Do not touch `comparison-harness.js` or `crypto-tracer-v3.js`.
-3. Do not touch any other file in the repo. In particular, do not modify `docs/CRYPTO_ANALYSIS.md`, `.claude/agents/token-verifier.md`, or `.claude/agents/key-extractor.md` — their references still resolve because they point at the two preserved tracers.
+Director recommendation: **(a) delete**. The file has been non-runnable since 64.1 (4 commits back), no live pipeline depends on it, and we have just confirmed its capture tool was itself dead.
 
-### Verification (run each check and paste raw output)
-- [ ] `ls tools/dynamic-tracers/` — returns exactly two files: `comparison-harness.js`, `crypto-tracer-v3.js`.
-- [ ] Grep `harness\.js|encoding-tracer|instrument\.js|payload-tracer` repo-wide — the only hits should reference `comparison-harness.js` (the word "harness.js" is a substring of "comparison-harness.js") or appear inside `plan.md`. No hits pointing into `tools/dynamic-tracers/` beyond `comparison-harness.js` itself. If a hit elsewhere references one of the four deleted filenames by exact basename, stop and report — that indicates a reference we missed.
-- [ ] `npm test` — still **230 pass, 0 fail, 2 skip**. Report the `# tests / # pass / # fail / # skipped` lines.
-- [ ] `git status --short` shows four `D` entries under `tools/dynamic-tracers/` and no unrelated additions/modifications you made.
+### Q2 — 65.4 trade-off for `fingerprint-harvester.js` (carried forward from plan init)
 
-### Suggested Agent
-`general-purpose` — four-file delete with one verification sweep. Trivial.
+The file is broken-as-written: its module header points at `src/bot/fingerprint-harvester.js` and `browser-mock.js`, neither of which exists in the tree. Its expected output, `profiles/chrome-fingerprint.json`, is already committed — so the harvester currently produces no value for any live flow.
+
+**Options**:
+- **(a) Delete** (original plan default). Accepts losing the "re-harvest on a new machine" capability. If re-harvest is ever needed, a fresh harvester would have to be written — the current file cannot be revived by a path-fix alone.
+- **(b) Fix**: repair the broken paths so the harvester runs again. Requires figuring out what `src/bot/fingerprint-harvester.js` and `browser-mock.js` were meant to point at (likely historical filenames from a pre-refactor layout).
+- **(c) Defer**.
+
+Director recommendation: **(a) delete** unless you plan to harvest a new profile soon. The committed `profiles/chrome-fingerprint.json` already covers the live scraper's needs.
+
+---
+
+## Next task (resumes once Q1 and Q2 are answered)
+
+Whichever of `65.3.1` / `65.4` the user confirms will be fully scoped into a Current Task block before the next dispatch.
 
 ---
 
