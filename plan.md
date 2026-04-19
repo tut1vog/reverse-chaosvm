@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 65 — Legacy code cleanup
-Current task: **awaiting user decisions** (see Open questions below) before dispatching 65.4
+Current task: 65.4 — Delete `tools/captcha-solver/fingerprint-harvester.js`
 
 ---
 
@@ -16,57 +16,47 @@ Current task: **awaiting user decisions** (see Open questions below) before disp
 | 65.1 | Delete dead `_getSigLegacy()` method from `tools/captcha-solver/captcha-client.js` | done |
 | 65.2 | Relocate `tools/scraper/vdata-harness.js` → `research/vm-slide-stack-vm/vdata-harness.js`; update 2 research-script importers, 4 research doc references, and the CLAUDE.md/README.md/scraper.js header carve-outs | done |
 | 65.3 | Delete four orphan tracers in `tools/dynamic-tracers/`: `harness.js`, `encoding-tracer.js`, `instrument.js`, `payload-tracer.js` | done |
-| 65.3.1 | (proposed) Delete `tools/token-generator/integration-verify.js` — surfaced as orphaned during 65.3 | **awaiting user decision** |
-| 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (broken — references non-existent `src/bot/` and `browser-mock.js`; re-harvest capability not preserved) | **awaiting user decision** (delete vs. fix) |
+| 65.3.1 | Delete orphan `tools/token-generator/integration-verify.js` (user-confirmed) | done |
+| 65.4 | Delete `tools/captcha-solver/fingerprint-harvester.js` (user-confirmed delete — re-harvest capability not preserved; committed `profiles/chrome-fingerprint.json` already covers the live scraper) | pending |
 | 65.5 | End-to-end smoke test of the four protected pipelines: decompiler, auto-port pipeline, Puppeteer CAPTCHA solver, Node.js scraper | pending |
 | 65.6 | Delete `plan.md` and close Phase 65 | pending |
 
 ---
 
-## Open questions — awaiting user decision before dispatching further
+## Current Task
 
-### Q1 — `tools/token-generator/integration-verify.js` is now doubly-orphaned (surfaced during 65.3)
+**ID**: 65.4
+**Title**: Delete `tools/captcha-solver/fingerprint-harvester.js`
+**Phase**: Phase 65 — Legacy code cleanup
+**Status**: pending (awaiting dispatch)
 
-**Finding**: `integration-verify.js` reads its ground-truth input from `output/dynamic/payload-trace.json`. That file was removed in Phase 64.1 (`output/` purge), and the capture tool that produced it (`payload-tracer.js`) was just deleted in 65.3. It also has **zero external references** in the repo — no `require()`, no `npm test` hookup, no doc link, no agent mention. It is not wired into any live pipeline.
+### Goal
+Delete a broken, orphan harvester that is unrunnable as-written and produces an output already committed to the repo. User has confirmed delete over fix; re-harvest capability is intentionally dropped.
 
-**Options**:
-- **(a) Delete** `integration-verify.js` as task 65.3.1 (fits the Phase 65 theme: "zero references + no way to run ⇒ dead").
-- **(b) Rescue**: restore `payload-tracer.js` from git history and document the capture/verify workflow as a supported utility. Larger scope — outside Phase 65 as originally framed.
-- **(c) Defer**: leave as-is for a future cleanup pass. The stale docstring at line 12 ("captured from tdc.js via payload-tracer.js") becomes a loose thread.
+### Context (verified by the director against the working tree)
+- File: `tools/captcha-solver/fingerprint-harvester.js`. Exists at that path.
+- Zero external references repo-wide: `grep 'fingerprint-harvester'` returns only two hits outside `plan.md`, and both are self-references inside the file itself (line 4 header title, line 12 usage comment pointing at the broken `src/bot/` path).
+- Module header (line 12) documents the expected invocation as `node src/bot/fingerprint-harvester.js` — the `src/bot/` directory does not exist in the current tree. The harvester is therefore unrunnable without reconstructing a path layout that was removed in an earlier refactor.
+- Expected output `profiles/chrome-fingerprint.json` is already committed; the live scraper's fingerprint needs are fully covered.
+- **Sibling files in `tools/captcha-solver/` are live and must not be touched**: `captcha-client.js`, `captcha-solver.js`, `cli.js`, `live-submit.js`, `slide-solver.js`, `slide-solver.py`. Confirm they all remain after the delete.
 
-Director recommendation: **(a) delete**. The file has been non-runnable since 64.1 (4 commits back), no live pipeline depends on it, and we have just confirmed its capture tool was itself dead.
+### Implementation Steps
+1. One Bash call: `git rm tools/captcha-solver/fingerprint-harvester.js`.
+2. Do not touch any other file. In particular, do not modify `profiles/chrome-fingerprint.json` or any sibling in `tools/captcha-solver/`.
 
-### Q2 — 65.4 trade-off for `fingerprint-harvester.js` (carried forward from plan init)
+### Verification
+- [ ] `ls tools/captcha-solver/fingerprint-harvester.js` — fails.
+- [ ] `ls tools/captcha-solver/` — returns exactly six entries: `captcha-client.js`, `captcha-solver.js`, `cli.js`, `live-submit.js`, `slide-solver.js`, `slide-solver.py`.
+- [ ] Grep for `fingerprint-harvester` repo-wide — zero hits outside `plan.md`.
+- [ ] `npm test` — baseline holds at 230 pass / 0 fail / 2 skip.
+- [ ] `git status --short` — one staged `D` line for `tools/captcha-solver/fingerprint-harvester.js`.
 
-The file is broken-as-written: its module header points at `src/bot/fingerprint-harvester.js` and `browser-mock.js`, neither of which exists in the tree. Its expected output, `profiles/chrome-fingerprint.json`, is already committed — so the harvester currently produces no value for any live flow.
-
-**Options**:
-- **(a) Delete** (original plan default). Accepts losing the "re-harvest on a new machine" capability. If re-harvest is ever needed, a fresh harvester would have to be written — the current file cannot be revived by a path-fix alone.
-- **(b) Fix**: repair the broken paths so the harvester runs again. Requires figuring out what `src/bot/fingerprint-harvester.js` and `browser-mock.js` were meant to point at (likely historical filenames from a pre-refactor layout).
-- **(c) Defer**.
-
-Director recommendation: **(a) delete** unless you plan to harvest a new profile soon. The committed `profiles/chrome-fingerprint.json` already covers the live scraper's needs.
-
----
-
-## Next task (resumes once Q1 and Q2 are answered)
-
-Whichever of `65.3.1` / `65.4` the user confirms will be fully scoped into a Current Task block before the next dispatch.
+### Suggested Agent
+`general-purpose` — one-file delete with verification sweep. Trivial.
 
 ---
 
 ## Upcoming task briefs (for user review — not yet dispatched)
-
-### 65.4 — Delete `fingerprint-harvester.js`
-
-**Why**: `tools/captcha-solver/fingerprint-harvester.js` is orphaned (zero importers). Its module header points to non-existent paths (`src/bot/fingerprint-harvester.js`, `browser-mock.js`) — it is unrunnable as-written. The output it was designed to produce, `profiles/chrome-fingerprint.json`, is already committed.
-
-**Trade-off to confirm with user before dispatching this task**: deleting removes the "re-harvest fingerprint on a new machine" capability. If that workflow is needed in the future, the harvester would need to be re-written (not merely un-deleted, since the paths it depends on no longer exist). If the user wants to preserve re-harvest, this task converts to "fix the harvester's paths" instead of a delete.
-
-**Verification**:
-- `grep -n "fingerprint-harvester" .` returns zero hits.
-- `ls tools/captcha-solver/` — `fingerprint-harvester.js` absent.
-- `npm test` — green.
 
 ### 65.5 — End-to-end smoke test of the four protected pipelines
 
