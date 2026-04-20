@@ -121,10 +121,10 @@ All documentation is reference material — verify against live behavior before 
 ## Durable Facts
 
 **Porting pipeline**
-- Automated `parse → opcode-map → key-extract → verify` produces byte-identical `collect` tokens for every register-machine `tdc.js` build observed to date (Templates A, B, C below).
+- Automated `parse → opcode-map → key-extract → verify` produces byte-identical `collect` tokens for every register-machine `tdc.js` build observed to date. The 30-build port survey (`output/port-survey/results.md`) auto-ported all 30 captures — 9 unique source hashes — to byte-identical tokens; aggregate per-hash XTEA keys at `output/port-survey/xtea-keys.md`.
 - Driven either by `node tools/porting-pipeline/run.js <path>` or by the `/port-version` slash command, which dispatches the `opcode-mapper`, `key-extractor`, and `token-verifier` agents under `.claude/agents/`.
 
-**Templates** (register-machine `tdc.js`)
+**Templates** (register-machine `tdc.js`) — historical A/B/C classifier
 
 | Template | Example `TDC_NAME` | Opcodes | XTEA key |
 |---|---|---|---|
@@ -132,7 +132,9 @@ All documentation is reference material — verify against live behavior before 
 | B | `SUOPMSFGeTelWAhfVaTKnRSJkFAfGHcD` | 94 | `6B516842 4D554B69 69655456 452C233E` |
 | C | `WAgdYOUnKVUhEBmBAOQASgTEAVSQkikE` | 100 | `5949415A 454D6265 6D686358 6C66525F` |
 
-XTEA delta (`0x9E3779B9`) and round count (32) are constant across templates. `STATE_A` key and key-modification constants vary per template and are extracted dynamically by `tools/porting-pipeline/key-extractor.js`. `eks` is server-baked into every `tdc.js` response (line 123) — extract via regex or `TDC.getInfo().info`; see `docs/EKS_FORMAT.md`.
+The A/B/C labels are bookmarks from early reversing; the live distribution is wider. The 30-build survey observed 9 unique hashes with caseCounts of 91, 92, 94, 96, 98, 99, 100, 103 — only two fit the classifier buckets (B=94, C=100). The porting pipeline does not branch on the label; see `output/port-survey/xtea-keys.md` for the full per-hash key set.
+
+XTEA delta (`0x9E3779B9`) and round count (32) are constant across every observed build. `STATE_A` key and key-modification constants vary per build and are extracted dynamically by `tools/porting-pipeline/key-extractor.js`. `eks` is server-baked into every `tdc.js` response (line 123) — extract via regex or `TDC.getInfo().info`; see `docs/EKS_FORMAT.md`.
 
 **Scrapers**
 - `tools/scraper/` — pure-Node, no Puppeteer, no DOM. Fetches live `tdc.js`, solves the slide CAPTCHA via the Python OpenCV solver, synthesizes `vData` via the inlined `vdata-generator`, and submits to `urlsec.qq.com`.
