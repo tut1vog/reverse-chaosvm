@@ -1,6 +1,14 @@
 node_modules/
 .venv/
-output/dynamic/session-*.json
 *.pyc
 __pycache__/
 .claude/settings.local.json
+
+# output/ — ignore run-local artifacts by default; whitelist the subdirs we intentionally track
+output/*
+!output/phase-67-diagnosis/
+!output/port-survey/
+!output/scraper-stress/
+
+# runtime cache populated by tools/scraper — not a source artifact
+tools/scraper/cache/
