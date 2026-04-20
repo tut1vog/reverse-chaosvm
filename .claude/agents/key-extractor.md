@@ -32,8 +32,8 @@ These values may differ between VM templates. Do NOT assume Template A values ar
 
 Before tracing, read these files to understand the cipher structure:
 
-- `tools/dynamic-tracers/crypto-tracer-v3.js` — reference tracer for Template A; study its approach but do NOT hardcode any PC addresses or opcode numbers from it
-- `docs/CRYPTO_ANALYSIS.md` — full XTEA analysis with derivation steps
+- `tools/porting-pipeline/key-extractor.js` — template-agnostic implementation of the extraction procedure (opcode-table driven); this is the canonical reference
+- `docs/CRYPTO_ANALYSIS.md` — full XTEA analysis with derivation steps (including historical findings from the Template-A reverse-engineering traces)
 - `tools/scraper/token-generator/crypto-core.js` — standalone XTEA implementation showing the expected algorithm
 
 ### Step 2 — Set up the tracing environment
@@ -103,7 +103,7 @@ Write extracted parameters to a JSON file at the location specified in the dispa
 
 ## Key References
 
-- `tools/dynamic-tracers/crypto-tracer-v3.js` — reference tracer (Template A only; adapt, don't copy PC values)
+- `tools/porting-pipeline/key-extractor.js` — template-agnostic reference implementation (canonical)
 - `docs/CRYPTO_ANALYSIS.md` — XTEA analysis and key derivation
 - `tools/scraper/token-generator/crypto-core.js` — standalone XTEA implementation
 - `tools/scraper/token-generator/generate-token.js` — token generation entry point (to understand when cipher is invoked)

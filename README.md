@@ -50,8 +50,7 @@ reverse-chaosvm/
 ├── tools/
 │   ├── scraper/             # pure-Node scraper + inlined token-generator/ + vdata-generator/
 │   ├── puppeteer/           # Puppeteer CAPTCHA solver + OpenCV slide solver
-│   ├── porting-pipeline/    # parse → opcode-map → key-extract → verify
-│   └── dynamic-tracers/     # standalone Puppeteer tracers
+│   └── porting-pipeline/    # parse → opcode-map → key-extract → verify
 ├── research/
 │   └── template-pool/       # live-comparison.js — end-to-end integration example
 ├── docs/                    # 15 reference docs — see Documentation

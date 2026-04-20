@@ -6,8 +6,6 @@
  * Captures a live token from a tdc.js build via Puppeteer with frozen environment,
  * then generates a standalone token using extracted XTEA key parameters and
  * compares them byte-for-byte.
- *
- * Adapted from dynamic/comparison-harness.js but parameterized for any template.
  */
 
 const puppeteer = require('puppeteer');
@@ -18,7 +16,7 @@ const path = require('path');
 const { buildInputChunks } = require('../scraper/token-generator/generate-token.js');
 const { urlEncode } = require('../scraper/token-generator/outer-pipeline.js');
 
-// Frozen deterministic values — must match comparison-harness.js
+// Frozen deterministic values
 const FROZEN_TIMESTAMP = 1700000000000;
 const FROZEN_RANDOM = 0.42;
 const FROZEN_PERF_NOW = 100.5;

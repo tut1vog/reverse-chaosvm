@@ -24,8 +24,7 @@ reverse-chaosvm/
 │   │   ├── token-generator/         # collect-token primitives (inlined from former tools/token-generator/)
 │   │   └── vdata-generator/         # vData primitives (inlined from former tools/vdata-generator/)
 │   ├── puppeteer/                   # Puppeteer CAPTCHA solver — logs requests + tokens
-│   ├── porting-pipeline/            # parse → opcode-map → key-extract → verify
-│   └── dynamic-tracers/             # standalone Puppeteer tracers (crypto-tracer-v3, comparison-harness)
+│   └── porting-pipeline/            # parse → opcode-map → key-extract → verify
 ├── research/
 │   └── template-pool/
 │       └── live-comparison.js       # end-to-end integration example (porting pipeline + puppeteer solver)

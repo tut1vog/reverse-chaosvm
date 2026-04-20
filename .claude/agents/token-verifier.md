@@ -112,7 +112,7 @@ Write a comparison report JSON to the location specified in the dispatch prompt:
 - `tools/scraper/token-generator/crypto-core.js` — XTEA encryption
 - `tools/scraper/token-generator/collector-schema.js` — 59-field fingerprint schema
 - `docs/TOKEN_FORMAT.md` — authoritative token structure documentation
-- `tools/dynamic-tracers/comparison-harness.js` — existing comparison approach (study for reference)
+- `tools/porting-pipeline/token-verifier.js` — canonical template-agnostic verifier (frozen-env capture + byte-identical compare)
 
 ---
 

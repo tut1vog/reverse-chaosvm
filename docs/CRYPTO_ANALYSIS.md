@@ -328,20 +328,28 @@ Key design decisions:
 
 ## Trace Data Reference
 
-- **Tracer v2**: `tools/dynamic-tracers/crypto-tracer-v2.js`
-  - Region hit counts: region1=8, region2=810, region3=802, exit=8 (across 2 getData() calls)
-  - Inner loop: 401 iterations per getData(), processing 3,208 bytes total
+The findings below were established by dynamic tracing during the
+Template-A reverse-engineering effort. The tracers themselves
+(`crypto-tracer-v2.js`, `crypto-tracer-v3.js`, `comparison-harness.js`) were
+deleted once their methodology had been absorbed into
+`tools/porting-pipeline/key-extractor.js` (template-agnostic cipher-round
+extraction) and `tools/porting-pipeline/token-verifier.js` (frozen-env
+byte-identical verification). Retrieve them from git history if needed.
+
+- **Dispatch-level trace (v2-era)**
+  - Region hit counts: region1=8, region2=810, region3=802, exit=8 (across 2 `getData()` calls)
+  - Inner loop: 401 iterations per `getData()`, processing 3,208 bytes total
   - Self-mod: Y[40178]: 37→87 (first pass), then 87→87 (idempotent)
   - Loop mechanism: CJMP (opcode 87), F.length=0 (no exception handling involved)
 
-- **Tracer v3 (Task 7.4)**: `tools/dynamic-tracers/crypto-tracer-v3.js`
+- **Cipher-round deep trace (v3-era)**
   - Deep arithmetic traces for 3 cipher round calls (1491 ops each)
   - Func identification: func_204 (cipher), func_136 (converter), func_140 (serializer)
   - Key finding: cipher is modified XTEA with key-index modifications
   - Loop termination: sum == 32 * DELTA (84,941,944,608) — compared without 32-bit truncation
 
 - **Reimplementation**: `tools/scraper/token-generator/crypto-core.js`
-  - Verified against all 802 cipher round I/O pairs (100% match)
+  - Verified against all 802 cipher round I/O pairs from the v2-era trace (100% match)
   - Verified against all 1,604 converter calls (100% match)
   - Verified against all 1,604 serializer calls (100% match)
-  - All 4 btoa segments match the v2 tracer's ground truth byte-for-byte
+  - All 4 btoa segments match the trace ground truth byte-for-byte
