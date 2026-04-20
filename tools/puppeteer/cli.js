@@ -9,7 +9,7 @@
  *
  * Usage:
  *   node tools/puppeteer/cli.js --domain example.com
- *   node tools/puppeteer/cli.js --domains domain.lst --output results.json
+ *   node tools/puppeteer/cli.js --domains domain.lst --output output/puppeteer/results.json
  *   node tools/puppeteer/cli.js --help
  */
 
@@ -23,12 +23,12 @@ Puppeteer CAPTCHA Solver — Tencent Slide CAPTCHA
 
 Usage:
   node tools/puppeteer/cli.js --domain <domain>
-  node tools/puppeteer/cli.js --domains <file> [--output results.json]
+  node tools/puppeteer/cli.js --domains <file> [--output output/puppeteer/results.json]
 
 Options:
   --domain <domain>     Solve CAPTCHA for a single domain
   --domains <file>      File with one domain per line
-  --output <path>       Output JSON file (default: results.json)
+  --output <path>       Output JSON file (default: output/puppeteer/results.json)
   --aid <id>            CAPTCHA app ID (default: ${DEFAULT_AID})
   --max-retries <n>     Max retry attempts per domain (default: 3)
   --delay <ms>          Delay between domains (default: 2000)
@@ -72,7 +72,7 @@ async function main() {
     domains = content.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
   }
 
-  const output = args.output || 'results.json';
+  const output = args.output || path.resolve(__dirname, '..', '..', 'output', 'puppeteer', 'results.json');
   const aid = args.aid || DEFAULT_AID;
   const maxRetries = parseInt(args['max-retries'] || '3', 10);
   const delayMs = parseInt(args.delay || '2000', 10);
@@ -142,6 +142,7 @@ async function main() {
     await solver.close();
   }
 
+  fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify(results, null, 2));
   console.error(`\nResults written to ${output}`);
   process.stdout.write(JSON.stringify(results, null, 2) + '\n');
