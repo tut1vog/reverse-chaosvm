@@ -1,0 +1,546 @@
+{
+  "generatedAt": "2026-04-20T14:35:23.843Z",
+  "totalElapsedMs": 179352,
+  "args": {
+    "count": 30,
+    "delayMs": 1500
+  },
+  "totals": {
+    "count": 30,
+    "success": 7,
+    "fail": 23
+  },
+  "errorCodeHistogram": {
+    "0": 7,
+    "12": 23
+  },
+  "autoPortFailures": [],
+  "perTdcName": {
+    "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk": {
+      "count": 3,
+      "successCount": 3,
+      "errorCodes": {
+        "0": 3
+      }
+    },
+    "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj": {
+      "count": 6,
+      "successCount": 1,
+      "errorCodes": {
+        "0": 1,
+        "12": 5
+      }
+    },
+    "UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS": {
+      "count": 2,
+      "successCount": 1,
+      "errorCodes": {
+        "0": 1,
+        "12": 1
+      }
+    },
+    "gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR": {
+      "count": 3,
+      "successCount": 1,
+      "errorCodes": {
+        "0": 1,
+        "12": 2
+      }
+    },
+    "GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV": {
+      "count": 5,
+      "successCount": 1,
+      "errorCodes": {
+        "0": 1,
+        "12": 4
+      }
+    },
+    "BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ": {
+      "count": 4,
+      "successCount": 0,
+      "errorCodes": {
+        "12": 4
+      }
+    },
+    "HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA": {
+      "count": 2,
+      "successCount": 0,
+      "errorCodes": {
+        "12": 2
+      }
+    },
+    "dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH": {
+      "count": 1,
+      "successCount": 0,
+      "errorCodes": {
+        "12": 1
+      }
+    },
+    "DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG": {
+      "count": 2,
+      "successCount": 0,
+      "errorCodes": {
+        "12": 2
+      }
+    },
+    "FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF": {
+      "count": 2,
+      "successCount": 0,
+      "errorCodes": {
+        "12": 2
+      }
+    }
+  },
+  "rows": [
+    {
+      "index": 1,
+      "startedAt": "2026-04-20T14:32:24.492Z",
+      "elapsedMs": 5217,
+      "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
+      "sourceHash": "e5341ccb12b78e65",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 2,
+      "startedAt": "2026-04-20T14:32:31.213Z",
+      "elapsedMs": 3445,
+      "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
+      "sourceHash": "e5341ccb12b78e65",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 3,
+      "startedAt": "2026-04-20T14:32:36.164Z",
+      "elapsedMs": 4615,
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sourceHash": "e6a45ba64d246f82",
+      "caseCount": 98,
+      "templateLabel": "unknown",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 4,
+      "startedAt": "2026-04-20T14:32:42.284Z",
+      "elapsedMs": 12820,
+      "tdcName": "UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS",
+      "sourceHash": "88ebeea62f566ec5",
+      "caseCount": 99,
+      "templateLabel": "unknown",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 5,
+      "startedAt": "2026-04-20T14:32:56.606Z",
+      "elapsedMs": 5012,
+      "tdcName": "SlVCfKSRjkmVXRnTigehmWSaDkeUUNfk",
+      "sourceHash": "e5341ccb12b78e65",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 6,
+      "startedAt": "2026-04-20T14:33:03.127Z",
+      "elapsedMs": 4441,
+      "tdcName": "gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR",
+      "sourceHash": "02fd132edb24a8c1",
+      "caseCount": 100,
+      "templateLabel": "C",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 7,
+      "startedAt": "2026-04-20T14:33:09.081Z",
+      "elapsedMs": 3784,
+      "tdcName": "GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV",
+      "sourceHash": "8f1d32beb4fcaa4d",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": true,
+      "errorCode": 0,
+      "ticketPresent": true,
+      "randstrPresent": true,
+      "failureKind": null,
+      "errorMessage": null
+    },
+    {
+      "index": 8,
+      "startedAt": "2026-04-20T14:33:14.371Z",
+      "elapsedMs": 6134,
+      "tdcName": "BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ",
+      "sourceHash": "3429444f324c6110",
+      "caseCount": 91,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 9,
+      "startedAt": "2026-04-20T14:33:19.113Z",
+      "elapsedMs": 3718,
+      "tdcName": "UAniMSgbcnMTPUjjGcEVEnBCQgkKHVWS",
+      "sourceHash": "88ebeea62f566ec5",
+      "caseCount": 99,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 10,
+      "startedAt": "2026-04-20T14:33:24.336Z",
+      "elapsedMs": 3513,
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sourceHash": "e6a45ba64d246f82",
+      "caseCount": 98,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 11,
+      "startedAt": "2026-04-20T14:33:29.352Z",
+      "elapsedMs": 3460,
+      "tdcName": "GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV",
+      "sourceHash": "8f1d32beb4fcaa4d",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 12,
+      "startedAt": "2026-04-20T14:33:34.315Z",
+      "elapsedMs": 4689,
+      "tdcName": "gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR",
+      "sourceHash": "02fd132edb24a8c1",
+      "caseCount": 100,
+      "templateLabel": "C",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 13,
+      "startedAt": "2026-04-20T14:33:40.505Z",
+      "elapsedMs": 4576,
+      "tdcName": "BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ",
+      "sourceHash": "3429444f324c6110",
+      "caseCount": 91,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 14,
+      "startedAt": "2026-04-20T14:33:46.589Z",
+      "elapsedMs": 2141,
+      "tdcName": "HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA",
+      "sourceHash": "27dda893f81dbc4f",
+      "caseCount": 103,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 15,
+      "startedAt": "2026-04-20T14:33:50.318Z",
+      "elapsedMs": 4505,
+      "tdcName": "dNiffQDBnfBhFYVHJUXMVbRchmDEmPaH",
+      "sourceHash": "f53142c54fc43699",
+      "caseCount": 92,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 16,
+      "startedAt": "2026-04-20T14:33:56.334Z",
+      "elapsedMs": 5123,
+      "tdcName": "DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG",
+      "sourceHash": "e2170903e201e018",
+      "caseCount": 93,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 17,
+      "startedAt": "2026-04-20T14:34:02.994Z",
+      "elapsedMs": 6347,
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sourceHash": "e6a45ba64d246f82",
+      "caseCount": 98,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 18,
+      "startedAt": "2026-04-20T14:34:10.845Z",
+      "elapsedMs": 4044,
+      "tdcName": "BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ",
+      "sourceHash": "3429444f324c6110",
+      "caseCount": 91,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 19,
+      "startedAt": "2026-04-20T14:34:16.392Z",
+      "elapsedMs": 4326,
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sourceHash": "e6a45ba64d246f82",
+      "caseCount": 98,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 20,
+      "startedAt": "2026-04-20T14:34:22.219Z",
+      "elapsedMs": 5027,
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sourceHash": "e6a45ba64d246f82",
+      "caseCount": 98,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 21,
+      "startedAt": "2026-04-20T14:34:28.780Z",
+      "elapsedMs": 3471,
+      "tdcName": "GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV",
+      "sourceHash": "8f1d32beb4fcaa4d",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 22,
+      "startedAt": "2026-04-20T14:34:33.756Z",
+      "elapsedMs": -833,
+      "tdcName": "XcabTONObCYZeEGNPRmPGBQbTmYKEAHj",
+      "sourceHash": "e6a45ba64d246f82",
+      "caseCount": 98,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 23,
+      "startedAt": "2026-04-20T14:34:34.442Z",
+      "elapsedMs": 5056,
+      "tdcName": "HhXakMGlnYKgNcBiVFZCDckSRgJKTmgA",
+      "sourceHash": "27dda893f81dbc4f",
+      "caseCount": 103,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 24,
+      "startedAt": "2026-04-20T14:34:41.003Z",
+      "elapsedMs": 3861,
+      "tdcName": "BGDfWkdQOJJJTnHCNCnZRJZJSeFRWONJ",
+      "sourceHash": "3429444f324c6110",
+      "caseCount": 91,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 25,
+      "startedAt": "2026-04-20T14:34:46.366Z",
+      "elapsedMs": 5494,
+      "tdcName": "GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV",
+      "sourceHash": "8f1d32beb4fcaa4d",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 26,
+      "startedAt": "2026-04-20T14:34:53.389Z",
+      "elapsedMs": 6177,
+      "tdcName": "gUbSKiHCiVNcdeXaKTECbTOEkdOclkcR",
+      "sourceHash": "02fd132edb24a8c1",
+      "caseCount": 100,
+      "templateLabel": "C",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 27,
+      "startedAt": "2026-04-20T14:35:01.068Z",
+      "elapsedMs": 4093,
+      "tdcName": "FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF",
+      "sourceHash": "daf0c711ccb82124",
+      "caseCount": 94,
+      "templateLabel": "B",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 28,
+      "startedAt": "2026-04-20T14:35:06.664Z",
+      "elapsedMs": 4495,
+      "tdcName": "GCDJAPicKHeHfOBnnYMEdUgUkTnAhOFV",
+      "sourceHash": "8f1d32beb4fcaa4d",
+      "caseCount": 96,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 29,
+      "startedAt": "2026-04-20T14:35:12.661Z",
+      "elapsedMs": 4664,
+      "tdcName": "DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG",
+      "sourceHash": "e2170903e201e018",
+      "caseCount": 93,
+      "templateLabel": "unknown",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    },
+    {
+      "index": 30,
+      "startedAt": "2026-04-20T14:35:18.830Z",
+      "elapsedMs": 5012,
+      "tdcName": "FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF",
+      "sourceHash": "daf0c711ccb82124",
+      "caseCount": 94,
+      "templateLabel": "B",
+      "success": false,
+      "errorCode": 12,
+      "ticketPresent": false,
+      "randstrPresent": false,
+      "failureKind": "errorCode-12",
+      "errorMessage": "CAPTCHA verify returned errorCode 12"
+    }
+  ]
+}
