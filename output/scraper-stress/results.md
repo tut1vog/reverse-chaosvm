@@ -63,3 +63,20 @@ _none_
 | 29 | false | 12 | e2170903 | DkPDkCnAekYMgVghTDOeSKmVZbkVCQUG | 93 | 4664 | errorCode-12 |
 | 30 | false | 12 | daf0c711 | FVgbJVJYTmGMFSCMcnTkYjmSFkYnESZF | 94 | 5012 | errorCode-12 |
 
+## Interpretation
+
+The 23 `errorCode 12` failures are **IP-based rate limiting** (confirmed
+empirically 2026-04-20). The shape of this run — 7 successes from a
+single public IP followed by 23 consecutive `errorCode 12` failures —
+is consistent with a per-IP rate window on `cap_union_new_verify`:
+
+- The error is independent of the `tdc.js` build (10 distinct source
+  hashes seen in the run; 9 appeared among the failures).
+- Four TDC_NAMEs flipped from success to `errorCode 12` within the same
+  run (`XcabTONOb…` 1→5, `UAniMSgb…` 1→1, `GCDJAPicK…` 1→4, `gUbSKiHC…`
+  1→2), so the rejection is not per-build nor per-TDC_NAME but tied to
+  the calling client.
+
+See `docs/CAPTCHA_ORCHESTRATOR.md` §7 for the updated error-code
+semantics.
+

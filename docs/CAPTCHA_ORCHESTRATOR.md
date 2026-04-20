@@ -596,8 +596,14 @@ Module 56 distinguishes the following non-zero error codes (FLOW.md §4.6):
 
 - **9** — wrong answer: show `puzzle8` cover, shake, call `q()` (refresh /
   getsig loop, §3.5).
-- **12** — soft fail: show `puzzle9` cover with refresh hook `q`. Distinct
-  from plain IP rate limiting.
+- **12** — **IP-based rate limiting** (confirmed empirically 2026-04-20;
+  see `output/scraper-stress/results.md` for the N=30 run where 23/23
+  failures were `errorCode 12` clustered after an initial success burst
+  from a single IP). Client-side: show `puzzle9` cover and install refresh
+  hook `q`. The client handler is a generic soft-retry; the server gates
+  further verify attempts from the offending IP until the rate window
+  expires. Superseded an earlier hypothesis that `errorCode 12` was
+  distinct from plain IP rate limiting.
 - **16 / 20 / 21** — session expired: `s.sessionTimeout()` (postMessage
   type 12 to parent).
 - **30 / 51** — hybrid verify handoff: `s.hybridVerify(e.sess, h.get())`
@@ -704,5 +710,9 @@ documentation. **No contradictions were found.** Each bullet below records a
   `errorCode 12` as a soft-retryable failure via `case 12:
   m.showCoverError("puzzle9", null, q, a.queryParam("sid"))`, with no
   special cleanup beyond the `e.sess && w(e.sess)` that runs
-  unconditionally before the switch. Consistent with the separately-recorded
-  finding that `errorCode 12` is not plain IP rate limiting.
+  unconditionally before the switch. Server-side semantic is **IP-based
+  rate limiting** (confirmed empirically 2026-04-20 — see §7 error-code
+  list and `output/scraper-stress/results.md`). This supersedes an earlier
+  separately-recorded finding that `errorCode 12` was not plain IP rate
+  limiting; the client-side handler is generic soft-retry and does not by
+  itself disclose the server reason.
