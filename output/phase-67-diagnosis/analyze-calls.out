@@ -1,0 +1,321 @@
+=== tdc-08.js ===
+bytecode=_0x3ff919 pc=_0x15c987 regs=_0x4a24ea cases=92
+total CallExpressions in switch: 122
+
+-- top callee shapes (count, signature) --
+  57  callee=Id(_0x79777a)
+        case 1:  _0x79777a(0xeb)
+  8  Id(String)[<computed>] args=[Member(Id(_0x3ff919)[Upd(++Id(_0x15c987))])]
+        case 14:  String[_0x79777a(0x113)](_0x3ff919[++_0x15c987])
+  7  Id(_0x361e76)[<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 7:  _0x361e76[_0x79777a(0x128)](_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24ea[_0x3ff919[++_0x15c987]])
+  5  Id(_0x361e76)[<computed>] args=[Id,Lit]
+        case 34:  _0x361e76[_0x79777a(0x104)](_0x15c987,0x1)
+  5  Id(_0x361e76)[<computed>] args=[regs[bc[++pc]],Member(Id(_0x3ff919)[Upd(++Id(_0x15c987))])]
+        case 45:  _0x361e76[_0x79777a(0x105)](_0x4a24ea[_0x3ff919[++_0x15c987]],_0x3ff919[++_0x15c987])
+  4  Id(String)["fromCharCode"] args=[Member(Id(_0x3ff919)[Upd(++Id(_0x15c987))])]
+        case 22:  String['fromCharCode'](_0x3ff919[++_0x15c987])
+  3  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]]]
+        case 4:  _0x4a24ea[_0x3ff919[++_0x15c987]][_0x79777a(0x10e)](_0x4f6760,_0x4a24ea[_0x3ff919[++_0x15c987]])
+  3  Id(_0xbb4883)[<computed>] args=[regs[bc[++pc]]]
+        case 34:  _0xbb4883[_0x79777a(0xeb)](_0x4a24ea[_0x3ff919[++_0x15c987]])
+  2  Id(_0x361e76)[<computed>] args=[Id,Member(Id(_0x3ff919)[Upd(++Id(_0x15c987))])]
+        case 1:  _0x361e76[_0x79777a(0xed)](_0x15c987,_0x3ff919[++_0x15c987])
+  2  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]],...]
+        case 5:  _0x4a24ea[_0x3ff919[++_0x15c987]][_0x79777a(0x10e)](_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24ea[_0x3ff9...
+  2  Id(_0x4d7455)[<computed>] args=[BinaryExpression]
+        case 12:  _0x4d7455[_0x79777a(0xeb)](_0x15c987+_0x3ff919[++_0x15c987])
+  2  Id(Object)[<computed>] args=[Member(Id(_0x4a24ea)[Id(_0x3ff919)[Call(Id(_0x361e76)[Call(Id(_0x79777a), n=1)], n=2)]]),CallExpression,...]
+        case 34:  Object[_0x79777a(0x11f)](_0x4a24ea[_0x3ff919[_0x361e76[_0x79777a(0x104)](_0x15c987,0x1)]],_0x79777a(0x118),{'value':_0x3ff919[++_0x15c987...
+  2  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]],...]
+        case 37:  _0x4a24ea[_0x3ff919[++_0x15c987]][_0x79777a(0x10e)](_0x4f6760,_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24...
+  2  callee=Id(_0x31502d)
+        case 40:  _0x31502d(_0x15c987+_0x3ff919[++_0x15c987],_0xbb4883,_0x224365,_0x2fe407,_0x5dc7d0)
+  2  Id(_0xbb4883)["push"] args=[regs[bc[++pc]]]
+        case 50:  _0xbb4883['push'](_0x4a24ea[_0x3ff919[++_0x15c987]])
+  1  Id(_0x4d7455)[<computed>] args=[CallExpression]
+        case 1:  _0x4d7455[_0x79777a(0xeb)](_0x361e76[_0x79777a(0xed)](_0x15c987,_0x3ff919[++_0x15c987]))
+  1  callee=Id(Array)
+        case 8:  Array(_0x3ff919[++_0x15c987])
+  1  Id(_0x4d7455)["pop"] args=[]
+        case 20:  _0x4d7455['pop']()
+  1  Id(_0x361e76)["DlILJ"] args=[regs[bc[++pc]],Member(Id(_0x3ff919)[Upd(++Id(_0x15c987))])]
+        case 30:  _0x361e76['DlILJ'](_0x4a24ea[_0x3ff919[++_0x15c987]],_0x3ff919[++_0x15c987])
+  1  Id(_0xbb4883)[<computed>] args=[Id]
+        case 33:  _0xbb4883[_0x79777a(0xeb)](_0x3dc862)
+
+current rule matches: 0 candidates={}
+
+-- Calls with callee object=regs[...] — property distribution --
+  10  prop=[Call(Id(_0x79777a), n=1)]
+        case 4:  _0x4a24ea[_0x3ff919[++_0x15c987]][_0x79777a(0x10e)](_0x4f6760,_0x4a24ea[_0x3ff919[++_0x15c987]])
+  1  prop=["call"]
+        case 67:  _0x4a24ea[_0x3ff919[++_0x15c987]]['call'](_0x4a24ea[_0x3ff919[++_0x15c987]])
+
+-- regs[bytecode[++pc]].<prop>(Identifier,...) — arg[0] identifier freq per prop --
+  6  [Call(Id(_0x79777a), n=1)] :: arg0=Id(_0x4f6760)
+        case 4:  _0x4a24ea[_0x3ff919[++_0x15c987]][_0x79777a(0x10e)](_0x4f6760,_0x4a24ea[_0x3ff919[++_0x15c987]])
+  4  [Call(Id(_0x79777a), n=1)] :: arg0=regs[bc[++pc]]
+        case 5:  _0x4a24ea[_0x3ff919[++_0x15c987]][_0x79777a(0x10e)](_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24ea[_0x3ff919[++_0x15c987]],_0x4a24ea[_0x3ff919[++_0x15c987]])
+  1  ["call"] :: arg0=regs[bc[++pc]]
+        case 67:  _0x4a24ea[_0x3ff919[++_0x15c987]]['call'](_0x4a24ea[_0x3ff919[++_0x15c987]])
+
+
+=== tdc-09.js ===
+bytecode=_0xc06ffc pc=_0x536cc0 regs=_0x29ce13 cases=99
+total CallExpressions in switch: 127
+
+-- top callee shapes (count, signature) --
+  59  callee=Id(_0x1ab1ec)
+        case 1:  _0x1ab1ec(0x11f)
+  14  Id(String)[<computed>] args=[Member(Id(_0xc06ffc)[Upd(++Id(_0x536cc0))])]
+        case 5:  String[_0x1ab1ec(0x129)](_0xc06ffc[++_0x536cc0])
+  6  Id(_0x18f732)[<computed>] args=[regs[bc[++pc]],Member(Id(_0xc06ffc)[Upd(++Id(_0x536cc0))])]
+        case 9:  _0x18f732[_0x1ab1ec(0x136)](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0xc06ffc[++_0x536cc0])
+  5  Id(_0x18f732)[<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 1:  _0x18f732[_0x1ab1ec(0x11f)](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  5  Id(_0x2fc2d1)[<computed>] args=[regs[bc[++pc]]]
+        case 12:  _0x2fc2d1[_0x1ab1ec(0x142)](_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  4  Id(_0x18f732)[<computed>] args=[Id,Lit]
+        case 12:  _0x18f732[_0x1ab1ec(0x12d)](_0x3a6e34,0x0)
+  3  callee=Id(_0x7e5074)
+        case 12:  _0x7e5074(_0x18f732[_0x1ab1ec(0x144)](_0x536cc0,_0xc06ffc[++_0x536cc0]),_0x2fc2d1,_0x3ec545,_0x4ad25e,_0x288faa)
+  3  Id(_0x18f732)[<computed>] args=[Id,Member(Id(_0xc06ffc)[Upd(++Id(_0x536cc0))])]
+        case 12:  _0x18f732[_0x1ab1ec(0x144)](_0x536cc0,_0xc06ffc[++_0x536cc0])
+  2  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]]]
+        case 8:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x149)](_0x54b916,_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  2  Id(String)["fromCharCode"] args=[Member(Id(_0xc06ffc)[Upd(++Id(_0x536cc0))])]
+        case 17:  String['fromCharCode'](_0xc06ffc[++_0x536cc0])
+  2  Id(_0x3e5e9a)[<computed>] args=[CallExpression]
+        case 25:  _0x3e5e9a[_0x1ab1ec(0x142)](_0x18f732['TFYze'](_0x536cc0,_0xc06ffc[++_0x536cc0]))
+  2  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]],...]
+        case 32:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x149)](_0x54b916,_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  2  regs[bytecode[++pc]]["call"] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 53:  _0x29ce13[_0xc06ffc[++_0x536cc0]]['call'](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  1  callee=Id(Array)
+        case 4:  Array(_0xc06ffc[++_0x536cc0])
+  1  regs[bytecode[++pc]]["call"] args=[regs[bc[++pc]],regs[bc[++pc]],...]
+        case 11:  _0x29ce13[_0xc06ffc[++_0x536cc0]]['call'](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x53...
+  1  Id(Object)["defineProperty"] args=[Member(Id(_0x29ce13)[Id(_0xc06ffc)[Bin(Id(_0x536cc0) - Lit(1))]]),Member(Id(_0x18f732)["rUbLL"]),...]
+        case 12:  Object['defineProperty'](_0x29ce13[_0xc06ffc[_0x536cc0-0x1]],_0x18f732['rUbLL'],{'value':_0xc06ffc[++_0x536cc0],'configurable':!![],'writ...
+  1  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]],...]
+        case 13:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x149)](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06f...
+  1  Id(_0x2fc2d1)[<computed>] args=[]
+        case 18:  _0x2fc2d1[_0x1ab1ec(0x134)]()
+  1  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],Id]
+        case 23:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x146)](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x2fc2d1)
+  1  Id(_0x18f732)["TFYze"] args=[Id,Member(Id(_0xc06ffc)[Upd(++Id(_0x536cc0))])]
+        case 25:  _0x18f732['TFYze'](_0x536cc0,_0xc06ffc[++_0x536cc0])
+
+current rule matches: 0 candidates={}
+
+-- Calls with callee object=regs[...] — property distribution --
+  7  prop=[Call(Id(_0x1ab1ec), n=1)]
+        case 8:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x149)](_0x54b916,_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  4  prop=["call"]
+        case 11:  _0x29ce13[_0xc06ffc[++_0x536cc0]]['call'](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]])
+
+-- regs[bytecode[++pc]].<prop>(Identifier,...) — arg[0] identifier freq per prop --
+  5  [Call(Id(_0x1ab1ec), n=1)] :: arg0=Id(_0x54b916)
+        case 8:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x149)](_0x54b916,_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  4  ["call"] :: arg0=regs[bc[++pc]]
+        case 11:  _0x29ce13[_0xc06ffc[++_0x536cc0]]['call'](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]])
+  2  [Call(Id(_0x1ab1ec), n=1)] :: arg0=regs[bc[++pc]]
+        case 13:  _0x29ce13[_0xc06ffc[++_0x536cc0]][_0x1ab1ec(0x149)](_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]],_0x29ce13[_0xc06ffc[++_0x536cc0]])
+
+
+=== tdc-01.js ===
+bytecode=_0x496410 pc=_0x23b425 regs=_0x293063 cases=96
+total CallExpressions in switch: 126
+
+-- top callee shapes (count, signature) --
+  57  callee=Id(_0x3fe4a4)
+        case 5:  _0x3fe4a4(0x11f)
+  10  Id(String)[<computed>] args=[Member(Id(_0x496410)[Upd(++Id(_0x23b425))])]
+        case 13:  String[_0x3fe4a4(0x146)](_0x496410[++_0x23b425])
+  6  Id(_0x4b7a91)[<computed>] args=[regs[bc[++pc]],Member(Id(_0x496410)[Upd(++Id(_0x23b425))])]
+        case 9:  _0x4b7a91[_0x3fe4a4(0x156)](_0x293063[_0x496410[++_0x23b425]],_0x496410[++_0x23b425])
+  6  Id(_0x4b7a91)[<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 10:  _0x4b7a91[_0x3fe4a4(0x143)](_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]])
+  4  Id(_0x4b7a91)[<computed>] args=[Id,Lit]
+        case 18:  _0x4b7a91[_0x3fe4a4(0x13e)](_0x23b425,0x1)
+  4  Id(_0x4b7a91)[<computed>] args=[Id,Member(Id(_0x496410)[Upd(++Id(_0x23b425))])]
+        case 41:  _0x4b7a91[_0x3fe4a4(0x140)](_0x23b425,_0x496410[++_0x23b425])
+  3  Id(String)["fromCharCode"] args=[Member(Id(_0x496410)[Upd(++Id(_0x23b425))])]
+        case 16:  String['fromCharCode'](_0x496410[++_0x23b425])
+  3  Id(_0x5c72f5)[<computed>] args=[regs[bc[++pc]]]
+        case 18:  _0x5c72f5[_0x3fe4a4(0x12f)](_0x293063[_0x496410[++_0x23b425]])
+  3  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]]]
+        case 25:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x5ae5b4,_0x293063[_0x496410[++_0x23b425]])
+  2  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 8:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]])
+  2  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]],...]
+        case 12:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x4964...
+  2  Id(_0x5c72f5)["push"] args=[regs[bc[++pc]]]
+        case 55:  _0x5c72f5['push'](_0x293063[_0x496410[++_0x23b425]])
+  2  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]],...]
+        case 71:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x5ae5b4,_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]])
+  2  callee=Id(_0x59d41d)
+        case 75:  _0x59d41d(_0x4b7a91[_0x3fe4a4(0x128)](_0x23b425,_0x496410[++_0x23b425]),_0x5c72f5,_0x271985,_0x28a441,_0x2aa449)
+  1  Id(_0x4b7a91)["TojTB"] args=[Id,Lit]
+        case 5:  _0x4b7a91['TojTB'](_0x23b425,0x1)
+  1  regs[bytecode[++pc]]["call"] args=[regs[bc[++pc]]]
+        case 6:  _0x293063[_0x496410[++_0x23b425]]['call'](_0x293063[_0x496410[++_0x23b425]])
+  1  Id(_0x4b7a91)["GffQs"] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 15:  _0x4b7a91['GffQs'](_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]])
+  1  Id(_0x4b7a91)["HnrHu"] args=[Id,Lit]
+        case 18:  _0x4b7a91['HnrHu'](_0x26fcfc,0x0)
+  1  Id(_0x4b7a91)[<computed>] args=[Id,BinaryExpression,...]
+        case 18:  _0x4b7a91[_0x3fe4a4(0x11e)](_0x59d41d,_0x23b425+_0x496410[++_0x23b425],_0x5c72f5,_0x271985,_0x28a441,_0x2aa449)
+  1  Id(Object)[<computed>] args=[Member(Id(_0x293063)[Id(_0x496410)[Call(Id(_0x4b7a91)[Call(Id(_0x3fe4a4), n=1)], n=2)]]),Member(Id(_0x4b7a91)[Call(Id(_0x3fe4a4), n=1)]),...]
+        case 18:  Object[_0x3fe4a4(0x144)](_0x293063[_0x496410[_0x4b7a91[_0x3fe4a4(0x13e)](_0x23b425,0x1)]],_0x4b7a91[_0x3fe4a4(0x13b)],{'value':_0x496410[...
+
+current rule matches: 1 candidates={"_0x5ae5b4":1}
+
+-- Calls with callee object=regs[...] — property distribution --
+  10  prop=[Call(Id(_0x3fe4a4), n=1)]
+        case 8:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]])
+  2  prop=["call"]
+        case 6:  _0x293063[_0x496410[++_0x23b425]]['call'](_0x293063[_0x496410[++_0x23b425]])
+
+-- regs[bytecode[++pc]].<prop>(Identifier,...) — arg[0] identifier freq per prop --
+  5  [Call(Id(_0x3fe4a4), n=1)] :: arg0=regs[bc[++pc]]
+        case 8:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x293063[_0x496410[++_0x23b425]],_0x293063[_0x496410[++_0x23b425]])
+  5  [Call(Id(_0x3fe4a4), n=1)] :: arg0=Id(_0x5ae5b4)
+        case 25:  _0x293063[_0x496410[++_0x23b425]][_0x3fe4a4(0x13c)](_0x5ae5b4,_0x293063[_0x496410[++_0x23b425]])
+  1  ["call"] :: arg0=regs[bc[++pc]]
+        case 6:  _0x293063[_0x496410[++_0x23b425]]['call'](_0x293063[_0x496410[++_0x23b425]])
+  1  ["call"] :: arg0=Id(_0x5ae5b4)
+        case 47:  _0x293063[_0x496410[++_0x23b425]]['call'](_0x5ae5b4)
+
+
+=== tdc-10.js ===
+bytecode=_0x319b10 pc=_0x2be400 regs=_0x304860 cases=94
+total CallExpressions in switch: 136
+
+-- top callee shapes (count, signature) --
+  63  callee=Id(_0x126831)
+        case 1:  _0x126831(0x1d9)
+  9  Id(_0x51aa7b)[<computed>] args=[regs[bc[++pc]],Member(Id(_0x319b10)[Upd(++Id(_0x2be400))])]
+        case 1:  _0x51aa7b[_0x126831(0x1d9)](_0x304860[_0x319b10[++_0x2be400]],_0x319b10[++_0x2be400])
+  9  Id(String)[<computed>] args=[Member(Id(_0x319b10)[Upd(++Id(_0x2be400))])]
+        case 27:  String[_0x126831(0x1d7)](_0x319b10[++_0x2be400])
+  6  Id(_0x51aa7b)[<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 20:  _0x51aa7b[_0x126831(0x1c5)](_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]])
+  5  Id(_0x51aa7b)[<computed>] args=[Id,Lit]
+        case 25:  _0x51aa7b[_0x126831(0x1c3)](_0x2be400,0x1)
+  4  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]]]
+        case 15:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x5c6106,_0x304860[_0x319b10[++_0x2be400]])
+  4  Id(String)["fromCharCode"] args=[Member(Id(_0x319b10)[Upd(++Id(_0x2be400))])]
+        case 30:  String['fromCharCode'](_0x319b10[++_0x2be400])
+  3  Id(_0x51aa7b)[<computed>] args=[Id,Member(Id(_0x319b10)[Upd(++Id(_0x2be400))])]
+        case 67:  _0x51aa7b[_0x126831(0x1e6)](_0x2be400,_0x319b10[++_0x2be400])
+  3  Id(_0x1b84f1)[<computed>] args=[regs[bc[++pc]]]
+        case 73:  _0x1b84f1[_0x126831(0x1aa)](_0x304860[_0x319b10[++_0x2be400]])
+  2  Id(_0x1b84f1)["push"] args=[regs[bc[++pc]]]
+        case 45:  _0x1b84f1['push'](_0x304860[_0x319b10[++_0x2be400]])
+  2  callee=Id(_0x251147)
+        case 45:  _0x251147(_0x2be400+_0x319b10[++_0x2be400],_0x1b84f1,_0x103e5a,_0x588af4,_0x4b8eb9)
+  2  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]],...]
+        case 51:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b...
+  1  Id(_0x1b84f1)[<computed>] args=[Id]
+        case 11:  _0x1b84f1[_0x126831(0x1aa)](_0xee3618)
+  1  Id(_0x23b34e)[<computed>] args=[]
+        case 23:  _0x23b34e[_0x126831(0x1d6)]()
+  1  Id(_0x51aa7b)[<computed>] args=[Member(Id(_0x51aa7b)[Call(Id(_0x126831), n=1)]),UnaryExpression]
+        case 25:  _0x51aa7b[_0x126831(0x1bd)](_0x51aa7b[_0x126831(0x1ac)],typeof _0x304860[_0x319b10[_0x51aa7b[_0x126831(0x1c3)](_0x2be400,0x1)]])
+  1  Id(_0x51aa7b)[<computed>] args=[regs[bc[++pc]],Lit]
+        case 25:  _0x51aa7b[_0x126831(0x1a9)](_0x304860[_0x319b10[++_0x2be400]],0x0)
+  1  Id(_0x1b84f1)["shift"] args=[]
+        case 38:  _0x1b84f1['shift']()
+  1  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 39:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]])
+  1  Id(Object)["defineProperty"] args=[Member(Id(_0x304860)[Id(_0x319b10)[Call(Id(_0x51aa7b)[Call(Id(_0x126831), n=1)], n=2)]]),Member(Id(_0x51aa7b)[Call(Id(_0x126831), n=1)]),...]
+        case 45:  Object['defineProperty'](_0x304860[_0x319b10[_0x51aa7b[_0x126831(0x1a9)](_0x2be400,0x1)]],_0x51aa7b[_0x126831(0x1bf)],{'value':_0x319b10[...
+  1  regs[bytecode[++pc]][<computed>] args=[Id]
+        case 50:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x5c6106)
+
+current rule matches: 1 candidates={"_0x5c6106":1}
+
+-- Calls with callee object=regs[...] — property distribution --
+  11  prop=[Call(Id(_0x126831), n=1)]
+        case 15:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x5c6106,_0x304860[_0x319b10[++_0x2be400]])
+  1  prop=["call"]
+        case 62:  _0x304860[_0x319b10[++_0x2be400]]['call'](_0x5c6106,_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]])
+
+-- regs[bytecode[++pc]].<prop>(Identifier,...) — arg[0] identifier freq per prop --
+  6  [Call(Id(_0x126831), n=1)] :: arg0=Id(_0x5c6106)
+        case 15:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x5c6106,_0x304860[_0x319b10[++_0x2be400]])
+  5  [Call(Id(_0x126831), n=1)] :: arg0=regs[bc[++pc]]
+        case 39:  _0x304860[_0x319b10[++_0x2be400]][_0x126831(0x1bb)](_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]])
+  1  ["call"] :: arg0=Id(_0x5c6106)
+        case 62:  _0x304860[_0x319b10[++_0x2be400]]['call'](_0x5c6106,_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]],_0x304860[_0x319b10[++_0x2be400]])
+
+
+=== tdc-20.js ===
+bytecode=_0x534f24 pc=_0x29aa77 regs=_0x454100 cases=100
+total CallExpressions in switch: 140
+
+-- top callee shapes (count, signature) --
+  65  callee=Id(_0x24e57e)
+        case 0:  _0x24e57e(0x10c)
+  12  Id(String)[<computed>] args=[Member(Id(_0x534f24)[Upd(++Id(_0x29aa77))])]
+        case 1:  String[_0x24e57e(0xed)](_0x534f24[++_0x29aa77])
+  8  Id(_0x2e0d5e)[<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 0:  _0x2e0d5e[_0x24e57e(0x10c)](_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f24[++_0x29aa77]])
+  6  Id(_0x2e0d5e)[<computed>] args=[Id,Member(Id(_0x534f24)[Upd(++Id(_0x29aa77))])]
+        case 22:  _0x2e0d5e[_0x24e57e(0xdd)](_0x29aa77,_0x534f24[++_0x29aa77])
+  5  Id(_0x2e0d5e)[<computed>] args=[regs[bc[++pc]],Member(Id(_0x534f24)[Upd(++Id(_0x29aa77))])]
+        case 8:  _0x2e0d5e[_0x24e57e(0xd1)](_0x454100[_0x534f24[++_0x29aa77]],_0x534f24[++_0x29aa77])
+  4  Id(String)["fromCharCode"] args=[Member(Id(_0x534f24)[Upd(++Id(_0x29aa77))])]
+        case 3:  String['fromCharCode'](_0x534f24[++_0x29aa77])
+  4  Id(_0x2e0d5e)[<computed>] args=[Id,Lit]
+        case 22:  _0x2e0d5e[_0x24e57e(0xea)](_0x3e3ff9,0x0)
+  4  Id(_0x31659f)[<computed>] args=[regs[bc[++pc]]]
+        case 28:  _0x31659f[_0x24e57e(0xd0)](_0x454100[_0x534f24[++_0x29aa77]])
+  2  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]]]
+        case 10:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f24[++_0x29aa77]])
+  2  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]]]
+        case 17:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x1e1607,_0x454100[_0x534f24[++_0x29aa77]])
+  2  callee=Id(_0x211195)
+        case 22:  _0x211195(_0x2e0d5e[_0x24e57e(0xdd)](_0x29aa77,_0x534f24[++_0x29aa77]),_0x31659f,_0x37c94c,_0x4afa10,_0xb11930)
+  2  Id(_0x581a60)[<computed>] args=[CallExpression]
+        case 32:  _0x581a60[_0x24e57e(0xd0)](_0x2e0d5e[_0x24e57e(0x104)](_0x29aa77,_0x534f24[++_0x29aa77]))
+  2  Id(_0x581a60)[<computed>] args=[]
+        case 55:  _0x581a60[_0x24e57e(0xdb)]()
+  2  regs[bytecode[++pc]][<computed>] args=[Id,regs[bc[++pc]],...]
+        case 57:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x1e1607,_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f24[++_0x29aa77]])
+  2  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]],regs[bc[++pc]],...]
+        case 59:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f2...
+  1  Id(_0x2e0d5e)["wwncf"] args=[regs[bc[++pc]],Member(Id(_0x534f24)[Upd(++Id(_0x29aa77))])]
+        case 6:  _0x2e0d5e['wwncf'](_0x454100[_0x534f24[++_0x29aa77]],_0x534f24[++_0x29aa77])
+  1  regs[bytecode[++pc]][<computed>] args=[regs[bc[++pc]]]
+        case 14:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x454100[_0x534f24[++_0x29aa77]])
+  1  regs[bytecode[++pc]][<computed>] args=[Id]
+        case 16:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x1e1607)
+  1  Id(_0x31659f)["push"] args=[regs[bc[++pc]]]
+        case 22:  _0x31659f['push'](_0x454100[_0x534f24[++_0x29aa77]])
+  1  Id(Object)["defineProperty"] args=[Member(Id(_0x454100)[Id(_0x534f24)[Bin(Id(_0x29aa77) - Lit(1))]]),Lit,...]
+        case 22:  Object['defineProperty'](_0x454100[_0x534f24[_0x29aa77-0x1]],'length',{'value':_0x534f24[++_0x29aa77],'configurable':!![],'writable':![],...
+
+current rule matches: 1 candidates={"_0x1e1607":1}
+
+-- Calls with callee object=regs[...] — property distribution --
+  10  prop=[Call(Id(_0x24e57e), n=1)]
+        case 10:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f24[++_0x29aa77]])
+  1  prop=["apply"]
+        case 39:  _0x454100[_0x534f24[++_0x29aa77]]['apply'](_0x454100[_0x534f24[++_0x29aa77]],_0x31659f)
+  1  prop=["call"]
+        case 99:  _0x454100[_0x534f24[++_0x29aa77]]['call'](_0x1e1607,_0x454100[_0x534f24[++_0x29aa77]])
+
+-- regs[bytecode[++pc]].<prop>(Identifier,...) — arg[0] identifier freq per prop --
+  5  [Call(Id(_0x24e57e), n=1)] :: arg0=regs[bc[++pc]]
+        case 10:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x454100[_0x534f24[++_0x29aa77]],_0x454100[_0x534f24[++_0x29aa77]])
+  5  [Call(Id(_0x24e57e), n=1)] :: arg0=Id(_0x1e1607)
+        case 16:  _0x454100[_0x534f24[++_0x29aa77]][_0x24e57e(0xfa)](_0x1e1607)
+  1  ["apply"] :: arg0=regs[bc[++pc]]
+        case 39:  _0x454100[_0x534f24[++_0x29aa77]]['apply'](_0x454100[_0x534f24[++_0x29aa77]],_0x31659f)
+  1  ["call"] :: arg0=Id(_0x1e1607)
+        case 99:  _0x454100[_0x534f24[++_0x29aa77]]['call'](_0x1e1607,_0x454100[_0x534f24[++_0x29aa77]])
+
+

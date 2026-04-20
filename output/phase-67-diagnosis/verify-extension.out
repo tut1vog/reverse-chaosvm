@@ -1,0 +1,30 @@
+== tdc-01.js ==
+  cases=96 bytecode=_0x496410 pc=_0x23b425 regs=_0x293063
+  ORIG cands={"_0x5ae5b4":1}  best={"name":"_0x5ae5b4","count":1}
+  EXT  cands={"_0x5ae5b4":6}  best={"name":"_0x5ae5b4","count":6}
+  status: origFound=true  extFound=true  winnersAgree=true
+
+== tdc-10.js ==
+  cases=94 bytecode=_0x319b10 pc=_0x2be400 regs=_0x304860
+  ORIG cands={"_0x5c6106":1}  best={"name":"_0x5c6106","count":1}
+  EXT  cands={"_0x5c6106":7}  best={"name":"_0x5c6106","count":7}
+  status: origFound=true  extFound=true  winnersAgree=true
+
+== tdc-20.js ==
+  cases=100 bytecode=_0x534f24 pc=_0x29aa77 regs=_0x454100
+  ORIG cands={"_0x1e1607":1}  best={"name":"_0x1e1607","count":1}
+  EXT  cands={"_0x1e1607":6}  best={"name":"_0x1e1607","count":6}
+  status: origFound=true  extFound=true  winnersAgree=true
+
+== tdc-08.js ==
+  cases=92 bytecode=_0x3ff919 pc=_0x15c987 regs=_0x4a24ea
+  ORIG cands={}  best={"name":null,"count":0}
+  EXT  cands={"_0x4f6760":6}  best={"name":"_0x4f6760","count":6}
+  status: origFound=false  extFound=true  winnersAgree=null
+
+== tdc-09.js ==
+  cases=99 bytecode=_0xc06ffc pc=_0x536cc0 regs=_0x29ce13
+  ORIG cands={}  best={"name":null,"count":0}
+  EXT  cands={"_0x54b916":5}  best={"name":"_0x54b916","count":5}
+  status: origFound=false  extFound=true  winnersAgree=null
+
