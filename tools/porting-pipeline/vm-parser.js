@@ -168,6 +168,9 @@ function extractRegs(switchNode, bytecodeVar, pcVar) {
  * Extract the thisCtx variable from .call() expressions in case handlers.
  * CALLQ-type handlers use: regs[a].call(thisCtx, ...) where thisCtx is a plain Identifier
  * (not a regs[bytecode[++pc]] access).
+ * The CALLQ call-site property may be either the literal identifier/string `"call"` or a
+ * runtime-decoded form — a single-argument `Identifier(Literal)` CallExpression that
+ * resolves to the string `"call"` under a string-obfuscation decoder.
  */
 function extractThisCtx(switchNode, bytecodeVar, pcVar, regsVar) {
   const candidates = {};
@@ -176,7 +179,11 @@ function extractThisCtx(switchNode, bytecodeVar, pcVar, regsVar) {
     if (node.type === 'CallExpression' &&
         node.callee.type === 'MemberExpression' &&
         ((node.callee.property.type === 'Identifier' && node.callee.property.name === 'call') ||
-         (node.callee.property.type === 'Literal' && node.callee.property.value === 'call')) &&
+         (node.callee.property.type === 'Literal' && node.callee.property.value === 'call') ||
+         (node.callee.property.type === 'CallExpression' &&
+          node.callee.property.callee.type === 'Identifier' &&
+          node.callee.property.arguments.length === 1 &&
+          node.callee.property.arguments[0].type === 'Literal')) &&
         node.arguments.length >= 1) {
       // The callee object should be regs[bytecode[++pc]]
       const calleeObj = node.callee.object;

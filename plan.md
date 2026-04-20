@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 67 — Porting pipeline stress test
-Current task: 67.4 — Extend `extractThisCtx` to cover the obfuscated-property CALLQ pattern
+Current task: 67.5 — Re-run full 30-build survey; verify 30/30 pass + aggregate all 9 XTEA keys
 
 ---
 
@@ -16,17 +16,43 @@ Current task: 67.4 — Extend `extractThisCtx` to cover the obfuscated-property 
 | 67.1 | Fetch 30 live tdc.js builds via handshake | done |
 | 67.2 | Run porting pipeline on all 30 builds, aggregate survey | done |
 | 67.3 | Diagnose why `extractThisCtx` misses on `f53142c5` and `88ebeea6` | done |
-| 67.4 | Extend `extractThisCtx` to cover the new AST pattern | in-progress |
-| 67.5 | Re-run full 30-build survey; verify 30/30 pass + aggregate all 9 XTEA keys | pending |
+| 67.4 | Extend `extractThisCtx` to cover the new AST pattern | done |
+| 67.5 | Re-run full 30-build survey; verify 30/30 pass + aggregate all 9 XTEA keys | in-progress |
 
 ---
 
 ## Current Task
 
-**ID**: 67.4
-**Title**: Extend `extractThisCtx` to cover the obfuscated-property CALLQ pattern
+**ID**: 67.5
+**Title**: Re-run full 30-build survey; verify 30/30 pass + aggregate all 9 XTEA keys
 **Phase**: Phase 67 — Porting pipeline stress test
 **Status**: in-progress
+
+### Goal
+Re-execute `research/port-survey/port-all.js` against the 30 captured `tdc.js` sources with the patched `extractThisCtx` in place and confirm that all 30 builds auto-port to byte-identical `collect` tokens. Aggregate the 9 unique XTEA keys into the survey summary.
+
+### Context
+67.4 extended `extractThisCtx` in `tools/porting-pipeline/vm-parser.js` to recognize the obfuscated-property CALLQ shape. A smoke test through the real `parseVmFunction` entry point resolves the expected `thisCtx` identifier on all five reference sources, including the two previously-failing hashes (`f53142c5` → `_0x4f6760`, `88ebeea6` → `_0x54b916`). `npm test` stays green (214 pass, 0 fail).
+
+The 67.2 survey driver at `research/port-survey/port-all.js` loops over the 30 sources in `output/port-survey/sources/`, invokes `portVersion()` with verification enabled, and writes `output/port-survey/results.json` + `output/port-survey/results.md`. Prior run: 24/30 green, 6/30 Stage 1 failures; wall clock ~334s. After 67.4, the 6 failures are expected to flip to green.
+
+### Implementation Steps
+_Director runs these directly; no subagent dispatch. This task is pure verification of 67.4's end-to-end impact._
+
+1. Re-run the survey: `node research/port-survey/port-all.js`.
+2. Read `output/port-survey/results.json` and confirm: `total=30, green=30, verifyMismatch=0, stageFailures=0`. Previously-failing indices (08, 09, 11, 17, 19, 27) now have `success:true`, `verifyMatch:true`, non-null `xteaKeyHex`.
+3. Extract the aggregated XTEA key set (one entry per unique `sourceHash`) and append a summary section to `output/port-survey/results.md` — or emit a companion `output/port-survey/xtea-keys.md` table keyed by source hash + TDC_NAME.
+4. Spot-check that the three previously-passing hashes that already had recorded keys (`8f1d32be`, `daf0c711`, `02fd132e` etc.) return byte-identical keys to the 67.2 run — i.e. the patch caused no drift on sources it was already handling correctly.
+
+### Verification
+- [ ] `output/port-survey/results.json` totals: `{total:30, green:30, verifyMismatch:0, stageFailures:0}`.
+- [ ] Indices 08, 09, 11, 17, 19, 27 all have `success:true` and non-null `xteaKeyHex`.
+- [ ] All 9 unique source hashes have a recorded XTEA key.
+- [ ] Keys for previously-green sources are unchanged from the 67.2 run.
+- [ ] `output/port-survey/results.md` (or a sibling `xtea-keys.md`) carries the aggregated key table.
+
+### Suggested Agent
+Director-run (no subagent). Single script invocation plus a written summary.
 
 ### Goal
 Patch `extractThisCtx` in `tools/porting-pipeline/vm-parser.js` to additively recognize the obfuscated-property CALLQ shape — `regs[bc[++pc]][decoder(0xNN)](thisCtxIdent, …)` — so source hashes `f53142c54fc43699` and `88ebeea62f566ec5` stop failing Stage 1, while the three passing reference builds (Templates A/B/C) keep returning the same `thisCtx` identifier as before.
