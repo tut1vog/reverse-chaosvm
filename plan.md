@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 71 — X-Forwarded-For rate-limit bypass research
-Current task: 71.3.2 — Regression test for per-call IP cache
+Current task: 71.4 — Execute the XFF-spoof experiment
 
 ---
 
@@ -17,47 +17,63 @@ Current task: 71.3.2 — Regression test for per-call IP cache
 | 71.2 | Add a unit test that asserts the extra header propagates through `httpRequest` to the verify POST | done |
 | 71.3 | Build experiment driver under `research/xff-spoof/` that runs N scraper invocations per condition with the candidate header set | done (with defect — see 71.3.1) |
 | 71.3.1 | Fix `materializeHeaders` to mint the RFC 5737 IP once per call so all `RFC5737_RANDOM_IP` headers within one attempt agree | done |
-| 71.3.2 | Add a unit test asserting two `RFC5737_RANDOM_IP` headers in the same `materializeHeaders` call return the same value, and across separate calls return (with overwhelming probability) different values | in-progress |
-| 71.4 | Execute the experiment and write `output/xff-spoof/results.md` with raw rows, errorCode histogram per condition, and interpretation | pending (blocked on 71.3.2) |
+| 71.3.2 | Add a unit test asserting two `RFC5737_RANDOM_IP` headers in the same `materializeHeaders` call return the same value, and across separate calls return (with overwhelming probability) different values | done |
+| 71.4 | Execute the experiment and write `output/xff-spoof/results.md` with raw rows, errorCode histogram per condition, and interpretation | in-progress |
 | 71.5 | If results are conclusive in either direction, update `docs/CAPTCHA_ORCHESTRATOR.md` §7/§9 with the finding | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 71.3.2
-**Title**: Regression test for per-call IP cache
+**ID**: 71.4
+**Title**: Execute the XFF-spoof experiment
 **Phase**: Phase 71 — X-Forwarded-For rate-limit bypass research
 **Status**: in-progress
 
 ### Goal
-Pin the per-call IP-cache contract in `materializeHeaders` with a regression test so future refactors cannot silently re-introduce the per-header minting bug. The test must assert both halves: (a) two `RFC5737_RANDOM_IP` headers in the SAME call return the SAME IP, and (b) across separate calls the IP changes (with overwhelming probability — RFC 5737 yields ~762 distinct IPs, so a 5-iteration test has effectively zero collision risk).
+Run the live experiment using the (now-patched) driver, gather empirical evidence of whether any of the candidate client-IP forwarding headers measurably affects the `errorCode 12` rate window, and write `output/xff-spoof/results.md` with the raw per-run rows, per-condition aggregates, and a written interpretation that 71.5 can use to update the docs.
+
+### Experiment matrix (frozen by the user, unchanged from the original 71.4 brief)
+
+| # | Condition | Headers | N |
+|---|---|---|---|
+| 1 | `control_pre` | none (calibration) | 2 |
+| 2 | `control_burn` | none | 8 |
+| 3 | `xff_only` | `X-Forwarded-For` | 4 |
+| 4 | `xrealip_only` | `X-Real-IP` | 4 |
+| 5 | `xff_xrealip` | `X-Forwarded-For` + `X-Real-IP` (same IP) | 4 |
+| 6 | `cf_connecting_ip` | `CF-Connecting-IP` | 4 |
+| 7 | `true_client_ip` | `True-Client-IP` | 4 |
+| 8 | `x_originating_ip` | `X-Originating-IP` | 4 |
+| 9 | `x_client_ip` | `X-Client-IP` | 4 |
+| 10 | `multi_header` | all six headers above, same fresh IP per attempt | 4 |
+| 11 | `control_post` | none | 4 |
+
+Total: 46 sequential attempts from a single IP. Headers using `valueTemplate: "RFC5737_RANDOM_IP"` are now (post-71.3.1) cached per call so all forwarding headers within one attempt agree on the same minted IP — the matrix is faithfully representable in the driver's config schema.
 
 ### Context
-- The fix landed in 71.3.1 — see `materializeHeaders` in `research/xff-spoof/run.js` (around lines 199–217 after the patch). The function is exported via `module.exports = { ..., materializeHeaders, ... }` (line ~592 — exact line moves with the patch).
-- A non-template header (`{name, value}` literal) must still be returned verbatim. The test should cover that too — a refactor that broke the literal path would be just as bad as one that broke the cache.
-- Existing test conventions: `tests/` directory, `node:test` framework, `npm test` runner (`package.json` `scripts.test` lists each test file explicitly — the new file must be appended to that list, same as 71.2 did).
-- The test harness at `tests/test-scraper-extra-headers.js` (added in 71.2) is the precedent for a small, focused unit test in this project. Mirror its style — `'use strict';`, `const { test } = require('node:test')`, `const assert = require('node:assert/strict')`, suite + cases.
-- Coding style: CommonJS, 2-space, single quotes, semicolons.
-- This is a pure unit test with no I/O — it requires the driver module, calls the exported function directly, asserts on returned values.
+- Driver: `research/xff-spoof/run.js` (post-71.3.1 + 71.3.2). CLI surface: `--config <path>`, `--n`, `--calibration-n`, `--post-control`, `--out`, `--dry-run`. The driver's `--help` is the authoritative reference.
+- Output rule (`.claude/rules/output-versioning.md`): every artefact lands under `output/xff-spoof/` with stable filenames (`runs.jsonl`, `summary.json`, `results.md`).
+- Each scraper attempt takes 5–15s. Sequential by design. Total wall time ~4–12 min.
+- Slide solver venv: `.venv/bin/python -c "import cv2, numpy"` (already confirmed healthy in the prior 71.4 dispatch — `cv2 4.13.0`, `numpy 2.4.4`).
 
 ### Implementation Steps
-1. Read `research/xff-spoof/run.js` to confirm `materializeHeaders` and `mintRfc5737Ip` are still exported and behave as the patch intended.
-2. Skim `tests/test-scraper-extra-headers.js` for style/structure conventions, then create `tests/test-xff-spoof-driver.js` (or a similarly clear name — match the project's existing prefix conventions). Its suite must contain at minimum:
-   - **Case A — intra-call agreement**: call `materializeHeaders` once with three `RFC5737_RANDOM_IP` headers (`X-Forwarded-For`, `X-Real-IP`, `True-Client-IP`); assert all three returned values are strictly equal.
-   - **Case B — inter-call divergence**: call `materializeHeaders` 5 times with the same 2-header spec; collect the IP from each call; assert at least 4 of the 5 IPs are distinct (a tiny tolerance against the astronomically unlikely event of two random calls colliding — RFC 5737 has 762 possible IPs so 5-call collision probability is ~0.013, but treating it as "all 5 must differ" creates a flaky test). Quote the IPs in the failure message so a flake is debuggable.
-   - **Case C — literal value passthrough**: call with `[{name:'X-Custom', value:'literal-value'}]`; assert the result is `{ 'X-Custom': 'literal-value' }`. Then call with a mix of literal + template; assert literal stays untouched and template gets a minted IP.
-   - **Case D — IP shape**: call with one `RFC5737_RANDOM_IP` header N times; assert every returned IP matches `^(192\.0\.2|198\.51\.100|203\.0\.113)\.([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])$` (RFC 5737 documentation blocks, host octets 1–254). This pins the IP-shape contract too.
-3. Append the new test file to `package.json`'s `scripts.test` (same pattern 71.2 used).
+1. Pre-flight: re-confirm slide solver venv healthy; `output/xff-spoof/` does not exist (or is safe to overwrite).
+2. Author `research/xff-spoof/config.json` encoding the matrix above using the driver's documented schema (`{n, calibrationN, postControl, conditions: [{name, n?, headers}]}`). If the driver does not support per-condition `n` overrides (read its source to confirm), split the run into multiple invocations: one for `control_burn` (`--n 8`), one for the 8 treatment conditions (`--n 4 --calibration-n 0`), and one for `control_post` (`--n 4 --calibration-n 0`); concatenate the resulting JSONL into a single `runs.jsonl`. Whichever path you take, capture the exact commands in `results.md` for reproducibility.
+3. Run the experiment(s). Tail stderr for per-attempt progress. If calibration aborts, stop and report — do NOT retry.
+4. Inspect `output/xff-spoof/runs.jsonl` and `summary.json`.
+5. Author `output/xff-spoof/results.md` with: Matrix, Totals, errorCode histogram, Per-condition breakdown, Raw rows, Interpretation. Match the structure of `output/scraper-stress/results.md` where reasonable. Interpretation must answer: did `control_burn` actually burn the IP? Did any treatment produce `successCount > 0`? Did `control_post` stay all-ec12 (rules out natural window expiry)? Bottom-line verdict — is XFF-style spoofing a viable bypass, or is the lead closed? Be honest about N=4 limitations. Per `.claude/rules/verify-dont-assume.md`, every claim must be backed by the committed JSONL.
 
 ### Verification
-- [ ] `npm test` passes including the new test file. Quote the new test names and the final summary line.
-- [ ] **Mutation check**: temporarily revert `materializeHeaders` to the broken pre-71.3.1 form (mint per header, no cache) — Case A must fail. Quote the failure output. Then restore the cached version and confirm green again.
-- [ ] **Test-runs-fast and IO-free**: confirm the new test file's runtime is under ~100ms (it should be — pure function, no spawn, no fs).
-- [ ] No implementation files modified in the final state — only `tests/test-xff-spoof-driver.js` (new) and `package.json` (one-line append).
+- [ ] Quote pre-flight: venv check, `output/xff-spoof/` initial state.
+- [ ] Quote `research/xff-spoof/config.json` (or the exact list of commands run).
+- [ ] Quote first 3 + last 3 lines of `output/xff-spoof/runs.jsonl`. Total line count ≥ 46 (assuming calibration didn't abort).
+- [ ] Quote `output/xff-spoof/summary.json` in full.
+- [ ] Quote the **Interpretation** section of `output/xff-spoof/results.md` in full.
+- [ ] `npm test` is still green.
 
 ### Suggested Agent
-`general-purpose` — straightforward unit-test addition. **Must be a different agent from the one that wrote 71.3.1** so the test author approaches the contract independently rather than mirroring the implementation's exact shape.
+`general-purpose` — runs the driver, inspects artefacts, writes the markdown. No code changes expected; if any are needed, escalate to the director.
 
 ### Context
 - Capability layer landed in 71.1: `tools/scraper/cli.js --extra-header "Name: Value"` (repeatable), wired to the `/cap_union_new_verify` POST only.
