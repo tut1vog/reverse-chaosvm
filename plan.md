@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 71 — X-Forwarded-For rate-limit bypass research
-Current task: 71.3 — Build XFF spoof experiment driver
+Current task: 71.4 — Execute the XFF-spoof experiment (awaiting user confirmation of matrix)
 
 ---
 
@@ -15,21 +15,69 @@ Current task: 71.3 — Build XFF spoof experiment driver
 |----|------|--------|
 | 71.1 | Add `--extra-header` capability to `tools/scraper/` (HTTP layer + CLI), wired through to the `/cap_union_new_verify` POST | done |
 | 71.2 | Add a unit test that asserts the extra header propagates through `httpRequest` to the verify POST | done |
-| 71.3 | Build experiment driver under `research/xff-spoof/` that runs N scraper invocations per condition with the candidate header set | in-progress |
-| 71.4 | Execute the experiment and write `output/xff-spoof/results.md` with raw rows, errorCode histogram per condition, and interpretation | pending |
+| 71.3 | Build experiment driver under `research/xff-spoof/` that runs N scraper invocations per condition with the candidate header set | done |
+| 71.4 | Execute the experiment and write `output/xff-spoof/results.md` with raw rows, errorCode histogram per condition, and interpretation | in-progress |
 | 71.5 | If results are conclusive in either direction, update `docs/CAPTCHA_ORCHESTRATOR.md` §7/§9 with the finding | pending |
 
 ---
 
 ## Current Task
 
-**ID**: 71.3
-**Title**: Build XFF spoof experiment driver
+**ID**: 71.4
+**Title**: Execute the XFF-spoof experiment
 **Phase**: Phase 71 — X-Forwarded-For rate-limit bypass research
-**Status**: in-progress
+**Status**: in-progress (awaiting user confirmation of experiment matrix)
 
 ### Goal
-Build a research driver script that orchestrates the Phase 71 experiment: for each of a configurable list of header-spoof conditions, invoke the `tools/scraper/cli.js --captcha-only --extra-header ...` flow N times, capture each run's `errorCode` and key metadata, and persist a structured per-run JSONL plus an aggregate summary. This task only delivers the **driver mechanics** — the specific experiment matrix and the interpretation are the next task (71.4).
+Run the live experiment using the driver from 71.3, gather empirical evidence of whether any of the candidate client-IP forwarding headers measurably affects the `errorCode 12` rate window, and write `output/xff-spoof/results.md` with the raw per-run rows, per-condition aggregates, and a written interpretation that 71.5 can use to update the docs.
+
+### Experiment matrix (proposed — user confirms before dispatch)
+
+Total budget: **~46 attempts from a single IP**, sequentially. Sample size deliberately small per condition because the IP burns fast and the goal is qualitative ("does this header reset the window?") not statistical.
+
+Order of execution:
+
+| # | Condition | Headers | N | Purpose |
+|---|---|---|---|---|
+| 1 | `control_pre` | _(calibration, none)_ | 2 | Baseline check; if both ec12 → ABORT, IP already burned |
+| 2 | `control_burn` | _(none)_ | 8 | Burn the IP intentionally; provides the fresh-IP success curve |
+| 3 | `xff_only` | `X-Forwarded-For: <RFC5737>` | 4 | Standard reverse-proxy header |
+| 4 | `xrealip_only` | `X-Real-IP: <RFC5737>` | 4 | nginx convention |
+| 5 | `xff_xrealip` | `X-Forwarded-For: <RFC5737>`, `X-Real-IP: <RFC5737>` (same IP) | 4 | Most common combination |
+| 6 | `cf_connecting_ip` | `CF-Connecting-IP: <RFC5737>` | 4 | Cloudflare convention |
+| 7 | `true_client_ip` | `True-Client-IP: <RFC5737>` | 4 | Akamai / Cloudflare Enterprise convention |
+| 8 | `x_originating_ip` | `X-Originating-IP: <RFC5737>` | 4 | Older Microsoft / mail convention |
+| 9 | `x_client_ip` | `X-Client-IP: <RFC5737>` | 4 | Generic |
+| 10 | `multi_header` | All six above, all carrying the same RFC5737 IP | 4 | Belt-and-braces — if anything is honoured, this hits it |
+| 11 | `control_post` | _(none)_ | 4 | Verify the IP is still burned (rules out "rate window expired naturally during the run") |
+
+Each `RFC5737` placeholder is freshly minted per attempt by the driver — no fake IP is reused across attempts within or across conditions, so the server cannot fingerprint a single fake IP.
+
+Decision rule for each treatment condition: if `successCount > 0` while `control_post` is still all ec12, that header had a measurable effect. Multiple positive treatments would suggest the upstream parses XFF/X-Real-IP/etc. and trusts whichever it finds first.
+
+### Context
+- Driver landed in 71.3: `research/xff-spoof/run.js`. Supports `--config <path>` or inline `--condition`/`--header` flags, plus `--n`, `--calibration-n`, `--post-control`, `--out`, `--dry-run`.
+- The driver writes `runs.jsonl` and `summary.json` under `--out` (default `output/xff-spoof/`). Per `.claude/rules/output-versioning.md`, filenames are stable across runs — a re-run overwrites them.
+- Each scraper attempt takes 5–15s. Sequential by design. Total wall time for 46 attempts: roughly 4–12 minutes.
+- The slide solver (Python OpenCV) must be available (`python3 -m venv .venv && .venv/bin/pip install opencv-python-headless numpy`). Confirm before running.
+- Coding style for any helper / config file: CommonJS / 2-space / single quotes / semicolons.
+
+### Implementation Steps
+1. Author `research/xff-spoof/config.json` encoding the matrix above (or pass it inline — config is preferred for reproducibility and so 71.4's commit captures the exact experiment).
+2. Confirm the slide solver venv is healthy: `python3 -c "import cv2, numpy"`. If it errors, the operator should fix it before proceeding.
+3. Run `node research/xff-spoof/run.js --config research/xff-spoof/config.json --post-control --out output/xff-spoof/`. Tail stderr for the per-attempt progress lines. If calibration aborts, stop and report.
+4. After the run completes, inspect `output/xff-spoof/runs.jsonl` and `summary.json`.
+5. Author `output/xff-spoof/results.md` capturing: the experiment matrix used, the per-condition aggregate table, the raw row table, and a 2–3 paragraph **Interpretation** section answering: did any treatment condition show a measurable `successCount > 0` against a still-burned `control_post`? If yes, which? If no, the lead is closed and the per-IP rate limit is not bypassable via header spoofing from this client.
+
+### Verification
+- [ ] `output/xff-spoof/runs.jsonl` exists and contains one line per attempt (≥ calibration + treatment + post-control rows). Quote the first 3 and last 3 lines.
+- [ ] `output/xff-spoof/summary.json` exists. Quote it in full.
+- [ ] `output/xff-spoof/results.md` exists with sections: Matrix, Per-condition table, Raw rows, Interpretation. Quote the Interpretation section in full in the report.
+- [ ] If calibration aborted, the run script exited non-zero and `output/xff-spoof/` was not created — stop and ask for guidance rather than retrying blindly.
+- [ ] `npm test` is still green.
+
+### Suggested Agent
+`general-purpose` — runs the driver, inspects artefacts, writes the markdown summary. No code changes expected; if any are needed, escalate to the director rather than fixing inline.
 
 ### Context
 - Capability layer landed in 71.1: `tools/scraper/cli.js --extra-header "Name: Value"` (repeatable), wired to the `/cap_union_new_verify` POST only.
