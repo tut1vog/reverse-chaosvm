@@ -5,7 +5,7 @@
   "scripts": {
     "token:standalone": "node tools/scraper/token-generator/cli.js",
     "solve:puppeteer": "node tools/puppeteer/cli.js",
-    "test": "node --test tests/test-vdata-generator-encoder.js tests/test-vdata-builder.js tests/test-vdata-for-post.js tests/test-scraper.js tests/test-structure-extractor.js tests/test-outer-pipeline.js tests/test-auto-port.js tests/test-phase49-profile-fixes.js"
+    "test": "node --test tests/test-vdata-generator-encoder.js tests/test-vdata-builder.js tests/test-vdata-for-post.js tests/test-scraper.js tests/test-structure-extractor.js tests/test-outer-pipeline.js tests/test-auto-port.js tests/test-phase49-profile-fixes.js tests/test-scraper-extra-headers.js"
   },
   "dependencies": {
     "acorn": "^8.16.0",

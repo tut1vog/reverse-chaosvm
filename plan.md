@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 71 — X-Forwarded-For rate-limit bypass research
-Current task: 71.2 — Unit test for `--extra-header` propagation
+Current task: 71.3 — Build XFF spoof experiment driver
 
 ---
 
@@ -14,8 +14,8 @@ Current task: 71.2 — Unit test for `--extra-header` propagation
 | ID | Task | Status |
 |----|------|--------|
 | 71.1 | Add `--extra-header` capability to `tools/scraper/` (HTTP layer + CLI), wired through to the `/cap_union_new_verify` POST | done |
-| 71.2 | Add a unit test that asserts the extra header propagates through `httpRequest` to the verify POST | in-progress |
-| 71.3 | Build experiment driver under `research/xff-spoof/` that runs N scraper invocations per condition with the candidate header set | pending |
+| 71.2 | Add a unit test that asserts the extra header propagates through `httpRequest` to the verify POST | done |
+| 71.3 | Build experiment driver under `research/xff-spoof/` that runs N scraper invocations per condition with the candidate header set | in-progress |
 | 71.4 | Execute the experiment and write `output/xff-spoof/results.md` with raw rows, errorCode histogram per condition, and interpretation | pending |
 | 71.5 | If results are conclusive in either direction, update `docs/CAPTCHA_ORCHESTRATOR.md` §7/§9 with the finding | pending |
 
@@ -23,35 +23,51 @@ Current task: 71.2 — Unit test for `--extra-header` propagation
 
 ## Current Task
 
-**ID**: 71.2
-**Title**: Unit test for `--extra-header` propagation
+**ID**: 71.3
+**Title**: Build XFF spoof experiment driver
 **Phase**: Phase 71 — X-Forwarded-For rate-limit bypass research
 **Status**: in-progress
 
 ### Goal
-Pin the new `--extra-header` capability with a regression test so future refactors cannot silently break the propagation path. The test must catch both halves of the contract: (a) user-supplied headers DO land on the verify POST with their exact values, and (b) user-supplied headers DO NOT land on any other outbound request.
+Build a research driver script that orchestrates the Phase 71 experiment: for each of a configurable list of header-spoof conditions, invoke the `tools/scraper/cli.js --captcha-only --extra-header ...` flow N times, capture each run's `errorCode` and key metadata, and persist a structured per-run JSONL plus an aggregate summary. This task only delivers the **driver mechanics** — the specific experiment matrix and the interpretation are the next task (71.4).
 
 ### Context
-- Implementation just landed in 71.1 — see commit (about to be made) modifying `tools/scraper/cli.js`, `tools/scraper/scraper.js`, `tools/puppeteer/captcha-client.js`.
-- The verify POST is fired from `tools/scraper/scraper.js` (around line 689, search `cap_union_new_verify`). The verify URL hits `t.captcha.qq.com` (NOT `urlsec.qq.com` — the latter is the consumer page; the CAPTCHA endpoint is at `t.captcha.qq.com`).
-- The HTTP transport is `httpRequest()` in `tools/puppeteer/captcha-client.js`; the merge happens inline in `scraper.js` before the call (the scraper builds a `verifyHeaders` object and overlays each user-supplied header onto it).
-- Existing test suite: `tests/` directory. Run with `npm test`. There are 43 suites currently (216 tests). Look at how existing tests intercept HTTP — they likely stub `https.request` or use a similar pattern. Pick the pattern already used in the suite; do not introduce new test infrastructure.
-- A full end-to-end Scraper run is too heavy to test in unit form (requires solving a slide CAPTCHA against a live server). The right granularity is to test the **merge logic** in isolation — either by mocking `httpRequest` and asserting the call arguments, or by extracting the merge into a tiny pure helper that can be unit-tested directly. Pick whichever is cleaner given the existing test conventions in this repo.
-- Coding style: CommonJS, 2-space, single quotes, semicolons (`.claude/rules/coding-style.md`).
+- Capability layer landed in 71.1: `tools/scraper/cli.js --extra-header "Name: Value"` (repeatable), wired to the `/cap_union_new_verify` POST only.
+- Driver location: `research/xff-spoof/run.js` (per the existing pattern set by `research/template-pool/live-comparison.js`).
+- Output location: `output/xff-spoof/` per `.claude/rules/output-versioning.md`. Artefacts:
+  - `output/xff-spoof/runs.jsonl` — one line per scraper run, fields: `{ts, condition, attempt, headers, exitCode, errorCode, ticket?, elapsedMs, sourceHashShort, tdcName?, errorKind?, stderrTail?}`.
+  - `output/xff-spoof/summary.json` — per-condition aggregates: `{condition, n, successCount, errorCodeHistogram, headerProfile}`.
+  - The driver writes filenames stable across runs (so consecutive runs `git diff` cleanly per the output-versioning rule).
+- Each run shells out to `node tools/scraper/cli.js --captcha-only --verbose --extra-header ... --extra-header ...` as a child process. Parse stdout/stderr to extract `errorCode`, `ticket`, `sourceHash`, `TDC_NAME`. The scraper already prints these in `--verbose` mode — read its source if you need to confirm the exact format.
+- Sample-size and condition-list configurability is essential — 71.4 will pick the experiment matrix; 71.3 should accept it as either CLI args or a config file. Pick whichever is simpler.
+- Each condition uses **a fresh randomised fake IP per attempt** (drawn from RFC 5737 documentation blocks 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24) to prevent the server from blacklisting a single fake IP across all attempts within a condition. The driver mints these.
+- The driver MUST detect "IP already burned" before starting: run a brief calibration of K (e.g. K=2) control attempts; if both return `errorCode 12`, abort the whole run and tell the operator the IP is already in the rate window — running further conditions would produce a noise-only result.
+- The driver MUST optionally re-run the control condition at the end (a "post-control") so 71.4 can rule out "rate window naturally expired mid-run". Make this opt-in via a flag.
+- Each scraper invocation can take 5–15s (slide solve via Python OpenCV + several HTTP round trips). Sequential execution is correct — do NOT parallelise. Parallel runs would burn the IP unevenly and confuse causal attribution.
+- Coding style: CommonJS, 2-space, single quotes, semicolons.
 
 ### Implementation Steps
-1. Read `tools/scraper/cli.js`, `tools/scraper/scraper.js` (specifically the `solveCaptcha` method and the verify-POST call site around line 689), and `tools/puppeteer/captcha-client.js` (the `httpRequest` function with the `DUMP_VERIFY` block) so you have the contract clearly in mind.
-2. List `tests/` and skim 2–3 existing test files to identify the test framework (`node:test` per the `npm test` runner output) and the dominant pattern for intercepting HTTP or for stubbing transport-layer calls. Match that pattern.
-3. Add a new test file under `tests/` (use the naming convention you observe — likely `tests/test-scraper-extra-headers.js` or similar). The file must contain at minimum these two test cases:
-   - **`extra headers land on verify POST with exact values`** — drive the scraper (or its merge logic) so it would issue a verify POST with two extra headers; assert that the headers reaching the transport include both names with their exact values.
-   - **`extra headers do not contaminate non-verify requests`** — drive a non-verify outbound (any of: prehandle, show-page, tdc.js fetch, getsig) and assert the `extraHeaders` list set on the Scraper does NOT appear on that request's outgoing header map.
-4. If the cleanest way to test (b) is to verify the merge code lives only at the verify call site (i.e. there is structurally no path for extra headers to reach other requests), a static assertion via `grep`-like reading of the source is acceptable — but a runtime assertion that drives a non-verify request and checks its headers is stronger and preferred.
-5. The test must run cleanly under `npm test` with no network access — fully stubbed/mocked transport.
+1. Read `tools/scraper/cli.js` (entry point) and the relevant verbose-output bits of `tools/scraper/scraper.js` to confirm the exact stdout format the driver will parse — specifically, where the final result (errorCode, ticket, sourceHash short, TDC_NAME) is printed.
+2. Read `research/template-pool/live-comparison.js` to mirror the directory and CLI conventions for a research driver.
+3. Create `research/xff-spoof/run.js`. CLI surface:
+   - `--config <path>` (optional) — JSON file with `{conditions: [{name, headers: [...]}], n: <int>, calibrationN: <int>, postControl: bool}`.
+   - Inline flags as alternatives if a config file is too heavy: `--condition <name>:<headerlist>` (repeatable), `--n <int>`, `--calibration-n <int>`, `--post-control`.
+   - `--out <dir>` defaulting to `output/xff-spoof/`.
+   - `--help` showing the usage.
+4. Implementation contract:
+   - Validate the IP isn't already burned via a `calibrationN` control batch. If exhausted, exit non-zero with a clear message and write nothing under `output/xff-spoof/` (so a stale prior run isn't overwritten).
+   - For each condition (in order), run N attempts. For each attempt: mint a fresh fake IP from RFC 5737 blocks, build the `--extra-header` argv, spawn `node tools/scraper/cli.js --captcha-only --verbose <headers>`, capture exit code + stdout + stderr, parse the result fields, append one line to `runs.jsonl`, log a short progress line to stderr.
+   - After all conditions, if `postControl` is on, run another N control attempts.
+   - Write `summary.json` with per-condition aggregates.
+   - Print a final one-line per-condition summary to stdout (e.g. `control: n=10 success=2 ec12=8`).
+5. The driver itself must NOT run the experiment as part of its own verification — that's 71.4. The driver's own tests/verification use a stub or `--dry-run` flag to prove the orchestration logic without making real network calls.
 
 ### Verification
-- [ ] `npm test` passes including the new test file. Run it and quote the new tests' names + the final summary line (`# tests N # pass N # fail 0`).
-- [ ] Temporarily break the `--extra-header` propagation (e.g. comment out the `for (const h of this.extraHeaders) { verifyHeaders[h.name] = h.value; }` loop in `scraper.js`) and rerun — the new test must FAIL. Quote the failure output. Then restore the line and confirm the test goes green again.
-- [ ] Test runs without any network I/O. Confirm by inspecting the test source — no `https.request`, no real fetch — and by the test runtime being fast (under ~500ms for the new file).
+- [ ] `node research/xff-spoof/run.js --help` prints usage, including the `--config`, `--n`, `--calibration-n`, `--post-control`, `--out` flags.
+- [ ] `node research/xff-spoof/run.js --dry-run --condition "test:X-Forwarded-For=1.2.3.4" --n 2 --out output/xff-spoof-dryrun/` (or whatever your dry-run incantation is) — produces `runs.jsonl` (with stub data) and `summary.json` under `output/xff-spoof-dryrun/`, makes zero real network calls, and exits 0. Show the first few lines of each artefact.
+- [ ] When `--dry-run` is off but `tools/scraper/cli.js` is replaced (in-process or via PATH) by a stub that returns a canned `errorCode 12`, the driver correctly aborts the calibration phase and writes nothing under `output/`. Demonstrate this with whatever stubbing mechanism you build in.
+- [ ] Sequential execution is enforced (no `Promise.all` over the spawn calls). Show the relevant code comment or the explicit awaiting pattern.
+- [ ] `npm test` is still green (no regressions).
 
 ### Suggested Agent
-`general-purpose` — straightforward unit-test addition. **Must be a different agent from the one that wrote 71.1** so the test author approaches the contract from a fresh perspective rather than mirroring the implementation's exact shape.
+`general-purpose` — straightforward Node child-process orchestration. No specialised agent needed.
