@@ -3,6 +3,7 @@ node_modules/
 *.pyc
 __pycache__/
 .claude/settings.local.json
+.claude/agents/cc-project-*.md
 
 # output/ — ignore run-local artifacts by default; whitelist the subdirs we intentionally track
 output/*
