@@ -194,7 +194,11 @@ function httpRequest(urlStr, opts = {}) {
       reject(new Error(`HTTP request timed out after ${reqOpts.timeout}ms: ${urlStr}`));
     });
 
-    // Phase 62: dump verify request details when DUMP_VERIFY env var is set
+    // Phase 62: dump verify request details when DUMP_VERIFY env var is set.
+    // DUMP_VERIFY is interpreted as a directory path: absolute, or relative to
+    // the project root. The verify request lands at <dir>/verify-request.json
+    // and the request headers (including any --extra-header overrides) are
+    // captured verbatim so the on-the-wire header map can be inspected.
     if (process.env.DUMP_VERIFY && urlStr.includes('cap_union_new_verify')) {
       const crypto = require('crypto');
       const fsDump = require('fs');
@@ -209,9 +213,12 @@ function httpRequest(urlStr, opts = {}) {
         bodyPrefix: bodyStr.slice(0, 500),
         bodySuffix: bodyStr.slice(-200),
       };
-      const dumpDir = pathDump.join(__dirname, '..', '..', 'output', 'phase-62');
+      const projectRoot = pathDump.join(__dirname, '..', '..');
+      const dumpDir = pathDump.isAbsolute(process.env.DUMP_VERIFY)
+        ? process.env.DUMP_VERIFY
+        : pathDump.join(projectRoot, process.env.DUMP_VERIFY);
       fsDump.mkdirSync(dumpDir, { recursive: true });
-      const dumpFile = pathDump.join(dumpDir, process.env.DUMP_VERIFY + '.json');
+      const dumpFile = pathDump.join(dumpDir, 'verify-request.json');
       fsDump.writeFileSync(dumpFile, JSON.stringify(dumpData, null, 2));
       process.stderr.write('[DUMP] Wrote verify request dump to ' + dumpFile + '\n');
     }

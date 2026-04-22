@@ -83,6 +83,9 @@ class Scraper {
    * @param {Object} [config.profile] - Browser fingerprint profile (default: profiles/default.json)
    * @param {number} [config.maxRetries=3] - Max CAPTCHA solve attempts
    * @param {boolean} [config.verbose=false] - Log progress to stderr
+   * @param {Array<{name: string, value: string}>} [config.extraHeaders] - Extra HTTP
+   *   headers to add ONLY to the /cap_union_new_verify POST. User-supplied values
+   *   take precedence over the scraper's built-in headers when names collide.
    */
   constructor(config) {
     const cfg = config || {};
@@ -96,6 +99,7 @@ class Scraper {
     this._chromeProfileData = null;
     this.maxRetries = cfg.maxRetries !== undefined ? cfg.maxRetries : 3;
     this.verbose = !!cfg.verbose;
+    this.extraHeaders = Array.isArray(cfg.extraHeaders) ? cfg.extraHeaders : [];
 
     this.vdataProfilePath = cfg.vdataProfile || DEFAULT_VDATA_PROFILE_PATH;
     this._vdataProfile = null;
@@ -114,6 +118,25 @@ class Scraper {
   _log(msg) {
     if (this.verbose) {
       process.stderr.write(`[scraper] ${msg}\n`);
+    }
+  }
+
+  /**
+   * Mirror the audit log into the DUMP_VERIFY directory so every sub-resource
+   * request (with its headers) can be inspected alongside verify-request.json.
+   * No-op when DUMP_VERIFY is unset. Path semantics match captcha-client.js:
+   * absolute or relative-to-project-root.
+   * @param {AuditLogger} auditLogger
+   */
+  _dumpAuditMirror(auditLogger) {
+    if (!process.env.DUMP_VERIFY) return;
+    const dumpDir = path.isAbsolute(process.env.DUMP_VERIFY)
+      ? process.env.DUMP_VERIFY
+      : path.join(PROJECT_ROOT, process.env.DUMP_VERIFY);
+    try {
+      auditLogger.save(path.join(dumpDir, 'audit-log.json'));
+    } catch (err) {
+      this._log('Failed to mirror audit log to ' + dumpDir + ': ' + err.message);
     }
   }
 
@@ -662,6 +685,13 @@ class Scraper {
           'sec-ch-ua-platform': '"Windows"',
           'Cookie': 'TDC_itoken=' + itokenValue,
         };
+        // Apply --extra-header overrides ONLY to the verify POST. User-supplied
+        // values take precedence over the scraper's built-in defaults: a later
+        // assignment to verifyHeaders[name] wins. This is the whole point of
+        // the flag — it exists to spoof or override what the scraper sends.
+        for (const h of this.extraHeaders) {
+          verifyHeaders[h.name] = h.value;
+        }
         const resp = await httpRequest('https://t.captcha.qq.com/cap_union_new_verify', {
           method: 'POST',
           headers: verifyHeaders,
@@ -688,6 +718,7 @@ class Scraper {
 
         if (result.errorCode === 0 || (result.errorCode === -1 && result.ticket)) {
           auditLogger.save(path.join(PROJECT_ROOT, 'output', 'phase-52-audit', 'scraper-audit.json'));
+          this._dumpAuditMirror(auditLogger);
           return {
             errorCode: result.errorCode,
             ticket: result.ticket,
@@ -709,6 +740,7 @@ class Scraper {
 
     // Save audit log even on failure — captures all requests for debugging
     auditLogger.save(path.join(PROJECT_ROOT, 'output', 'phase-52-audit', 'scraper-audit.json'));
+    this._dumpAuditMirror(auditLogger);
     throw lastError || new Error('solveCaptcha: max retries exceeded');
   }
 

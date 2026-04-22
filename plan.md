@@ -2,7 +2,7 @@
 
 ## Status
 Current phase: Phase 71 — X-Forwarded-For rate-limit bypass research
-Current task: 71.1 — Add `--extra-header` capability to scraper HTTP layer
+Current task: 71.2 — Unit test for `--extra-header` propagation
 
 ---
 
@@ -13,8 +13,8 @@ Current task: 71.1 — Add `--extra-header` capability to scraper HTTP layer
 
 | ID | Task | Status |
 |----|------|--------|
-| 71.1 | Add `--extra-header` capability to `tools/scraper/` (HTTP layer + CLI), wired through to the `/cap_union_new_verify` POST | in-progress |
-| 71.2 | Add a unit test that asserts the extra header propagates through `httpRequest` to the verify POST | pending |
+| 71.1 | Add `--extra-header` capability to `tools/scraper/` (HTTP layer + CLI), wired through to the `/cap_union_new_verify` POST | done |
+| 71.2 | Add a unit test that asserts the extra header propagates through `httpRequest` to the verify POST | in-progress |
 | 71.3 | Build experiment driver under `research/xff-spoof/` that runs N scraper invocations per condition with the candidate header set | pending |
 | 71.4 | Execute the experiment and write `output/xff-spoof/results.md` with raw rows, errorCode histogram per condition, and interpretation | pending |
 | 71.5 | If results are conclusive in either direction, update `docs/CAPTCHA_ORCHESTRATOR.md` §7/§9 with the finding | pending |
@@ -23,36 +23,35 @@ Current task: 71.1 — Add `--extra-header` capability to scraper HTTP layer
 
 ## Current Task
 
-**ID**: 71.1
-**Title**: Add `--extra-header` capability to scraper HTTP layer
+**ID**: 71.2
+**Title**: Unit test for `--extra-header` propagation
 **Phase**: Phase 71 — X-Forwarded-For rate-limit bypass research
 **Status**: in-progress
 
 ### Goal
-Give the pure-Node scraper a way to inject arbitrary extra HTTP headers onto the `/cap_union_new_verify` POST so the Phase 71 experiment can probe whether client-IP forwarding headers (XFF, X-Real-IP, etc.) bypass the per-IP rate window. Capability only — no experiment driver yet.
+Pin the new `--extra-header` capability with a regression test so future refactors cannot silently break the propagation path. The test must catch both halves of the contract: (a) user-supplied headers DO land on the verify POST with their exact values, and (b) user-supplied headers DO NOT land on any other outbound request.
 
 ### Context
-- Scraper entry point: `tools/scraper/cli.js` — argv-style parser, hands off to `tools/scraper/scraper.js`.
-- Scraper main flow: `tools/scraper/scraper.js` — orchestrates fetch tdc.js → solve slide → POST verify.
-- HTTP transport: every outbound request goes through a `httpRequest()` helper (search `tools/scraper/scraper.js` for it). Phase 62.1 (commit `de37e5c`) already added a `DUMP_VERIFY` env-var hook that dumps the verify POST to disk — read it as the model for how to thread a new option down through the call stack.
-- The verify POST is the single critical path: only the `/cap_union_new_verify` call needs the extra headers. Sub-resource fetches (tdc.js, getsig, etc.) must NOT have them, because they originate from a different code path and contaminating them would muddy the experiment.
-- The CLI flag should be repeatable so multiple headers can be set in one run, e.g. `--extra-header "X-Forwarded-For: 1.2.3.4" --extra-header "X-Real-IP: 1.2.3.4"`.
+- Implementation just landed in 71.1 — see commit (about to be made) modifying `tools/scraper/cli.js`, `tools/scraper/scraper.js`, `tools/puppeteer/captcha-client.js`.
+- The verify POST is fired from `tools/scraper/scraper.js` (around line 689, search `cap_union_new_verify`). The verify URL hits `t.captcha.qq.com` (NOT `urlsec.qq.com` — the latter is the consumer page; the CAPTCHA endpoint is at `t.captcha.qq.com`).
+- The HTTP transport is `httpRequest()` in `tools/puppeteer/captcha-client.js`; the merge happens inline in `scraper.js` before the call (the scraper builds a `verifyHeaders` object and overlays each user-supplied header onto it).
+- Existing test suite: `tests/` directory. Run with `npm test`. There are 43 suites currently (216 tests). Look at how existing tests intercept HTTP — they likely stub `https.request` or use a similar pattern. Pick the pattern already used in the suite; do not introduce new test infrastructure.
+- A full end-to-end Scraper run is too heavy to test in unit form (requires solving a slide CAPTCHA against a live server). The right granularity is to test the **merge logic** in isolation — either by mocking `httpRequest` and asserting the call arguments, or by extracting the merge into a tiny pure helper that can be unit-tested directly. Pick whichever is cleaner given the existing test conventions in this repo.
 - Coding style: CommonJS, 2-space, single quotes, semicolons (`.claude/rules/coding-style.md`).
-- Output rule: any artefact emitted during dry-run verification goes under `output/` per `.claude/rules/output-versioning.md` — do NOT scatter dump files into the project root or into `tools/scraper/`.
 
 ### Implementation Steps
-1. Read `tools/scraper/cli.js` and `tools/scraper/scraper.js` end-to-end so you understand the existing argv parser, the `httpRequest()` signature, the verify-POST call site, and how `DUMP_VERIFY` was wired through in 62.1.
-2. Extend `tools/scraper/cli.js` to accept a repeatable `--extra-header "Name: Value"` flag. Parse each occurrence into a `{name, value}` pair; reject malformed inputs (no colon, empty name) with a clear error and non-zero exit. Pass the collected list down into the scraper as an option (e.g. on the existing options object — match the existing convention, do not invent a new transport).
-3. Plumb the option through `tools/scraper/scraper.js` until it reaches the verify POST call site. Apply the headers ONLY on the `/cap_union_new_verify` request; every other outbound request (prehandle, tdc.js fetch, slide image fetches, getsig, etc.) must be unchanged.
-4. Update `httpRequest()` (or its caller, depending on which is cleaner) so the supplied headers are merged into the outgoing request headers map. Existing scraper headers win over user-supplied headers ONLY if the user-supplied name collides with one the scraper sets internally for the verify POST — and in that case, the user-supplied value should take precedence (the whole point is to override what the scraper would otherwise send). Document the precedence in a short code comment at the merge site.
-5. If the existing `DUMP_VERIFY` mechanism logs request headers, you are done. If it only logs the body, extend it to also log the outgoing header map so the verification step below is observable.
+1. Read `tools/scraper/cli.js`, `tools/scraper/scraper.js` (specifically the `solveCaptcha` method and the verify-POST call site around line 689), and `tools/puppeteer/captcha-client.js` (the `httpRequest` function with the `DUMP_VERIFY` block) so you have the contract clearly in mind.
+2. List `tests/` and skim 2–3 existing test files to identify the test framework (`node:test` per the `npm test` runner output) and the dominant pattern for intercepting HTTP or for stubbing transport-layer calls. Match that pattern.
+3. Add a new test file under `tests/` (use the naming convention you observe — likely `tests/test-scraper-extra-headers.js` or similar). The file must contain at minimum these two test cases:
+   - **`extra headers land on verify POST with exact values`** — drive the scraper (or its merge logic) so it would issue a verify POST with two extra headers; assert that the headers reaching the transport include both names with their exact values.
+   - **`extra headers do not contaminate non-verify requests`** — drive a non-verify outbound (any of: prehandle, show-page, tdc.js fetch, getsig) and assert the `extraHeaders` list set on the Scraper does NOT appear on that request's outgoing header map.
+4. If the cleanest way to test (b) is to verify the merge code lives only at the verify call site (i.e. there is structurally no path for extra headers to reach other requests), a static assertion via `grep`-like reading of the source is acceptable — but a runtime assertion that drives a non-verify request and checks its headers is stronger and preferred.
+5. The test must run cleanly under `npm test` with no network access — fully stubbed/mocked transport.
 
 ### Verification
-- [ ] `node tools/scraper/cli.js --help` (or equivalent) shows the new `--extra-header` flag with a one-line description.
-- [ ] Malformed input (`--extra-header "no-colon-here"`) exits non-zero with a clear error.
-- [ ] Run a captcha-only dry-run with `DUMP_VERIFY=output/xff-spoof-smoke ./tools/scraper/cli.js --captcha-only --extra-header "X-Forwarded-For: 203.0.113.42" --extra-header "X-Real-IP: 203.0.113.42"`. Inspect the dumped artefact under `output/xff-spoof-smoke/` and confirm BOTH headers are present in the verify POST's outgoing header set, with the exact values supplied.
-- [ ] In the same dump, confirm at least one earlier sub-resource request (e.g. tdc.js fetch) does NOT carry the spoofed headers.
-- [ ] `npm test` is still green (no regressions in the existing test suite).
+- [ ] `npm test` passes including the new test file. Run it and quote the new tests' names + the final summary line (`# tests N # pass N # fail 0`).
+- [ ] Temporarily break the `--extra-header` propagation (e.g. comment out the `for (const h of this.extraHeaders) { verifyHeaders[h.name] = h.value; }` loop in `scraper.js`) and rerun — the new test must FAIL. Quote the failure output. Then restore the line and confirm the test goes green again.
+- [ ] Test runs without any network I/O. Confirm by inspecting the test source — no `https.request`, no real fetch — and by the test runtime being fast (under ~500ms for the new file).
 
 ### Suggested Agent
-`general-purpose` — straightforward Node CLI + transport change in a familiar file set; no specialised agent needed.
+`general-purpose` — straightforward unit-test addition. **Must be a different agent from the one that wrote 71.1** so the test author approaches the contract from a fresh perspective rather than mirroring the implementation's exact shape.

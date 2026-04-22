@@ -31,6 +31,9 @@ Options:
                        real Chrome capture (profiles/chrome-fingerprint.json)
   --vdata-profile <p>  Path to a vData browser-profile JSON file
                        (default: profiles/vdata-browser-default.json)
+  --extra-header <h>   Extra HTTP header for the verify POST only, in
+                       "Name: Value" form. Repeatable. Overrides built-in
+                       header values when names collide.
   --help, -h           Show this help message
 
 Examples:
@@ -48,6 +51,7 @@ function parseArgs(argv) {
     captchaOnly: false,
     chromeProfile: true,
     vdataProfile: null,
+    extraHeaders: [],
     help: false,
     url: null,
   };
@@ -83,6 +87,24 @@ function parseArgs(argv) {
       if (isNaN(args.retries) || args.retries < 1) {
         throw new Error('--retries requires a positive integer');
       }
+    } else if (arg === '--extra-header') {
+      const raw = argv[++i];
+      if (raw === undefined) {
+        throw new Error('--extra-header requires a "Name: Value" argument');
+      }
+      const colonIdx = raw.indexOf(':');
+      if (colonIdx === -1) {
+        throw new Error('--extra-header value must be "Name: Value" (missing colon): ' + raw);
+      }
+      const name = raw.slice(0, colonIdx).trim();
+      const value = raw.slice(colonIdx + 1).trim();
+      if (!name) {
+        throw new Error('--extra-header has empty name: ' + raw);
+      }
+      if (!value) {
+        throw new Error('--extra-header has empty value: ' + raw);
+      }
+      args.extraHeaders.push({ name: name, value: value });
     } else if (arg.startsWith('-')) {
       throw new Error(`Unknown option: ${arg}`);
     } else {
@@ -119,6 +141,7 @@ async function main() {
     chromeProfile: args.chromeProfile,
     vdataProfile: args.vdataProfile,
     maxRetries: args.retries,
+    extraHeaders: args.extraHeaders,
   });
   await scraper.init();
 
