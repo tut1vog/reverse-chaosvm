@@ -1,0 +1,61 @@
+{
+  "n": 4,
+  "calibrationN": 0,
+  "postControl": true,
+  "conditions": [
+    {
+      "name": "xff_only",
+      "headers": [
+        { "name": "X-Forwarded-For", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "xrealip_only",
+      "headers": [
+        { "name": "X-Real-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "xff_xrealip",
+      "headers": [
+        { "name": "X-Forwarded-For", "valueTemplate": "RFC5737_RANDOM_IP" },
+        { "name": "X-Real-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "cf_connecting_ip",
+      "headers": [
+        { "name": "CF-Connecting-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "true_client_ip",
+      "headers": [
+        { "name": "True-Client-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "x_originating_ip",
+      "headers": [
+        { "name": "X-Originating-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "x_client_ip",
+      "headers": [
+        { "name": "X-Client-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    },
+    {
+      "name": "multi_header",
+      "headers": [
+        { "name": "X-Forwarded-For", "valueTemplate": "RFC5737_RANDOM_IP" },
+        { "name": "X-Real-IP", "valueTemplate": "RFC5737_RANDOM_IP" },
+        { "name": "CF-Connecting-IP", "valueTemplate": "RFC5737_RANDOM_IP" },
+        { "name": "True-Client-IP", "valueTemplate": "RFC5737_RANDOM_IP" },
+        { "name": "X-Originating-IP", "valueTemplate": "RFC5737_RANDOM_IP" },
+        { "name": "X-Client-IP", "valueTemplate": "RFC5737_RANDOM_IP" }
+      ]
+    }
+  ]
+}

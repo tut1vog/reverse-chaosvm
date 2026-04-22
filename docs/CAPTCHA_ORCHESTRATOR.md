@@ -603,7 +603,18 @@ Module 56 distinguishes the following non-zero error codes (FLOW.md §4.6):
   hook `q`. The client handler is a generic soft-retry; the server gates
   further verify attempts from the offending IP until the rate window
   expires. Superseded an earlier hypothesis that `errorCode 12` was
-  distinct from plain IP rate limiting.
+  distinct from plain IP rate limiting. **Header-spoofing bypass tested
+  and rejected** (Phase 71, 2026-04-22) — `output/xff-spoof/results.md`
+  records a 46-attempt experiment from one IP across eight forwarding
+  headers (`X-Forwarded-For`, `X-Real-IP`, `CF-Connecting-IP`,
+  `True-Client-IP`, `X-Originating-IP`, `X-Client-IP`, the XFF+X-Real-IP
+  pair, and the union of all six). With a confirmed-burned IP at
+  `control_post`, none of the eight conditions delivered a measurable
+  bypass: the apparent ec0 successes during treatments did not survive
+  the additivity check (the `multi_header` union did not exceed the
+  best individual condition) nor the `control_post` independence check
+  (4/4 ec12 immediately after the run). The rate window is keyed on the
+  TCP source IP, not on any forwarding header.
 - **16 / 20 / 21** — session expired: `s.sessionTimeout()` (postMessage
   type 12 to parent).
 - **30 / 51** — hybrid verify handoff: `s.hybridVerify(e.sess, h.get())`
