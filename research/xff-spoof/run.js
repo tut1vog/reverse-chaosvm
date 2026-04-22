@@ -199,12 +199,17 @@ function mintRfc5737Ip() {
   return block + host;
 }
 
+// Per-call IP cache: every RFC5737_RANDOM_IP header in a single call resolves to
+// the same minted IP, so multi-header conditions (XFF + X-Real-IP, etc.) announce
+// one consistent client IP per attempt. Across calls, the IP rotates as before.
 function materializeHeaders(headerSpecs) {
   const out = {};
+  let cachedIp = null;
   for (const h of headerSpecs) {
     let v;
     if (h.valueTemplate === 'RFC5737_RANDOM_IP') {
-      v = mintRfc5737Ip();
+      if (cachedIp === null) cachedIp = mintRfc5737Ip();
+      v = cachedIp;
     } else {
       v = h.value;
     }
